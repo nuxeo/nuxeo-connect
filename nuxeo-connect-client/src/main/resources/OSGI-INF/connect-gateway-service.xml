@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.connect.connector.service.ConnectGatewayComponent">
+    <implementation
+        class="org.nuxeo.connect.connector.service.ConnectGatewayComponent" />
+
+    <service>
+        <provide
+            interface="org.nuxeo.connect.registration.ConnectRegistrationService" />
+        <provide
+            interface="org.nuxeo.connect.connector.ConnectConnector" />
+        <provide
+            interface="org.nuxeo.connect.downloads.ConnectDownloadManager" />
+    </service>
+
+</component>

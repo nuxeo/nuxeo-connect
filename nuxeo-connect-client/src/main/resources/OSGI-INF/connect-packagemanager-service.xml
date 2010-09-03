@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.connect.packages.PackageManagerImpl">
+    <implementation
+        class="org.nuxeo.connect.packages.PackageManagerImpl" />
+
+    <service>
+        <provide
+            interface="org.nuxeo.connect.packages.PackageManager" />
+    </service>
+
+</component>
