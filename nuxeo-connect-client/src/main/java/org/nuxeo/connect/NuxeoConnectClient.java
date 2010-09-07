@@ -23,6 +23,8 @@ public class NuxeoConnectClient {
 
     protected static ConnectGatewayComponent connectGatewayComponent = null;
 
+    public static final String PROTOCOL_VERSION_OVERRIDE = "org.nuxeo.connect.protol.version.override";
+
     protected static PackageManagerImpl packageManager = null;
 
     protected static CallbackHolder cbHolder = new DefaultCallbackHolder();
@@ -74,14 +76,14 @@ public class NuxeoConnectClient {
     }
 
     public static String getProtocolVersion() {
-        return PROTOCOL_VERSION;
+        return getProperty(PROTOCOL_VERSION_OVERRIDE, PROTOCOL_VERSION);
     }
 
     public static String getBuildVersion() {
         if (buildVersion == null) {
             try {
                 InputStream pomStream = NuxeoConnectClient.class.getClassLoader().getResourceAsStream(
-                        "META-INF/maven/org.nuxeo.admin/nuxeo-connect-client/pom.properties");
+                        "META-INF/maven/org.nuxeo.connect/nuxeo-connect-client/pom.properties");
                 if (pomStream == null) {
                     buildVersion = "Unknow (no pom)";
                 } else {
