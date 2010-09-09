@@ -13,10 +13,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <modules>
-   <module>nuxeo-connect-client</module>
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -36,9 +32,7 @@
         <scope>provided</scope>
       </dependency>
     </dependencies>
-
   </dependencyManagement>
-
 
   <dependencies>
     <dependency>
@@ -499,16 +493,17 @@
     </plugins>
   </reporting>
 
-  <profiles>
+  <modules>
+    <module>nuxeo-connect-client</module>
+  </modules>
 
+  <profiles>
     <profile>
       <id>no-osgi</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>nuxeo-dm</module>
-        <module>nuxeo-gwt</module>
       </modules>
     </profile>
     <profile>
@@ -637,90 +632,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <!-- aggregate parameter is deprecated since 2.5. use the aggregate 
-                goal instead of -->
-              <aggregate>true</aggregate>
-              <maxmemory>512m</maxmemory>
-              <!-- stylesheetfile> ${basedir}/src/site/resources/css/jdstyle.css 
-                </stylesheetfile -->
-              <windowtitle>
-                Nuxeo Enterprise Platform 5.3 API Documentation
-              </windowtitle>
-              <doctitle>
-                Nuxeo Enterprise Platform 5.3 API Documentation
-              </doctitle>
-              <header>Nuxeo Enterprise Platform 5.3</header>
-              <links>
-                <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
-                <link>http://java.sun.com/javaee/5/docs/api/</link>
-                <link>
-                  http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-                </link>
-                <link>
-                  http://jakarta.apache.org/commons/fileupload/apidocs/
-                </link>
-                <link>
-                  http://jakarta.apache.org/commons/httpclient/apidocs/
-                </link>
-                <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-                <link>http://jakarta.apache.org/commons/io/apidocs/</link>
-                <link>http://junit.sourceforge.net/javadoc/</link>
-                <link>http://logging.apache.org/log4j/docs/api/</link>
-                <link>http://jackrabbit.apache.org/api-1/</link>
-                <link>http://www.day.com/maven/jsr170/javadocs/jcr-1.0/</link>
-                <link>http://www.restlet.org/documentation/1.0/api/</link>
-                <link>http://www.hibernate.org/hib_docs/v3/api/</link>
-                <link>http://docs.jboss.com/seam/1.1.5.GA/api/</link>
-                <link>http://docs.jboss.com/jbpm/v3.1/javadoc.jbpm/</link>
-                <link>http://docs.jboss.com/jbpm/v3.1/javadoc.identity/</link>
-                <link>http://labs.jboss.com/jbossremoting/docs/api/</link>
-              </links>
-              <groups>
-                <group>
-                  <title>Nuxeo Common Packages</title>
-                  <packages>org.nuxeo.common:org.nuxeo.common.*</packages>
-                </group>
-                <group>
-                  <title>Nuxeo Runtime Packages</title>
-                  <packages>
-                    org.nuxeo.runtime:org.nuxeo.runtime.*:org.nuxeo.osgi
-                  </packages>
-                </group>
-                <group>
-                  <title>Nuxeo Core Packages</title>
-                  <packages>org.nuxeo.ecm.core:org.nuxeo.ecm.core.*</packages>
-                </group>
-                <group>
-                  <title>Nuxeo Platform Packages</title>
-                  <packages>
-                    org.nuxeo.ecm.platform:org.nuxeo.ecm.platform.*:org.nuxeo.ecm.directory*:
-                  </packages>
-                </group>
-                <group>
-                  <title>Nuxeo WebApp Packages</title>
-                  <packages>org.nuxeo.ecm.webapp*</packages>
-                </group>
-                <group>
-                  <title>Nuxeo WebEngine Packages</title>
-                  <packages>
-                    org.nuxeo.webengine*:org.nuxeo.ecm.webengine*
-                  </packages>
-                </group>
-                <group>
-                  <title>Nuxeo GWT Packages</title>
-                  <packages>org.nuxeo.ecm.gwt*</packages>
-                </group>
-                <group>
-                  <title>Nuxeo OpenSocial Packages</title>
-                  <packages>org.nuxeo.opensocial*</packages>
-                </group>
-                <group>
-                  <title>Nuxeo Theme Packages</title>
-                  <packages>org.nuxeo.theme:org.nuxeo.theme.*</packages>
-                </group>
-              </groups>
-            </configuration>
           </plugin>
         </plugins>
       </reporting>
@@ -924,9 +835,9 @@
   </developers>
 
   <scm>
-    <connection>scm:hg:http://hg.nuxeo.org/nuxeo</connection>
-    <developerConnection>scm:hg:https://hg.nuxeo.org/nuxeo</developerConnection>
-    <url>http://hg.nuxeo.org/nuxeo/</url>
+    <connection>scm:hg:http://hg.nuxeo.org/nuxeo-connect</connection>
+    <developerConnection>scm:hg:https://hg.nuxeo.org/nuxeo-connect</developerConnection>
+    <url>http://hg.nuxeo.org/nuxeo-connect/</url>
   </scm>
 
   <repositories>
@@ -998,6 +909,5 @@
       <uniqueVersion>true</uniqueVersion>
     </snapshotRepository>
   </distributionManagement>
-
 
 </project>
