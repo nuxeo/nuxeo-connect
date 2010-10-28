@@ -72,7 +72,6 @@ public class TestSerialization extends TestCase {
         p.setClassifier("MyClassifier");
         p.setDescription("MyDescription");
         p.setHomePage("http://www.nuxeo.org");
-        p.setId("my-test-package");
         p.setName("testPackage");
         p.setTargetPlatforms(targets);
         p.setTitle("My Title");

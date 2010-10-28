@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.packages.dependencies.DependencyException;
+import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.update.PackageType;
 
 /**
@@ -126,5 +128,9 @@ public interface PackageManager {
     DownloadablePackage getRemotePackage(String pkgId);
 
     void flushCache();
+
+    List<DownloadablePackage> listInstalledPackages();
+
+    DependencyResolution isPackageInstallable(String pkgId) throws DependencyException ;
 
 }

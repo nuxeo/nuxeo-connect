@@ -20,6 +20,7 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +30,21 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.packages.dependencies.DependencyException;
+import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
+import org.nuxeo.connect.update.Package;
+import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
+import org.nuxeo.connect.update.Version;
+import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
+
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
 *
@@ -51,6 +62,8 @@ public class PackageManagerImpl implements
     protected List<String> sourcesNames = new ArrayList<String>();
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
+    protected DependencyResolver resolver;
+
     protected List<PackageSource> getAllSources() {
         List<PackageSource> allSources = new ArrayList<PackageSource>();
         allSources.addAll(remoteSources);
@@ -62,6 +75,7 @@ public class PackageManagerImpl implements
         registerSource(new RemotePackageSource(), false);
         registerSource(new DownloadingPackageSource(), true);
         registerSource(new LocalPackageSource(), true);
+        resolver = new DependencyResolver(this);
     }
 
     public void resetSources() {
@@ -112,6 +126,100 @@ public class PackageManagerImpl implements
         return resPackages;
     }
 
+    public List<DownloadablePackage> findRemotePackages(String packageName) {
+
+        List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
+        for (PackageSource source : remoteSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(packageName)) {
+                    pkgs.add(pkg);
+                }
+            }
+        }
+        return pkgs;
+    }
+
+    public List<Version> findLocalPackageVersions(String packageName) {
+
+        List<Version> versions = new ArrayList<Version>();
+        for (PackageSource source : localSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(packageName)) {
+                    versions.add(pkg.getVersion());
+                }
+            }
+        }
+        return versions;
+    }
+
+    public DownloadablePackage findPackageById(String packageId) {
+        for (PackageSource source : localSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getId().equals(packageId)) {
+                    return pkg;
+                }
+            }
+        }
+        for (PackageSource source : remoteSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getId().equals(packageId)) {
+                    return pkg;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Version> getPreferedVersions(String pkgName) {
+        List<Version> versions = new ArrayList<Version>();
+        List<Version> installedVersions = new ArrayList<Version>();
+        List<Version> localVersions = new ArrayList<Version>();
+        List<Version> remoteVersions = new ArrayList<Version>();
+
+        for (PackageSource source : localSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(pkgName)) {
+                    if (pkg.getState()==PackageState.INSTALLED) {
+                        installedVersions.add(pkg.getVersion());
+                    } else {
+                        localVersions.add(pkg.getVersion());
+                    }
+                }
+            }
+        }
+        for (PackageSource source : remoteSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(pkgName)) {
+                    remoteVersions.add(pkg.getVersion());
+                }
+            }
+        }
+
+        Collections.sort(localVersions);
+        Collections.sort(remoteVersions);
+
+        versions.addAll(installedVersions);
+        versions.addAll(localVersions);
+        versions.addAll(remoteVersions);
+
+        return versions;
+    }
+
+    public List<Version> getAvailableVersion(String pkgName, VersionRange range) {
+
+        List<Version> versions = new ArrayList<Version>();
+        for (PackageSource source : getAllSources()) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(pkgName) && range.matchVersion(pkg.getVersion())) {
+                    if (!versions.contains(pkg.getVendor())) {
+                        versions.add(pkg.getVersion());
+                    }
+                }
+            }
+        }
+        return versions;
+    }
+
     public List<DownloadablePackage> listPackages() {
         return doMergePackages(getAllSources(), null);
     }
@@ -135,6 +243,18 @@ public class PackageManagerImpl implements
                 remoteSources.add(source);
             }
         }
+    }
+
+    public List<DownloadablePackage> listInstalledPackages() {
+        List<DownloadablePackage> res = new ArrayList<DownloadablePackage>();
+        for (PackageSource source : localSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getState()>=PackageState.INSTALLING) {
+                    res.add(pkg);
+                }
+            }
+        }
+        return res;
     }
 
     public List<DownloadablePackage> listRemotePackages() {
@@ -249,6 +369,11 @@ public class PackageManagerImpl implements
         return getPkgInList(pkgs, pkgId);
     }
 
+    public DownloadablePackage resolvePackage(String pkgId) {
+       // get
+        return null;
+    }
+
     public DownloadablePackage getPackage(String pkgId) {
 
         List<DownloadablePackage> pkgs  = listPackages();
@@ -345,4 +470,17 @@ public class PackageManagerImpl implements
             source.flushCache();
         }
     }
+
+
+
+    @Override
+    public DependencyResolution isPackageInstallable(String pkgId)  {
+        try {
+            return resolver.resolve(pkgId);
+        }
+        catch (DependencyException e) {
+            return new DependencyResolution(e);
+        }
+    }
+
 }

@@ -64,7 +64,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         this.classifier = descriptor.getClassifier();
         this.description = descriptor.getDescription();
         this.homePage = descriptor.getHomePage();
-        this.id = descriptor.getId();
         this.name = descriptor.getName();
         this.targetPlatforms = descriptor.getTargetPlatforms();
         this.title = descriptor.getTitle();
@@ -91,7 +90,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
         String path = cdm.getDownloadedBundleLocalStorage();
 
-        path = path + id;
+        path = path + getId();
         file = new File(path);
 
         OutputStream out = null;
@@ -161,7 +160,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                     completed = true;
                     registerDownloadedPackage();
                     ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-                    cdm.removeDownloadingPackage(id);
+                    cdm.removeDownloadingPackage(getId());
                 }
             } catch (Exception e) {
                 throw new ConnectServerError(

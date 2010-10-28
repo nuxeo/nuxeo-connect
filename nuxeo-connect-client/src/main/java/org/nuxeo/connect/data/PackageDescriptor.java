@@ -43,8 +43,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     protected String description;
 
-    protected String id;
-
     protected String name;
 
     protected String vendor;
@@ -125,7 +123,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     public String getId() {
-        return id;
+        if (getVersion()==null) {
+            return getName();
+        } else {
+            return getName() + "-" + getVersion();
+        }
     }
 
     public String getName() {
@@ -218,7 +220,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
         PackageDescriptor bundle = new PackageDescriptor();
 
-        bundle.id = json.getString("id");
         if (json.has("homePage")) {
             bundle.homePage = json.getString("homePage");
         }
@@ -318,10 +319,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.description = description;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -392,5 +389,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public int getDownloadsCount() {
         return downloadsCount;
+    }
+
+    @Override
+    public String toString() {
+        return getId() + ":" + getName();
     }
 }
