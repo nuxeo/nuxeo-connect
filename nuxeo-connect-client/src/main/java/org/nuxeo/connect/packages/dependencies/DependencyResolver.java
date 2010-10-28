@@ -21,11 +21,11 @@ public class DependencyResolver {
         this.pm=pm;
     }
 
-    public DependencyResolution resolve(String pkgId)  throws DependencyException{
+    public DependencyResolution resolve(String pkgId, String targetPlatform)  throws DependencyException{
 
         // compute possible dependecy sets
         log.info("Computing possible dependency sets");
-        DependencyChoicesResolver choices = computeAvailableChoices(pkgId);
+        DependencyChoicesResolver choices = computeAvailableChoices(pkgId, targetPlatform);
         log.info("Resulting choices : ");
         log.info(choices.toString());
         log.info("Max possibilities : " + choices.getNaxPossibilities());
@@ -47,19 +47,19 @@ public class DependencyResolver {
     }
 
     // walk dep tree to find all possible needed versions of packages
-    protected DependencyChoicesResolver computeAvailableChoices(String pkgId) throws DependencyException{
-        DependencyChoicesResolver dc = new DependencyChoicesResolver(pkgId,pm);
-        recurseOnAvailableChoices(pkgId, dc, 1);
+    protected DependencyChoicesResolver computeAvailableChoices(String pkgId, String targetPlatform) throws DependencyException{
+        DependencyChoicesResolver dc = new DependencyChoicesResolver(pkgId,pm, targetPlatform);
+        recurseOnAvailableChoices(pkgId, targetPlatform, dc, 1);
         return dc;
     }
 
-    protected void recurseOnAvailableChoices(String pkgId, DependencyChoicesResolver dc, int depth) throws DependencyException {
+    protected void recurseOnAvailableChoices(String pkgId, String targetPlatform, DependencyChoicesResolver dc, int depth) throws DependencyException {
         Package pkg = pm.findPackageById(pkgId);
         if (pkg==null) {
             throw new DependencyException("Unable to find package " + pkgId);
         }
         for (PackageDependency dep :  pkg.getDependencies()) {
-            List<Version> versions = pm.getAvailableVersion(dep.getName(), dep.getVersionRange());
+            List<Version> versions = pm.getAvailableVersion(dep.getName(), dep.getVersionRange(), targetPlatform);
             if (versions.size()==0) {
                 throw new DependencyException("Unable to find a compatible version for package " + dep.getName() + " (" + dep.getVersionRange().toString()+")");
             }
@@ -68,7 +68,7 @@ public class DependencyResolver {
                 throw new DependencyException("Maximum depth reached, check that you don't have a loop in dependencies");
             }
             for (Version v : versions) {
-                recurseOnAvailableChoices(dep.getName()+ "-" + v.toString(), dc, depth+1);
+                recurseOnAvailableChoices(dep.getName()+ "-" + v.toString(),targetPlatform, dc, depth+1);
             }
         }
     }

@@ -29,3 +29,6 @@
 {"version":"1.0.0","name":"Z2","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":0,"type":"addon"}
 {"version":"2.0.0","name":"Z2","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":0,"type":"addon"}
 {"version":"1.1.0","name":"Blocker2","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["Z2:1.1.0:2.0.0"],"state":0,"type":"addon"}
+{"version":"1.0.0","name":"PF1","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["PF2:1.0.0:2.0.0"],"state":0,"type":"addon"}
+{"version":"1.0.0","name":"PF2","targetPlatforms":["5.3.0"],"dependencies":[],"state":0,"type":"addon"}
+{"version":"2.0.0","name":"PF2","targetPlatforms":["5.3.1"],"dependencies":[],"state":0,"type":"addon"}

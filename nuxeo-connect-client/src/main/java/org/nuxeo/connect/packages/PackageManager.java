@@ -131,6 +131,6 @@ public interface PackageManager {
 
     List<DownloadablePackage> listInstalledPackages();
 
-    DependencyResolution isPackageInstallable(String pkgId) throws DependencyException ;
+    DependencyResolution resolveDependencies(String pkgId, String targetPlatform) throws DependencyException ;
 
 }

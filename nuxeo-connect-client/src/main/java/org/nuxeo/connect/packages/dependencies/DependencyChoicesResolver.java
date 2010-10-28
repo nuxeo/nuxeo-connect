@@ -17,6 +17,8 @@ public class DependencyChoicesResolver {
 
     protected String packageId;
 
+    protected String targetPlatform;
+
     protected PackageManagerImpl pm;
 
     protected boolean resolved=false;
@@ -29,9 +31,10 @@ public class DependencyChoicesResolver {
 
     protected List<DownloadablePackage> installedPackages;
 
-    public DependencyChoicesResolver(String packageId, PackageManagerImpl pm) {
+    public DependencyChoicesResolver(String packageId, PackageManagerImpl pm, String targetPlatform) {
         this.packageId=packageId;
         this.pm=pm;
+        this.targetPlatform=targetPlatform;
     }
 
     public void sort(PackageManagerImpl pm) {
@@ -134,7 +137,13 @@ public class DependencyChoicesResolver {
                         // first check if this is possible
                         List<DownloadablePackage> possibleUpdates = toUpdatePackageNames.get(pkg.getName());
                         if (possibleUpdates==null) {
-                            possibleUpdates = pm.findRemotePackages(pkg.getName());
+                            List<DownloadablePackage> unfiltredPossibleUpdates = pm.findRemotePackages(pkg.getName());
+                            possibleUpdates = new ArrayList<DownloadablePackage>();
+                            for (DownloadablePackage pup : unfiltredPossibleUpdates) {
+                                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pup, targetPlatform)) {
+                                    possibleUpdates.add(pup);
+                                }
+                            }
                         }
                         // find possible candidate versions
                         List<DownloadablePackage> filtredPossibleUpdates = new ArrayList<DownloadablePackage>();
@@ -200,7 +209,7 @@ public class DependencyChoicesResolver {
         }
 
         if (dependencyUpdates.size()==0) {
-            // magic !
+            // magic ! : we can directly update
             result.setTransparentUpdate();
             for (DownloadablePackage pkg : choosenPackgesToUpdate) {
                 result.addPackage(pkg);

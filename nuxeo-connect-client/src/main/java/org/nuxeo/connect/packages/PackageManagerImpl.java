@@ -33,18 +33,15 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
+import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
-import org.nuxeo.connect.update.Package;
-import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
 *
@@ -205,13 +202,13 @@ public class PackageManagerImpl implements
         return versions;
     }
 
-    public List<Version> getAvailableVersion(String pkgName, VersionRange range) {
+    public List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform) {
 
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : getAllSources()) {
             for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getName().equals(pkgName) && range.matchVersion(pkg.getVersion())) {
-                    if (!versions.contains(pkg.getVendor())) {
+                if (pkg.getName().equals(pkgName) && range.matchVersion(pkg.getVersion()) && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
+                    if (!versions.contains(pkg.getVersion())) {
                         versions.add(pkg.getVersion());
                     }
                 }
@@ -474,9 +471,9 @@ public class PackageManagerImpl implements
 
 
     @Override
-    public DependencyResolution isPackageInstallable(String pkgId)  {
+    public DependencyResolution resolveDependencies(String pkgId, String targetPlatform)  {
         try {
-            return resolver.resolve(pkgId);
+            return resolver.resolve(pkgId, targetPlatform);
         }
         catch (DependencyException e) {
             return new DependencyResolution(e);
