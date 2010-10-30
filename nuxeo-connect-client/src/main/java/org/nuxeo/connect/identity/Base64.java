@@ -68,7 +68,7 @@ package org.nuxeo.connect.identity;
  * @author rob@iharder.net
  * @version 2.1
  */
-@SuppressWarnings({"ALL"})
+@SuppressWarnings({"all"})
 public class Base64
 {
 

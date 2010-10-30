@@ -21,6 +21,7 @@ package org.nuxeo.connect.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.nuxeo.connect.data.marshaling.JSONExportableField;
 
 /**
  * DTO representing a (client) Project.
@@ -29,8 +30,10 @@ import org.json.JSONObject;
  */
 public class ConnectProject extends AbstractJSONSerializableData {
 
+    @JSONExportableField
     protected String name;
 
+    @JSONExportableField
     protected String uuid;
 
     public String getName() {
@@ -49,24 +52,14 @@ public class ConnectProject extends AbstractJSONSerializableData {
         this.uuid = uuid;
     }
 
-
+    @Deprecated
     public static ConnectProject loadFromJSON(JSONObject ob) throws JSONException {
-
-        ConnectProject prj = new ConnectProject();
-
-        if (ob.has("errorMessage")) {
-            prj.errorMessage = ob.getString("errorMessage");
-        }
-
-        prj.name = ob.getString("name");
-        prj.uuid = ob.getString("uuid");
-
-        return prj;
+        return ConnectProject.loadFromJSON(ConnectProject.class, ob);
     }
 
+    @Deprecated
     public static ConnectProject loadFromJSON(String json) throws JSONException {
-        JSONObject ob = new JSONObject(json);
-        return loadFromJSON(ob);
+        return ConnectProject.loadFromJSON(ConnectProject.class, json);
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -46,7 +47,9 @@ import org.nuxeo.connect.update.PackageUpdateService;
  *
  * Implementation of the {@link DownloadingPackage} interface.
  *
- * Encapsulate download management.
+ * Encapsulate download management :
+ *
+ * ( implements {@link Runnable} to be used in a {@link ThreadPoolExecutor})
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */

@@ -22,6 +22,8 @@ package org.nuxeo.connect.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
+import org.nuxeo.connect.data.marshaling.JSONExportableField;
+import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 
 /**
  * DTO to transfer Subscription related information.
@@ -30,14 +32,19 @@ import org.nuxeo.connect.connector.NuxeoClientInstanceType;
  */
 public class SubscriptionStatus extends AbstractJSONSerializableData {
 
+    @JSONExportableField
     protected String contractStatus;
 
+    @JSONExportableField
     protected String endDate;
 
+    @JSONExportableField
     protected String message;
 
+    @JSONExportableField
     protected String description;
 
+    @JSONExportableField
     protected NuxeoClientInstanceType instanceType;
 
     public String getDescription() {
@@ -54,6 +61,11 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
 
     public void setInstanceType(NuxeoClientInstanceType instanceType) {
         this.instanceType = instanceType;
+    }
+
+    @JSONImportMethod(name="instanceType")
+    protected void setInstanceType(String instanceType) {
+        this.instanceType = NuxeoClientInstanceType.fromString(instanceType);
     }
 
     public String getMessage() {
@@ -82,41 +94,18 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
         this.endDate = endDate;
     }
 
+    @Deprecated
     public static SubscriptionStatus loadFromJSON(JSONObject ob) throws JSONException {
-
-        SubscriptionStatus status = new SubscriptionStatus();
-
-        status.contractStatus = ob.getString("contractStatus");
-
-        if (ob.has("description")) {
-            status.description = ob.getString("description");
-        }
-        if (ob.has("message")) {
-            status.message = ob.getString("message");
-        }
-        if (ob.has("endDate")) {
-            status.endDate = ob.getString("endDate");
-        }
-
-        if (ob.has("errorMessage")) {
-            status.errorMessage = ob.getString("errorMessage");
-        }
-
-        if (ob.has("instanceType")) {
-            status.instanceType = NuxeoClientInstanceType.fromString(ob.getString("instanceType"));
-        }
-
-        return status;
+        return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, ob);
     }
 
+    @Deprecated
     public static SubscriptionStatus loadFromJSON(String json) throws JSONException {
-        JSONObject ob = new JSONObject(json);
-        return loadFromJSON(ob);
+        return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, json);
     }
 
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
 
         if (isError()) {

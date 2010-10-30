@@ -24,49 +24,52 @@ import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
-import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageUpdateService;
 
 /**
- * Service interface that wrapps all {@link PackageSource} to provide an unified view
+ * Service interface that wraps all {@link PackageSource} to provide an unified view
+ * The main purpose of this interface is to provide listing methods that return the
+ * most up to date version of packages for given filters
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public interface PackageManager {
+public interface PackageManager extends BasePackageManager {
 
     /**
-     * Returns all {@link DownloadablePackage} from all sources.
+     * Returns most recent version of {@link DownloadablePackage} from all sources.
      */
     List<DownloadablePackage> listPackages();
 
     /**
-     * Returns all {@link DownloadablePackage} from all sources for a give {@link PackageType}.
+     * Returns most recent version of {@link DownloadablePackage} from all sources for a give {@link PackageType}.
      */
     List<DownloadablePackage> listPackages(PackageType type);
 
     /**
-     * Search for packages.
+     * Search for packages. (Currently not implemented)
      */
     List<DownloadablePackage> searchPackages(String searchExpr);
 
     /**
-     * Lists all {@link DownloadablePackage} locally present.
+     * Lists most recent version of {@link DownloadablePackage} locally present.
      */
     List<DownloadablePackage> listLocalPackages();
 
     /**
-     * Lists all {@link DownloadablePackage} locally present for a give {@link PackageType}.
+     * Lists most recent version of {@link DownloadablePackage} locally present for a give {@link PackageType}.
      */
     List<DownloadablePackage> listLocalPackages(PackageType type);
 
     /**
-     * Lists all {@link DownloadablePackage} available on connect server.
+     * Lists most recent version of {@link DownloadablePackage} available on connect server.
      */
     List<DownloadablePackage> listRemotePackages();
 
     /**
-     * Lists all {@link DownloadablePackage} available on connect server for a given {@link PackageType}.
+     * Lists most recent version of {@link DownloadablePackage} available on connect server for a given {@link PackageType}.
      */
     List<DownloadablePackage> listRemotePackages(PackageType type);
 
@@ -83,24 +86,24 @@ public interface PackageManager {
     List<DownloadablePackage> listUpdatePackages(PackageType type);
 
     /**
-     * Lists all {@link DownloadablePackage} available only on the connect server
+     * Lists most recent version of {@link DownloadablePackage} available only on the connect server
      * (ie no local version).
      */
     List<DownloadablePackage> listOnlyRemotePackages();
 
     /**
-     * Lists all {@link DownloadablePackage} available only on the connect server (ie no local version)
+     * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local version)
      * for a given {@link PackageType}.
      */
     List<DownloadablePackage> listOnlyRemotePackages(PackageType type);
 
     /**
-     * Lists all version of the studio packages associated to user account.
+     * Lists all versions of the studio packages associated to user account.
      */
     List<DownloadablePackage> listAllStudioRemotePackages();
 
     /**
-     * Lists all version of the studio packages associated to user account in remote and potentially
+     * Lists all versions of the studio packages associated to user account in remote and potentially
      * overridden by a local package.
      */
     List<DownloadablePackage> listAllStudioRemoteOrLocalPackages();
@@ -115,22 +118,44 @@ public interface PackageManager {
      */
     List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type);
 
+    /**
+     * Register a new {@link PackageSource}
+     *
+     * @param source
+     * @param local
+     */
     void registerSource(PackageSource source, boolean local);
 
+    /**
+     * Get the Download descriptor for a given package id
+     *
+     * @param packageId
+     * @return
+     * @throws Exception
+     */
     DownloadingPackage download(String packageId) throws Exception ;
 
+    /**
+     * Start installation process via {@link PackageUpdateService}
+     *
+     * @param packageId Identifier of the {@link Package} to install
+     * @param params Installation parameters (as collected via Wizard's form)
+     * @throws Exception
+     */
     void install(String packageId, Map<String, String> params) throws Exception;
 
-    DownloadablePackage getPackage(String pkgId);
-
-    DownloadablePackage getLocalPackage(String pkgId);
-
-    DownloadablePackage getRemotePackage(String pkgId);
-
+    /**
+     * Flushes the caches used on remote {@link PackageSource}
+     */
     void flushCache();
 
-    List<DownloadablePackage> listInstalledPackages();
-
-    DependencyResolution resolveDependencies(String pkgId, String targetPlatform) throws DependencyException ;
+    /**
+     * Try to resolve dependencies of a given {@link Package}
+     *
+     * @param pkgId
+     * @param targetPlatform (String representing the target platform or null
+     * @return
+     */
+    DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
 
 }

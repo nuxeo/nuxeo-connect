@@ -24,6 +24,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.nuxeo.connect.data.marshaling.JSONExportMethod;
+import org.nuxeo.connect.data.marshaling.JSONExportableField;
+import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.Version;
@@ -37,46 +40,101 @@ import org.nuxeo.connect.update.Version;
 public class PackageDescriptor extends AbstractJSONSerializableData implements
         DownloadablePackage {
 
+    @JSONExportableField
     protected String homePage;
 
+    @JSONExportableField
     protected String classifier;
 
+    @JSONExportableField
     protected String description;
 
+    @JSONExportableField
     protected String name;
 
+    @JSONExportableField
     protected String vendor;
 
+    @JSONExportableField
     protected int state;
 
+    @JSONExportableField
     protected String license;
 
+    @JSONExportableField
     protected String licenseUrl;
 
+    @JSONExportableField
     protected String[] targetPlatforms;
 
     protected PackageDependency[] dependencies;
 
+    @JSONExportableField
     protected String title;
 
+    @JSONExportableField
     protected PackageType type;
 
+    @JSONExportableField
     protected Version version;
 
+    @JSONExportableField
     protected String sourceDigest;
 
+    @JSONExportableField
     protected String sourceUrl;
 
+    @JSONExportableField
     protected long sourceSize;
 
+    @JSONExportableField
     protected int commentsNumber;
 
+    @JSONExportableField
     protected String pictureUrl;
 
+    @JSONExportableField
     protected int downloadsCount;
 
+    @JSONExportableField
     protected int rating;
 
+    @JSONExportMethod(name="dependencies")
+    protected JSONArray getDependenciesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getDependencies()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name="dependencies")
+    protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setDependencies(deps);
+    }
+
+    @JSONImportMethod(name="targetPlatforms")
+    public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
+        String[] targets = new String[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            targets[i] = array.getString(i);
+        }
+        targetPlatforms = targets;
+    }
+
+    @JSONImportMethod(name = "type")
+    public void setTypeAsJSON(String strType) {
+        type=PackageType.getByValue(strType);
+    }
+
+    @JSONImportMethod(name = "version")
+    public void setVersionAsJSON(String v) {
+        version = new Version(v);
+    }
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
@@ -189,123 +247,17 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return sourceSize;
     }
 
-    // *********************************
-    // Marshaling stuffs
-
-    @Override
-    public JSONObject asJSON() {
-        String[] names = { "id", "getHomePage", "sourceSize", "sourceUrl",
-                "classifier", "description", "name", "state", "title",
-                "version", "type", "sourceDigest", "targetPlatform",
-                "commentsNumber", "rating", "pictureUrl", "downloadsCount" };
-        JSONObject json = new JSONObject(this);
-
-        String jsonString = json.toString();
-
-        JSONArray deps = new JSONArray();
-        for (PackageDependency dep : getDependencies()) {
-            deps.put(dep.toString());
-        }
-
-        try {
-            json.put("dependencies", deps);
-        } catch (JSONException e) {
-            // NOP
-        }
-        return json;
-    }
-
+    @Deprecated
     public static PackageDescriptor loadFromJSON(JSONObject json)
             throws JSONException {
-
-        PackageDescriptor bundle = new PackageDescriptor();
-
-        if (json.has("homePage")) {
-            bundle.homePage = json.getString("homePage");
-        }
-
-        if (json.has("classifier")) {
-            bundle.classifier = json.getString("classifier");
-        }
-
-        if (json.has("description")) {
-            bundle.description = json.getString("description");
-        }
-
-        if (json.has("name")) {
-            bundle.name = json.getString("name");
-        }
-
-        if (json.has("state")) {
-            bundle.state = json.getInt("state");
-        }
-
-        if (json.has("title")) {
-            bundle.title = json.getString("title");
-        }
-
-        if (json.has("version")) {
-            bundle.version = new Version(json.getString("version"));
-        }
-
-        if (json.has("type")) {
-            bundle.type = PackageType.getByValue(json.getString("type"));
-        }
-
-        if (json.has("sourceUrl")) {
-            bundle.sourceUrl = json.getString("sourceUrl");
-        }
-
-        if (json.has("sourceDigest")) {
-            bundle.sourceDigest = json.getString("sourceDigest");
-        }
-
-        if (json.has("sourceSize")) {
-            bundle.sourceSize = json.getLong("sourceSize");
-        }
-
-        if (json.has("commentsNumber")) {
-            bundle.commentsNumber = json.getInt("commentsNumber");
-        }
-        if (json.has("rating")) {
-            bundle.rating = json.getInt("rating");
-        }
-        if (json.has("downloadsCount")) {
-            bundle.downloadsCount = json.getInt("downloadsCount");
-        }
-
-        if (json.has("pictureUrl")) {
-            bundle.pictureUrl = json.getString("pictureUrl");
-        }
-
-        if (json.has("targetPlatforms")) {
-            JSONArray array = json.getJSONArray("targetPlatforms");
-            String[] targets = new String[array.length()];
-            for (int i = 0; i < array.length(); i++) {
-                targets[i] = array.getString(i);
-            }
-            bundle.targetPlatforms = targets;
-        }
-
-        if (json.has("dependencies")) {
-            JSONArray array = json.getJSONArray("dependencies");
-            PackageDependency[] deps = new PackageDependency[array.length()];
-            for (int i = 0; i < array.length(); i++) {
-                deps[i] = new PackageDependency(array.getString(i));
-            }
-            bundle.dependencies = deps;
-        }
-
-        return bundle;
+        return PackageDescriptor.loadFromJSON(PackageDescriptor.class, json);
     }
 
+    @Deprecated
     public static PackageDescriptor loadFromJSON(String json)
             throws JSONException {
         return loadFromJSON(new JSONObject(json));
     }
-
-    // *********************************
-    // Setters
 
     public void setHomePage(String homePage) {
         this.homePage = homePage;
@@ -393,6 +345,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public String toString() {
-        return getId() + ":" + getName();
+        return getId();
     }
 }

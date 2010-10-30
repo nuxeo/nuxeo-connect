@@ -19,8 +19,6 @@
 
 package org.nuxeo.connect.data;
 
-import java.io.File;
-
 import org.nuxeo.connect.update.Package;
 
 /**
@@ -30,12 +28,24 @@ import org.nuxeo.connect.update.Package;
  */
 public interface DownloadingPackage extends DownloadablePackage {
 
+    /**
+     * Verify Digest
+     * @return
+     */
     boolean isDigestOk();
 
-    File getFile();
-
+    /**
+     * Indicates if Download process is terminated
+     *
+     * @return
+     */
     boolean isCompleted();
 
+    /**
+     * Return Download progres in %
+     *
+     * @return
+     */
     int getDownloadProgress();
 
 }

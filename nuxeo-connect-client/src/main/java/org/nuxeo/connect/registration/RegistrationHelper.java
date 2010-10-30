@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
+import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
@@ -79,7 +80,7 @@ public class RegistrationHelper {
                     JSONArray array = new JSONArray(json);
                     for (int i = 0; i< array.length(); i++) {
                         JSONObject ob = (JSONObject) array.get(i);
-                        result.add(ConnectProject.loadFromJSON(ob));
+                        result.add(AbstractJSONSerializableData.loadFromJSON(ConnectProject.class, ob));
                     }
                     return result;
                 } catch (JSONException e) {
@@ -102,14 +103,11 @@ public class RegistrationHelper {
         configureHttpClient(httpClient, login, password);
 
         PostMethod method = new PostMethod(url);
-
-//        NameValuePair action   = new NameValuePair("action", POST_REGISTER_SUFFIX );
         NameValuePair project   = new NameValuePair("projectId", prjId);
         NameValuePair desc = new NameValuePair("description", description);
         NameValuePair strType = new NameValuePair("type", type.getValue());
         NameValuePair ctid = new NameValuePair("CTID", TechnicalInstanceIdentifier.instance().getCTID());
 
-//        method.setRequestBody(new NameValuePair[] {action, project, desc, strType, ctid});
         method.setRequestBody(new NameValuePair[] {project, desc, strType, ctid});
 
         try  {

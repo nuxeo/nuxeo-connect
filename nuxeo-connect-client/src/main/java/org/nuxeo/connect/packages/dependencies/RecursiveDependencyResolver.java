@@ -1,3 +1,21 @@
+/*
+ * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Nuxeo - initial API and implementation
+ *
+ * $Id$
+ */
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
@@ -7,19 +25,30 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.PackageManagerImpl;
+import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 
-public class DependencyChoicesResolver {
+/**
+ * This is the "heart" of this dumb resolution system
+ *
+ * For each possible {@link DependencySet} it checks if it matches the contrainsts.
+ * If yes it verifies that installation can be done without breaking already installed packages.
+ *
+ * The update checks is for now very limited because it does not re-run the complete resolution system.
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ *
+ */
+public class RecursiveDependencyResolver {
 
     protected String packageId;
 
     protected String targetPlatform;
 
-    protected PackageManagerImpl pm;
+    protected InternalPackageManager pm;
 
     protected boolean resolved=false;
 
@@ -31,13 +60,13 @@ public class DependencyChoicesResolver {
 
     protected List<DownloadablePackage> installedPackages;
 
-    public DependencyChoicesResolver(String packageId, PackageManagerImpl pm, String targetPlatform) {
+    public RecursiveDependencyResolver(String packageId, InternalPackageManager pm, String targetPlatform) {
         this.packageId=packageId;
         this.pm=pm;
         this.targetPlatform=targetPlatform;
     }
 
-    public void sort(PackageManagerImpl pm) {
+    public void sort(InternalPackageManager pm) {
         for (String pkgName : deps.keySet()) {
             List<Version> versions = deps.get(pkgName);
 

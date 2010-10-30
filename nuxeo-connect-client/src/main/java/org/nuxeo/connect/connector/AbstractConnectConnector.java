@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
+import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
@@ -69,7 +70,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         String json = response.getString();
 
         try {
-            return SubscriptionStatus.loadFromJSON(json);
+            return AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
         } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
 
@@ -93,7 +94,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         String json = response.getString();
 
         try {
-            PackageDescriptor pkg = PackageDescriptor.loadFromJSON(json);
+            PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
             return cdm.storeDownloadedBundle(pkg);
         } catch (Exception e) {
@@ -117,7 +118,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             JSONArray array = new JSONArray(json);
             for (int i = 0; i< array.length(); i++) {
                 JSONObject ob = (JSONObject) array.get(i);
-                result.add(PackageDescriptor.loadFromJSON(ob));
+                result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
             }
             return result;
         }
