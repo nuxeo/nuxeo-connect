@@ -102,4 +102,29 @@ public interface Package {
      */
     boolean isLocal();
 
+    /**
+     * Get the production status of the package (testing, production ready ...)
+     * @return
+     */
+    ProductionState getProductionState();
+
+    /**
+     * Get the validation state of the package (not certified, in process, certified ...)
+     * @return
+     */
+    NuxeoValidationState getValidationState();
+
+
+    /**
+     * Tests if the package can be hot reloaded
+     * @return
+     */
+    boolean supportsHotReload();
+
+    /**
+     * Test if the package is supported by Nuxeo
+     */
+    boolean isSupported();
+
 }
+

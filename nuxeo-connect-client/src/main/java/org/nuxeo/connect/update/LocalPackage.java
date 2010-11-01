@@ -43,6 +43,11 @@ public interface LocalPackage extends Package {
     final static String LICENSE = "license.txt";
 
     /**
+     * A text file containing terms and conditions.
+     */
+    final static String TERMSANDCONDITIONS = "terms-and-conditions.txt";
+
+    /**
      * The install commands file name
      */
     final static String INSTALL = "install.xml";
@@ -86,6 +91,13 @@ public interface LocalPackage extends Package {
      * @return
      */
     String getLicenseContent() throws PackageException;
+
+    /**
+     * Get the content of the terms and conditions file.
+     *
+     * @return
+     */
+    String getTermsAndConditionsContent() throws PackageException;
 
     /**
      * Get the attached bundle if any. Remote packages has no attached bundle
@@ -163,5 +175,12 @@ public interface LocalPackage extends Package {
      * @return the list to forms or null
      */
     Form[] getValidationForms() throws PackageException;
+
+    /**
+     * Indicates if terms and conditions must be accepted bu user before installation
+     *
+     * @return
+     */
+    boolean requireTermsAndConditionsAcceptance();
 
 }

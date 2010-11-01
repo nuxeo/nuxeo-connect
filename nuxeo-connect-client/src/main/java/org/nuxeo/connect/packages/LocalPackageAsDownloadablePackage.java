@@ -21,10 +21,12 @@ import java.io.File;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.LocalPackage;
+import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageData;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.model.Form;
@@ -137,6 +139,30 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
 
     public Version getVersion() {
         return localPackage.getVersion();
+    }
+
+    public boolean requireTermsAndConditionsAcceptance() {
+        return localPackage.requireTermsAndConditionsAcceptance();
+    }
+
+    public String getTermsAndConditionsContent() throws PackageException {
+        return localPackage.getTermsAndConditionsContent();
+    }
+
+    public ProductionState getProductionState() {
+        return localPackage.getProductionState();
+    }
+
+    public NuxeoValidationState getValidationState() {
+        return localPackage.getValidationState();
+    }
+
+    public boolean supportsHotReload() {
+        return localPackage.supportsHotReload();
+    }
+
+    public boolean isSupported() {
+        return localPackage.isSupported();
     }
 
     public boolean isLocal() {

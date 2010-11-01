@@ -27,8 +27,10 @@ import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
+import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
@@ -99,6 +101,18 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected int rating;
 
+    @JSONExportableField
+    protected ProductionState productionState;
+
+    @JSONExportableField
+    protected NuxeoValidationState nuxeoValidationState;
+
+    @JSONExportableField
+    protected boolean supported;
+
+    @JSONExportableField
+    protected boolean supportsHotReload;
+
     @JSONExportMethod(name="dependencies")
     protected JSONArray getDependenciesAsJSON() {
         JSONArray deps = new JSONArray();
@@ -134,6 +148,16 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONImportMethod(name = "version")
     public void setVersionAsJSON(String v) {
         version = new Version(v);
+    }
+
+    @JSONImportMethod(name = "productionState")
+    public void setProductionStateAsJSON(String state) {
+       productionState = ProductionState.getByValue(state);
+    }
+
+    @JSONImportMethod(name = "nuxeoValidationState")
+    public void setNuxeoValidationState(String state) {
+        nuxeoValidationState = NuxeoValidationState.getByValue(state);
     }
 
     public void setVendor(String vendor) {
@@ -347,4 +371,49 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     public String toString() {
         return getId();
     }
+
+    @Override
+    public ProductionState getProductionState() {
+        if (productionState==null) {
+            return ProductionState.TESTING;
+        } else {
+            return productionState;
+        }
+    }
+
+    @Override
+    public NuxeoValidationState getValidationState() {
+        if (nuxeoValidationState==null) {
+            return NuxeoValidationState.NONE;
+        } else {
+            return nuxeoValidationState;
+        }
+    }
+
+    @Override
+    public boolean isSupported() {
+        return supported;
+    }
+
+    @Override
+    public boolean supportsHotReload() {
+        return supportsHotReload;
+    }
+
+    public void setProductionState(ProductionState productionState) {
+        this.productionState = productionState;
+    }
+
+    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
+        this.nuxeoValidationState = nuxeoValidationState;
+    }
+
+    public void setSupported(boolean supported) {
+        this.supported = supported;
+    }
+
+    public void setSupportsHotReload(boolean supportsHotReload) {
+        this.supportsHotReload = supportsHotReload;
+    }
+
 }

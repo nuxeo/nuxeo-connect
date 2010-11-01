@@ -27,11 +27,14 @@ import junit.framework.TestCase;
 
 import org.json.JSONException;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
+import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
+import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 public class TestSerialization extends TestCase {
@@ -51,7 +54,7 @@ public class TestSerialization extends TestCase {
         assertNotNull(json);
         System.out.println(json);
 
-        SubscriptionStatus s2 = SubscriptionStatus.loadFromJSON(json);
+        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
         assertNotNull(s2);
 
         assertEquals(status.getContractStatus(), s2.getContractStatus());
@@ -84,13 +87,18 @@ public class TestSerialization extends TestCase {
         p.setPictureUrl("http://xxx");
         p.setState(PackageState.INSTALLED);
 
+        p.setNuxeoValidationState(NuxeoValidationState.NUXEO_CERTIFIED);
+        p.setProductionState(ProductionState.PRODUCTION_READY);
+        p.setSupported(true);
+        p.setSupportsHotReload(true);
+
         String json = p.serializeAsJSON();
 
         assertNotNull(json);
         System.out.println(json);
 
 
-        PackageDescriptor p2 = PackageDescriptor.loadFromJSON(json);
+        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
         assertNotNull(p2);
 
         assertEquals(p.getHomePage(),p2.getHomePage());
@@ -109,6 +117,10 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getPictureUrl(),p2.getPictureUrl());
         assertEquals(p.getCommentsNumber(),p2.getCommentsNumber());
         assertEquals(PackageState.INSTALLED, p2.getState());
+        assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
+        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED, p2.getValidationState());
+        assertEquals(true, p2.isSupported());
+        assertEquals(true, p2.supportsHotReload());
 
     }
 }
