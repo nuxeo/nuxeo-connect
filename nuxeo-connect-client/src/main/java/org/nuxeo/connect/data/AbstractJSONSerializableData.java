@@ -70,8 +70,18 @@ public abstract class AbstractJSONSerializableData {
 
     protected Map<String, Object> getDataToSerialize() {
         Map<String, Object> data = new HashMap<String, Object>();
+        fetchDataToSerialize(data, this.getClass());
+        return data;
+    }
 
-        for (Field field : this.getClass().getDeclaredFields()) {
+    protected void fetchDataToSerialize(Map<String, Object> data, Class<?> klass) {
+
+        Class<?> parentKlass = klass.getSuperclass();
+        if (parentKlass!=null) {
+            fetchDataToSerialize(data, parentKlass);
+        }
+
+        for (Field field : klass.getDeclaredFields()) {
             if (field.getAnnotation(JSONExportableField.class)!=null) {
                 try {
                     data.put(field.getName(), field.get(this));
@@ -81,7 +91,7 @@ public abstract class AbstractJSONSerializableData {
             }
         }
 
-        for (Method method : this.getClass().getDeclaredMethods()) {
+        for (Method method : klass.getDeclaredMethods()) {
             if (method.getAnnotation(JSONExportMethod.class)!=null) {
                 try {
                     data.put(method.getAnnotation(JSONExportMethod.class).name(), method.invoke(this,(Object[])null));
@@ -90,10 +100,13 @@ public abstract class AbstractJSONSerializableData {
                 }
             }
         }
-        return data;
     }
 
-    protected static Object doLoadFromJSON(JSONObject data, Object instance) throws JSONException {
+    protected static Object doLoadFromJSON(JSONObject data, Class<?> klass, Object instance) throws JSONException {
+
+        if (klass.getSuperclass()!=null) {
+            instance = doLoadFromJSON(data, klass.getSuperclass(), instance);
+        }
 
         List<String> fieldNames = new ArrayList<String>();
         for (Method method : instance.getClass().getDeclaredMethods()) {
@@ -123,7 +136,7 @@ public abstract class AbstractJSONSerializableData {
 
     public static <T> T loadFromJSON(Class<T> targetClass, JSONObject data) throws JSONException {
         try {
-            return targetClass.cast(doLoadFromJSON(data, targetClass.newInstance()));
+            return targetClass.cast(doLoadFromJSON(data, targetClass, targetClass.newInstance()));
         } catch (Exception e) {
           throw new JSONException(e);
         }

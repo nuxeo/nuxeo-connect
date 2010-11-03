@@ -95,6 +95,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
         try {
             PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
+            if (pkg==null || pkg.getId()==null) {
+                throw new ConnectSecurityError("Unable to parse server response : package has no id");
+            }
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
             return cdm.storeDownloadedBundle(pkg);
         } catch (Exception e) {
