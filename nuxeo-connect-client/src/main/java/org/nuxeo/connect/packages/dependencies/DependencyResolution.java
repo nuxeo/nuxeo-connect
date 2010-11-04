@@ -19,15 +19,19 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.Version;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
 * Represents the result of the dependencies resolution process :
@@ -151,6 +155,62 @@ public class DependencyResolution {
 
     public Map<String, Version> getLocalUnchangedPackages() {
         return localUnchangedPackages;
+    }
+
+    public boolean requireChanges() {
+        if (localPackagesToRemove.size()>0) {
+            return true;
+        }
+        if (localPackagesToUpgrade.size()>0) {
+            return true;
+        }
+        if (localPackagesToInstall.size()>0) {
+            return true;
+        }
+        if (newPackagesToDownload.size()>0) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<String> getUnchangedPackageIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String,Version> entry : getLocalUnchangedPackages().entrySet()) {
+            res.add(entry.getKey()+"-"+entry.getValue().toString());
+        }
+        return res;
+    }
+
+    public List<String> getUpgradePackageIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String,Version> entry : getLocalPackagesToUpgrade().entrySet()) {
+            res.add(entry.getKey()+"-"+entry.getValue().toString());
+        }
+        return res;
+    }
+
+    public List<String> getInstallPackageIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String,Version> entry : getLocalPackagesToInstall().entrySet()) {
+            res.add(entry.getKey()+"-"+entry.getValue().toString());
+        }
+        return res;
+    }
+
+    public List<String> getDownloadPackageIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String,Version> entry : getNewPackagesToDownload().entrySet()) {
+            res.add(entry.getKey()+"-"+entry.getValue().toString());
+        }
+        return res;
+    }
+
+    public List<String> getRemovePackageIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String,Version> entry : getLocalPackagesToRemove().entrySet()) {
+            res.add(entry.getKey()+"-"+entry.getValue().toString());
+        }
+        return res;
     }
 
     public String toString() {
