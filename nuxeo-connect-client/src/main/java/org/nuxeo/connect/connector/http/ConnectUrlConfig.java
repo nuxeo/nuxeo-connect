@@ -33,6 +33,14 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_URL_PROPERTY = "org.nuxeo.connect.url";
 
+    public static final String CONNECT_PROXY_HOST_PROPERTY = "org.nuxeo.connect.proxy.host";
+
+    public static final String CONNECT_PROXY_PORT_PROPERTY = "org.nuxeo.connect.proxy.port";
+
+    public static final String CONNECT_PROXY_LOGIN_PROPERTY = "org.nuxeo.connect.proxy.login";
+
+    public static final String CONNECT_PROXY_PASSWORD_PROPERTY = "org.nuxeo.connect.proxy.password";
+
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
     public static final String CONNECT_REGISTRED_ROOT_PATH = "registred/";
@@ -59,5 +67,40 @@ public class ConnectUrlConfig {
         return getRegistrationBaseUrl() + CONNECT_REGISTRED_ROOT_PATH;
     }
 
+
+    // Proxy settings management
+
+    protected static Boolean useProxy=null;
+
+    public static boolean useProxy() {
+        if (useProxy==null) {
+            if (getProxyHost()!=null) {
+                useProxy=true;
+            } else {
+                useProxy=false;
+            }
+        }
+        return useProxy;
+    }
+
+    public static String getProxyHost() {
+        return  NuxeoConnectClient.getProperty(CONNECT_PROXY_HOST_PROPERTY, null);
+    }
+
+    public static int getProxyPort() {
+        String  portAsString = NuxeoConnectClient.getProperty(CONNECT_PROXY_PORT_PROPERTY, null);
+        if (portAsString==null) {
+            return 80;
+        }
+        return Integer.parseInt(portAsString);
+    }
+
+    public static String getProxyLogin() {
+        return  NuxeoConnectClient.getProperty(CONNECT_PROXY_LOGIN_PROPERTY, null);
+    }
+
+    public static String getProxyPassword() {
+        return  NuxeoConnectClient.getProperty(CONNECT_PROXY_PASSWORD_PROPERTY, null);
+    }
 
 }

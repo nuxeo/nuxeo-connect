@@ -21,8 +21,11 @@ package org.nuxeo.connect.connector.http;
 
 import java.util.Map;
 
+import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +73,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
+        ProxyHelper.configureProxyIfNeeded(httpClient);
         HttpMethod method = new GetMethod(url);
 
         method.setFollowRedirects(true);

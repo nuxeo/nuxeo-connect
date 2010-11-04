@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
+import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
@@ -54,10 +55,13 @@ public class RegistrationHelper {
     }
 
     protected static void configureHttpClient(HttpClient httpClient, String login, String password) {
+        // Configure BA to access Connect for registration
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
         httpClient.getParams().setAuthenticationPreemptive(true);
         Credentials ba = new UsernamePasswordCredentials(login, password);
         httpClient.getState().setCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+        // Configure the http proxy if needed
+        ProxyHelper.configureProxyIfNeeded(httpClient);
     }
 
     public static List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) {
