@@ -22,13 +22,10 @@ package org.nuxeo.connect.data;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 
@@ -65,41 +62,7 @@ public abstract class AbstractJSONSerializableData {
     }
 
     public JSONObject asJSON() {
-        return new JSONObject(getDataToSerialize());
-    }
-
-    protected Map<String, Object> getDataToSerialize() {
-        Map<String, Object> data = new HashMap<String, Object>();
-        fetchDataToSerialize(data, this.getClass());
-        return data;
-    }
-
-    protected void fetchDataToSerialize(Map<String, Object> data, Class<?> klass) {
-
-        Class<?> parentKlass = klass.getSuperclass();
-        if (parentKlass!=null) {
-            fetchDataToSerialize(data, parentKlass);
-        }
-
-        for (Field field : klass.getDeclaredFields()) {
-            if (field.getAnnotation(JSONExportableField.class)!=null) {
-                try {
-                    data.put(field.getName(), field.get(this));
-                } catch (Exception e) {
-                    // NOP
-                }
-            }
-        }
-
-        for (Method method : klass.getDeclaredMethods()) {
-            if (method.getAnnotation(JSONExportMethod.class)!=null) {
-                try {
-                    data.put(method.getAnnotation(JSONExportMethod.class).name(), method.invoke(this,(Object[])null));
-                } catch (Exception e) {
-                    // NOP
-                }
-            }
-        }
+        return new JSONObject(IntrospectionHelper.getDataToSerialize(this));
     }
 
     protected static Object doLoadFromJSON(JSONObject data, Class<?> klass, Object instance) throws JSONException {
