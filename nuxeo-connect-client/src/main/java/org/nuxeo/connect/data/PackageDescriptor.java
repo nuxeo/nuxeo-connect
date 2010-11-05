@@ -156,7 +156,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     @JSONImportMethod(name = "nuxeoValidationState")
-    public void setNuxeoValidationState(String state) {
+    public void setNuxeoValidationStateAsJSON(String state) {
         nuxeoValidationState = NuxeoValidationState.getByValue(state);
     }
 
