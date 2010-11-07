@@ -35,7 +35,7 @@ public class TargetPlatformFilterHelper {
             return true;
         }
         for (String pf : pkg.getTargetPlatforms()) {
-            if (pf.equals(targetPlatform)) {
+            if (pf.equalsIgnoreCase(targetPlatform)) {
                 return true;
             }
         }
