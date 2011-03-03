@@ -40,6 +40,9 @@ import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 */
 public class LogicalInstanceIdentifier {
 
+    protected static final String KEY_FILE = "instance.clid";
+    protected static final String NUXEO_DATA_DIR_KEY = "nuxeo.data.dir";
+
     public static class InvalidCLID extends Exception {
 
         private static final long serialVersionUID = 1L;
@@ -119,14 +122,31 @@ public class LogicalInstanceIdentifier {
         return CLID2;
     }
 
-    protected static String getSaveFileName() {
-           String path = NuxeoConnectClient.getHomePath();
-           return path + "instance.clid";
+    protected static String getSaveFileName(boolean load) {
+
+       // first look in Nuxeo Data dir
+       String path = NuxeoConnectClient.getProperty(NUXEO_DATA_DIR_KEY, NuxeoConnectClient.getHomePath());
+
+       if (path==null) {
+           path = System.getProperty("java.tmp.dir");
+       }
+       if (!path.endsWith(File.separator)) {
+           path = path + File.separator;
+       }
+
+       path = path + KEY_FILE;
+
+       if (!new File(path).exists() && load) {
+           // do fallback on RuntimeHome
+           path = NuxeoConnectClient.getHomePath() + KEY_FILE;
+       }
+
+       return path;
     }
 
     public static void  cleanUp() {
         instance = null;
-        File file  = new File(getSaveFileName());
+        File file  = new File(getSaveFileName(false));
         if (file.exists()) {
             file.delete();
         }
@@ -140,7 +160,7 @@ public class LogicalInstanceIdentifier {
             data = Base64.encodeBytes(data.getBytes());
         }
 
-        File file = new File(getSaveFileName());
+        File file = new File(getSaveFileName(false));
 
         FileOutputStream fos = null;
         try {
@@ -176,7 +196,7 @@ public class LogicalInstanceIdentifier {
     public static LogicalInstanceIdentifier load() throws Exception {
 
 
-        File file = new File(getSaveFileName());
+        File file = new File(getSaveFileName(true));
         if (!file.exists()) {
             return null;
         }
