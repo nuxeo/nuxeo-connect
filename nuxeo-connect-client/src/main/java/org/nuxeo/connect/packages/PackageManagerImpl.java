@@ -282,6 +282,7 @@ public class PackageManagerImpl implements
         List<DownloadablePackage> toUpdate = new ArrayList<DownloadablePackage>();
         List<String>  toUpdateIds = new ArrayList<String>();
 
+        // take all the remote packages that correspond to an upgrade of a local package
         for (DownloadablePackage pkg : localPackages) {
             for (DownloadablePackage remotePkg : remotePackages) {
                 if (remotePkg.getName().equals(pkg.getName())) {
@@ -289,18 +290,42 @@ public class PackageManagerImpl implements
                         if (remotePkg.getVersion().greaterThan(pkg.getVersion())) {
                             toUpdate.add(remotePkg);
                             toUpdateIds.add(remotePkg.getId());
+                        } else if (remotePkg.getVersion().equals(pkg.getVersion())) {
+                            // also list update in progress
+                            if (pkg.getState()== PackageState.DOWNLOADING ||
+                                    pkg.getState()== PackageState.DOWNLOADED ||
+                                    pkg.getState()== PackageState.INSTALLING) {
+                                toUpdate.add(pkg);
+                                toUpdateIds.add(pkg.getId());
+                            }
                         }
                     } else {
                         log.warn("Package " + remotePkg.getId() + " has a null version");
                     }
+                    break;
                 }
             }
         }
 
-        List<DownloadablePackage> hotFixes = listRemotePackages(PackageType.HOT_FIX);
-        for (DownloadablePackage pkg : hotFixes) {
-            if (!toUpdateIds.contains(pkg.getId())) {
-                toUpdate.add(0, pkg);
+        if (type==null || type==PackageType.HOT_FIX) {
+            // force addition of hot-fixes
+            List<DownloadablePackage> hotFixes = listRemotePackages(PackageType.HOT_FIX);
+            for (DownloadablePackage pkg : hotFixes) {
+                if (!toUpdateIds.contains(pkg.getId())) { // check it is not already in update list
+                    // check if package is not already in local
+                    boolean alreadyInLocal = false;
+                    for (DownloadablePackage lpkg : localPackages) {
+                        if (lpkg.getName().equals(pkg.getName())) {
+                            if (lpkg.getVersion().greaterOrEqualThan(pkg.getVersion())) {
+                                    alreadyInLocal = true;
+                            }
+                            break;
+                        }
+                    }
+                    if (!alreadyInLocal) {
+                        toUpdate.add(0, pkg);
+                    }
+                }
             }
         }
 

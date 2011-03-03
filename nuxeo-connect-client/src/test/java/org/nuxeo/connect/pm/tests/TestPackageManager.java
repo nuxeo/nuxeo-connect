@@ -20,7 +20,7 @@ package org.nuxeo.connect.pm.tests;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.update.PackageState;
 
 public class TestPackageManager extends AbstractPackageManagerTestCase {
 
@@ -78,22 +78,25 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> remotes = pm.listRemotePackages();
         dumpPkgList("remote", remotes);
-        assertEquals(2, remotes.size());
+        assertEquals(3, remotes.size());
 
         List<DownloadablePackage> locals = pm.listLocalPackages();
         dumpPkgList("local", locals);
-        assertEquals(2, locals.size());
+        assertEquals(3, locals.size());
 
         List<DownloadablePackage> all = pm.listPackages();
         dumpPkgList("all", all);
-        assertEquals(3, all.size());
+        assertEquals(4, all.size());
 
-        DownloadablePackage downloading = all.get(0);
+        DownloadablePackage downloading = all.get(1);
         assertEquals(2, downloading.getState());
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
-        assertEquals(0, updates.size());
+        assertEquals(1, updates.size());
+
+        assertEquals("pkgA",updates.get(0).getName());
+
 
         List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages();
         dumpPkgList("remoteOnly", remoteOnly);
@@ -101,10 +104,39 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> remoteOrLocal = pm.listRemoteOrLocalPackages();
         dumpPkgList("remoteOrLocal", remoteOrLocal);
-        assertEquals(2, remoteOrLocal.size());
-        downloading = remoteOrLocal.get(0);
+        assertEquals(3, remoteOrLocal.size());
+        downloading = remoteOrLocal.get(1);
         assertEquals(2, downloading.getState());
+
 
     }
 
+    public void testUpdateListing() throws Exception {
+        List<DownloadablePackage> local = getDownloads("localhf1.json");
+        List<DownloadablePackage> remote = getDownloads("remotehf1.json");
+
+        assertNotNull(local);
+        assertTrue(local.size()>0);
+        assertNotNull(remote);
+        assertTrue(remote.size()>0);
+
+        pm.registerSource(new DummyPackageSource(local, true), true);
+        pm.registerSource(new DummyPackageSource(remote, false), false);
+
+        List<DownloadablePackage> remotes = pm.listRemotePackages();
+        dumpPkgList("remote", remotes);
+        assertEquals(4, remotes.size());
+
+        List<DownloadablePackage> locals = pm.listLocalPackages();
+        dumpPkgList("local", locals);
+        assertEquals(3, locals.size());
+
+        List<DownloadablePackage> updates = pm.listUpdatePackages();
+        dumpPkgList("updates", updates);
+        assertEquals(3, updates.size());
+
+        // check that one of them is actually a package downloaded but not installed
+        assertEquals(PackageState.DOWNLOADED, updates.get(2).getState());
+
+    }
 }
