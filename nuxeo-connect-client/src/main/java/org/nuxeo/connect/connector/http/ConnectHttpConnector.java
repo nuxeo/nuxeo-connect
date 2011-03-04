@@ -86,6 +86,9 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
                 return new ConnectHttpResponse(httpClient, method);
             } else {
                 String body = method.getResponseBodyAsString();
+                if (rc==401) {
+                    throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
+                }
                 try {
                     JSONObject obj = new JSONObject(body);
                     String message = obj.getString("message");
