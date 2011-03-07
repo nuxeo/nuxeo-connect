@@ -54,7 +54,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
     protected SubscriptionStatus cachedStatus=null;
 
-    protected static int STATUS_CACHE_TIME_H = 1;
+    public static final String CONNECT_HTTP_CACHE_MINUTES_PROPERTY = "org.nuxeo.connect.http.cache.duration";
 
     protected long lastStatusFetchTime;
 
@@ -128,18 +128,32 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
     }
 
+    protected int httpCacheDurationInMinutes() {
+
+        String cacheInMinutes = NuxeoConnectClient.getProperty(CONNECT_HTTP_CACHE_MINUTES_PROPERTY, "0");
+        try {
+            return Integer.parseInt(cacheInMinutes);
+        }
+        catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    protected boolean useHttpCache() {
+        return httpCacheDurationInMinutes()>0;
+    }
 
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
 
-        if (cachedStatus!=null) {
-            if ((System.currentTimeMillis()-lastStatusFetchTime) < STATUS_CACHE_TIME_H*3600*1000) {
+        if (useHttpCache() && cachedStatus!=null) {
+            if ((System.currentTimeMillis()-lastStatusFetchTime) < httpCacheDurationInMinutes()*60*1000) {
                 return cachedStatus;
             }
         }
 
         try {
             SubscriptionStatus status = super.getConnectStatus();
-            if (!NuxeoConnectClient.isTestModeSet()) { // no cache for testing
+            if (!NuxeoConnectClient.isTestModeSet() && useHttpCache()) { // no cache for testing
                 cachedStatus=status;
             }
             lastStatusFetchTime=System.currentTimeMillis();
