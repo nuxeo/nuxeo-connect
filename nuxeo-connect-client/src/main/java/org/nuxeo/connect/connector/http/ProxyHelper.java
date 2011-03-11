@@ -36,7 +36,7 @@ public class ProxyHelper {
             // configure http proxy
            httpClient.getHostConfiguration().setProxy(ConnectUrlConfig.getProxyHost(), ConnectUrlConfig.getProxyPort());
            // configure proxy auth in BA
-           if (ConnectUrlConfig.getProxyLogin()!=null) {
+           if (ConnectUrlConfig.isProxyAuthenticated()) {
                Credentials ba = new UsernamePasswordCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword());
                httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
            }
