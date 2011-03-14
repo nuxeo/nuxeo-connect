@@ -264,11 +264,29 @@ public class PackageManagerImpl implements
 
 
     public List<DownloadablePackage> listLocalPackages() {
-        return doMergePackages(localSources, null);
+        return listLocalPackages(null);
     }
 
     public List<DownloadablePackage> listLocalPackages(PackageType type) {
-        return doMergePackages(localSources, type);
+
+        // for local package we don't merge / filter on latest versions
+        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<String> pkgIds = new ArrayList<String>();
+        for (PackageSource source : localSources) {
+            List<DownloadablePackage> pkgs = null;
+            if (type==null) {
+                pkgs = source.listPackages();
+            } else {
+                pkgs = source.listPackages(type);
+            }
+            for (DownloadablePackage pkg : pkgs) {
+                if (!pkgIds.contains(pkg.getId())) {
+                    pkgIds.add(pkg.getId());
+                    result.add(pkg);
+                }
+            }
+        }
+        return result;
     }
 
     public List<DownloadablePackage> listUpdatePackages() {
@@ -277,7 +295,9 @@ public class PackageManagerImpl implements
 
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
 
-        List<DownloadablePackage> localPackages = listLocalPackages(type);
+        List<DownloadablePackage> localPackages = doMergePackages(localSources, type);
+        List<DownloadablePackage> localPackages2 = listLocalPackages(type);
+
         List<DownloadablePackage> remotePackages = listRemotePackages(type);
         List<DownloadablePackage> toUpdate = new ArrayList<DownloadablePackage>();
         List<String>  toUpdateIds = new ArrayList<String>();

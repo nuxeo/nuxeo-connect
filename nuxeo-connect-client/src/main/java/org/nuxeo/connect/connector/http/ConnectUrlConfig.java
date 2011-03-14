@@ -84,7 +84,7 @@ public class ConnectUrlConfig {
     public static boolean useProxy() {
         if (useProxy == null) {
             String host = getProxyHost();
-            if (host == null || host.isEmpty()) {
+            if (host == null || host.isEmpty() || host.startsWith("$")) {
                 useProxy=false;
             } else {
                 useProxy = true;
@@ -96,7 +96,7 @@ public class ConnectUrlConfig {
     public static boolean isProxyAuthenticated() {
         if (isProxyAuthenticated == null) {
             String login = getProxyLogin();
-            if (login == null || login.isEmpty()) {
+            if (login == null || login.isEmpty() || login.startsWith("$")) {
                 isProxyAuthenticated=false;
             } else {
                 isProxyAuthenticated = true;
@@ -104,7 +104,6 @@ public class ConnectUrlConfig {
         }
         return isProxyAuthenticated;
     }
-
 
     public static String getProxyHost() {
         return NuxeoConnectClient.getProperty(CONNECT_PROXY_HOST_PROPERTY,
@@ -115,10 +114,14 @@ public class ConnectUrlConfig {
         String portAsString = NuxeoConnectClient.getProperty(
                 CONNECT_PROXY_PORT_PROPERTY, NuxeoConnectClient.getProperty(
                         NUXEO_PROXY_PORT_PROPERTY, null));
-        if (portAsString == null) {
+        if (portAsString == null || portAsString.isEmpty() || portAsString.startsWith("$")) {
             return 80;
         }
-        return Integer.parseInt(portAsString);
+        try {
+           return Integer.parseInt(portAsString);
+        } catch (NumberFormatException e) {
+           return 80;
+        }
     }
 
     public static String getProxyLogin() {
