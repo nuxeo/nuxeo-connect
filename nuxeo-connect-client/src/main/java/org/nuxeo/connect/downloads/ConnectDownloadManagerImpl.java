@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
@@ -34,19 +36,21 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
-*
-* Implementation of the {@link ConnectDownloadManager} interface.
-* This implementation is accessed via {@link ConnectGatewayComponent}
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*/
+ *
+ * Implementation of the {@link ConnectDownloadManager} interface. This
+ * implementation is accessed via {@link ConnectGatewayComponent}
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
-    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(10);
+    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
+            10);
 
-    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,TimeUnit.SECONDS, pendingDownloadTasks);
+    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
+            TimeUnit.SECONDS, pendingDownloadTasks,new DaemonThreadFactory());
 
-    protected Map<String,DownloadingPackage> downloadingPackages = new HashMap<String, DownloadingPackage>();
+    protected Map<String, DownloadingPackage> downloadingPackages = new HashMap<String, DownloadingPackage>();
 
     public List<DownloadingPackage> listDownloadingPackages() {
 
@@ -57,7 +61,8 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
     public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
 
-        LocalDownloadingPackage localPackage = new LocalDownloadingPackage(descriptor);
+        LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
+                descriptor);
         tpexec.execute(localPackage);
         downloadingPackages.put(localPackage.getId(), localPackage);
         return localPackage;
@@ -78,4 +83,31 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         downloadingPackages.remove(packageId);
     }
 
+    protected static class DaemonThreadFactory implements ThreadFactory {
+
+        private final ThreadGroup group;
+
+        private final String namePrefix;
+
+        private static final AtomicInteger poolNumber = new AtomicInteger();
+
+        private final AtomicInteger threadNumber = new AtomicInteger();
+
+        public DaemonThreadFactory() {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup()
+                    : Thread.currentThread().getThreadGroup();
+            namePrefix = "ConnectDownloadThread-" + poolNumber.incrementAndGet() + '-';
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            String name = namePrefix + threadNumber.incrementAndGet();
+            Thread t = new Thread(group, r, name);
+            t.setDaemon(true);
+            t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+
+    }
 }
