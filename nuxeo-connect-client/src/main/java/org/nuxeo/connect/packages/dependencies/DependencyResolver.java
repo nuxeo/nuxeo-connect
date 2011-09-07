@@ -20,6 +20,7 @@
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,11 +82,11 @@ public class DependencyResolver {
     // walk dep tree to find all possible needed versions of packages
     protected RecursiveDependencyResolver computeAvailableChoices(String pkgId, String targetPlatform) throws DependencyException{
         RecursiveDependencyResolver dc = new RecursiveDependencyResolver(pkgId,pm, targetPlatform);
-        recurseOnAvailableChoices(pkgId, targetPlatform, dc, 1);
+        recurseOnAvailableChoices(pkgId, targetPlatform, dc, pkgId);
         return dc;
     }
 
-    protected void recurseOnAvailableChoices(String pkgId, String targetPlatform, RecursiveDependencyResolver dc, int depth) throws DependencyException {
+    protected void recurseOnAvailableChoices(String pkgId, String targetPlatform, RecursiveDependencyResolver dc, String path) throws DependencyException {
         Package pkg = pm.findPackageById(pkgId);
         if (pkg==null) {
             throw new DependencyException("Unable to find package " + pkgId);
@@ -94,13 +95,13 @@ public class DependencyResolver {
             List<Version> versions = pm.getAvailableVersion(dep.getName(), dep.getVersionRange(), targetPlatform);
             if (versions.size()==0) {
                 throw new DependencyException("Unable to find a compatible version for package " + dep.getName() + " (" + dep.getVersionRange().toString()+")");
+            } 
+            if (path.contains(dep.getName())) {
+            	throw new DependencyException(String.format("Detected loop in dependencies: pkg=%s,dep=%s,path=%s'", pkgId, dep.getName(), path));            	
             }
             dc.addDep(dep.getName(), versions);
-            if (depth>=MAX_DEPTH) {
-                throw new DependencyException("Maximum depth reached, check that you don't have a loop in dependencies");
-            }
             for (Version v : versions) {
-                recurseOnAvailableChoices(dep.getName()+ "-" + v.toString(),targetPlatform, dc, depth+1);
+                recurseOnAvailableChoices(dep.getName()+ "-" + v.toString(),targetPlatform, dc, path + "/" + dep.getName());
             }
         }
     }
