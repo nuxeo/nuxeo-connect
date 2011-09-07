@@ -6,7 +6,7 @@
 
   <groupId>org.nuxeo.connect</groupId>
   <artifactId>nuxeo-connect-client-parent</artifactId>
-  <version>1.2</version>
+  <version>1.2-HF01</version>
   <packaging>pom</packaging>
   <name>Nuxeo Connect Client Parent</name>
   <description>Nuxeo Connect Client Parent</description>
