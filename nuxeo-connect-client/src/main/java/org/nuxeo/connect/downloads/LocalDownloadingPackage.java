@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
+import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
@@ -134,6 +135,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
+        ProxyHelper.configureProxyIfNeeded(httpClient);
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
 
