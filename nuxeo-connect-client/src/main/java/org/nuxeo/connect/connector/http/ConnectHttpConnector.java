@@ -19,6 +19,8 @@
 
 package org.nuxeo.connect.connector.http;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -36,7 +38,10 @@ import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectSecurityError;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
+import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.SubscriptionStatus;
+import org.nuxeo.connect.update.PackageType;
 
 
 /**
@@ -54,7 +59,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
     protected SubscriptionStatus cachedStatus=null;
 
+    protected boolean connectServerNotReachable;
+
     public static final String CONNECT_HTTP_CACHE_MINUTES_PROPERTY = "org.nuxeo.connect.http.cache.duration";
+
+    public static final String CONNECT_SERVER_REACHABLE_PROPERTY = "org.nuxeo.connect.server.reachable";
 
     protected long lastStatusFetchTime;
 
@@ -63,6 +72,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
             return overrideUrl;
         }
         return super.getBaseUrl();
+    }
+
+    protected boolean isConnectServerReachable() {
+        return Boolean.parseBoolean(NuxeoConnectClient.getProperty(
+                CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
 
     @Override
@@ -145,6 +159,10 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
 
+        if (!isConnectServerReachable()) {
+            throw new CanNotReachConnectServer("Connect server set as not reachable");
+        }
+
         if (useHttpCache() && cachedStatus!=null) {
             if ((System.currentTimeMillis()-lastStatusFetchTime) < httpCacheDurationInMinutes()*60*1000) {
                 return cachedStatus;
@@ -166,6 +184,21 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
                 throw e;
             }
         }
+    }
+
+    public List<DownloadablePackage> getDownloads(PackageType type)
+            throws ConnectServerError {
+        if (!isConnectServerReachable()) {
+            return new ArrayList<DownloadablePackage>();
+        }
+        return super.getDownloads(type);
+    }
+
+    public DownloadingPackage getDownload(String id) throws ConnectServerError {
+        if (!isConnectServerReachable()) {
+            throw new CanNotReachConnectServer("Connect server set as not reachable");
+        }
+        return super.getDownload(id);
     }
 
 }
