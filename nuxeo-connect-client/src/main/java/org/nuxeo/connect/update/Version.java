@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2011 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu
+ *     bstefanescu, jcarsique
  */
 package org.nuxeo.connect.update;
 
@@ -132,8 +132,7 @@ public class Version implements Comparable<Version> {
             return true;
         }
         if (obj instanceof Version) {
-            Version v = (Version) obj;
-            return v.major == major && v.minor == minor && v.patch == patch;
+            return compareTo((Version) obj) == 0;
         }
         return false;
     }
