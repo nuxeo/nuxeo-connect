@@ -58,6 +58,8 @@ public class RecursiveDependencyResolver {
 
     protected Map<String, List<Version>> deps = new HashMap<String, List<Version>>();
 
+    protected List<String> orderedPackages = new ArrayList<String>();
+
     protected List<DownloadablePackage> installedPackages;
 
     public RecursiveDependencyResolver(String packageId, InternalPackageManager pm, String targetPlatform) {
@@ -91,7 +93,7 @@ public class RecursiveDependencyResolver {
                 }
             }
         }
-        if (resolved) {
+        if (resolved) {            
             return resolution;
         } else {
             if (fallBacks.size()>0) {
@@ -261,6 +263,8 @@ public class RecursiveDependencyResolver {
                 }
             }
         }
+        orderedPackages.remove(pkgName);
+        orderedPackages.add(pkgName);
     }
 
 
@@ -268,7 +272,7 @@ public class RecursiveDependencyResolver {
         return resolve(packageId, depSet);
     }
 
-    // check if the Dependency set satifies all contracts
+    // check if the Dependency set satisfies all contracts
     protected DependencyResolution resolve(String pkgId, DependencySet depSet) {
         DependencyResolution res = new DependencyResolution();
 
@@ -321,4 +325,9 @@ public class RecursiveDependencyResolver {
         }
         return sb.toString();
     }
+
+    public List<String> getOrderedPackages() {
+        return orderedPackages;
+    }
+
 }

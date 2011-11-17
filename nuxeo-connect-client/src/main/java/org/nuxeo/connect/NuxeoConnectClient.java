@@ -63,6 +63,11 @@ public class NuxeoConnectClient {
         return packageManager;
     }
 
+    public static void resetPackageManager() {
+        packageManager = null;
+    }
+
+
     public static boolean isTestModeSet() {
         return cbHolder.isTestModeSet();
     }

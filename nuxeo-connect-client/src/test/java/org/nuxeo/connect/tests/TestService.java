@@ -43,6 +43,7 @@ public class TestService extends TestCase {
         System.setProperty("org.nuxeo.connect.client.testMode", "true");
 
         LogicalInstanceIdentifier.cleanUp();
+        NuxeoConnectClient.resetPackageManager();
     }
 
     public void testServiceLookup() {

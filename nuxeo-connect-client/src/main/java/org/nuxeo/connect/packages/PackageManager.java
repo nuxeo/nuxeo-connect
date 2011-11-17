@@ -136,6 +136,15 @@ public interface PackageManager extends BasePackageManager {
     DownloadingPackage download(String packageId) throws Exception ;
 
     /**
+     * Get the Download descriptors for a given list of package ids
+     *
+     * @param packageIds
+     * @return
+     * @throws Exception
+     */
+    List<DownloadingPackage> download(List<String> packageIds) throws Exception;
+
+    /**
      * Start installation process via {@link PackageUpdateService}
      *
      * @param packageId Identifier of the {@link Package} to install
@@ -143,6 +152,15 @@ public interface PackageManager extends BasePackageManager {
      * @throws Exception
      */
     void install(String packageId, Map<String, String> params) throws Exception;
+
+    /**
+     * Serial installation of several packages
+     *
+     * @param packageIds List of identifiers of the {@link Package}s to install
+     * @param params Installation parameters (as collected via Wizard's form)
+     * @throws Exception
+     */
+    void install(List<String> packageIds, Map<String, String> params) throws Exception;
 
     /**
      * Flushes the caches used on remote {@link PackageSource}

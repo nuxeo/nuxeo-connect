@@ -20,6 +20,7 @@
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,6 @@ import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.Version;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
 * Represents the result of the dependencies resolution process :
@@ -62,6 +61,8 @@ public class DependencyResolution {
     protected Map<String, Version> localPackagesToRemove = new HashMap<String, Version>();
 
     protected Map<String, Version> localUnchangedPackages = new HashMap<String, Version>();
+
+    protected List<String> orderedInstallablePackages = new ArrayList<String>();
 
     public DependencyResolution() {
 
@@ -98,11 +99,12 @@ public class DependencyResolution {
         if (allPackages.containsKey(pkgName)) {
             if (!allPackages.get(pkgName).equals(v)) {
                 resolution=false;
+            } else {
             }
         } else {
             allPackages.put(pkgName, v);
+            orderedInstallablePackages.add(0, pkgName);
         }
-
         return !isFailed();
     }
 
@@ -133,8 +135,8 @@ public class DependencyResolution {
                 }
             }
         }
-        sorted=true;
 
+        sorted=true;
     }
 
     public Map<String, Version> getNewPackagesToDownload() {
@@ -173,11 +175,16 @@ public class DependencyResolution {
         return false;
     }
 
+    public List<String> getInstallationOrder() {
+        return orderedInstallablePackages;
+    }
+
     public List<String> getUnchangedPackageIds() {
         List<String> res = new ArrayList<String>();
         for (Entry<String,Version> entry : getLocalUnchangedPackages().entrySet()) {
             res.add(entry.getKey()+"-"+entry.getValue().toString());
         }
+        Collections.sort(res);
         return res;
     }
 
@@ -186,6 +193,7 @@ public class DependencyResolution {
         for (Entry<String,Version> entry : getLocalPackagesToUpgrade().entrySet()) {
             res.add(entry.getKey()+"-"+entry.getValue().toString());
         }
+        Collections.sort(res);
         return res;
     }
 
@@ -194,6 +202,7 @@ public class DependencyResolution {
         for (Entry<String,Version> entry : getLocalPackagesToInstall().entrySet()) {
             res.add(entry.getKey()+"-"+entry.getValue().toString());
         }
+        Collections.sort(res);
         return res;
     }
 
@@ -202,6 +211,7 @@ public class DependencyResolution {
         for (Entry<String,Version> entry : getNewPackagesToDownload().entrySet()) {
             res.add(entry.getKey()+"-"+entry.getValue().toString());
         }
+        Collections.sort(res);
         return res;
     }
 
@@ -210,6 +220,7 @@ public class DependencyResolution {
         for (Entry<String,Version> entry : getLocalPackagesToRemove().entrySet()) {
             res.add(entry.getKey()+"-"+entry.getValue().toString());
         }
+        Collections.sort(res);
         return res;
     }
 
@@ -264,9 +275,27 @@ public class DependencyResolution {
                     sb.append(localPackagesToRemove.get(pkgName).toString());
                     sb.append(", ");
                 }
-
+                sb.append("\nInstallation Order: ");
+                sb.append(getInstallationOrderAsString());
             }
         }
+        return sb.toString();
+    }
+
+    public String getInstallationOrderAsString() {
+        if (orderedInstallablePackages==null) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < orderedInstallablePackages.size();  i++ ) {
+            if (i>0) {
+                sb.append("/");
+            }
+            sb.append(orderedInstallablePackages.get(i));
+
+
+        }
+
         return sb.toString();
     }
 }

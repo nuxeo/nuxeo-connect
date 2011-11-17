@@ -354,9 +354,16 @@ public class PackageManagerImpl implements
 
 
     public DownloadingPackage download(String packageId) throws Exception {
-
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         return crs.getConnector().getDownload(packageId);
+    }
+
+    public List<DownloadingPackage> download(List<String> packageIds) throws Exception {
+        List<DownloadingPackage> downloadings = new ArrayList<DownloadingPackage>();
+        for (String packageId : packageIds) {
+            downloadings.add(download(packageId));
+        }
+        return downloadings;
     }
 
     public void install(String packageId, Map<String, String> params) throws Exception {
@@ -374,6 +381,12 @@ public class PackageManagerImpl implements
         Task installationTask = pkg.getInstallTask();
         installationTask.validate();
         installationTask.run(params);
+    }
+
+    public void install(List<String> packageIds, Map<String, String> params) throws Exception {
+        for (String packageId : packageIds) {
+            install(packageId, params);
+        }
     }
 
     // Internal impl
