@@ -64,6 +64,8 @@ public class DependencyResolution {
 
     protected List<String> orderedInstallablePackages = new ArrayList<String>();
 
+    protected List<String> allPackagesToDownload = new ArrayList<String>();
+
     public DependencyResolution() {
 
     }
@@ -118,6 +120,7 @@ public class DependencyResolution {
         newPackagesToDownload.clear();
         localPackagesToInstall.clear();
         localUnchangedPackages.clear();
+        allPackagesToDownload.clear();
 
         for (String pkgName : allPackages.keySet()) {
             String id = pkgName + "-" + allPackages.get(pkgName).toString();
@@ -125,9 +128,13 @@ public class DependencyResolution {
             List<Version> existingVersions = pm.findLocalPackageVersions(pkg.getName());
             if (existingVersions.size()>0 && ! existingVersions.contains(pkg.getVersion())) {
                 localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
+                if (pkg.getState()==PackageState.REMOTE) {
+                    allPackagesToDownload.add(id);
+                }
             } else {
                 if (pkg.getState()==PackageState.REMOTE) {
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
+                    allPackagesToDownload.add(id);
                 } else if (pkg.getState()>PackageState.REMOTE && pkg.getState()<PackageState.INSTALLING) {
                     localPackagesToInstall.put(pkg.getName(), pkg.getVersion());
                 } else if ( pkg.getState()>PackageState.INSTALLING) {
@@ -135,7 +142,6 @@ public class DependencyResolution {
                 }
             }
         }
-
         sorted=true;
     }
 
@@ -292,10 +298,18 @@ public class DependencyResolution {
                 sb.append("/");
             }
             sb.append(orderedInstallablePackages.get(i));
-
-
         }
+        return sb.toString();
+    }
 
+    public String getAllPackagesToDownloadAsString() {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < allPackagesToDownload.size();  i++ ) {
+            if (i>0) {
+                sb.append("/");
+            }
+            sb.append(allPackagesToDownload.get(i) );
+        }
         return sb.toString();
     }
 }
