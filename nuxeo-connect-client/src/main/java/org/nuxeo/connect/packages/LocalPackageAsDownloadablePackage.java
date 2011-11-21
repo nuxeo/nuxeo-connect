@@ -197,4 +197,8 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
         return null;
     }
 
+    @Override
+    public String toString() {
+       return getId();
+    }
 }

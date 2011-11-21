@@ -302,6 +302,18 @@ public class DependencyResolution {
         return sb.toString();
     }
 
+    public List<String> getOrderedPackageIdsToInstall() {
+
+        List<String> pkgIds = new ArrayList<String>();
+
+        for (String pkgName : orderedInstallablePackages) {
+            String pkgId = pkgName + "-" + allPackages.get(pkgName).toString();
+            pkgIds.add(pkgId);
+        }
+
+        return pkgIds;
+    }
+
     public String getAllPackagesToDownloadAsString() {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < allPackagesToDownload.size();  i++ ) {

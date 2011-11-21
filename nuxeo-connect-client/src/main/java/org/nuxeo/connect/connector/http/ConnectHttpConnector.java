@@ -132,14 +132,14 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
         }
         catch (Throwable t) {
             String exName = t.getClass().getName();
-            if (exName.startsWith("java.net")) {
+            if (exName.startsWith("java.net") || exName.startsWith("org.apache.commons.httpclient")) {
                 log.warn("Connect Server is not reachable");
+                method.releaseConnection();
                 throw new CanNotReachConnectServer(t.getMessage(), t);
             }
             method.releaseConnection();
             throw new ConnectServerError("Error during communication with the Nuxeo Connect Server", t);
         }
-
     }
 
     protected int httpCacheDurationInMinutes() {

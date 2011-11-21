@@ -68,12 +68,13 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         ConnectServerResponse response = execCall(url);
 
         String json = response.getString();
-
+        if (json==null) {
+            throw new ConnectServerError("null response from server");
+        }
         try {
             return AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
-        } catch (JSONException e) {
-            throw new ConnectServerError("Unable to parse response", e);
-
+        } catch (Throwable t) {
+            throw new ConnectServerError("Unable to parse response : " + json , t);
         }finally {
             response.release();
         }
