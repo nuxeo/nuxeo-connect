@@ -251,6 +251,7 @@ public class PackageManagerImpl implements
                 }
             }
         }
+        Collections.sort(res, new VersionPackageComparator());
         return res;
     }
 
@@ -259,7 +260,9 @@ public class PackageManagerImpl implements
     }
 
     public List<DownloadablePackage> listRemotePackages(PackageType type) {
-        return doMergePackages(remoteSources, type);
+        List<DownloadablePackage> result =  doMergePackages(remoteSources, type);
+        Collections.sort(result, new VersionPackageComparator());
+        return result;
     }
 
 
@@ -286,6 +289,8 @@ public class PackageManagerImpl implements
                 }
             }
         }
+
+        Collections.sort(result, new VersionPackageComparator());
         return result;
     }
 
@@ -296,7 +301,6 @@ public class PackageManagerImpl implements
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
 
         List<DownloadablePackage> localPackages = doMergePackages(localSources, type);
-        List<DownloadablePackage> localPackages2 = listLocalPackages(type);
 
         List<DownloadablePackage> remotePackages = listRemotePackages(type);
         List<DownloadablePackage> toUpdate = new ArrayList<DownloadablePackage>();
@@ -348,6 +352,8 @@ public class PackageManagerImpl implements
                 }
             }
         }
+
+        Collections.sort(toUpdate, new VersionPackageComparator());
 
         return toUpdate;
     }

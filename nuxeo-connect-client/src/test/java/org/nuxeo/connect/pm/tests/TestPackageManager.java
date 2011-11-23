@@ -136,7 +136,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         assertEquals(3, updates.size());
 
         // check that one of them is actually a package downloaded but not installed
-        assertEquals(PackageState.DOWNLOADED, updates.get(2).getState());
+        assertEquals(PackageState.DOWNLOADED, updates.get(0).getState());
 
     }
 }

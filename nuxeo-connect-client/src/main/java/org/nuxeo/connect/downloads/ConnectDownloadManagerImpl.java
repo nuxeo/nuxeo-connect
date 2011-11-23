@@ -44,8 +44,7 @@ import org.nuxeo.connect.data.PackageDescriptor;
  */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
-    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
-            10);
+    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(25);
 
     protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
             TimeUnit.SECONDS, pendingDownloadTasks,new DaemonThreadFactory());
