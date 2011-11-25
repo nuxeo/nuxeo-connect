@@ -52,6 +52,14 @@ public interface InternalPackageManager extends BasePackageManager{
     List<Version> findLocalPackageVersions(String packageName);
 
     /**
+     * Returns all local {@link Package} installed versions for a given name
+     *
+     * @param packageName
+     * @return
+     */
+    List<Version> findLocalPackageInstalledVersions(String packageName);
+
+    /**
      * Returns all {@link Package} versions for a given name and {@link VersionRange}
      *
      * @param packageName

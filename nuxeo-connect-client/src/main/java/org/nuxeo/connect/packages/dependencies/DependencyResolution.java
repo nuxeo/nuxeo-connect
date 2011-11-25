@@ -125,7 +125,7 @@ public class DependencyResolution {
         for (String pkgName : allPackages.keySet()) {
             String id = pkgName + "-" + allPackages.get(pkgName).toString();
             DownloadablePackage pkg = pm.findPackageById(id);
-            List<Version> existingVersions = pm.findLocalPackageVersions(pkg.getName());
+            List<Version> existingVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
             if (existingVersions.size()>0 && ! existingVersions.contains(pkg.getVersion())) {
                 localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
                 if (pkg.getState()==PackageState.REMOTE) {
@@ -324,6 +324,6 @@ public class DependencyResolution {
         }
         return sb.toString();
     }
-    
-    
+
+
 }

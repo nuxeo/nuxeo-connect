@@ -68,4 +68,7 @@ public class DummyPackageSource implements PackageSource {
         // NOP
     }
 
+    public void reset(List<DownloadablePackage> pkgs) {
+        this.pkgs = pkgs;
+    }
 }

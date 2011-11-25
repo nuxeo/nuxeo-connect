@@ -123,7 +123,20 @@ public class Version implements Comparable<Version> {
         if (d != 0) {
             return d;
         }
-        return 0;
+
+        if (classifier==null) {
+            if (o.classifier==null) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            if (o.classifier==null) {
+                return -1;
+            } else {
+                return classifier.compareTo(o.classifier);
+            }
+        }
     }
 
     @Override

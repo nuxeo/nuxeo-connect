@@ -149,6 +149,19 @@ public class PackageManagerImpl implements
         return versions;
     }
 
+    public List<Version> findLocalPackageInstalledVersions(String packageName) {
+
+        List<Version> versions = new ArrayList<Version>();
+        for (PackageSource source : localSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(packageName) && pkg.getState()>=PackageState.INSTALLING) {
+                    versions.add(pkg.getVersion());
+                }
+            }
+        }
+        return versions;
+    }
+
     public DownloadablePackage findPackageById(String packageId) {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {

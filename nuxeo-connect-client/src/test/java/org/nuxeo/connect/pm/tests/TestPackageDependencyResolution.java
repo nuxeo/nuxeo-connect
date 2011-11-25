@@ -52,7 +52,7 @@ public class TestPackageDependencyResolution extends AbstractPackageManagerTestC
         depResolution = pm.resolveDependencies("F-1.0.0", null);
         log.info("Dependency resolution : " + depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(0, depResolution.getLocalUnchangedPackages().size());
         assertEquals(2, depResolution.getNewPackagesToDownload().size());

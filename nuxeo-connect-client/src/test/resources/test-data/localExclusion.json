@@ -1,0 +1,3 @@
+{"id":"nuxeo-cap-5.5","name":"nuxeo-cap", "version":"5.5","title":"Nuxeo CAP","description":"Nuxeo CAP", "type":"addon", "state":5}
+{"id":"nuxeo-content-browser-5.5.0","name":"nuxeo-content-browser", "version":"5.5.0","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":5}
+{"id":"nuxeo-dm-5.5","name":"nuxeo-dm", "version":"5.5","title":"Nuxeo DM","description":"Nuxeo DM", "type":"addon", "state":5, "dependencies":["nuxeo-content-browser:5.5.0:5.5.0"]}
