@@ -6,8 +6,6 @@ import org.nuxeo.connect.data.DownloadablePackage;
 
 public class TestUninstallCheck extends AbstractPackageManagerTestCase {
 
-    protected DummyPackageSource source;
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

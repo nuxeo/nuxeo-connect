@@ -34,7 +34,14 @@ public class Version implements Comparable<Version> {
 
     protected String classifier;
 
+    protected boolean snapshot = false;
+
     public Version(String version) {
+        int i = version.indexOf("-SNAPSHOT");
+        if (i > 0) {
+            version = version.substring(0, i);
+            snapshot = true;
+        }
         int p = version.lastIndexOf('-');
         if (p > 0) { // classifier found
             classifier = version.substring(p + 1);
@@ -124,18 +131,21 @@ public class Version implements Comparable<Version> {
             return d;
         }
 
-        if (classifier==null) {
-            if (o.classifier==null) {
+        String mClassifier = (classifier == null)? "":classifier;
+        String oClassifier = (o.classifier == null)? "":o.classifier;
+
+        if (mClassifier.equals(oClassifier)) {
+            if (new Boolean(snapshot).equals(o.isSnapshot())) {
                 return 0;
             } else {
-                return 1;
+                if (isSnapshot()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         } else {
-            if (o.classifier==null) {
-                return -1;
-            } else {
-                return classifier.compareTo(o.classifier);
-            }
+            return mClassifier.compareTo(oClassifier);
         }
     }
 
@@ -156,11 +166,16 @@ public class Version implements Comparable<Version> {
     }
 
     public String toString() {
+        String v;
         if (classifier == null) {
-            return major + "." + minor + "." + patch;
+            v = major + "." + minor + "." + patch;
         } else {
-            return major + "." + minor + "." + patch + "-" + classifier;
+            v = major + "." + minor + "." + patch + "-" + classifier;
         }
+        if (isSnapshot()) {
+            v = v + "-SNAPSHOT";
+        }
+        return v;
     }
 
     public static void main(String[] args) {
@@ -168,4 +183,9 @@ public class Version implements Comparable<Version> {
         System.out.println(new Version("1-SNAPSHOT"));
         System.out.println(new Version("1.0.0-SNAPSHOT"));
     }
+
+    public boolean isSnapshot() {
+        return snapshot;
+    }
+
 }
