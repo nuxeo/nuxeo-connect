@@ -36,6 +36,7 @@ import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
+import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -557,4 +558,37 @@ public class PackageManagerImpl implements
         }
     }
 
+    @Override
+    public List<DownloadablePackage> getUninstallDependencies(DownloadablePackage pkg) {
+
+        // This impl is clearly not very sharp
+
+        List<String> pkgNamesToRemove = new ArrayList<String>();
+        List<DownloadablePackage> installedPackages = listInstalledPackages();
+        int nbImpactedPackages = 0;
+        pkgNamesToRemove.add(pkg.getName());
+        while (pkgNamesToRemove.size()>nbImpactedPackages) {
+            nbImpactedPackages = pkgNamesToRemove.size();
+            for (DownloadablePackage p : installedPackages) {
+                if (!pkgNamesToRemove.contains(p.getName())) {
+                    for (PackageDependency dep : p.getDependencies()) {
+                        if (pkgNamesToRemove.contains(dep.getName())) {
+                            pkgNamesToRemove.add(p.getName());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
+        for (String pkgName : pkgNamesToRemove) {
+            for (Version v : findLocalPackageInstalledVersions(pkgName)) {
+                DownloadablePackage p = getLocalPackage(pkgName + "-" + v.toString());
+                packagesToUninstall.add(p);
+            }
+
+        }
+
+        return packagesToUninstall;
+    }
 }

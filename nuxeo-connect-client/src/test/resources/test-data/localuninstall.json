@@ -1,0 +1,8 @@
+{"version":"1.0.0","name":"A","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"B","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"C","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["B:1.0.0:1.0.0"],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"D","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"E","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["D:1.0.0:1.0.0"],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"F","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":5,"type":"addon"}
+{"version":"1.0.0","name":"G","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["B:1.0.0:1.0.0"],"state":2,"type":"addon"}
+{"version":"1.0.0","name":"H","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["B:1.0.0:1.0.0"],"state":3,"type":"addon"}
