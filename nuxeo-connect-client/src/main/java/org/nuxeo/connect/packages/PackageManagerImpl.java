@@ -36,6 +36,7 @@ import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
@@ -559,7 +560,7 @@ public class PackageManagerImpl implements
     }
 
     @Override
-    public List<DownloadablePackage> getUninstallDependencies(DownloadablePackage pkg) {
+    public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
 
         // This impl is clearly not very sharp
 

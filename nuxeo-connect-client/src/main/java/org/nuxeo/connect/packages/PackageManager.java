@@ -177,10 +177,10 @@ public interface PackageManager extends BasePackageManager {
     DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
 
     /**
-     * Returns the packages uninstalled if the given {@link DownloadablePackage} is removed
+     * Returns the packages uninstalled if the given {@link Package} is removed
      *
-     * @param pkg the {@link DownloadablePackage} that is being uninstalled
+     * @param pkg the {@link Package} that is being uninstalled
      * @return List of all {@link DownloadablePackage} that must be uninstalled too
      */
-    List<DownloadablePackage> getUninstallDependencies(DownloadablePackage pkg);
+    List<DownloadablePackage> getUninstallDependencies(Package pkg);
 }
