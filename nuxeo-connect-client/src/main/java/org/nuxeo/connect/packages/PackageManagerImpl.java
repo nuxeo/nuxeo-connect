@@ -581,6 +581,9 @@ public class PackageManagerImpl implements
                 }
             }
         }
+
+        pkgNamesToRemove.remove(pkg.getName());
+
         List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
         for (String pkgName : pkgNamesToRemove) {
             for (Version v : findLocalPackageInstalledVersions(pkgName)) {
