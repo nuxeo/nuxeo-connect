@@ -325,5 +325,8 @@ public class DependencyResolution {
         return sb.toString();
     }
 
+    public int getNbPackagesToDownload() {
+        return allPackagesToDownload.size();
+    }
 
 }
