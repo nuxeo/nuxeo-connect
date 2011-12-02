@@ -43,6 +43,10 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_PROXY_PASSWORD_PROPERTY = "org.nuxeo.connect.proxy.password";
 
+    public static final String CONNECT_PROXY_NTLM_HOST = "org.nuxeo.connect.proxy.ntlm.host";
+
+    public static final String CONNECT_PROXY_NTLM_DOMAIN = "org.nuxeo.connect.proxy.ntlm.domain";
+
     public static final String NUXEO_PROXY_HOST_PROPERTY = "nuxeo.http.proxy.host";
 
     public static final String NUXEO_PROXY_PORT_PROPERTY = "nuxeo.http.proxy.port";
@@ -50,6 +54,10 @@ public class ConnectUrlConfig {
     public static final String NUXEO_PROXY_LOGIN_PROPERTY = "nuxeo.http.proxy.login";
 
     public static final String NUXEO_PROXY_PASSWORD_PROPERTY = "nuxeo.http.proxy.password";
+
+    public static final String NUXEO_PROXY_NTLM_HOST = "nuxeo.http.proxy.ntlm.host";
+
+    public static final String NUXEO_PROXY_NTLM_DOMAIN = "nuxeo.http.proxy.ntlm.domain";
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
@@ -136,4 +144,27 @@ public class ConnectUrlConfig {
                         null));
     }
 
+    public static String getProxyNTLMHost() {
+        return NuxeoConnectClient.getProperty(CONNECT_PROXY_NTLM_HOST,
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_HOST,
+                        null));
+    }
+
+    public static String getProxyNTLMDomain() {
+        return NuxeoConnectClient.getProperty(CONNECT_PROXY_NTLM_DOMAIN,
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_DOMAIN,
+                        null));
+    }
+
+    public static boolean isProxyNTLM() {
+        String host = getProxyNTLMHost();
+        if (host == null || host.isEmpty() || host.startsWith("$")) {
+            return false;
+        }
+        String domain = getProxyNTLMDomain();
+        if (domain == null || domain.isEmpty() || domain.startsWith("$")) {
+            return false;
+        }
+        return true;
+    }
 }

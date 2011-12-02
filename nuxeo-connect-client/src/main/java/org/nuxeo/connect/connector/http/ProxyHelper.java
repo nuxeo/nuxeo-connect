@@ -21,6 +21,7 @@ package org.nuxeo.connect.connector.http;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 /**
@@ -31,14 +32,21 @@ import org.apache.commons.httpclient.auth.AuthScope;
  */
 public class ProxyHelper {
 
+    protected static boolean useNTLM = false;
+
     public static void configureProxyIfNeeded(HttpClient httpClient) {
         if (ConnectUrlConfig.useProxy()) {
             // configure http proxy
            httpClient.getHostConfiguration().setProxy(ConnectUrlConfig.getProxyHost(), ConnectUrlConfig.getProxyPort());
            // configure proxy auth in BA
            if (ConnectUrlConfig.isProxyAuthenticated()) {
-               Credentials ba = new UsernamePasswordCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword());
-               httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+               if (ConnectUrlConfig.isProxyNTLM()) {
+                   NTCredentials ntlmCredential = new NTCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword(), ConnectUrlConfig.getProxyNTLMHost(), ConnectUrlConfig.getProxyNTLMDomain());
+                   httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ntlmCredential);
+               } else {
+                   Credentials ba = new UsernamePasswordCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword());
+                   httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+               }
            }
         }
     }
