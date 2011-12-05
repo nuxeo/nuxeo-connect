@@ -65,6 +65,15 @@ public interface PackageUpdateService {
     LocalPackage addPackage(File file) throws PackageException;
 
     /**
+     * Removes a package from the packages registry given its ID.
+     * The package has to be in {@link PackageState#DOWNLOADED} state.
+     *
+     * @param id
+     * @throws Exception
+     */
+    void removePackage(String id) throws PackageException;
+
+    /**
      * Get a package object given its ID
      * 
      * @param id
