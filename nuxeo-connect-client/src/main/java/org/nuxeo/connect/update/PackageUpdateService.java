@@ -30,6 +30,13 @@ import org.nuxeo.connect.update.model.PackageDefinition;
 public interface PackageUpdateService {
 
     /**
+     * Get the directory where files packages and meta-data files are are stored
+     * 
+     * @return
+     */
+    File getDataDir();
+
+    /**
      * Initialize the service. This is usually doing file system initialization
      * and loading the list of local packages.
      * 
@@ -138,12 +145,12 @@ public interface PackageUpdateService {
             throws PackageException;
 
     /**
-     * Reset the index file -> mark all packages as downloaded.
-     * Do not modify package data. This method should be used after a system upgrade 
-     * to reset packages that were previously installed.
+     * Reset the index file -> mark all packages as downloaded. Do not modify
+     * package data. This method should be used after a system upgrade to reset
+     * packages that were previously installed.
      * 
-     * This is usually invoked from command line tools by the administrator after 
-     * an upgrade to reset the downloaded package states.  
+     * This is usually invoked from command line tools by the administrator
+     * after an upgrade to reset the downloaded package states.
      * 
      * @throws PackageException
      */
