@@ -38,14 +38,12 @@ public interface PackageDefinition {
      * The ID is a string composed from the package name and the package
      * version: <code>name-version</code>
      *
-     * @return
      */
     String getId();
 
     /**
      * Get the package name.
      *
-     * @return
      */
     String getName();
 
@@ -59,7 +57,6 @@ public interface PackageDefinition {
     /**
      * Get the package version.
      *
-     * @return
      */
     Version getVersion();
 
@@ -73,7 +70,6 @@ public interface PackageDefinition {
     /**
      * Get the package type.
      *
-     * @return
      */
     PackageType getType();
 
@@ -87,7 +83,6 @@ public interface PackageDefinition {
     /**
      * Get the package title.
      *
-     * @return
      */
     String getTitle();
 
@@ -101,7 +96,6 @@ public interface PackageDefinition {
     /**
      * Get the package description.
      *
-     * @return
      */
     String getDescription();
 
@@ -115,7 +109,6 @@ public interface PackageDefinition {
     /**
      * Get the package classifier.
      *
-     * @return
      */
     String getClassifier();
 
@@ -131,7 +124,6 @@ public interface PackageDefinition {
      *
      * The vendor represent the entity providing the package.
      *
-     * @return
      */
     String getVendor();
 
@@ -273,43 +265,36 @@ public interface PackageDefinition {
     /**
      * Get an XML representation of this package definition.
      *
-     * @return
      */
     public String toXML();
 
     /**
      * Get the production state of the package
      *
-     * @return
      */
     public ProductionState getProductionState();
 
     /**
      * Get the validation state of the Package
-     * @return
      */
     public NuxeoValidationState getValidationState();
 
     /**
      * Test if Package is supported by Nuxeo
      *
-     * @return
      */
     public boolean isSupported();
 
     /**
      * Test if package supports HotReload
      *
-     * @return
      */
     public boolean supportsHotReload();
 
     /**
      * Test if terms and conditions should be accepted by user
      *
-     * @return
      */
     public boolean requireTermsAndConditionsAcceptance();
 
 }
-

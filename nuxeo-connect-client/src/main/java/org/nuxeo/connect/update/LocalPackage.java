@@ -88,14 +88,12 @@ public interface LocalPackage extends Package {
     /**
      * Get the content of the license file.
      *
-     * @return
      */
     String getLicenseContent() throws PackageException;
 
     /**
      * Get the content of the terms and conditions file.
      *
-     * @return
      */
     String getTermsAndConditionsContent() throws PackageException;
 
@@ -104,14 +102,13 @@ public interface LocalPackage extends Package {
      * and must return null. All local packages have an attached bundle and must
      * return non null.
      *
-     * @return
      */
     PackageData getData();
 
     /**
      * Get the install commands file to execute when installing the package
      *
-     * @return
+     *
      * @throws PackageException
      */
     File getInstallFile() throws PackageException;
@@ -119,7 +116,7 @@ public interface LocalPackage extends Package {
     /**
      * Get the install log commands file to execute when uninstalling.
      *
-     * @return
+     *
      * @throws PackageException
      */
     File getUninstallFile() throws PackageException;
@@ -127,7 +124,7 @@ public interface LocalPackage extends Package {
     /**
      * Get the install task instance.
      *
-     * @return
+     *
      * @throws PackageException
      */
     Task getInstallTask() throws PackageException;
@@ -135,7 +132,7 @@ public interface LocalPackage extends Package {
     /**
      * Get the uninstall task instance.
      *
-     * @return
+     *
      * @throws PackageException
      */
     Task getUninstallTask() throws PackageException;
@@ -177,9 +174,9 @@ public interface LocalPackage extends Package {
     Form[] getValidationForms() throws PackageException;
 
     /**
-     * Indicates if terms and conditions must be accepted bu user before installation
+     * Indicates if terms and conditions must be accepted bu user before
+     * installation
      *
-     * @return
      */
     boolean requireTermsAndConditionsAcceptance();
 

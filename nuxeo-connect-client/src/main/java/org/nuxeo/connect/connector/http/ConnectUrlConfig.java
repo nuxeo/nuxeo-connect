@@ -21,8 +21,6 @@ package org.nuxeo.connect.connector.http;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 
-import sun.security.action.GetLongAction;
-
 /**
  *
  * Helper to manage URL configuration when accessing Nuxceo Connect Services
@@ -87,13 +85,14 @@ public class ConnectUrlConfig {
     // Proxy settings management
 
     protected static Boolean useProxy = null;
+
     protected static Boolean isProxyAuthenticated = null;
 
     public static boolean useProxy() {
         if (useProxy == null) {
             String host = getProxyHost();
             if (host == null || host.isEmpty() || host.startsWith("$")) {
-                useProxy=false;
+                useProxy = false;
             } else {
                 useProxy = true;
             }
@@ -105,7 +104,7 @@ public class ConnectUrlConfig {
         if (isProxyAuthenticated == null) {
             String login = getProxyLogin();
             if (login == null || login.isEmpty() || login.startsWith("$")) {
-                isProxyAuthenticated=false;
+                isProxyAuthenticated = false;
             } else {
                 isProxyAuthenticated = true;
             }
@@ -120,15 +119,16 @@ public class ConnectUrlConfig {
 
     public static int getProxyPort() {
         String portAsString = NuxeoConnectClient.getProperty(
-                CONNECT_PROXY_PORT_PROPERTY, NuxeoConnectClient.getProperty(
-                        NUXEO_PROXY_PORT_PROPERTY, null));
-        if (portAsString == null || portAsString.isEmpty() || portAsString.startsWith("$")) {
+                CONNECT_PROXY_PORT_PROPERTY,
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_PORT_PROPERTY, null));
+        if (portAsString == null || portAsString.isEmpty()
+                || portAsString.startsWith("$")) {
             return 80;
         }
         try {
-           return Integer.parseInt(portAsString);
+            return Integer.parseInt(portAsString);
         } catch (NumberFormatException e) {
-           return 80;
+            return 80;
         }
     }
 
@@ -146,14 +146,12 @@ public class ConnectUrlConfig {
 
     public static String getProxyNTLMHost() {
         return NuxeoConnectClient.getProperty(CONNECT_PROXY_NTLM_HOST,
-                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_HOST,
-                        null));
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_HOST, null));
     }
 
     public static String getProxyNTLMDomain() {
         return NuxeoConnectClient.getProperty(CONNECT_PROXY_NTLM_DOMAIN,
-                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_DOMAIN,
-                        null));
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_NTLM_DOMAIN, null));
     }
 
     public static boolean isProxyNTLM() {

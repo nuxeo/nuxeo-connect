@@ -30,8 +30,10 @@ import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
 
 /**
- * Service interface that wraps all {@link PackageSource} to provide an unified view
- * The main purpose of this interface is to provide listing methods that return the
+ * Service interface that wraps all {@link PackageSource} to provide an unified
+ * view
+ * The main purpose of this interface is to provide listing methods that return
+ * the
  * most up to date version of packages for given filters
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
@@ -39,12 +41,14 @@ import org.nuxeo.connect.update.PackageUpdateService;
 public interface PackageManager extends BasePackageManager {
 
     /**
-     * Returns most recent version of {@link DownloadablePackage} from all sources.
+     * Returns most recent version of {@link DownloadablePackage} from all
+     * sources.
      */
     List<DownloadablePackage> listPackages();
 
     /**
-     * Returns most recent version of {@link DownloadablePackage} from all sources for a give {@link PackageType}.
+     * Returns most recent version of {@link DownloadablePackage} from all
+     * sources for a give {@link PackageType}.
      */
     List<DownloadablePackage> listPackages(PackageType type);
 
@@ -59,17 +63,20 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listLocalPackages();
 
     /**
-     * Lists most recent version of {@link DownloadablePackage} locally present for a give {@link PackageType}.
+     * Lists most recent version of {@link DownloadablePackage} locally present
+     * for a give {@link PackageType}.
      */
     List<DownloadablePackage> listLocalPackages(PackageType type);
 
     /**
-     * Lists most recent version of {@link DownloadablePackage} available on connect server.
+     * Lists most recent version of {@link DownloadablePackage} available on
+     * connect server.
      */
     List<DownloadablePackage> listRemotePackages();
 
     /**
-     * Lists most recent version of {@link DownloadablePackage} available on connect server for a given {@link PackageType}.
+     * Lists most recent version of {@link DownloadablePackage} available on
+     * connect server for a given {@link PackageType}.
      */
     List<DownloadablePackage> listRemotePackages(PackageType type);
 
@@ -81,18 +88,21 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present
-     * and that can be updated by a higher version available on connect server for a given {@link PackageType}.
+     * and that can be updated by a higher version available on connect server
+     * for a given {@link PackageType}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type);
 
     /**
-     * Lists most recent version of {@link DownloadablePackage} available only on the connect server
+     * Lists most recent version of {@link DownloadablePackage} available only
+     * on the connect server
      * (ie no local version).
      */
     List<DownloadablePackage> listOnlyRemotePackages();
 
     /**
-     * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local version)
+     * Lists most recent version of {@link DownloadablePackage} available only
+     * on the connect server (ie no local version)
      * for a given {@link PackageType}.
      */
     List<DownloadablePackage> listOnlyRemotePackages(PackageType type);
@@ -103,18 +113,21 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listAllStudioRemotePackages();
 
     /**
-     * Lists all versions of the studio packages associated to user account in remote and potentially
+     * Lists all versions of the studio packages associated to user account in
+     * remote and potentially
      * overridden by a local package.
      */
     List<DownloadablePackage> listAllStudioRemoteOrLocalPackages();
 
     /**
-     * Lists packages available in remote and potentially overridden by a local package.
+     * Lists packages available in remote and potentially overridden by a local
+     * package.
      */
     List<DownloadablePackage> listRemoteOrLocalPackages();
 
     /**
-     * Lists packages availab.e in remote and potentially overridden by a local package.
+     * Lists packages availab.e in remote and potentially overridden by a local
+     * package.
      */
     List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type);
 
@@ -130,16 +143,16 @@ public interface PackageManager extends BasePackageManager {
      * Get the Download descriptor for a given package id
      *
      * @param packageId
-     * @return
+     *
      * @throws Exception
      */
-    DownloadingPackage download(String packageId) throws Exception ;
+    DownloadingPackage download(String packageId) throws Exception;
 
     /**
      * Get the Download descriptors for a given list of package ids
      *
      * @param packageIds
-     * @return
+     *
      * @throws Exception
      */
     List<DownloadingPackage> download(List<String> packageIds) throws Exception;
@@ -160,7 +173,8 @@ public interface PackageManager extends BasePackageManager {
      * @param params Installation parameters (as collected via Wizard's form)
      * @throws Exception
      */
-    void install(List<String> packageIds, Map<String, String> params) throws Exception;
+    void install(List<String> packageIds, Map<String, String> params)
+            throws Exception;
 
     /**
      * Flushes the caches used on remote {@link PackageSource}
@@ -172,7 +186,6 @@ public interface PackageManager extends BasePackageManager {
      *
      * @param pkgId
      * @param targetPlatform (String representing the target platform or null
-     * @return
      */
     DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
 
@@ -180,7 +193,8 @@ public interface PackageManager extends BasePackageManager {
      * Returns the packages uninstalled if the given {@link Package} is removed
      *
      * @param pkg the {@link Package} that is being uninstalled
-     * @return List of all {@link DownloadablePackage} that must be uninstalled too
+     * @return List of all {@link DownloadablePackage} that must be uninstalled
+     *         too
      */
     List<DownloadablePackage> getUninstallDependencies(Package pkg);
 }
