@@ -63,7 +63,8 @@ public interface Package {
     String[] getTargetPlatforms();
 
     /**
-     * Gets the list of dependencies of this package. If not dependencies exists,
+     * Gets the list of dependencies of this package. If not dependencies
+     * exists,
      * either null or an empty array is returned.
      */
     PackageDependency[] getDependencies();
@@ -104,20 +105,17 @@ public interface Package {
 
     /**
      * Get the production status of the package (testing, production ready ...)
-     * @return
      */
     ProductionState getProductionState();
 
     /**
-     * Get the validation state of the package (not certified, in process, certified ...)
-     * @return
+     * Get the validation state of the package (not certified, in process,
+     * certified ...)
      */
     NuxeoValidationState getValidationState();
 
-
     /**
      * Tests if the package can be hot reloaded
-     * @return
      */
     boolean supportsHotReload();
 
@@ -127,4 +125,3 @@ public interface Package {
     boolean isSupported();
 
 }
-

@@ -34,14 +34,12 @@ public interface PackageData {
     /**
      * Get the package manifest - an XML file.
      *
-     * @return
      */
     File getManifest();
 
     /**
      * Get the package bundle root.
      *
-     * @return
      */
     File getRoot();
 
@@ -49,7 +47,6 @@ public interface PackageData {
      * Get a package entry given a relative path to the package root.
      *
      * @param path
-     * @return
      */
     File getEntry(String path);
 
@@ -57,7 +54,7 @@ public interface PackageData {
      * Get a package entry as a stream given a relative path.
      *
      * @param path
-     * @return
+     *
      * @throws IOException
      */
     InputStream getEntryAsStream(String path) throws IOException;
@@ -66,7 +63,6 @@ public interface PackageData {
      * Load a class from that package (can be Groovy) given the class name.
      *
      * @param name
-     * @return
      */
     Class<?> loadClass(String name) throws PackageException;
 

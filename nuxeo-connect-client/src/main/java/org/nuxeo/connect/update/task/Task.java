@@ -27,7 +27,7 @@ import org.nuxeo.connect.update.ValidationStatus;
  * A task implements the logic of an install or uninstall. If this gets wrong
  * (the run method is throwing an exception) then the rollback method should be
  * invoked to revert all modifications that was done by the run method.
- * 
+ *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public interface Task {
@@ -53,7 +53,7 @@ public interface Task {
     /**
      * Run the task. Throws an exception if something goes wrong. At the end of
      * the run the commands log must be written on disk.
-     * 
+     *
      * @param params the user parameters or null if none.
      */
     void run(Map<String, String> params) throws PackageException;
@@ -70,8 +70,7 @@ public interface Task {
 
     /**
      * Whether or not the platform must be restarted after the task is executed.
-     * 
-     * @return
+     *
      */
     boolean isRestartRequired();
 
@@ -83,9 +82,8 @@ public interface Task {
     /**
      * Get the file path relative to server home. If the file is not located
      * inside the server home, the absolute file path of the file is returned.
-     * 
+     *
      * @param file
-     * @return
      */
     String getRelativeFilePath(File file);
 }

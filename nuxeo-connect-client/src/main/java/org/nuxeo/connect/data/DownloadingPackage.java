@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.data;
@@ -30,21 +29,16 @@ public interface DownloadingPackage extends DownloadablePackage {
 
     /**
      * Verify Digest
-     * @return
      */
     boolean isDigestOk();
 
     /**
      * Indicates if Download process is terminated
-     *
-     * @return
      */
     boolean isCompleted();
 
     /**
-     * Return Download progres in %
-     *
-     * @return
+     * Return Download progress in %
      */
     int getDownloadProgress();
 

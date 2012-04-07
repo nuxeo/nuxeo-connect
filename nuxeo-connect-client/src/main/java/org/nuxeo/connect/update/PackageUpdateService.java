@@ -22,24 +22,24 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.nuxeo.connect.update.model.PackageDefinition;
+import org.nuxeo.connect.update.task.Command;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public interface PackageUpdateService {
 
     /**
      * Get the directory where files packages and meta-data files are are stored
-     * 
-     * @return
+     *
      */
     File getDataDir();
 
     /**
      * Initialize the service. This is usually doing file system initialization
      * and loading the list of local packages.
-     * 
+     *
      * @throws Exception
      */
     void initialize() throws PackageException;
@@ -47,14 +47,14 @@ public interface PackageUpdateService {
     /**
      * Close any resource held by this service. The service instance will no
      * more be available.
-     * 
+     *
      * @throws Exception
      */
     void shutdown() throws PackageException;
 
     /**
      * Set the state for the given package.
-     * 
+     *
      * @param id
      * @param state
      */
@@ -64,7 +64,7 @@ public interface PackageUpdateService {
      * Add a new package to the packages registry given the package file (a zip
      * or directory). The package will be added and put in
      * {@link PackageState#DOWNLOADED} state.
-     * 
+     *
      * @param file the package file.
      * @return the package object.
      * @throws Exception
@@ -82,7 +82,7 @@ public interface PackageUpdateService {
 
     /**
      * Get a package object given its ID
-     * 
+     *
      * @param id
      * @return the package or null if not found
      */
@@ -91,8 +91,7 @@ public interface PackageUpdateService {
     /**
      * Get a list with all local packages (that were already registered - i.e.
      * downloaded).
-     * 
-     * @return
+     *
      */
     List<LocalPackage> getPackages() throws PackageException;
 
@@ -104,9 +103,9 @@ public interface PackageUpdateService {
      * <li> {@link PackageState#INSTALLED}
      * <li> {@link PackageState#STARTED}
      * </ul>
-     * 
+     *
      * Return null if no such package is found.
-     * 
+     *
      * @param name the package name
      * @return the package or null if no package is found
      */
@@ -119,26 +118,24 @@ public interface PackageUpdateService {
 
     /**
      * Load the package definition from the given package ZIP.
-     * 
+     *
      * @param zip
-     * @return
      */
     public PackageDefinition loadPackageFromZip(File zip)
             throws PackageException;
 
     /**
      * Load the package definition from the given XML file.
-     * 
+     *
      * @param file
-     * @return
      */
     public PackageDefinition loadPackage(File file) throws PackageException;
 
     /**
      * Load the package definition for the given XML input stream.
-     * 
+     *
      * @param in
-     * @return
+     *
      * @throws IOException
      */
     public PackageDefinition loadPackage(InputStream in)
@@ -148,12 +145,20 @@ public interface PackageUpdateService {
      * Reset the index file -> mark all packages as downloaded. Do not modify
      * package data. This method should be used after a system upgrade to reset
      * packages that were previously installed.
-     * 
+     *
      * This is usually invoked from command line tools by the administrator
      * after an upgrade to reset the downloaded package states.
-     * 
+     *
      * @throws PackageException
      */
     public void reset() throws PackageException;
+
+    /**
+     * @since 5.6
+     * @param id
+     *
+     * @throws PackageException
+     */
+    public abstract Command getCommand(String id) throws PackageException;
 
 }

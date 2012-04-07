@@ -54,7 +54,6 @@ public class TestService extends TestCase {
         assertNotNull(connector);
     }
 
-
     public void testServiceAsUnresistred() {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
 
@@ -62,15 +61,10 @@ public class TestService extends TestCase {
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
 
-        boolean isFakeConnector = false;
-        if (connector instanceof UnregistredFakeConnector) {
-            UnregistredFakeConnector fakeConnector = (UnregistredFakeConnector) connector;
-            isFakeConnector = true;
-        }
-        assertTrue(isFakeConnector);
+        assertTrue(connector instanceof UnregistredFakeConnector);
     }
 
-    public void testServiceAsRegistred() throws Exception  {
+    public void testServiceAsRegistred() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
 
         assertFalse(crs.isInstanceRegistred());
@@ -81,15 +75,10 @@ public class TestService extends TestCase {
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
 
-        boolean isHttpConnector = false;
-        if (connector instanceof ConnectHttpConnector) {
-            ConnectHttpConnector httpConnector = (ConnectHttpConnector) connector;
-            isHttpConnector = true;
-        }
-        assertTrue(isHttpConnector);
+        assertTrue(connector instanceof ConnectHttpConnector);
     }
 
-    public void testServiceAsTest() throws Exception  {
+    public void testServiceAsTest() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
 
         assertFalse(crs.isInstanceRegistred());
@@ -98,12 +87,7 @@ public class TestService extends TestCase {
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
 
-        boolean isTestConnector = false;
-        if (connector instanceof ConnectTestConnector) {
-            ConnectTestConnector testConnector = (ConnectTestConnector) connector;
-            isTestConnector = true;
-        }
-        assertTrue(isTestConnector);
+        assertTrue(connector instanceof ConnectTestConnector);
     }
 
     public void testDownloadService() throws Exception {
@@ -129,6 +113,5 @@ public class TestService extends TestCase {
         assertEquals(3, pkgs.size());
 
     }
-
 
 }

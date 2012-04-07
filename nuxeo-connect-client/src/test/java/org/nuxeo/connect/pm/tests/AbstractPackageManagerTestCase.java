@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
@@ -16,12 +18,12 @@ import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.packages.PackageManagerImpl;
 
-import junit.framework.TestCase;
-
 public abstract class AbstractPackageManagerTestCase extends TestCase {
 
     protected PackageManager pm;
+
     protected static Log log = LogFactory.getLog(TestPackageManager.class);
+
     public static final String TEST_DATA = "test-data/";
 
     protected static List<String> readLines(InputStream in) throws IOException {
@@ -55,15 +57,17 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
         assertNotNull(pm);
 
-        ((PackageManagerImpl)pm).resetSources();
+        ((PackageManagerImpl) pm).resetSources();
 
     }
 
-    protected static List<DownloadablePackage> getDownloads(String filename) throws Exception {
+    protected static List<DownloadablePackage> getDownloads(String filename)
+            throws Exception {
 
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
 
-        InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(TEST_DATA + filename);
+        InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(
+                TEST_DATA + filename);
 
         List<String> lines = readLines(is);
 
@@ -82,7 +86,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         super(name);
     }
 
-    protected void dumpPkgList(String label,List<DownloadablePackage> pkgs) {
+    protected void dumpPkgList(String label, List<DownloadablePackage> pkgs) {
         StringBuffer sb = new StringBuffer();
 
         sb.append(label);

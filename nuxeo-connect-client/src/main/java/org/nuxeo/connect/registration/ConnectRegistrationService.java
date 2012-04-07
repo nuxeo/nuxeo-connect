@@ -26,35 +26,34 @@ import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
-import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier.InvalidCLID;
+import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
 /**
-*
-* Interface for Nuxeo Connect Registration
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*/
+ *
+ * Interface for Nuxeo Connect Registration
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ */
 public interface ConnectRegistrationService {
 
     /**
      * get the Technical Identifier for the current Nuxeo Instance
      *
-     * @return
      */
     TechnicalInstanceIdentifier getCTID();
 
     /**
      * get the Logical Instance identifier
      *
-     * @return
      */
     LogicalInstanceIdentifier getCLID();
 
     /**
      * Register locally an instance provided a CLID
      *
-     * (Means user has registred it's instance against Connect Web site and has already obtained a CLID)
+     * (Means user has registred it's instance against Connect Web site and has
+     * already obtained a CLID)
      *
      * => can be used if local instance has no access to internet
      *
@@ -63,8 +62,8 @@ public interface ConnectRegistrationService {
      * @throws InvalidCLID
      * @throws IOException
      */
-    void localRegisterInstance(String strCLID, String description) throws InvalidCLID, IOException;
-
+    void localRegisterInstance(String strCLID, String description)
+            throws InvalidCLID, IOException;
 
     /**
      *
@@ -74,11 +73,11 @@ public interface ConnectRegistrationService {
      *
      * @param login
      * @param password
-     * @return
+     *
      * @throws Exception
      */
-    List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) throws Exception ;
-
+    List<ConnectProject> getAvailableProjectsForRegistration(String login,
+            String password) throws Exception;
 
     /**
      * Let Nuxeo client do all the registration process
@@ -92,20 +91,18 @@ public interface ConnectRegistrationService {
      * @param description
      * @throws Exception
      */
-    void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type, String description) throws Exception ;
-
+    void remoteRegisterInstance(String login, String password, String prjId,
+            NuxeoClientInstanceType type, String description) throws Exception;
 
     /**
      * Gives instance registration status
      *
-     * @return
      */
     boolean isInstanceRegistred();
 
     /**
      * return the connector to access connect remote services
      *
-     * @return
      */
     ConnectConnector getConnector();
 }
