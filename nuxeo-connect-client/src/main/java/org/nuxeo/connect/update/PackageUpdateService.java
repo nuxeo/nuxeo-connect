@@ -161,4 +161,19 @@ public interface PackageUpdateService {
      */
     public abstract Command getCommand(String id) throws PackageException;
 
+    /**
+     * Returns the class name of the InstallTask suitable for this
+     * instance of the service.
+     * @since 5.6
+     */
+    public abstract String getDefaultInstallTaskType();
+
+    /**
+     * Returns the class name of the UninstallTask suitable for this
+     * instance of the service.
+     * @since 5.6
+     */
+    public abstract String getDefaultUninstallTaskType();
+
+
 }
