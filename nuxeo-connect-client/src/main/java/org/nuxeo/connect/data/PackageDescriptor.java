@@ -71,6 +71,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     protected PackageDependency[] dependencies;
 
+    protected PackageDependency[] conflicts;
+
+    protected PackageDependency[] provides;
+
     @JSONExportableField
     protected String title;
 
@@ -129,6 +133,42 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
             deps[i] = new PackageDependency(array.getString(i));
         }
         setDependencies(deps);
+    }
+
+    @JSONExportMethod(name="conflicts")
+    protected JSONArray getConflictsAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getConflicts()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name="conflicts")
+    protected void setConflictsAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setConflicts(deps);
+    }
+
+    @JSONExportMethod(name="provides")
+    protected JSONArray getProvidesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getProvides()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name="provides")
+    protected void setProvidesAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setProvides(deps);
     }
 
     @JSONImportMethod(name="targetPlatforms")
@@ -243,6 +283,19 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return dependencies;
     }
 
+    public PackageDependency[] getConflicts() {
+        if (conflicts == null) {
+            return new PackageDependency[0];
+        }
+        return conflicts;
+    }
+    public PackageDependency[] getProvides() {
+        if (provides == null) {
+            return new PackageDependency[0];
+        }
+        return provides;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -336,6 +389,14 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.dependencies = dependencies;
     }
 
+    public void setConflicts(PackageDependency[] conflicts) {
+        this.conflicts = conflicts;
+    }
+
+    public void setProvides(PackageDependency[] provides) {
+        this.provides = provides;
+    }
+
     public String getDependenciesAsString() {
         StringBuilder sb = new StringBuilder();
 
@@ -344,6 +405,36 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         }
 
         for (PackageDependency dep : getDependencies()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+
+        return sb.toString();
+    }
+
+    public String getConflictsAsString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (conflicts == null || conflicts.length == 0) {
+            return "";
+        }
+
+        for (PackageDependency dep : getConflicts()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+
+        return sb.toString();
+    }
+
+    public String getProvidesAsString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (provides == null || provides.length == 0) {
+            return "";
+        }
+
+        for (PackageDependency dep : getProvides()) {
             sb.append(dep.toString());
             sb.append(",");
         }

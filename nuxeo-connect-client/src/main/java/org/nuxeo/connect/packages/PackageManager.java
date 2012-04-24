@@ -25,6 +25,7 @@ import java.util.Map;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -180,6 +181,13 @@ public interface PackageManager extends BasePackageManager {
      * Flushes the caches used on remote {@link PackageSource}
      */
     void flushCache();
+
+    /**
+     * Choose the resolver implementation
+     *
+     * @param resolverType the {@link DependencyResolver} to use
+     */
+    void setResolver(String resolverType);
 
     /**
      * Try to resolve dependencies of a given {@link Package}

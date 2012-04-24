@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -33,6 +33,8 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
+import org.nuxeo.connect.packages.dependencies.LegacyDependencyResolver;
+import org.nuxeo.connect.packages.dependencies.P2CUDFDependencyResolver;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
@@ -62,6 +64,9 @@ public class PackageManagerImpl implements
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
     protected DependencyResolver resolver;
+    protected static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
+    protected static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
+    protected static final String DEFAULT_DEPENDENCY_RESOLVER = LEGACY_DEPENDENCY_RESOLVER;
 
     protected List<PackageSource> getAllSources() {
         List<PackageSource> allSources = new ArrayList<PackageSource>();
@@ -74,7 +79,18 @@ public class PackageManagerImpl implements
         registerSource(new RemotePackageSource(), false);
         registerSource(new DownloadingPackageSource(), true);
         registerSource(new LocalPackageSource(), true);
-        resolver = new DependencyResolver(this);
+        setResolver(DEFAULT_DEPENDENCY_RESOLVER);
+    }
+
+    public void setResolver(String resolverType) {
+        if (resolverType.equals(P2CUDF_DEPENDENCY_RESOLVER)) {
+            resolver = new P2CUDFDependencyResolver(this);
+        } else if (resolverType.equals(LEGACY_DEPENDENCY_RESOLVER)) {
+            resolver = new LegacyDependencyResolver(this);
+        }else {
+            log.warn("Resolver " + resolverType + "is not supported - falling back on default resolver.");
+            resolver = new LegacyDependencyResolver(this);
+        }
     }
 
     public void resetSources() {

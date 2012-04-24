@@ -101,6 +101,14 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
         return localPackage.getDependencies();
     }
 
+    public PackageDependency[] getConflicts() {
+        return localPackage.getConflicts();
+    }
+
+    public PackageDependency[] getProvides() {
+        return localPackage.getProvides();
+    }
+
     public String getDescription() {
         return localPackage.getDescription();
     }
