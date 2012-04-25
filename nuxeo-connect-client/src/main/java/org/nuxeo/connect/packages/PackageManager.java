@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages;
@@ -205,4 +204,9 @@ public interface PackageManager extends BasePackageManager {
      *         too
      */
     List<DownloadablePackage> getUninstallDependencies(Package pkg);
+
+    /**
+     * @return all the packages, in all versions, properly managing classifiers
+     */
+    List<DownloadablePackage> listAllPackages();
 }

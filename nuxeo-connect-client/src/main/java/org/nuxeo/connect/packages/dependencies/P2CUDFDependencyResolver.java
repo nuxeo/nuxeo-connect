@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -27,8 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.packages.PackageManager;
 
 /**
-* This implementation uses the p2cudf resolver to solve complex dependencies
-*/
+ * This implementation uses the p2cudf resolver to solve complex dependencies
+ *
+ * @since 5.6
+ */
 public class P2CUDFDependencyResolver implements DependencyResolver {
 
     protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
@@ -36,11 +37,14 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     protected PackageManager pm;
 
     public P2CUDFDependencyResolver(PackageManager pm) {
-        this.pm=pm;
+        this.pm = pm;
     }
 
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade, String targetPlatform) {
-        // get helper
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform) {
+        CUDFHelper cudfHelper = new CUDFHelper(pm);
+
         // create mapping
         // generate "package universe" CUDF
         // generate request stanza
@@ -49,7 +53,8 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         return null;
     }
 
-    public DependencyResolution resolve(String pkgId, String targetPlatform)  throws DependencyException{
+    public DependencyResolution resolve(String pkgId, String targetPlatform)
+            throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
         pkgInstall.add(pkgId);
         return resolve(pkgInstall, null, null, targetPlatform);
