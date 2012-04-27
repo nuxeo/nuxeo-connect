@@ -19,9 +19,24 @@
 package org.nuxeo.connect.packages.dependencies;
 
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 
 class NuxeoCUDFPackage {
+
+    public static final String CUDF_PACKAGE = "package: ";
+
+    public static final String CUDF_VERSION = "version: ";
+
+    public static final String CUDF_INSTALLED = "installed: ";
+
+    public static final String CUDF_DEPENDS = "depends: ";
+
+    public static final String CUDF_CONFLICTS = "conflicts: ";
+
+    public static final String CUDF_PROVIDES = "provides: ";
+
+    private final String newLine = System.getProperty("line.separator");
 
     private DownloadablePackage pkg;
 
@@ -29,34 +44,27 @@ class NuxeoCUDFPackage {
 
     private String cudfName;
 
-    /**
-     * @param name Nuxeo name
-     * @param version Nuxeo version
-     */
+    private boolean installed;
+
     public NuxeoCUDFPackage(DownloadablePackage pkg) {
         this.pkg = pkg;
         cudfName = pkg.getName();
-        if (pkg.getVersion().classifier() != null) {
-            cudfName += ":" + pkg.getVersion().classifier();
-        }
+        // No more add classifier at the end of name
+        // if (pkg.getVersion().classifier() != null) {
+        // cudfName += ":" + pkg.getVersion().classifier();
+        // }
     }
 
-    /**
-     * @param name Nuxeo package name
-     * @param version Nuxeo package version
-     */
     public String getCUDFName() {
         return cudfName;
     }
 
-    /**
-     * @return cleaned Nuxeo version
-     */
     public Version getNuxeoVersion() {
-        Version version = new Version(pkg.getVersion().toString());
-        version.setSnapshot(version.isSnapshot());
-        version.setClassifier(null);
-        return version;
+        // No more remove classifier from version
+        // Version version = new Version(pkg.getVersion().toString());
+        // version.setSnapshot(version.isSnapshot());
+        // version.setClassifier(null);
+        return pkg.getVersion();
     }
 
     /**
@@ -72,6 +80,35 @@ class NuxeoCUDFPackage {
 
     @Override
     public String toString() {
-        return cudfName + " " + cudfVersion;
+        return "CUDF {" + cudfVersion + "}" + " Nuxeo {" + pkg.getVersion()
+                + "} " + pkg.getClass();
+    }
+
+    /**
+     * @return CUDF stanza for that package; see
+     *         {@link "http://www.mancoosi.org/cudf/"}
+     */
+    public String getCUDFStanza() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(CUDF_PACKAGE + cudfName + newLine);
+        sb.append(CUDF_VERSION + cudfVersion + newLine);
+        sb.append(CUDF_INSTALLED + installed + newLine);
+        return sb.toString();
+    }
+
+    public void setInstalled(boolean installed) {
+        this.installed = installed;
+    }
+
+    public PackageDependency[] getDependencies() {
+        return pkg.getDependencies();
+    }
+
+    public PackageDependency[] getConflicts() {
+        return pkg.getConflicts();
+    }
+
+    public PackageDependency[] getProvides() {
+        return pkg.getProvides();
     }
 }

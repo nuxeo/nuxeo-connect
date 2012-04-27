@@ -164,6 +164,7 @@ public interface PackageUpdateService {
     /**
      * Returns the class name of the InstallTask suitable for this
      * instance of the service.
+     *
      * @since 5.6
      */
     public abstract String getDefaultInstallTaskType();
@@ -171,9 +172,17 @@ public interface PackageUpdateService {
     /**
      * Returns the class name of the UninstallTask suitable for this
      * instance of the service.
+     *
      * @since 5.6
      */
     public abstract String getDefaultUninstallTaskType();
 
+    /**
+     * Tell if a package is in {@link PackageState#STARTED} state.
+     *
+     * @since 5.6
+     * @return false if not started, including not existing (downloaded) at all.
+     */
+    boolean isStarted(String pkgId);
 
 }

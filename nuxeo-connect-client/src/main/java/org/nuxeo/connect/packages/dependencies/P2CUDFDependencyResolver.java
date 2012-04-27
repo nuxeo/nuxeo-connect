@@ -44,9 +44,8 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) {
         CUDFHelper cudfHelper = new CUDFHelper(pm);
-
-        // create mapping
         // generate "package universe" CUDF
+        System.out.println(cudfHelper.getCUDFFile());
         // generate request stanza
         // pass to p2cudf for solving
         // build a DependencyResolution from the result

@@ -439,7 +439,6 @@ public class PackageManagerImpl implements PackageManager,
 
     public void install(String packageId, Map<String, String> params)
             throws Exception {
-
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         if (pus == null) {
             if (!NuxeoConnectClient.isTestModeSet()) {
@@ -447,7 +446,6 @@ public class PackageManagerImpl implements PackageManager,
             }
             return;
         }
-
         LocalPackage pkg = pus.getPackage(packageId);
 
         Task installationTask = pkg.getInstallTask();
@@ -461,8 +459,6 @@ public class PackageManagerImpl implements PackageManager,
             install(packageId, params);
         }
     }
-
-    // Internal impl
 
     protected void invalidateCache() {
         cachedPackageList = null;
@@ -647,5 +643,15 @@ public class PackageManagerImpl implements PackageManager,
     @Override
     public List<DownloadablePackage> listAllPackages() {
         return getAllPackages(getAllSources(), null);
+    }
+
+    @Override
+    public boolean isInstalled(Package pkg) {
+        PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
+        if (pus == null) {
+            log.error("Can not locate PackageUpdateService, set package as not installed.");
+            return false;
+        }
+        return pus.isStarted(pkg.getId());
     }
 }

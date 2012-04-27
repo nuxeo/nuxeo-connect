@@ -209,4 +209,9 @@ public interface PackageManager extends BasePackageManager {
      * @return all the packages, in all versions, properly managing classifiers
      */
     List<DownloadablePackage> listAllPackages();
+
+    /**
+     * @since 5.6
+     */
+    boolean isInstalled(Package pkg);
 }

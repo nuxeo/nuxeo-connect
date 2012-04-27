@@ -24,14 +24,22 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
+import org.nuxeo.connect.update.VersionRange;
 
 /**
  * @since 5.6
  */
 public class CUDFHelper {
+
+    private static final Log log = LogFactory.getLog(CUDFHelper.class);
+
+    public static final String newLine = System.getProperty("line.separator");
 
     protected PackageManager pm;
 
@@ -60,6 +68,9 @@ public class CUDFHelper {
         // populate Nuxeo2CUDFMap and the reverse CUDF2NuxeoMap
         for (DownloadablePackage pkg : allPackages) {
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
+            if (pm != null) {
+                nuxeoCUDFPackage.setInstalled(pm.isInstalled(pkg));
+            }
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
             if (pkgVersions == null) {
                 pkgVersions = new TreeMap<Version, NuxeoCUDFPackage>();
@@ -78,12 +89,73 @@ public class CUDFHelper {
                         pkg.getCUDFName() + "-" + pkg.getCUDFVersion(), pkg);
             }
         }
-        MapUtils.verbosePrint(System.out, "nuxeo2CUDFMap", nuxeo2CUDFMap);
-        MapUtils.verbosePrint(System.out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
+        if (log.isDebugEnabled() || true) {
+            MapUtils.verbosePrint(System.out, "nuxeo2CUDFMap", nuxeo2CUDFMap);
+            MapUtils.verbosePrint(System.out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
+        }
     }
 
     protected List<DownloadablePackage> getAllPackages() {
         return pm.listAllPackages();
+    }
+
+    public NuxeoCUDFPackage getCUDFPackage(String cudfKey) {
+        return CUDF2NuxeoMap.get(cudfKey);
+    }
+
+    public Map<Version, NuxeoCUDFPackage> getCUDFPackages(String cudfName) {
+        return nuxeo2CUDFMap.get(cudfName);
+    }
+
+    public String getCUDFFile() {
+        StringBuffer sb = new StringBuffer();
+        for (String cudfKey : CUDF2NuxeoMap.keySet()) {
+            NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
+            sb.append(cudfPackage.getCUDFStanza());
+            sb.append(NuxeoCUDFPackage.CUDF_DEPENDS
+                    + formatCUDF(cudfPackage.getDependencies()) + newLine);
+            sb.append(NuxeoCUDFPackage.CUDF_CONFLICTS
+                    + formatCUDF(cudfPackage.getConflicts()) + newLine);
+            sb.append(NuxeoCUDFPackage.CUDF_PROVIDES
+                    + formatCUDF(cudfPackage.getProvides()) + newLine);
+            sb.append(System.getProperty("line.separator"));
+        }
+        return sb.toString();
+    }
+
+    private String formatCUDF(PackageDependency[] dependencies) {
+        if (dependencies == null) {
+            return "";
+        }
+        StringBuffer sb = new StringBuffer();
+        for (PackageDependency packageDependency : dependencies) {
+            Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(packageDependency.getName());
+            VersionRange versionRange = packageDependency.getVersionRange();
+            NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
+            int cudfMinVersion = (cudfPackage == null) ? -1
+                    : cudfPackage.getCUDFVersion();
+            cudfPackage = versionsMap.get(versionRange.getMaxVersion());
+            int cudfMaxVersion = (cudfPackage == null) ? -1
+                    : cudfPackage.getCUDFVersion();
+            if (cudfMinVersion != -1 && cudfMinVersion == cudfMaxVersion) {
+                sb.append(packageDependency.getName() + " = " + cudfMinVersion
+                        + ",");
+                continue;
+            }
+            if (cudfMinVersion != -1) {
+                sb.append(packageDependency.getName() + " >= " + cudfMinVersion
+                        + ",");
+            }
+            if (cudfMaxVersion != -1) {
+                sb.append(packageDependency.getName() + " <= " + cudfMaxVersion
+                        + ",");
+            }
+        }
+        if (sb.length() > 0) { // remove ending comma
+            return sb.toString().substring(0, sb.length() - 1);
+        } else {
+            return "";
+        }
     }
 
 }
