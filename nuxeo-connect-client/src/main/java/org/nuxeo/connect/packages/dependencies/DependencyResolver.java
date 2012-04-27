@@ -19,6 +19,8 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.util.List;
+
 
 /**
 * Main entry point for Dependency resolution.
@@ -29,5 +31,12 @@ package org.nuxeo.connect.packages.dependencies;
 public interface DependencyResolver {
 
     public DependencyResolution resolve(String pkgId, String targetPlatform)  throws DependencyException;
+
+    /*
+     * @since 5.6
+     */
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform) throws DependencyException;
 
 }

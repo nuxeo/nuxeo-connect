@@ -74,6 +74,16 @@ public class LegacyDependencyResolver implements DependencyResolver {
         throw new DependencyException("Unable to resolve dependencies");
     }
 
+    /* @since 5.6
+     * @see org.nuxeo.connect.packages.dependencies.DependencyResolver#resolve(java.util.List, java.util.List, java.util.List, java.lang.String)
+     */
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform) throws DependencyException {
+        throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
+    }
+
     // walk dep tree to find all possible needed versions of packages
     protected RecursiveDependencyResolver computeAvailableChoices(String pkgId, String targetPlatform) throws DependencyException{
         RecursiveDependencyResolver dc = new RecursiveDependencyResolver(pkgId,pm, targetPlatform);
@@ -101,4 +111,5 @@ public class LegacyDependencyResolver implements DependencyResolver {
             }
         }
     }
+
 }

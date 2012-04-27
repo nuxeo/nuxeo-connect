@@ -197,6 +197,19 @@ public interface PackageManager extends BasePackageManager {
     DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
 
     /**
+     * @param pkgInstall
+     * @param pkgRemove
+     * @param pkgUpgrade
+     * @param targetPlatform
+     * @return
+     * @since 5.6
+     */
+    DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform);
+
+
+    /**
      * Returns the packages uninstalled if the given {@link Package} is removed
      *
      * @param pkg the {@link Package} that is being uninstalled
@@ -214,4 +227,5 @@ public interface PackageManager extends BasePackageManager {
      * @since 5.6
      */
     boolean isInstalled(Package pkg);
+
 }

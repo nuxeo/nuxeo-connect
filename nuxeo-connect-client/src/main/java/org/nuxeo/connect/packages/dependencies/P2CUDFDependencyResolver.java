@@ -42,7 +42,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform) {
+            String targetPlatform) throws DependencyException {
         CUDFHelper cudfHelper = new CUDFHelper(pm);
         // generate "package universe" CUDF
         System.out.println(cudfHelper.getCUDFFile());
