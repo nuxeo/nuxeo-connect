@@ -31,6 +31,10 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.equinox</groupId>
+      <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
+    </dependency>
   </dependencies>
 
 </project>
