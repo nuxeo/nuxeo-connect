@@ -107,8 +107,11 @@ public class CUDFHelper {
         return nuxeo2CUDFMap.get(cudfName);
     }
 
+    /**
+     * @return a CUDF universe as a String
+     */
     public String getCUDFFile() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
             sb.append(cudfPackage.getCUDFStanza());
@@ -127,35 +130,67 @@ public class CUDFHelper {
         if (dependencies == null) {
             return "";
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (PackageDependency packageDependency : dependencies) {
             Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(packageDependency.getName());
             VersionRange versionRange = packageDependency.getVersionRange();
-            NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
-            int cudfMinVersion = (cudfPackage == null) ? -1
-                    : cudfPackage.getCUDFVersion();
-            cudfPackage = versionsMap.get(versionRange.getMaxVersion());
-            int cudfMaxVersion = (cudfPackage == null) ? -1
-                    : cudfPackage.getCUDFVersion();
-            if (cudfMinVersion != -1 && cudfMinVersion == cudfMaxVersion) {
-                sb.append(packageDependency.getName() + " = " + cudfMinVersion
-                        + ",");
+            int cudfMinVersion, cudfMaxVersion;
+            if (versionRange.getMinVersion() == null) {
+                cudfMinVersion = -1;
+            } else {
+                NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
+                cudfMinVersion = (cudfPackage == null) ? -1
+                        : cudfPackage.getCUDFVersion();
+            }
+            if (versionRange.getMaxVersion() == null) {
+                cudfMaxVersion = -1;
+            } else {
+                NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMaxVersion());
+                cudfMaxVersion = (cudfPackage == null) ? -1
+                        : cudfPackage.getCUDFVersion();
+            }
+            if (cudfMinVersion == cudfMaxVersion) {
+                if (cudfMinVersion == -1) {
+                    sb.append(packageDependency.getName() + ", ");
+                } else {
+                    sb.append(packageDependency.getName() + " = "
+                            + cudfMinVersion + ", ");
+                }
                 continue;
             }
             if (cudfMinVersion != -1) {
                 sb.append(packageDependency.getName() + " >= " + cudfMinVersion
-                        + ",");
+                        + ", ");
             }
             if (cudfMaxVersion != -1) {
                 sb.append(packageDependency.getName() + " <= " + cudfMaxVersion
-                        + ",");
+                        + ", ");
             }
         }
         if (sb.length() > 0) { // remove ending comma
-            return sb.toString().substring(0, sb.length() - 1);
+            return sb.toString().substring(0, sb.length() - 2);
         } else {
             return "";
         }
+    }
+
+    /**
+     * @param pkgInstall
+     * @param pkgRemove
+     * @param pkgUpgrade
+     * @return a CUDF string with packages universe and request stanza
+     */
+    public String getCUDFFile(PackageDependency[] pkgInstall,
+            PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade) {
+        StringBuilder sb = new StringBuilder(getCUDFFile());
+        sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall)
+                + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_REMOVE + formatCUDF(pkgRemove)
+                + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE + formatCUDF(pkgUpgrade)
+                + newLine);
+        return sb.toString();
     }
 
 }

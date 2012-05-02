@@ -44,7 +44,7 @@ package: nuxeo-dm
 version: 2
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts:
+conflicts: nuxeo-cmf
 provides:
 
 package: nuxeo-sc
@@ -58,12 +58,12 @@ package: nuxeo-dm
 version: 3
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts:
+conflicts: nuxeo-cmf
 provides:
 
 package: nuxeo-dm
 version: 1
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts:
+conflicts: nuxeo-cmf
 provides:

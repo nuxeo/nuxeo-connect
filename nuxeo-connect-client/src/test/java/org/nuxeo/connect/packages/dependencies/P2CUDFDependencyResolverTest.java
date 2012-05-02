@@ -18,7 +18,6 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,23 +26,31 @@ import org.junit.Test;
  */
 public class P2CUDFDependencyResolverTest {
 
+    private final class P2CUDFDependencyResolverExtension extends
+            P2CUDFDependencyResolver {
+        public P2CUDFDependencyResolverExtension(CUDFHelper cudfHelper) {
+            this.cudfHelper = cudfHelper;
+        }
+
+    }
+
+    private CUDFHelper cudfHelper;
+
+    private P2CUDFDependencyResolver p2cudfDependencyResolver;
+
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
+        cudfHelper = CUDFHelperTest.getCUDFTestHelper();
+        p2cudfDependencyResolver = new P2CUDFDependencyResolverExtension(
+                cudfHelper);
     }
 
     @Test
     public void testResolve() throws Exception {
-
+        p2cudfDependencyResolver.resolve("nuxeo-dm", null);
     }
 
 }

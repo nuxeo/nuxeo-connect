@@ -51,7 +51,11 @@ public class CUDFHelperTest {
      */
     @Before
     public void setUp() throws Exception {
-        cudfHelper = new CUDFHelper(null) {
+        cudfHelper = getCUDFTestHelper();
+    }
+
+    public static CUDFHelper getCUDFTestHelper() {
+        return new CUDFHelper(null) {
 
             @Override
             protected List<DownloadablePackage> getAllPackages() {
@@ -75,6 +79,7 @@ public class CUDFHelperTest {
                             version));
                     pkg.addDependency(new PackageDependency(
                             "nuxeo-content-browser:1.1.0:1.1.0"));
+                    pkg.addConflict(new PackageDependency("nuxeo-cmf"));
                     allPackages.add(pkg);
                 }
                 pkg = new FakeDownloadablePackage("nuxeo-sc",
@@ -131,9 +136,10 @@ public class CUDFHelperTest {
                                 + "universe.cudf")));
         try {
             while (gen.ready() && ref.ready()) {
+                String generatedLine = gen.readLine().trim();
                 assertEquals(
                         "Generated CUDF universe different than reference",
-                        ref.readLine().trim(), gen.readLine().trim());
+                        ref.readLine().trim(), generatedLine);
             }
             assertFalse(gen.ready() && ref.ready());
         } finally {

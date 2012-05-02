@@ -36,6 +36,14 @@ class NuxeoCUDFPackage {
 
     public static final String CUDF_PROVIDES = "provides: ";
 
+    public static final String CUDF_REQUEST = "request: ";
+
+    public static final String CUDF_INSTALL = "install: ";
+
+    public static final String CUDF_REMOVE = "remove: ";
+
+    public static final String CUDF_UPGRADE = "upgrade: ";
+
     private final String newLine = System.getProperty("line.separator");
 
     private DownloadablePackage pkg;
