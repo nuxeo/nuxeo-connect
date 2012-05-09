@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.Parser;
 import org.eclipse.equinox.p2.cudf.metadata.IProvidedCapability;
 import org.eclipse.equinox.p2.cudf.metadata.IRequiredCapability;
@@ -51,6 +53,8 @@ import org.nuxeo.connect.pm.tests.DummyPackageSource;
  */
 public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
+    static final Log log = LogFactory.getLog(CUDFHelperTest.class);
+
     /**
      * Add a space at the end of lines ending with ':'. That is made at runtime
      * because we don't want to rely on ending spaces in the test resource file
@@ -69,7 +73,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         @Override
         public int read() throws IOException {
             if (!is.markSupported()) {
-                System.err.println("Cannot add spaces, that aspect won't be tested.");
+                log.error("Cannot add spaces, that aspect won't be tested.");
                 return is.read();
             }
             is.mark(2);

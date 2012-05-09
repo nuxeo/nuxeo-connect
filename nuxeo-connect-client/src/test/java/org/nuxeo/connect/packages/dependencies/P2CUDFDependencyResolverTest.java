@@ -54,7 +54,7 @@ public class P2CUDFDependencyResolverTest extends
     @Test
     public void testResolve() throws Exception {
         DependencyResolution resolution = p2cudfDependencyResolver.resolve(
-                "nuxeo-dm:5.5.0:5.6.0-SNAPSHOT", null);
+                "nuxeo-dm:5.5.0:5.5.0", null);
         assertEquals(2, resolution.getRemovePackageIds().size());
         assertEquals(
                 Arrays.asList(new String[] { "nuxeo-cmf-5.5.0",

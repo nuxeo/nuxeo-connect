@@ -60,7 +60,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         // generate CUDF package universe and request stanza
         String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
                 str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
-        log.info("CUDF request:\n" + cudf);
+        log.debug("CUDF request:\n" + cudf);
 
         // pass to p2cudf for solving
         ProfileChangeRequest req = new Parser().parse(IOUtils.toInputStream(cudf));
