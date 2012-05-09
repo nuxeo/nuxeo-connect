@@ -24,7 +24,7 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> pkgToRemove = pm.getUninstallDependencies(pkg);
 
-        System.out.println(pkgToRemove);
+        log.info(pkgToRemove);
 
         assertTrue(pkgToRemove.contains(pm.getPackage("B-1.0.0")));
         assertTrue(pkgToRemove.contains(pm.getPackage("C-1.0.0")));

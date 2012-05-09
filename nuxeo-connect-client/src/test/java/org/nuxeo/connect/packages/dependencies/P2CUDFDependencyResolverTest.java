@@ -18,21 +18,25 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+//import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
+import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
 /**
  * @since 5.6
  */
-public class P2CUDFDependencyResolverTest {
+public class P2CUDFDependencyResolverTest extends
+        AbstractPackageManagerTestCase {
 
-    private final class P2CUDFDependencyResolverExtension extends
-            P2CUDFDependencyResolver {
-        public P2CUDFDependencyResolverExtension(CUDFHelper cudfHelper) {
-            this.cudfHelper = cudfHelper;
-        }
-
-    }
+    private static final Log log = LogFactory.getLog(P2CUDFDependencyResolverTest.class);
 
     private CUDFHelper cudfHelper;
 
@@ -43,14 +47,28 @@ public class P2CUDFDependencyResolverTest {
      */
     @Before
     public void setUp() throws Exception {
-        cudfHelper = CUDFHelperTest.getCUDFTestHelper();
-        p2cudfDependencyResolver = new P2CUDFDependencyResolverExtension(
-                cudfHelper);
+        super.setUp();
+        List<DownloadablePackage> local = getDownloads("local3.json");
+        List<DownloadablePackage> remote = getDownloads("remote3.json");
+        DummyPackageSource source = new DummyPackageSource(local, true);
+        pm.registerSource(source, true);
+        pm.registerSource(new DummyPackageSource(remote, false), false);
+        // cudfHelper = getCUDFTestHelper(pm);
+        cudfHelper = new CUDFHelper(pm);
+        // p2cudfDependencyResolver = new P2CUDFDependencyResolverExtension(
+        // cudfHelper);
+        p2cudfDependencyResolver = new P2CUDFDependencyResolver(pm);
     }
 
     @Test
     public void testResolve() throws Exception {
-        p2cudfDependencyResolver.resolve("nuxeo-dm", null);
+        DependencyResolution resolution = p2cudfDependencyResolver.resolve(
+                "nuxeo-dm:5.5.0:5.6.0-SNAPSHOT", null);
+        log.info(resolution);
+        // assertEquals(2, resolution.getLocalPackagesToInstall().size());
+        // assertEquals(0, resolution.getLocalPackagesToUpgrade().size());
+        // assertEquals(0, resolution.getLocalUnchangedPackages().size());
+        // assertEquals(2, resolution.getNewPackagesToDownload().size());
     }
 
 }

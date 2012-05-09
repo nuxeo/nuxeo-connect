@@ -606,18 +606,22 @@ public class PackageManagerImpl implements PackageManager,
 
     /*
      * @since 5.6
-     * @see org.nuxeo.connect.packages.PackageManager#resolveDependencies(java.util.List, java.util.List, java.util.List, java.lang.String)
+     * @see
+     * org.nuxeo.connect.packages.PackageManager#resolveDependencies(java.util
+     * .List, java.util.List, java.util.List, java.lang.String)
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) {
         try {
-            return resolver.resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform);
+            return resolver.resolve(pkgInstall, pkgRemove, pkgUpgrade,
+                    targetPlatform);
         } catch (DependencyException e) {
             return new DependencyResolution(e);
         }
     }
+
     @Override
     public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
         // This impl is clearly not very sharp
@@ -663,7 +667,9 @@ public class PackageManagerImpl implements PackageManager,
     public boolean isInstalled(Package pkg) {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         if (pus == null) {
-            log.error("Can not locate PackageUpdateService, set package as not installed.");
+            if (!NuxeoConnectClient.isTestModeSet()) {
+                log.error("Can not locate PackageUpdateService, set package as not installed.");
+            }
             return false;
         }
         return pus.isStarted(pkg.getId());

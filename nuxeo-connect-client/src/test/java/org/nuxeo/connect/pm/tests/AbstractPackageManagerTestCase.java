@@ -73,7 +73,8 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         List<String> lines = readLines(is);
 
         for (String data : lines) {
-            PackageDescriptor pkg = PackageDescriptor.loadFromJSON(PackageDescriptor.class, new JSONObject(data));
+            PackageDescriptor pkg = PackageDescriptor.loadFromJSON(
+                    PackageDescriptor.class, new JSONObject(data));
             result.add(pkg);
         }
         return result;
@@ -107,7 +108,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
         sb.append("]");
 
-        System.out.println(sb.toString());
+        log.info(sb.toString());
     }
 
 }

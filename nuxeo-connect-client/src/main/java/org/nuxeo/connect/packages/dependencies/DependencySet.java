@@ -29,7 +29,7 @@ import org.nuxeo.connect.update.VersionRange;
 /**
 *
 * Because Connect Dependencies are exposed as {@link VersionRange} there can be several versions
-* of a package to fullfill dependencies.
+* of a package to fulfill dependencies.
 * The system will evaluate the different dep versions set.
 *
 * This calls is used to represent a set of Versionned Packages.

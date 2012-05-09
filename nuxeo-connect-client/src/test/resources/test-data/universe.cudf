@@ -1,21 +1,14 @@
 package: nuxeo-cmf
 version: 1
-installed: false
-depends: nuxeo-content-browser = 2
+installed: true
+depends: nuxeo-content-browser*cmf = 1
 conflicts:
 provides:
 
 package: nuxeo-cmf
 version: 2
 installed: false
-depends: nuxeo-content-browser = 2
-conflicts:
-provides:
-
-package: nuxeo-email-suggestion
-version: 1
-installed: false
-depends:
+depends: nuxeo-content-browser*cmf = 1
 conflicts:
 provides:
 
@@ -23,20 +16,27 @@ package: nuxeo-content-browser
 version: 1
 installed: false
 depends:
-conflicts: nuxeo-content-browser = 2
+conflicts: nuxeo-content-browser*cmf
 provides:
 
-package: nuxeo-content-browser
-version: 2
+package: nuxeo-dam
+version: 1
 installed: false
+depends: nuxeo-content-browser = 1
+conflicts:
+provides:
+
+package: nuxeo-content-browser*cmf
+version: 1
+installed: true
 depends:
-conflicts: nuxeo-content-browser = 1
+conflicts: nuxeo-content-browser
 provides:
 
 package: nuxeo-cmf
 version: 3
 installed: false
-depends: nuxeo-content-browser = 2
+depends: nuxeo-content-browser*cmf = 1
 conflicts:
 provides:
 
@@ -44,13 +44,13 @@ package: nuxeo-dm
 version: 2
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts: nuxeo-cmf
+conflicts:
 provides:
 
 package: nuxeo-sc
 version: 1
 installed: false
-depends: nuxeo-dm = 3
+depends: nuxeo-dm = 1
 conflicts:
 provides:
 
@@ -58,12 +58,12 @@ package: nuxeo-dm
 version: 3
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts: nuxeo-cmf
+conflicts:
 provides:
 
 package: nuxeo-dm
 version: 1
 installed: false
 depends: nuxeo-content-browser = 1
-conflicts: nuxeo-cmf
+conflicts:
 provides:

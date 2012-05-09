@@ -19,10 +19,17 @@
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.equinox.p2.cudf.Parser;
+import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
+import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
+import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
+import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
 
@@ -50,16 +57,37 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) throws DependencyException {
-        // generate CUDF "package universe"
-        String cudf = cudfHelper.getCUDFFile();
-        // System.out.println("CUDF universe:\n" + cudf);
-        // get request stanza
-        cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
+        // generate CUDF package universe and request stanza
+        String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
                 str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
-        System.out.println("CUDF request:\n" + cudf);
+        log.info("CUDF request:\n" + cudf);
+
         // pass to p2cudf for solving
-        // build a DependencyResolution from the result
-        return null;
+        ProfileChangeRequest req = new Parser().parse(IOUtils.toInputStream(cudf));
+        SolverConfiguration configuration = new SolverConfiguration(
+                SolverConfiguration.OBJ_PARANOID);
+        SimplePlanner planner = new SimplePlanner();
+        planner.getSolutionFor(req, configuration);
+        planner.stopSolver();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            // Hazardous wait for the solver stop
+        }
+        @SuppressWarnings("unchecked")
+        Collection<InstallableUnit> solution = planner.getBestSolutionFoundSoFar();
+        if (solution == null) {
+            return new DependencyResolution(new DependencyException(
+                    "No solution found:\n" + planner.getExplanation()));
+        } else if (solution.isEmpty()) {
+            return new DependencyResolution();
+        } else {
+            if (!planner.isSolutionOptimal()) {
+                log.warn("The solution found might not be optimal");
+            }
+            return cudfHelper.buildDependencyResolution(solution,
+                    planner.getSolutionDetails());
+        }
     }
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {

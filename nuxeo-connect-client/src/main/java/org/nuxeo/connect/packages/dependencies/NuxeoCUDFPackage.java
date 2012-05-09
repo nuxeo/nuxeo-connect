@@ -18,8 +18,11 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.util.Arrays;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.Version;
 
 class NuxeoCUDFPackage {
@@ -57,14 +60,20 @@ class NuxeoCUDFPackage {
     public NuxeoCUDFPackage(DownloadablePackage pkg) {
         this.pkg = pkg;
         cudfName = pkg.getName();
-        // No more add classifier at the end of name
-        // if (pkg.getVersion().classifier() != null) {
-        // cudfName += ":" + pkg.getVersion().classifier();
-        // }
+        // NXP-9268: Workaround for nuxeo-content-browser
+        if ("nuxeo-content-browser".equals(cudfName)
+                && "cmf".equalsIgnoreCase(pkg.getVersion().classifier())) {
+            cudfName += "*" + pkg.getVersion().classifier();
+        }
+        setInstalled(pkg.getState() == PackageState.STARTED);
     }
 
     public String getCUDFName() {
         return cudfName;
+    }
+
+    public String getNuxeoName() {
+        return pkg.getName();
     }
 
     public Version getNuxeoVersion() {
@@ -108,15 +117,67 @@ class NuxeoCUDFPackage {
         this.installed = installed;
     }
 
+    public boolean isInstalled() {
+        return installed;
+    }
+
     public PackageDependency[] getDependencies() {
+        // NXP-9268: Workaround for nuxeo-content-browser
+        // PackageDependency[] dependencies = pkg.getDependencies();
+        // for (PackageDependency packageDependency : dependencies) {
+        // if
+        // ("nuxeo-content-browser*cmf".equals(getCUDFName(packageDependency)))
+        // {
+        //
+        // }
+        // }
+        // return renameDependency(dependencies, "nuxeo-content-browser");
+        // } else if ("nuxeo-content-browser".equals(cudfName)) {
+        // return addToConflicts(conflicts, "nuxeo-content-browser*cmf");
+        // } else {
         return pkg.getDependencies();
+        // }
     }
 
     public PackageDependency[] getConflicts() {
-        return pkg.getConflicts();
+        // NXP-9268: Workaround for nuxeo-content-browser
+        PackageDependency[] conflicts = pkg.getConflicts();
+        if ("nuxeo-content-browser*cmf".equals(cudfName)) {
+            return addToConflicts(conflicts, "nuxeo-content-browser");
+        } else if ("nuxeo-content-browser".equals(cudfName)) {
+            return addToConflicts(conflicts, "nuxeo-content-browser*cmf");
+        } else {
+            return conflicts;
+        }
+    }
+
+    private PackageDependency[] addToConflicts(PackageDependency[] conflicts,
+            String dep) {
+        PackageDependency[] withContentBrowser;
+        if (conflicts != null && conflicts.length > 0) {
+            withContentBrowser = Arrays.copyOf(conflicts, conflicts.length + 1);
+        } else {
+            withContentBrowser = new PackageDependency[1];
+        }
+        withContentBrowser[withContentBrowser.length - 1] = new PackageDependency(
+                dep);
+        return withContentBrowser;
     }
 
     public PackageDependency[] getProvides() {
         return pkg.getProvides();
+    }
+
+    /**
+     * @param packageDependency
+     */
+    public static String getCUDFName(PackageDependency dependency) {
+        // NXP-9268: Workaround for nuxeo-content-browser
+        if ("nuxeo-content-browser".equals(dependency.getName())
+                && dependency.getVersionRange().toString().contains("cmf")) {
+            return dependency.getName() + "*cmf";
+        } else {
+            return dependency.getName();
+        }
     }
 }
