@@ -76,18 +76,11 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         }
         @SuppressWarnings("unchecked")
         Collection<InstallableUnit> solution = planner.getBestSolutionFoundSoFar();
-        if (solution == null) {
-            return new DependencyResolution(new DependencyException(
-                    "No solution found:\n" + planner.getExplanation()));
-        } else if (solution.isEmpty()) {
-            return new DependencyResolution();
-        } else {
-            if (!planner.isSolutionOptimal()) {
-                log.warn("The solution found might not be optimal");
-            }
-            return cudfHelper.buildDependencyResolution(solution,
-                    planner.getSolutionDetails());
+        if (!planner.isSolutionOptimal()) {
+            log.warn("The solution found might not be optimal");
         }
+        return cudfHelper.buildDependencyResolution(solution,
+                planner.getSolutionDetails());
     }
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {

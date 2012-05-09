@@ -237,6 +237,12 @@ public class CUDFHelper {
     public DependencyResolution buildDependencyResolution(
             Collection<InstallableUnit> solution,
             Map<Criteria, List<String>> details) {
+        if (solution == null) {
+            return new DependencyResolution(new DependencyException(
+                    "No solution found."));
+        } else if (solution.isEmpty()) {
+            return new DependencyResolution();
+        }
         for (Criteria criteria : Criteria.values()) {
             log.debug(criteria.label + ": " + details.get(criteria));
         }

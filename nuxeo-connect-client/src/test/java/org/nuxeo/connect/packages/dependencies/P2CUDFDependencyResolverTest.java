@@ -20,10 +20,9 @@ package org.nuxeo.connect.packages.dependencies;
 
 //import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -35,10 +34,6 @@ import org.nuxeo.connect.pm.tests.DummyPackageSource;
  */
 public class P2CUDFDependencyResolverTest extends
         AbstractPackageManagerTestCase {
-
-    private static final Log log = LogFactory.getLog(P2CUDFDependencyResolverTest.class);
-
-    private CUDFHelper cudfHelper;
 
     private P2CUDFDependencyResolver p2cudfDependencyResolver;
 
@@ -53,10 +48,6 @@ public class P2CUDFDependencyResolverTest extends
         DummyPackageSource source = new DummyPackageSource(local, true);
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
-        // cudfHelper = getCUDFTestHelper(pm);
-        cudfHelper = new CUDFHelper(pm);
-        // p2cudfDependencyResolver = new P2CUDFDependencyResolverExtension(
-        // cudfHelper);
         p2cudfDependencyResolver = new P2CUDFDependencyResolver(pm);
     }
 
@@ -64,11 +55,15 @@ public class P2CUDFDependencyResolverTest extends
     public void testResolve() throws Exception {
         DependencyResolution resolution = p2cudfDependencyResolver.resolve(
                 "nuxeo-dm:5.5.0:5.6.0-SNAPSHOT", null);
-        log.info(resolution);
-        // assertEquals(2, resolution.getLocalPackagesToInstall().size());
-        // assertEquals(0, resolution.getLocalPackagesToUpgrade().size());
-        // assertEquals(0, resolution.getLocalUnchangedPackages().size());
-        // assertEquals(2, resolution.getNewPackagesToDownload().size());
+        assertEquals(2, resolution.getRemovePackageIds().size());
+        assertEquals(
+                Arrays.asList(new String[] { "nuxeo-cmf-5.5.0",
+                        "nuxeo-content-browser-1.1.0-cmf" }),
+                resolution.getRemovePackageIds());
+        assertEquals(2, resolution.getOrderedPackageIdsToInstall().size());
+        assertEquals(
+                Arrays.asList(new String[] { "nuxeo-dm-5.5.0",
+                        "nuxeo-content-browser-1.1.0" }),
+                resolution.getOrderedPackageIdsToInstall());
     }
-
 }
