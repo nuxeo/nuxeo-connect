@@ -24,6 +24,8 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
 
@@ -33,6 +35,7 @@ import org.nuxeo.connect.connector.ConnectServerResponse;
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectHttpResponse implements ConnectServerResponse {
+    protected static final Log log = LogFactory.getLog(ConnectHttpResponse.class);
 
     protected HttpClient httpClient;
     protected HttpMethod method;

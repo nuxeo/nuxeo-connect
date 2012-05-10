@@ -55,7 +55,7 @@ public class SecurityHeaderGenerator {
                     .digest(toDigest.getBytes()));
         } catch (Exception e) {
             throw new ConnectSecurityError(
-                    "Unable to contruct Security Headers", e);
+                    "Unable to construct Security Headers", e);
         }
 
         headers.put(ProtocolConst.CLID_HEADER, CLID1);

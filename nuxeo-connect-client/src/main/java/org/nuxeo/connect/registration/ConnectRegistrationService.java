@@ -52,10 +52,10 @@ public interface ConnectRegistrationService {
     /**
      * Register locally an instance provided a CLID
      *
-     * (Means user has registred it's instance against Connect Web site and has
+     * (Means user has registered it's instance against Connect Web site and has
      * already obtained a CLID)
      *
-     * => can be used if local instance has no access to internet
+     * => can be used if local instance has no access to Internet
      *
      * @param strCLID
      * @param description
@@ -82,7 +82,7 @@ public interface ConnectRegistrationService {
     /**
      * Let Nuxeo client do all the registration process
      *
-     * (Requires the local instance to have internet access)
+     * (Requires the local instance to have Internet access)
      *
      * @param login
      * @param password
