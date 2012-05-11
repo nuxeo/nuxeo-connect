@@ -172,6 +172,9 @@ public class CUDFHelper {
         for (PackageDependency packageDependency : dependencies) {
             String cudfName = NuxeoCUDFPackage.getCUDFName(packageDependency);
             Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(cudfName);
+            if (versionsMap == null) {
+                continue;
+            }
             VersionRange versionRange = packageDependency.getVersionRange();
             int cudfMinVersion, cudfMaxVersion;
             if (versionRange.getMinVersion() == null) {
