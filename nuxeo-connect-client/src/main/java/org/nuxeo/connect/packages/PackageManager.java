@@ -33,12 +33,24 @@ import org.nuxeo.connect.update.PackageUpdateService;
  * Service interface that wraps all {@link PackageSource} to provide an unified
  * view
  * The main purpose of this interface is to provide listing methods that return
- * the
- * most up to date version of packages for given filters
+ * the most up to date version of packages for given filters
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface PackageManager extends BasePackageManager {
+
+    /**
+     * @since 1.4
+     */
+    public static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
+    /**
+     * @since 1.4
+     */
+    public static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
+    /**
+     * @since 1.4
+     */
+    public static final String DEFAULT_DEPENDENCY_RESOLVER = LEGACY_DEPENDENCY_RESOLVER;
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all
@@ -201,13 +213,11 @@ public interface PackageManager extends BasePackageManager {
      * @param pkgRemove
      * @param pkgUpgrade
      * @param targetPlatform
-     * @return
-     * @since 5.6
+     * @since 1.4
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform);
-
 
     /**
      * Returns the packages uninstalled if the given {@link Package} is removed
@@ -224,7 +234,7 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listAllPackages();
 
     /**
-     * @since 5.6
+     * @since 1.4
      */
     boolean isInstalled(Package pkg);
 

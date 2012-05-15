@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,7 +32,7 @@ public class DummyPackageSource implements PackageSource {
 
     public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local) {
         this.pkgs = pkgs;
-        this.local=local;
+        this.local = local;
     }
 
     public String getName() {
@@ -68,7 +68,7 @@ public class DummyPackageSource implements PackageSource {
         // NOP
     }
 
-    public void reset(List<DownloadablePackage> pkgs) {
-        this.pkgs = pkgs;
+    public void reset(List<DownloadablePackage> packages) {
+        this.pkgs = packages;
     }
 }

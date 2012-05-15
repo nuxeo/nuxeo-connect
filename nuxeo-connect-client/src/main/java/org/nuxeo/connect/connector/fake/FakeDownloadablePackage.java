@@ -31,7 +31,7 @@ import org.nuxeo.connect.update.Version;
 /**
  *
  *
- * @since 5.6
+ * @since 1.4
  */
 public class FakeDownloadablePackage implements DownloadablePackage {
 

@@ -39,7 +39,7 @@ public class NuxeoConnectClient {
 
     public static final String PROTOCOL_VERSION_OVERRIDE = "org.nuxeo.connect.protol.version.override";
 
-    protected static PackageManagerImpl packageManager = null;
+    protected static PackageManager packageManager = null;
 
     protected static CallbackHolder cbHolder = new DefaultCallbackHolder();
 

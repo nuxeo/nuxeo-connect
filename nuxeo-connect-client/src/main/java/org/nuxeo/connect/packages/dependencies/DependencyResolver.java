@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -33,7 +32,7 @@ public interface DependencyResolver {
     public DependencyResolution resolve(String pkgId, String targetPlatform)  throws DependencyException;
 
     /*
-     * @since 5.6
+     * @since 1.4
      */
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,

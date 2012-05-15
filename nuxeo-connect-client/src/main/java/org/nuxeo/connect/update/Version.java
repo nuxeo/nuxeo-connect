@@ -22,7 +22,7 @@ package org.nuxeo.connect.update;
 public class Version implements Comparable<Version> {
 
     /**
-     * @since 5.6
+     * @since 1.4
      */
     public static final String SNAPSHOT = "-SNAPSHOT";
 
@@ -188,14 +188,14 @@ public class Version implements Comparable<Version> {
     }
 
     /**
-     * @since 5.6
+     * @since 1.4
      */
     public void setSnapshot(boolean isSnapshot) {
         snapshot = isSnapshot;
     }
 
     /**
-     * @since 5.6
+     * @since 1.4
      */
     public void setClassifier(String classifier) {
         this.classifier = classifier;

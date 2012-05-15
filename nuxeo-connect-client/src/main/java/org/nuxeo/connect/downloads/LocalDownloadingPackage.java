@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.downloads;
@@ -140,12 +139,10 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         method.setFollowRedirects(true);
 
         try {
-
             if (!sourceUrl.contains("127.0.0.1:8082/test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
-
-                for (String name : headers.keySet()) {
-                    method.addRequestHeader(name, headers.get(name));
+                for (String headerName : headers.keySet()) {
+                    method.addRequestHeader(headerName, headers.get(headerName));
                 }
             }
 
@@ -153,9 +150,9 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
             try {
                 rc = httpClient.executeMethod(method);
                 if (rc == 200) {
-                    if (sourceSize==0) {
+                    if (sourceSize == 0) {
                         Header clheader = method.getResponseHeader("content-length");
-                        if (clheader!=null) {
+                        if (clheader != null) {
                             sourceSize = Long.parseLong(clheader.getValue());
                         }
                     }

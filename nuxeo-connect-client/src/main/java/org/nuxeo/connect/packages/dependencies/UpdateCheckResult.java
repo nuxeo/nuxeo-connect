@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -27,21 +26,30 @@ import java.util.Map;
 import org.nuxeo.connect.data.DownloadablePackage;
 
 /**
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*
-*/
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ *
+ */
 public class UpdateCheckResult {
 
-    protected boolean requireUpdate=false;
+    protected boolean requireUpdate = false;
 
-    protected boolean transparentUpdate=false;
+    protected boolean transparentUpdate = false;
 
     protected List<DownloadablePackage> packagesToRemove = new ArrayList<DownloadablePackage>();
 
     protected Map<String, Boolean> updatePossible = new HashMap<String, Boolean>();
 
     protected List<DownloadablePackage> packagesToAdd = new ArrayList<DownloadablePackage>();
+
+    private String lastUpdateImpossiblePkgName;
+
+    /**
+     * @since 1.4
+     */
+    public String getLastUpdateImpossiblePkgName() {
+        return lastUpdateImpossiblePkgName;
+    }
 
     public List<DownloadablePackage> getPackagesToRemove() {
         return packagesToRemove;
@@ -60,8 +68,9 @@ public class UpdateCheckResult {
     }
 
     public boolean isUpdatePossible() {
-        for (Boolean possible : updatePossible.values()) {
-            if (!possible) {
+        for (String key : updatePossible.keySet()) {
+            if (!updatePossible.get(key)) {
+                lastUpdateImpossiblePkgName = key;
                 return false;
             }
         }
@@ -71,7 +80,7 @@ public class UpdateCheckResult {
     public void setTransparentUpdate() {
         updatePossible.clear();
         packagesToRemove.clear();
-        transparentUpdate=true;
+        transparentUpdate = true;
     }
 
     public void setUpdatePossible(String pkgName, boolean updatePossible) {

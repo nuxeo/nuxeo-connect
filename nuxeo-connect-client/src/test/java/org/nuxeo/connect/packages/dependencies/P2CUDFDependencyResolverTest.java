@@ -26,16 +26,15 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
 /**
- * @since 5.6
+ * @since 1.4
  */
 public class P2CUDFDependencyResolverTest extends
         AbstractPackageManagerTestCase {
-
-    private P2CUDFDependencyResolver p2cudfDependencyResolver;
 
     /**
      * @throws java.lang.Exception
@@ -48,13 +47,14 @@ public class P2CUDFDependencyResolverTest extends
         DummyPackageSource source = new DummyPackageSource(local, true);
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
-        p2cudfDependencyResolver = new P2CUDFDependencyResolver(pm);
+        pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
     }
 
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = p2cudfDependencyResolver.resolve(
-                "nuxeo-dm:5.5.0:5.5.0", null);
+        DependencyResolution resolution = pm.resolveDependencies(
+                "nuxeo-dm-5.5.0", "5.5.0");
+        assertFalse(resolution.toString(), resolution.isFailed());
         assertEquals(2, resolution.getRemovePackageIds().size());
         assertEquals(
                 Arrays.asList(new String[] { "nuxeo-cmf-5.5.0",
@@ -62,8 +62,8 @@ public class P2CUDFDependencyResolverTest extends
                 resolution.getRemovePackageIds());
         assertEquals(2, resolution.getOrderedPackageIdsToInstall().size());
         assertEquals(
-                Arrays.asList(new String[] { "nuxeo-dm-5.5.0",
-                        "nuxeo-content-browser-1.1.0" }),
+                Arrays.asList(new String[] { "nuxeo-content-browser-1.1.0",
+                        "nuxeo-dm-5.5.0" }),
                 resolution.getOrderedPackageIdsToInstall());
     }
 }

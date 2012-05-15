@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -30,9 +30,9 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         List<DownloadablePackage> remote = getDownloads("remote1.json");
 
         assertNotNull(local);
-        assertTrue(local.size()>0);
+        assertTrue(local.size() > 0);
         assertNotNull(remote);
-        assertTrue(remote.size()>0);
+        assertTrue(remote.size() > 0);
 
         pm.registerSource(new DummyPackageSource(local, true), true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
@@ -69,9 +69,9 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         List<DownloadablePackage> remote = getDownloads("remote2.json");
 
         assertNotNull(local);
-        assertTrue(local.size()>0);
+        assertTrue(local.size() > 0);
         assertNotNull(remote);
-        assertTrue(remote.size()>0);
+        assertTrue(remote.size() > 0);
 
         pm.registerSource(new DummyPackageSource(local, true), true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
@@ -95,8 +95,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         dumpPkgList("update", updates);
         assertEquals(1, updates.size());
 
-        assertEquals("pkgA",updates.get(0).getName());
-
+        assertEquals("pkgA", updates.get(0).getName());
 
         List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages();
         dumpPkgList("remoteOnly", remoteOnly);
@@ -108,7 +107,6 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         downloading = remoteOrLocal.get(1);
         assertEquals(2, downloading.getState());
 
-
     }
 
     public void testUpdateListing() throws Exception {
@@ -116,9 +114,9 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         List<DownloadablePackage> remote = getDownloads("remotehf1.json");
 
         assertNotNull(local);
-        assertTrue(local.size()>0);
+        assertTrue(local.size() > 0);
         assertNotNull(remote);
-        assertTrue(remote.size()>0);
+        assertTrue(remote.size() > 0);
 
         pm.registerSource(new DummyPackageSource(local, true), true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
@@ -135,7 +133,8 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         dumpPkgList("updates", updates);
         assertEquals(3, updates.size());
 
-        // check that one of them is actually a package downloaded but not installed
+        // check that one of them is actually a package downloaded but not
+        // installed
         assertEquals(PackageState.DOWNLOADED, updates.get(0).getState());
 
     }

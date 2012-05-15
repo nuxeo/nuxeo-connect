@@ -18,9 +18,11 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,13 +33,13 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 
 /**
- * @since 5.6
+ * @since 1.4
  */
 public class CUDFHelper {
 
@@ -45,7 +47,7 @@ public class CUDFHelper {
 
     public static final String newLine = System.getProperty("line.separator");
 
-    protected PackageManager pm;
+    protected InternalPackageManager pm;
 
     /**
      * Map of all NuxeoCUDFPackage per Nuxeo version, per package name
@@ -61,13 +63,17 @@ public class CUDFHelper {
      */
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<String, NuxeoCUDFPackage>();
 
-    public CUDFHelper(PackageManager pm) {
+    private String targetPlatform;
+
+    public CUDFHelper(InternalPackageManager pm) {
         this.pm = pm;
         initMapping();
     }
 
     public void resetMapping() {
         pm.flushCache();
+        nuxeo2CUDFMap.clear();
+        CUDF2NuxeoMap.clear();
         initMapping();
     }
 
@@ -81,6 +87,12 @@ public class CUDFHelper {
         // them a "CUDF posint" version
         // populate Nuxeo2CUDFMap and the reverse CUDF2NuxeoMap
         for (DownloadablePackage pkg : allPackages) {
+            // ignore incompatible packages when a targetPlatform is set
+            if (targetPlatform != null
+                    && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
+                            pkg, targetPlatform)) {
+                continue;
+            }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
             if (pkgVersions == null) {
@@ -147,24 +159,27 @@ public class CUDFHelper {
 
     /**
      * @return a CUDF universe as a String
+     * @throws DependencyException
      */
-    public String getCUDFFile() {
+    public String getCUDFFile() throws DependencyException {
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
             sb.append(cudfPackage.getCUDFStanza());
             sb.append(NuxeoCUDFPackage.CUDF_DEPENDS
-                    + formatCUDF(cudfPackage.getDependencies()) + newLine);
+                    + formatCUDF(cudfPackage.getDependencies(), false)
+                    + newLine);
             sb.append(NuxeoCUDFPackage.CUDF_CONFLICTS
-                    + formatCUDF(cudfPackage.getConflicts()) + newLine);
+                    + formatCUDF(cudfPackage.getConflicts(), false) + newLine);
             sb.append(NuxeoCUDFPackage.CUDF_PROVIDES
-                    + formatCUDF(cudfPackage.getProvides()) + newLine);
+                    + formatCUDF(cudfPackage.getProvides(), false) + newLine);
             sb.append(System.getProperty("line.separator"));
         }
         return sb.toString();
     }
 
-    private String formatCUDF(PackageDependency[] dependencies) {
+    private String formatCUDF(PackageDependency[] dependencies,
+            boolean failOnError) throws DependencyException {
         if (dependencies == null) {
             return "";
         }
@@ -173,7 +188,13 @@ public class CUDFHelper {
             String cudfName = NuxeoCUDFPackage.getCUDFName(packageDependency);
             Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(cudfName);
             if (versionsMap == null) {
-                continue;
+                String errMsg = "Missing mapping for " + packageDependency;
+                if (failOnError) {
+                    throw new DependencyException(errMsg);
+                } else {
+                    log.warn(errMsg);
+                    continue;
+                }
             }
             VersionRange versionRange = packageDependency.getVersionRange();
             int cudfMinVersion, cudfMaxVersion;
@@ -218,16 +239,18 @@ public class CUDFHelper {
      * @param pkgRemove
      * @param pkgUpgrade
      * @return a CUDF string with packages universe and request stanza
+     * @throws DependencyException
      */
     public String getCUDFFile(PackageDependency[] pkgInstall,
-            PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade) {
+            PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade)
+            throws DependencyException {
         StringBuilder sb = new StringBuilder(getCUDFFile());
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall)
+        sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall, true)
                 + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_REMOVE + formatCUDF(pkgRemove)
+        sb.append(NuxeoCUDFPackage.CUDF_REMOVE + formatCUDF(pkgRemove, true)
                 + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE + formatCUDF(pkgUpgrade)
+        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE + formatCUDF(pkgUpgrade, true)
                 + newLine);
         return sb.toString();
     }
@@ -236,21 +259,42 @@ public class CUDFHelper {
      * @param solution CUDF solution
      * @param details
      * @return a DependencyResolution built from the given CUDF solution
+     * @throws DependencyException
      */
-    public DependencyResolution buildDependencyResolution(
+    public DependencyResolution buildResolution(
             Collection<InstallableUnit> solution,
-            Map<Criteria, List<String>> details) {
+            Map<Criteria, List<String>> details) throws DependencyException {
         if (solution == null) {
-            return new DependencyResolution(new DependencyException(
-                    "No solution found."));
+            throw new DependencyException("No solution found.");
         } else if (solution.isEmpty()) {
             return new DependencyResolution();
         }
         for (Criteria criteria : Criteria.values()) {
-            log.debug(criteria.label + ": " + details.get(criteria));
+            log.info(criteria.label + ": " + details.get(criteria));
         }
         DependencyResolution res = new DependencyResolution();
-        // TODO NXP-9268 specify dep to upgrade, download, ...?
+        completeResolution(res, details, solution);
+        if (res.isFailed()) {
+            throw new DependencyException(res.failedMessage);
+        }
+        res.markAsSuccess();
+        res.sort(pm);
+        return res;
+    }
+
+    /**
+     * TODO NXP-9268 should use results from {@link Criteria#NEW},
+     * {@value Criteria#NOTUPTODATE}, {@link Criteria#RECOMMENDED} and
+     * {@link Criteria#VERSION_CHANGED}
+     *
+     * @param res
+     * @param details
+     * @param solution
+     */
+    private void completeResolution(DependencyResolution res,
+            Map<Criteria, List<String>> details,
+            Collection<InstallableUnit> solution) {
+        // Complete with removals
         for (String pkgName : details.get(Criteria.REMOVED)) {
             NuxeoCUDFPackage pkg = getInstalledCUDFPackage(pkgName);
             if (pkg != null) {
@@ -258,18 +302,39 @@ public class CUDFHelper {
                         pkg.getNuxeoVersion());
             }
         }
-        for (Iterator<InstallableUnit> iterator = solution.iterator(); iterator.hasNext();) {
-            InstallableUnit iu = iterator.next();
+
+        // Complete with additions
+        details.get(Criteria.CHANGED).removeAll(details.get(Criteria.REMOVED));
+        // log.debug("changed-removed: " + details.get(Criteria.CHANGED));
+        List<InstallableUnit> sortedSolution = new ArrayList<InstallableUnit>(
+                solution);
+        Collections.sort(sortedSolution);
+        log.debug("Sorted solution: " + sortedSolution);
+        Collections.reverse(sortedSolution);
+        Map<String, NuxeoCUDFPackage> map = new LinkedHashMap<String, NuxeoCUDFPackage>();
+        for (InstallableUnit iu : sortedSolution) {
             NuxeoCUDFPackage pkg = getCUDFPackage(iu.getId() + "-"
                     + iu.getVersion());
+            if (pkg == null) {
+                log.warn("Couldn't find " + pkg);
+                continue;
+            }
+            if (details.get(Criteria.CHANGED).contains(iu.getId())
+                    && (!map.containsKey(pkg.getNuxeoName()) || pkg.getNuxeoVersion().greaterThan(
+                            map.get(pkg.getNuxeoName()).getNuxeoVersion()))) {
+                map.put(pkg.getNuxeoName(), pkg);
+            }
+        }
+        for (NuxeoCUDFPackage pkg : map.values()) {
             if (!res.addPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
                 break;
             }
         }
-        if (!res.isFailed()) {
-            res.markAsSuccess();
-        }
-        return res;
+    }
+
+    public void setTargetPlatform(String targetPlatform) {
+        this.targetPlatform = targetPlatform;
+        resetMapping();
     }
 
 }

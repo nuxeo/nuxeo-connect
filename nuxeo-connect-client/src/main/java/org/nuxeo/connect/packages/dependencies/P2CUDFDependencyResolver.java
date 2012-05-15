@@ -30,33 +30,36 @@ import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
 import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
-import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.VersionRange;
 
 /**
  * This implementation uses the p2cudf resolver to solve complex dependencies
  *
- * @since 5.6
+ * @since 1.4
  */
 public class P2CUDFDependencyResolver implements DependencyResolver {
 
     protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
 
-    protected PackageManager pm;
+    protected InternalPackageManager pm;
 
     protected CUDFHelper cudfHelper;
 
     protected P2CUDFDependencyResolver() {
     }
 
-    public P2CUDFDependencyResolver(PackageManager pm) {
+    public P2CUDFDependencyResolver(InternalPackageManager pm) {
         this.pm = pm;
-        cudfHelper = new CUDFHelper(pm);
     }
 
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) throws DependencyException {
+        cudfHelper = new CUDFHelper(pm);
+        cudfHelper.setTargetPlatform(targetPlatform);
         // generate CUDF package universe and request stanza
         String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
                 str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
@@ -65,7 +68,11 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         // pass to p2cudf for solving
         ProfileChangeRequest req = new Parser().parse(IOUtils.toInputStream(cudf));
         SolverConfiguration configuration = new SolverConfiguration(
-                SolverConfiguration.OBJ_PARANOID);
+                SolverConfiguration.OBJ_ALL_CRITERIA);
+        if (log.isTraceEnabled()) {
+            configuration.verbose = true;
+            configuration.explain = true;
+        }
         SimplePlanner planner = new SimplePlanner();
         planner.getSolutionFor(req, configuration);
         planner.stopSolver();
@@ -76,11 +83,15 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         }
         @SuppressWarnings("unchecked")
         Collection<InstallableUnit> solution = planner.getBestSolutionFoundSoFar();
+        if (log.isTraceEnabled()) {
+            log.trace(planner.getExplanation());
+        }
         if (!planner.isSolutionOptimal()) {
             log.warn("The solution found might not be optimal");
         }
-        return cudfHelper.buildDependencyResolution(solution,
+        DependencyResolution resolution = cudfHelper.buildResolution(solution,
                 planner.getSolutionDetails());
+        return resolution;
     }
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {
@@ -97,7 +108,16 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     public DependencyResolution resolve(String pkgId, String targetPlatform)
             throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
-        pkgInstall.add(pkgId);
+        if (pkgId.contains(":")) { // new syntax (PackageDependency style)
+            pkgInstall.add(pkgId);
+        } else { // old syntax (DownloadablePackage style)
+            Package pkg = pm.getPackage(pkgId);
+            if (pkg == null) {
+                throw new DependencyException("Couldn't find " + pkgId);
+            }
+            pkgInstall.add(new PackageDependency(pkg.getName(),
+                    new VersionRange(pkg.getVersion())).toString());
+        }
         return resolve(pkgInstall, null, null, targetPlatform);
     }
 

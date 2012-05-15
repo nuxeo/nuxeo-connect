@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.Parser;
 import org.eclipse.equinox.p2.cudf.metadata.IProvidedCapability;
 import org.eclipse.equinox.p2.cudf.metadata.IRequiredCapability;
@@ -43,17 +41,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
 /**
  *
  *
- * @since 5.6
+ * @since 1.4
  */
 public class CUDFHelperTest extends AbstractPackageManagerTestCase {
-
-    static final Log log = LogFactory.getLog(CUDFHelperTest.class);
 
     /**
      * Add a space at the end of lines ending with ':'. That is made at runtime
@@ -109,7 +106,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
         // cudfHelper = getCUDFTestHelper(pm);
-        cudfHelper = new CUDFHelper(pm);
+        cudfHelper = new CUDFHelper((InternalPackageManager) pm);
         pcr = new Parser().parse(new AddSpaceInputStream(
                 this.getClass().getClassLoader().getResourceAsStream(
                         AbstractPackageManagerTestCase.TEST_DATA

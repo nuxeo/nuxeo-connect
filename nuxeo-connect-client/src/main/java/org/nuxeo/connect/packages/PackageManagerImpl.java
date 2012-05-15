@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages;
@@ -53,8 +52,7 @@ import org.nuxeo.connect.update.task.Task;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class PackageManagerImpl implements PackageManager,
-        InternalPackageManager {
+public class PackageManagerImpl implements InternalPackageManager {
 
     protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
 
@@ -67,21 +65,6 @@ public class PackageManagerImpl implements PackageManager,
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
     protected DependencyResolver resolver;
-
-    /**
-     * @since 5.6
-     */
-    protected static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
-
-    /**
-     * @since 5.6
-     */
-    protected static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
-
-    /**
-     * @since 5.6
-     */
-    protected static final String DEFAULT_DEPENDENCY_RESOLVER = LEGACY_DEPENDENCY_RESOLVER;
 
     protected List<PackageSource> getAllSources() {
         List<PackageSource> allSources = new ArrayList<PackageSource>();
@@ -98,16 +81,17 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     /**
-     * @since 5.6
+     * @since 1.4
      */
     public void setResolver(String resolverType) {
-        if (resolverType.equals(P2CUDF_DEPENDENCY_RESOLVER)) {
+        if (P2CUDF_DEPENDENCY_RESOLVER.equals(resolverType)) {
             resolver = new P2CUDFDependencyResolver(this);
-        } else if (resolverType.equals(LEGACY_DEPENDENCY_RESOLVER)) {
+        } else if (LEGACY_DEPENDENCY_RESOLVER.equals(resolverType)) {
             resolver = new LegacyDependencyResolver(this);
         } else {
             log.warn("Resolver " + resolverType
-                    + "is not supported - falling back on default resolver.");
+                    + "is not supported - fallback on default resolver "
+                    + DEFAULT_DEPENDENCY_RESOLVER);
             resolver = new LegacyDependencyResolver(this);
         }
     }
@@ -144,7 +128,7 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     /**
-     * @since 5.6
+     * @since 1.4
      * @return All downloadable packages from given sources filtered on type if
      *         not null
      */
@@ -168,7 +152,6 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<DownloadablePackage> findRemotePackages(String packageName) {
-
         List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
         for (PackageSource source : remoteSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
@@ -181,7 +164,6 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<Version> findLocalPackageVersions(String packageName) {
-
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
@@ -194,7 +176,6 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<Version> findLocalPackageInstalledVersions(String packageName) {
-
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
@@ -262,7 +243,6 @@ public class PackageManagerImpl implements PackageManager,
 
     public List<Version> getAvailableVersion(String pkgName,
             VersionRange range, String targetPlatform) {
-
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : getAllSources()) {
             for (DownloadablePackage pkg : source.listPackages()) {
@@ -293,7 +273,6 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public void registerSource(PackageSource source, boolean local) {
-
         String name = source.getName();
         if (!sourcesNames.contains(name)) {
             if (local) {
@@ -331,8 +310,10 @@ public class PackageManagerImpl implements PackageManager,
         return listLocalPackages(null);
     }
 
+    /**
+     * for local package we don't merge / filter on latest versions
+     */
     public List<DownloadablePackage> listLocalPackages(PackageType type) {
-        // for local package we don't merge / filter on latest versions
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         List<String> pkgIds = new ArrayList<String>();
         for (PackageSource source : localSources) {
@@ -397,9 +378,8 @@ public class PackageManagerImpl implements PackageManager,
             // force addition of hot-fixes
             List<DownloadablePackage> hotFixes = listRemotePackages(PackageType.HOT_FIX);
             for (DownloadablePackage pkg : hotFixes) {
-                if (!toUpdateIds.contains(pkg.getId())) { // check it is not
-                                                          // already in update
-                                                          // list
+                // check it is not already in update list
+                if (!toUpdateIds.contains(pkg.getId())) {
                     // check if package is not already in local
                     boolean alreadyInLocal = false;
                     for (DownloadablePackage lpkg : localPackages) {
@@ -419,7 +399,6 @@ public class PackageManagerImpl implements PackageManager,
         }
 
         Collections.sort(toUpdate, new VersionPackageComparator());
-
         return toUpdate;
     }
 
@@ -500,8 +479,10 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public DownloadablePackage getPackage(String pkgId) {
-
-        List<DownloadablePackage> pkgs = listPackages();
+        // Merge is an issue for P2CUDFDependencyResolver, try with
+        // listAllPackages() instead of listPackages()
+        // List<DownloadablePackage> pkgs = listPackages();
+        List<DownloadablePackage> pkgs = listAllPackages();
         DownloadablePackage pkg = getPkgInList(pkgs, pkgId);
         if (pkg == null) {
             List<DownloadablePackage> studioPkgs = listAllStudioRemotePackages();
@@ -532,13 +513,11 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
-
         List<DownloadablePackage> remote = listAllStudioRemotePackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
 
         for (DownloadablePackage pkg : remote) {
-
             boolean found = false;
             for (DownloadablePackage lpkg : local) {
                 if (lpkg.getId().equals(pkg.getId())) {
@@ -551,9 +530,7 @@ public class PackageManagerImpl implements PackageManager,
                 result.add(pkg);
             }
         }
-
         return result;
-
     }
 
     public List<DownloadablePackage> listOnlyRemotePackages() {
@@ -561,7 +538,6 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<DownloadablePackage> listOnlyRemotePackages(PackageType type) {
-
         List<DownloadablePackage> result = listRemotePackages(type);
         List<DownloadablePackage> local = listLocalPackages(type);
 
@@ -577,14 +553,11 @@ public class PackageManagerImpl implements PackageManager,
     }
 
     public List<DownloadablePackage> listAllStudioRemotePackages() {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (PackageSource source : remoteSources) {
             List<DownloadablePackage> packages = source.listPackages(PackageType.STUDIO);
             result.addAll(packages);
         }
-
         return result;
     }
 
@@ -604,11 +577,9 @@ public class PackageManagerImpl implements PackageManager,
         }
     }
 
-    /*
-     * @since 5.6
-     * @see
-     * org.nuxeo.connect.packages.PackageManager#resolveDependencies(java.util
-     * .List, java.util.List, java.util.List, java.lang.String)
+    /**
+     * @since 1.4
+     * @see PackageManager#resolveDependencies(List, List, List, String)
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall,
@@ -644,7 +615,6 @@ public class PackageManagerImpl implements PackageManager,
         }
 
         pkgNamesToRemove.remove(pkg.getName());
-
         List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
         for (String pkgName : pkgNamesToRemove) {
             for (Version v : findLocalPackageInstalledVersions(pkgName)) {
