@@ -43,14 +43,16 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4
      */
     public static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
+
     /**
      * @since 1.4
      */
     public static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
+
     /**
      * @since 1.4
      */
-    public static final String DEFAULT_DEPENDENCY_RESOLVER = LEGACY_DEPENDENCY_RESOLVER;
+    public static final String DEFAULT_DEPENDENCY_RESOLVER = P2CUDF_DEPENDENCY_RESOLVER;
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all

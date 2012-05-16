@@ -242,7 +242,7 @@ public class DependencyResolution {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         if (isFailed()) {
-            sb.append("Failed to resolve dependencies : ");
+            sb.append("Failed to resolve dependencies: ");
             sb.append(failedMessage);
         } else if (!sorted) {
             append(sb, allPackages, "Unsorted packages: ");
