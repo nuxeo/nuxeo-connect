@@ -66,28 +66,20 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-
         System.setProperty("org.nuxeo.connect.client.testMode", "true");
         LogicalInstanceIdentifier.cleanUp();
-
         pm = NuxeoConnectClient.getPackageManager();
-
+        pm.setResolver(PackageManager.LEGACY_DEPENDENCY_RESOLVER);
         assertNotNull(pm);
-
         ((PackageManagerImpl) pm).resetSources();
-
     }
 
     protected static List<DownloadablePackage> getDownloads(String filename)
             throws Exception {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(
                 TEST_DATA + filename);
-
         List<String> lines = readLines(is);
-
         for (String data : lines) {
             PackageDescriptor pkg = PackageDescriptor.loadFromJSON(
                     PackageDescriptor.class, new JSONObject(data));
@@ -106,10 +98,8 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
     protected void dumpPkgList(String label, List<DownloadablePackage> pkgs) {
         StringBuffer sb = new StringBuffer();
-
         sb.append(label);
         sb.append("=[");
-
         for (DownloadablePackage pkg : pkgs) {
             sb.append(pkg.getId());
             sb.append(" (");
@@ -121,9 +111,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
             sb.append(pkg.getState());
             sb.append("] ,");
         }
-
         sb.append("]");
-
         log.info(sb.toString());
     }
 
