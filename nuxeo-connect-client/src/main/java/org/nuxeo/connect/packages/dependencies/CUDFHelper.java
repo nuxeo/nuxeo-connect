@@ -266,8 +266,6 @@ public class CUDFHelper {
             Map<Criteria, List<String>> details) throws DependencyException {
         if (solution == null) {
             throw new DependencyException("No solution found.");
-        } else if (solution.isEmpty()) {
-            return new DependencyResolution();
         }
         for (Criteria criteria : Criteria.values()) {
             log.info(criteria.label + ": " + details.get(criteria));
