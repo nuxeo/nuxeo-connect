@@ -1,5 +1,5 @@
 {"id":"nuxeo-cap-5.5","name":"nuxeo-cap", "version":"5.5","title":"Nuxeo CAP","description":"Nuxeo CAP", "type":"addon", "state":5}
 {"id":"nuxeo-content-browser-5.5.0","name":"nuxeo-content-browser", "version":"5.5.0","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":2}
 {"id":"nuxeo-dm-5.5","name":"nuxeo-dm", "version":"5.5","title":"Nuxeo DM","description":"Nuxeo DM", "type":"addon", "state":2, "dependencies":["nuxeo-content-browser:5.5.0:5.5.0"]}
-{"id":"nuxeo-content-browser-5.5.0-CMF","name":"nuxeo-content-browser", "version":"5.5.0-CMF","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":5}
-{"id":"nuxeo-cmf-5.5","name":"nuxeo-cmf", "version":"5.5","title":"Nuxeo CMF","description":"Nuxeo CMF", "type":"addon", "state":5, "dependencies":["nuxeo-content-browser:5.5.0-CMF:5.5.0-CMF"]}
+{"id":"nuxeo-content-browser-5.5.0-cmf","name":"nuxeo-content-browser", "version":"5.5.0-cmf","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":5}
+{"id":"nuxeo-cmf-5.5","name":"nuxeo-cmf", "version":"5.5","title":"Nuxeo CMF","description":"Nuxeo CMF", "type":"addon", "state":5, "dependencies":["nuxeo-content-browser:5.5.0-cmf:5.5.0-cmf"]}

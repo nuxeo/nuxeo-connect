@@ -45,7 +45,7 @@ public class UnregistredFakeConnector extends AbstractFakeConnector {
 
     @Override
     protected String getJSONDataForStatus() {
-        return "{ contractStatus : 'unregistred', endDate : ''}";
+        return "{ contractStatus : 'unregistered', endDate : ''}";
     }
 
 }

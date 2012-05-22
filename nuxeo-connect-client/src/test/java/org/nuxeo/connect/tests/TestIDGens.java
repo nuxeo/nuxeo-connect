@@ -21,10 +21,14 @@ package org.nuxeo.connect.tests;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
 public class TestIDGens extends TestCase {
+
+    private static final Log log = LogFactory.getLog(TestIDGens.class);
 
     public void testCTIDGen() throws Exception {
 
@@ -36,14 +40,15 @@ public class TestIDGens extends TestCase {
 
         String ctId2 = ctid2.getCTID();
 
-        System.out.print(ctId1);
+        log.info(ctId1);
 
         assertEquals(ctId1, ctId2);
 
     }
 
     protected void dotestCLID() throws Exception {
-        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier("toto--titi", "myInstance");
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
+                "toto--titi", "myInstance");
 
         CLID.save();
 
@@ -53,15 +58,16 @@ public class TestIDGens extends TestCase {
 
         assertEquals(CLID.getCLID1(), CLID2.getCLID1());
         assertEquals(CLID.getCLID2(), CLID2.getCLID2());
-        assertEquals(CLID.getInstanceDescription(), CLID2.getInstanceDescription());
+        assertEquals(CLID.getInstanceDescription(),
+                CLID2.getInstanceDescription());
     }
 
     public void testCLID() throws Exception {
 
-        LogicalInstanceIdentifier.USE_BASE64_SAVE=false;
+        LogicalInstanceIdentifier.USE_BASE64_SAVE = false;
         dotestCLID();
 
-        LogicalInstanceIdentifier.USE_BASE64_SAVE=true;
+        LogicalInstanceIdentifier.USE_BASE64_SAVE = true;
         dotestCLID();
     }
 }

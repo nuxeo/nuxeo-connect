@@ -1,0 +1,5 @@
+{"id":"nuxeo-content-browser-1.0.0","name":"nuxeo-content-browser", "version":"1.1.0","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":5}
+{"id":"nuxeo-dm-5.6.0-SNAPSHOT","name":"nuxeo-dm", "version":"5.6.0-SNAPSHOT","title":"Nuxeo DM","description":"Nuxeo DM", "type":"addon", "state":5, "dependencies":["nuxeo-content-browser:1.1.0:1.1.0"], "targetPlatforms":["5.6.0-SNAPSHOT"]}
+{"id":"nuxeo-social-collaboration-5.6.0-SNAPSHOT","name":"nuxeo-social-collaboration", "version":"5.6.0-SNAPSHOT","title":"Nuxeo SC","description":"Nuxeo SC", "type":"addon", "state":5, "dependencies":["nuxeo-dm:5.6.0-SNAPSHOT:5.6.0-SNAPSHOT"], "targetPlatforms":["5.6.0-SNAPSHOT"]}
+{"id":"nuxeo-content-browser-1.1.0-cmf","name":"nuxeo-content-browser", "version":"1.1.0-cmf","title":"Nuxeo STD Layout","description":"", "type":"addon", "state":2}
+{"id":"nuxeo-cmf-5.6.0-SNAPSHOT","name":"nuxeo-cmf", "version":"5.6.0-SNAPSHOT","title":"Nuxeo CMF","description":"Nuxeo CMF", "type":"addon", "state":2, "dependencies":["nuxeo-content-browser:1.1.0-cmf:1.1.0-cmf"], "targetPlatforms":["5.6.0-SNAPSHOT"]}

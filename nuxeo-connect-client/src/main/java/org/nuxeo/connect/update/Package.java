@@ -63,11 +63,25 @@ public interface Package {
     String[] getTargetPlatforms();
 
     /**
-     * Gets the list of dependencies of this package. If not dependencies
+     * Gets the list of dependencies of this package. If no dependency
      * exists,
      * either null or an empty array is returned.
      */
     PackageDependency[] getDependencies();
+
+    /**
+     * Gets the list of conflicts of this package. If no conflict
+     * exists,
+     * either null or an empty array is returned.
+     */
+    PackageDependency[] getConflicts();
+
+    /**
+     * Gets the list of provides of this package. If no provide
+     * exists,
+     * either null or an empty array is returned.
+     */
+    PackageDependency[] getProvides();
 
     /**
      * Gets the package life cycle status.

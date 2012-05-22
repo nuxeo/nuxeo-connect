@@ -25,6 +25,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -39,6 +41,8 @@ import org.nuxeo.connect.update.Version;
 
 public class TestSerialization extends TestCase {
 
+    private static final Log log = LogFactory.getLog(TestSerialization.class);
+
     public void testSerializeSubscriptionStatus() throws JSONException {
 
         SubscriptionStatus status = new SubscriptionStatus();
@@ -52,9 +56,10 @@ public class TestSerialization extends TestCase {
         String json = status.serializeAsJSON();
 
         assertNotNull(json);
-        System.out.println(json);
+        log.info(json);
 
-        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
+        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(
+                SubscriptionStatus.class, json);
         assertNotNull(s2);
 
         assertEquals(status.getContractStatus(), s2.getContractStatus());
@@ -68,10 +73,12 @@ public class TestSerialization extends TestCase {
 
         PackageDescriptor p = new PackageDescriptor();
 
-        List<String> targets=new ArrayList<String>();
+        List<String> targets = new ArrayList<String>();
         targets.add("5.3.0");
         targets.add("5.3.1");
-        PackageDependency[] deps = {new PackageDependency("my-package:1.1:1.2"),new PackageDependency("my-package:2.0:2.2")};
+        PackageDependency[] deps = {
+                new PackageDependency("my-package:1.1:1.2"),
+                new PackageDependency("my-package:2.0:2.2") };
         p.setClassifier("MyClassifier");
         p.setDescription("MyDescription");
         p.setHomePage("http://www.nuxeo.org");
@@ -95,30 +102,32 @@ public class TestSerialization extends TestCase {
         String json = p.serializeAsJSON();
 
         assertNotNull(json);
-        System.out.println(json);
+        log.info(json);
 
-
-        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
+        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(
+                PackageDescriptor.class, json);
         assertNotNull(p2);
 
-        assertEquals(p.getHomePage(),p2.getHomePage());
-        assertEquals(p.getDescription(),p2.getDescription());
-        assertEquals(p.getClassifier(),p2.getClassifier());
-        assertEquals(p.getId(),p2.getId());
-        assertEquals(p.getName(),p2.getName());
-        assertEquals(p.getState(),p2.getState());
-        assertEquals(p.getTitle(),p2.getTitle());
-        assertEquals(Arrays.asList(p.getTargetPlatforms()).toString(),Arrays.asList(p2.getTargetPlatforms()).toString());
-        assertEquals(p.getType(),p2.getType());
-        assertEquals(p.getVersion(),p2.getVersion());
-        assertEquals(p.getDependenciesAsString(),p2.getDependenciesAsString());
-        assertEquals(p.getDownloadsCount(),p2.getDownloadsCount());
-        assertEquals(p.getRating(),p2.getRating());
-        assertEquals(p.getPictureUrl(),p2.getPictureUrl());
-        assertEquals(p.getCommentsNumber(),p2.getCommentsNumber());
+        assertEquals(p.getHomePage(), p2.getHomePage());
+        assertEquals(p.getDescription(), p2.getDescription());
+        assertEquals(p.getClassifier(), p2.getClassifier());
+        assertEquals(p.getId(), p2.getId());
+        assertEquals(p.getName(), p2.getName());
+        assertEquals(p.getState(), p2.getState());
+        assertEquals(p.getTitle(), p2.getTitle());
+        assertEquals(Arrays.asList(p.getTargetPlatforms()).toString(),
+                Arrays.asList(p2.getTargetPlatforms()).toString());
+        assertEquals(p.getType(), p2.getType());
+        assertEquals(p.getVersion(), p2.getVersion());
+        assertEquals(p.getDependenciesAsString(), p2.getDependenciesAsString());
+        assertEquals(p.getDownloadsCount(), p2.getDownloadsCount());
+        assertEquals(p.getRating(), p2.getRating());
+        assertEquals(p.getPictureUrl(), p2.getPictureUrl());
+        assertEquals(p.getCommentsNumber(), p2.getCommentsNumber());
         assertEquals(PackageState.INSTALLED, p2.getState());
         assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
-        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED, p2.getValidationState());
+        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED,
+                p2.getValidationState());
         assertEquals(true, p2.isSupported());
         assertEquals(true, p2.supportsHotReload());
 

@@ -1,0 +1,6 @@
+{"id":"nuxeo-dm-5.6","name":"nuxeo-dm", "version":"5.6","title":"Nuxeo DM","description":"Nuxeo DM", "type":"addon", "state":0, "dependencies":["nuxeo-content-browser:1.1.0:1.1.0"], "targetPlatforms":["5.6"]}
+{"id":"nuxeo-dm-5.6-SNAPSHOT","name":"nuxeo-dm", "version":"5.6-SNAPSHOT","title":"Nuxeo DM","description":"Nuxeo DM", "type":"addon", "state":0, "dependencies":["nuxeo-content-browser:1.1.0:1.1.0"], "targetPlatforms":["5.6-SNAPSHOT"]}
+{"id":"nuxeo-cmf-5.6","name":"nuxeo-cmf", "version":"5.6","title":"Nuxeo CMF","description":"Nuxeo CMF", "type":"addon", "state":0, "dependencies":["nuxeo-content-browser:1.1.0-cmf:1.1.0-cmf"], "targetPlatforms":["5.6"]}
+{"id":"nuxeo-cmf-5.6-SNAPSHOT","name":"nuxeo-cmf", "version":"5.6-SNAPSHOT","title":"Nuxeo CMF","description":"Nuxeo CMF", "type":"addon", "state":0, "dependencies":["nuxeo-content-browser:1.1.0-cmf:1.1.0-cmf"], "targetPlatforms":["5.6-SNAPSHOT"]}
+{"id":"nuxeo-dam-5.5","name":"nuxeo-dam", "version":"5.5","title":"Nuxeo DAM","description":"Nuxeo DAM", "type":"addon", "state":0, "dependencies":["nuxeo-content-browser:1.1.0:1.1.0"], "targetPlatforms":["5.5.0"]}
+{"id":"nuxeo-sc-5.5","name":"nuxeo-sc", "version":"5.5","title":"Nuxeo SC","description":"Nuxeo SC", "type":"addon", "state":0, "dependencies":["nuxeo-dm:5.5:5.5"], "targetPlatforms":["5.5.0"]}

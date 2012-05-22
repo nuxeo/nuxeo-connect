@@ -1,0 +1,69 @@
+package: nuxeo-cmf
+version: 1
+installed: true
+depends: nuxeo-content-browser*cmf = 1
+conflicts:
+provides:
+
+package: nuxeo-cmf
+version: 2
+installed: false
+depends: nuxeo-content-browser*cmf = 1
+conflicts:
+provides:
+
+package: nuxeo-content-browser
+version: 1
+installed: false
+depends:
+conflicts: nuxeo-content-browser*cmf
+provides:
+
+package: nuxeo-dam
+version: 1
+installed: false
+depends: nuxeo-content-browser = 1
+conflicts:
+provides:
+
+package: nuxeo-content-browser*cmf
+version: 1
+installed: true
+depends:
+conflicts: nuxeo-content-browser
+provides:
+
+package: nuxeo-cmf
+version: 3
+installed: false
+depends: nuxeo-content-browser*cmf = 1
+conflicts:
+provides:
+
+package: nuxeo-dm
+version: 2
+installed: false
+depends: nuxeo-content-browser = 1
+conflicts:
+provides:
+
+package: nuxeo-sc
+version: 1
+installed: false
+depends: nuxeo-dm = 1
+conflicts:
+provides:
+
+package: nuxeo-dm
+version: 3
+installed: false
+depends: nuxeo-content-browser = 1
+conflicts:
+provides:
+
+package: nuxeo-dm
+version: 1
+installed: false
+depends: nuxeo-content-browser = 1
+conflicts:
+provides:

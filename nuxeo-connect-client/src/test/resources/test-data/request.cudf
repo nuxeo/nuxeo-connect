@@ -1,0 +1,53 @@
+package: nuxeo-cmf
+version: 1
+installed: true
+depends:
+conflicts: nuxeo-dm
+provides:
+
+package: nuxeo-social-collaboration
+version: 1
+installed: false
+depends: nuxeo-dm = 1
+conflicts:
+provides:
+
+package: nuxeo-dam
+version: 1
+installed: false
+depends:
+conflicts: nuxeo-cmf
+provides:
+
+package: nuxeo-dm
+version: 1
+#installed: false
+depends:
+conflicts: nuxeo-cmf
+provides:
+
+#package: nuxeo-dm
+#version: 2
+#installed: false
+#depends:
+#conflicts: nuxeo-cmf
+#provides:
+
+package: nuxeo-addon
+version: 1
+installed: false
+depends: nuxeo-dm >= 1
+conflicts:
+provides:
+
+package: nuxeo-independent-addon
+version: 1
+installed: true
+depends:
+conflicts:
+provides:
+
+request:
+install: nuxeo-social-collaboration,nuxeo-addon,nuxeo-independent-addon
+remove:
+upgrade:

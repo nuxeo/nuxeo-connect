@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2011 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -17,12 +17,14 @@
 package org.nuxeo.connect.update;
 
 /**
- * TODO : version classifier is not took into account when comparing versions
- *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public class Version implements Comparable<Version> {
+
+    /**
+     * @since 1.4
+     */
+    public static final String SNAPSHOT = "-SNAPSHOT";
 
     public final static Version ZERO = new Version(0);
 
@@ -37,7 +39,7 @@ public class Version implements Comparable<Version> {
     protected boolean snapshot = false;
 
     public Version(String version) {
-        int i = version.indexOf("-SNAPSHOT");
+        int i = version.indexOf(SNAPSHOT);
         if (i > 0) {
             version = version.substring(0, i);
             snapshot = true;
@@ -131,8 +133,8 @@ public class Version implements Comparable<Version> {
             return d;
         }
 
-        String mClassifier = (classifier == null)? "":classifier;
-        String oClassifier = (o.classifier == null)? "":o.classifier;
+        String mClassifier = (classifier == null) ? "" : classifier;
+        String oClassifier = (o.classifier == null) ? "" : o.classifier;
 
         if (mClassifier.equals(oClassifier)) {
             if (new Boolean(snapshot).equals(o.isSnapshot())) {
@@ -150,14 +152,9 @@ public class Version implements Comparable<Version> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof Version) {
-            return compareTo((Version) obj) == 0;
-        }
-        return false;
+    public boolean equals(Object o) {
+        return (this == o || o != null && (o instanceof Version)
+                && compareTo((Version) o) == 0);
     }
 
     @Override
@@ -173,19 +170,35 @@ public class Version implements Comparable<Version> {
             v = major + "." + minor + "." + patch + "-" + classifier;
         }
         if (isSnapshot()) {
-            v = v + "-SNAPSHOT";
+            v = v + SNAPSHOT;
         }
         return v;
     }
 
     public static void main(String[] args) {
-        System.out.println(new Version("1.0-SNAPSHOT"));
-        System.out.println(new Version("1-SNAPSHOT"));
-        System.out.println(new Version("1.0.0-SNAPSHOT"));
+        System.out.println(new Version("1.0" + SNAPSHOT));
+        System.out.println(new Version("1" + SNAPSHOT));
+        System.out.println(new Version("1.0.0" + SNAPSHOT));
+        System.out.println(new Version(
+                new Version("1.0.0" + SNAPSHOT).toString()));
     }
 
     public boolean isSnapshot() {
         return snapshot;
+    }
+
+    /**
+     * @since 1.4
+     */
+    public void setSnapshot(boolean isSnapshot) {
+        snapshot = isSnapshot;
+    }
+
+    /**
+     * @since 1.4
+     */
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
     }
 
 }

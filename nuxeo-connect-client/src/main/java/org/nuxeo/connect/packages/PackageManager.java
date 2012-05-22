@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages;
@@ -25,6 +24,7 @@ import java.util.Map;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -33,12 +33,26 @@ import org.nuxeo.connect.update.PackageUpdateService;
  * Service interface that wraps all {@link PackageSource} to provide an unified
  * view
  * The main purpose of this interface is to provide listing methods that return
- * the
- * most up to date version of packages for given filters
+ * the most up to date version of packages for given filters
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface PackageManager extends BasePackageManager {
+
+    /**
+     * @since 1.4
+     */
+    public static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
+
+    /**
+     * @since 1.4
+     */
+    public static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
+
+    /**
+     * @since 1.4
+     */
+    public static final String DEFAULT_DEPENDENCY_RESOLVER = P2CUDF_DEPENDENCY_RESOLVER;
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all
@@ -182,12 +196,30 @@ public interface PackageManager extends BasePackageManager {
     void flushCache();
 
     /**
+     * Choose the resolver implementation
+     *
+     * @param resolverType the {@link DependencyResolver} to use
+     */
+    void setResolver(String resolverType);
+
+    /**
      * Try to resolve dependencies of a given {@link Package}
      *
      * @param pkgId
      * @param targetPlatform (String representing the target platform or null
      */
     DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
+
+    /**
+     * @param pkgInstall
+     * @param pkgRemove
+     * @param pkgUpgrade
+     * @param targetPlatform
+     * @since 1.4
+     */
+    DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform);
 
     /**
      * Returns the packages uninstalled if the given {@link Package} is removed
@@ -197,4 +229,15 @@ public interface PackageManager extends BasePackageManager {
      *         too
      */
     List<DownloadablePackage> getUninstallDependencies(Package pkg);
+
+    /**
+     * @return all the packages, in all versions, properly managing classifiers
+     */
+    List<DownloadablePackage> listAllPackages();
+
+    /**
+     * @since 1.4
+     */
+    boolean isInstalled(Package pkg);
+
 }

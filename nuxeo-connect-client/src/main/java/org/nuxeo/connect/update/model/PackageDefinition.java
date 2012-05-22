@@ -208,6 +208,44 @@ public interface PackageDefinition {
     void setDependencies(PackageDependency[] deps);
 
     /**
+     * Get the package conflicts.
+     *
+     * The conflict value format is:
+     * <code>package_name[:package_min_version[:package_max_version]]</code> if
+     * no min and max version are specified the the last version should be used.
+     *
+     * @return an array of conflicts or null if no conflicts are set.
+     */
+    PackageDependency[] getConflicts();
+
+    /**
+     * Set the package conflicts.
+     *
+     * @param deps
+     * @see #getConflicts()
+     */
+    void setConflicts(PackageDependency[] deps);
+
+    /**
+     * Get the package provides.
+     *
+     * The provide value format is:
+     * <code>package_name[:package_min_version[:package_max_version]]</code> if
+     * no min and max version are specified the the last version should be used.
+     *
+     * @return an array of provides or null if no provides are set.
+     */
+    PackageDependency[] getProvides();
+
+    /**
+     * Set the package provides.
+     *
+     * @param deps
+     * @see #getProvides()
+     */
+    void setProvides(PackageDependency[] deps);
+
+    /**
      * Get the package installer definition.
      *
      * The installer is a class implementing {@link Task}. if not specified the
