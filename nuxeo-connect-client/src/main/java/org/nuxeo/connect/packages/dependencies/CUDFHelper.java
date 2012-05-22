@@ -267,8 +267,11 @@ public class CUDFHelper {
         if (solution == null) {
             throw new DependencyException("No solution found.");
         }
+        log.debug("\nP2CUDF resolution details: ");
         for (Criteria criteria : Criteria.values()) {
-            log.info(criteria.label + ": " + details.get(criteria));
+            if (!details.get(criteria).isEmpty()) {
+                log.debug(criteria.label + ": " + details.get(criteria));
+            }
         }
         DependencyResolution res = new DependencyResolution();
         completeResolution(res, details, solution);
