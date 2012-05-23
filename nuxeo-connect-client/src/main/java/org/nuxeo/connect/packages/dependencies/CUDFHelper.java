@@ -51,14 +51,14 @@ public class CUDFHelper {
 
     /**
      * Map of all NuxeoCUDFPackage per Nuxeo version, per package name
-     *
+     * 
      * nuxeo2CUDFMap = { "pkgName", { nuxeoVersion, NuxeoCUDFPackage }}
      */
     protected Map<String, Map<Version, NuxeoCUDFPackage>> nuxeo2CUDFMap = new HashMap<String, Map<Version, NuxeoCUDFPackage>>();
 
     /**
      * Map of all NuxeoCUDFPackage per CUDF unique ID (pkgName-pkgCUDFVersion)
-     *
+     * 
      * CUDF2NuxeoMap = { "pkgName-pkgCUDFVersion", NuxeoCUDFPackage }
      */
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<String, NuxeoCUDFPackage>();
@@ -71,7 +71,6 @@ public class CUDFHelper {
     }
 
     public void resetMapping() {
-        pm.flushCache();
         nuxeo2CUDFMap.clear();
         CUDF2NuxeoMap.clear();
         initMapping();
@@ -123,7 +122,7 @@ public class CUDFHelper {
     }
 
     /**
-     *
+     * 
      * @param cudfKey in the form "pkgName-pkgCUDFVersion"
      * @return NuxeoCUDFPackage corresponding to the given cudfKey
      */
@@ -132,7 +131,7 @@ public class CUDFHelper {
     }
 
     /**
-     *
+     * 
      * @param cudfName a package name
      * @return all NuxeoCUDFPackage versions corresponding to the given package
      */
@@ -287,7 +286,7 @@ public class CUDFHelper {
      * TODO NXP-9268 should use results from {@link Criteria#NEW},
      * {@value Criteria#NOTUPTODATE}, {@link Criteria#RECOMMENDED} and
      * {@link Criteria#VERSION_CHANGED}
-     *
+     * 
      * @param res
      * @param details
      * @param solution
