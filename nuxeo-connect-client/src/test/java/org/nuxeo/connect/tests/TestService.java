@@ -54,7 +54,7 @@ public class TestService extends TestCase {
         assertNotNull(connector);
     }
 
-    public void testServiceAsUnresistred() {
+    public void testServiceAsUnregistered() {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
 
         assertFalse(crs.isInstanceRegistred());
@@ -107,6 +107,7 @@ public class TestService extends TestCase {
         crs.localRegisterInstance("toto--titi", "my test server");
 
         ConnectGatewayComponent.testConnector = new ConnectTestConnector();
+        ConnectGatewayComponent.testConnector.flushCache();
 
         List<DownloadablePackage> pkgs = pm.listPackages();
 

@@ -83,7 +83,11 @@ public class RemotePackageSource implements PackageSource {
     }
 
     public void flushCache() {
+        // memory cache
         cache = new PackageListCache();
+        // disk cache
+        ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+        crs.getConnector().flushCache();
     }
 
 }

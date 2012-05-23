@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,8 +13,6 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
- * $Id$
  */
 package org.nuxeo.connect.connector;
 
@@ -26,10 +24,10 @@ import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.update.PackageType;
 
 /**
-* Interface for APIs exposed by the Connect Server.
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*/
+ * Interface for APIs exposed by the Connect Server.
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ */
 public interface ConnectConnector {
 
     List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
@@ -37,5 +35,7 @@ public interface ConnectConnector {
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 
     SubscriptionStatus getConnectStatus() throws ConnectServerError;
+
+    void flushCache();
 
 }

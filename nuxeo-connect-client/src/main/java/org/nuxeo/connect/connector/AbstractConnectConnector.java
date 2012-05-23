@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,17 +13,21 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
- * $Id$
  */
 
 package org.nuxeo.connect.connector;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,8 +54,48 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     public static final String GET_DOWNLOAD_SUFFIX = "getDownload";
     public static final String GET_STATUS_SUFFIX = "status";
 
+    public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
+
+    public static final String CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY = "org.nuxeo.connect.connector.cache.duration";
+    public static final long DEFAULT_CACHE_TIME_MS = 24 * 3600 * 1000;
+
     protected String getBaseUrl() {
         return ConnectUrlConfig.getRegistredBaseUrl();
+    }
+
+    protected File getCacheFileFor(PackageType type) {
+        String connectUrlString = ConnectUrlConfig.getBaseUrl();
+        String cacheDir = NuxeoConnectClient.getProperty(
+                NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
+        try {
+            URL connectUrl = new URL(connectUrlString);
+            String cachePrefix = connectUrl.getHost() + "_";
+            int port = connectUrl.getPort();
+            if (port == -1) {
+                port = connectUrl.getDefaultPort();
+            }
+            if (port == -1) {
+                cachePrefix = cachePrefix + "00_";
+            } else {
+                cachePrefix = cachePrefix + Integer.toString(port) + "_";
+            }
+            cachePrefix = cachePrefix
+                    + connectUrl.getPath().replaceAll("/", "#");
+            String cacheFileName = cachePrefix + "_" + type.toString()
+                    + ".json";
+            return new File(cacheDir, cacheFileName);
+        } catch (MalformedURLException e) {
+            String fallbackFileName = connectUrlString + "_" + type.toString()
+                    + ".json";
+            return new File(cacheDir, fallbackFileName);
+        }
+    }
+
+    public void flushCache() {
+        for (PackageType type : PackageType.values()) {
+            File cacheFile = getCacheFileFor(type);
+            FileUtils.deleteQuietly(cacheFile);
+        }
     }
 
     protected ConnectServerResponse execCall(String url) throws ConnectServerError {
@@ -112,27 +156,66 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             throws ConnectServerError {
 
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        String json = null;
 
-        String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + type.getValue();
-        ConnectServerResponse response = execCall(url);
+        String cacheTimeString = NuxeoConnectClient.getProperty(
+                CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, null);
+        long cacheMaxAge;
+        if (cacheTimeString == null) {
+            cacheMaxAge = DEFAULT_CACHE_TIME_MS;
+        } else {
+            cacheMaxAge = (long) Long.parseLong(cacheTimeString) * 60 * 1000;
+        }
 
-        String json = response.getString();
+        File cacheFile = getCacheFileFor(type);
 
-        try {
-            JSONArray array = new JSONArray(json);
-            for (int i = 0; i< array.length(); i++) {
-                JSONObject ob = (JSONObject) array.get(i);
-                result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
+        // Try reading from the cache first
+        Date NOW = new Date();
+        if (cacheFile.exists()
+                && ((NOW.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
+            try {
+                json = FileUtils.readFileToString(cacheFile);
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject ob = (JSONObject) array.get(i);
+                    result.add(AbstractJSONSerializableData.loadFromJSON(
+                            PackageDescriptor.class, ob));
+                }
+            } catch (IOException e) {
+                // Issue reading the file
+                json = null;
+            } catch (JSONException e) {
+                // Issue parsing the file
+                json = null;
+                result = new ArrayList<DownloadablePackage>();
             }
-            return result;
-        }
-        catch (JSONException e) {
-            throw new ConnectServerError("Unable to parse response", e);
-        }
-        finally {
-            response.release();
         }
 
+        // Fallback on the real source
+        if (json == null) {
+            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + type.getValue();
+            ConnectServerResponse response = execCall(url);
+            json = response.getString();
+            response.release();
+            try {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i< array.length(); i++) {
+                    JSONObject ob = (JSONObject) array.get(i);
+                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
+                }
+            }
+            catch (JSONException e) {
+                throw new ConnectServerError("Unable to parse response", e);
+            }
+            // Parsing went OK, we cache the result
+            try {
+                FileUtils.writeStringToFile(cacheFile, json);
+            } catch (IOException e) {
+                // Can't cache - ignore
+            }
+        }
+
+        return result;
     }
 
 }
