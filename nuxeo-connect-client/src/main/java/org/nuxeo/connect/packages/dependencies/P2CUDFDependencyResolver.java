@@ -30,6 +30,7 @@ import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
 import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
+import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.InternalPackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
@@ -37,7 +38,7 @@ import org.nuxeo.connect.update.VersionRange;
 
 /**
  * This implementation uses the p2cudf resolver to solve complex dependencies
- *
+ * 
  * @since 1.4
  */
 public class P2CUDFDependencyResolver implements DependencyResolver {
@@ -99,8 +100,22 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         if (pkgList == null || pkgList.size() == 0) {
             return list.toArray(new PackageDependency[0]);
         }
+        List<DownloadablePackage> allPackages = pm.listAllPackages();
         for (String pkgStr : pkgList) {
-            list.add(new PackageDependency(pkgStr));
+            boolean isId = false;
+            if (allPackages != null) {
+                for (DownloadablePackage checkPkg : allPackages) {
+                    if (checkPkg.getId().equals(pkgStr)) {
+                        isId = true;
+                        list.add(new PackageDependency(checkPkg.getName(),
+                                checkPkg.getVersion(), checkPkg.getVersion()));
+                        break;
+                    }
+                }
+            }
+            if (!isId) {
+                list.add(new PackageDependency(pkgStr));
+            }
         }
         return list.toArray(new PackageDependency[list.size()]);
     }
