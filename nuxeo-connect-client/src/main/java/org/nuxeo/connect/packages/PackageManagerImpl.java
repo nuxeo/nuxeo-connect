@@ -163,7 +163,7 @@ public class PackageManagerImpl implements InternalPackageManager {
     }
 
     @Override
-    public Map<String, DownloadablePackage> getAllPackagesByName() {
+    public Map<String, List<DownloadablePackage>> getAllPackagesByName() {
         return getAllPackagesByName(getAllSources(), null);
     }
 
@@ -172,9 +172,9 @@ public class PackageManagerImpl implements InternalPackageManager {
      * @return a Map of all packages from given sources filtered on type if not
      *         null
      */
-    protected Map<String, DownloadablePackage> getAllPackagesByName(
+    protected Map<String, List<DownloadablePackage>> getAllPackagesByName(
             List<PackageSource> sources, PackageType type) {
-        Map<String, DownloadablePackage> packagesByName = new HashMap<String, DownloadablePackage>();
+        Map<String, List<DownloadablePackage>> packagesByName = new HashMap<String, List<DownloadablePackage>>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
             if (type == null) {
@@ -183,7 +183,14 @@ public class PackageManagerImpl implements InternalPackageManager {
                 packages = source.listPackages(type);
             }
             for (DownloadablePackage pkg : packages) {
-                packagesByName.put(pkg.getName(), pkg);
+                List<DownloadablePackage> pkgsForName;
+                if (!packagesByName.containsKey(pkg.getName())) {
+                    pkgsForName = new ArrayList<DownloadablePackage>();
+                    packagesByName.put(pkg.getName(), pkgsForName);
+                } else {
+                    pkgsForName = packagesByName.get(pkg.getName());
+                }
+                pkgsForName.add(pkg);
             }
         }
         return packagesByName;
