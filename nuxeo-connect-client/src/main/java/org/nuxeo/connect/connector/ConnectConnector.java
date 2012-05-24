@@ -36,6 +36,9 @@ public interface ConnectConnector {
 
     SubscriptionStatus getConnectStatus() throws ConnectServerError;
 
+    /**
+     * @since 1.4
+     */
     void flushCache();
 
 }

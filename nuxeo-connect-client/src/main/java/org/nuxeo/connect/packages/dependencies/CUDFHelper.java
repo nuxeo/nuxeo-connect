@@ -51,14 +51,14 @@ public class CUDFHelper {
 
     /**
      * Map of all NuxeoCUDFPackage per Nuxeo version, per package name
-     * 
+     *
      * nuxeo2CUDFMap = { "pkgName", { nuxeoVersion, NuxeoCUDFPackage }}
      */
     protected Map<String, Map<Version, NuxeoCUDFPackage>> nuxeo2CUDFMap = new HashMap<String, Map<Version, NuxeoCUDFPackage>>();
 
     /**
      * Map of all NuxeoCUDFPackage per CUDF unique ID (pkgName-pkgCUDFVersion)
-     * 
+     *
      * CUDF2NuxeoMap = { "pkgName-pkgCUDFVersion", NuxeoCUDFPackage }
      */
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<String, NuxeoCUDFPackage>();
@@ -67,20 +67,17 @@ public class CUDFHelper {
 
     public CUDFHelper(InternalPackageManager pm) {
         this.pm = pm;
-        initMapping();
-    }
-
-    public void resetMapping() {
-        nuxeo2CUDFMap.clear();
-        CUDF2NuxeoMap.clear();
-        initMapping();
     }
 
     /**
      * Map "name, version-classifier" to "name-classifier, version" (with
      * -SNAPSHOT being a specific case)
+     *
+     * @param packagesInRequest
      */
     public void initMapping() {
+        nuxeo2CUDFMap.clear();
+        CUDF2NuxeoMap.clear();
         List<DownloadablePackage> allPackages = getAllPackages();
         // for each unique "name-classifier", sort versions so we can attribute
         // them a "CUDF posint" version
@@ -88,6 +85,7 @@ public class CUDFHelper {
         for (DownloadablePackage pkg : allPackages) {
             // ignore incompatible packages when a targetPlatform is set
             if (targetPlatform != null
+                    && !pkg.isLocal()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
                             pkg, targetPlatform)) {
                 continue;
@@ -122,7 +120,7 @@ public class CUDFHelper {
     }
 
     /**
-     * 
+     *
      * @param cudfKey in the form "pkgName-pkgCUDFVersion"
      * @return NuxeoCUDFPackage corresponding to the given cudfKey
      */
@@ -131,7 +129,7 @@ public class CUDFHelper {
     }
 
     /**
-     * 
+     *
      * @param cudfName a package name
      * @return all NuxeoCUDFPackage versions corresponding to the given package
      */
@@ -244,6 +242,7 @@ public class CUDFHelper {
     public String getCUDFFile(PackageDependency[] pkgInstall,
             PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade)
             throws DependencyException {
+        initMapping();
         StringBuilder sb = new StringBuilder(getCUDFFile());
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
         sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall, true)
@@ -287,7 +286,7 @@ public class CUDFHelper {
      * TODO NXP-9268 should use results from {@link Criteria#NEW},
      * {@value Criteria#NOTUPTODATE}, {@link Criteria#RECOMMENDED} and
      * {@link Criteria#VERSION_CHANGED}
-     * 
+     *
      * @param res
      * @param details
      * @param solution
@@ -335,7 +334,6 @@ public class CUDFHelper {
 
     public void setTargetPlatform(String targetPlatform) {
         this.targetPlatform = targetPlatform;
-        resetMapping();
     }
 
 }

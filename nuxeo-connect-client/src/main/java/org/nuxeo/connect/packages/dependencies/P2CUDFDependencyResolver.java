@@ -33,9 +33,7 @@ import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.InternalPackageManager;
-import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
-import org.nuxeo.connect.update.VersionRange;
 
 /**
  * This implementation uses the p2cudf resolver to solve complex dependencies
@@ -101,9 +99,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         if (pkgList == null || pkgList.size() == 0) {
             return list.toArray(new PackageDependency[0]);
         }
-
         Map<String, DownloadablePackage> packagesByID = pm.getAllPackagesByID();
-
         for (String pkgStr : pkgList) {
             if (packagesByID.containsKey(pkgStr)) {
                 DownloadablePackage pkg = packagesByID.get(pkgStr);
@@ -119,16 +115,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     public DependencyResolution resolve(String pkgId, String targetPlatform)
             throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
-        if (pkgId.contains(":")) { // new syntax (PackageDependency style)
-            pkgInstall.add(pkgId);
-        } else { // old syntax (DownloadablePackage style)
-            Package pkg = pm.getPackage(pkgId);
-            if (pkg == null) {
-                throw new DependencyException("Couldn't find " + pkgId);
-            }
-            pkgInstall.add(new PackageDependency(pkg.getName(),
-                    new VersionRange(pkg.getVersion())).toString());
-        }
+        pkgInstall.add(pkgId);
         return resolve(pkgInstall, null, null, targetPlatform);
     }
 
