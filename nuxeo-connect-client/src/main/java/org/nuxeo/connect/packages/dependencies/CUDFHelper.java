@@ -187,7 +187,8 @@ public class CUDFHelper {
             String cudfName = NuxeoCUDFPackage.getCUDFName(packageDependency);
             Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(cudfName);
             if (versionsMap == null) {
-                String errMsg = "Missing mapping for " + packageDependency;
+                String errMsg = "Missing mapping for " + packageDependency
+                        + " with target platform " + targetPlatform;
                 if (failOnError) {
                     throw new DependencyException(errMsg);
                 } else {
