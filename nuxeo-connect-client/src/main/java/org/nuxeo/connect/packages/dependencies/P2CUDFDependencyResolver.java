@@ -21,6 +21,7 @@ package org.nuxeo.connect.packages.dependencies;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -38,7 +39,7 @@ import org.nuxeo.connect.update.VersionRange;
 
 /**
  * This implementation uses the p2cudf resolver to solve complex dependencies
- * 
+ *
  * @since 1.4
  */
 public class P2CUDFDependencyResolver implements DependencyResolver {
@@ -100,20 +101,15 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         if (pkgList == null || pkgList.size() == 0) {
             return list.toArray(new PackageDependency[0]);
         }
-        List<DownloadablePackage> allPackages = pm.listAllPackages();
+
+        Map<String, DownloadablePackage> packagesByID = pm.getAllPackagesByID();
+
         for (String pkgStr : pkgList) {
-            boolean isId = false;
-            if (allPackages != null) {
-                for (DownloadablePackage checkPkg : allPackages) {
-                    if (checkPkg.getId().equals(pkgStr)) {
-                        isId = true;
-                        list.add(new PackageDependency(checkPkg.getName(),
-                                checkPkg.getVersion(), checkPkg.getVersion()));
-                        break;
-                    }
-                }
-            }
-            if (!isId) {
+            if (packagesByID.containsKey(pkgStr)) {
+                DownloadablePackage pkg = packagesByID.get(pkgStr);
+                list.add(new PackageDependency(pkg.getName(), pkg.getVersion(),
+                        pkg.getVersion()));
+            } else {
                 list.add(new PackageDependency(pkgStr));
             }
         }

@@ -644,4 +644,14 @@ public class PackageManagerImpl implements InternalPackageManager {
         }
         return pus.isStarted(pkg.getId());
     }
+
+    @Override
+    public Map<String, DownloadablePackage> getAllPackagesByID() {
+        List<DownloadablePackage> allPackages = listAllPackages();
+        Map<String, DownloadablePackage> packagesByID = new HashMap<String, DownloadablePackage>();
+        for (DownloadablePackage pkg : allPackages) {
+            packagesByID.put(pkg.getId(), pkg);
+        }
+        return packagesByID;
+    }
 }
