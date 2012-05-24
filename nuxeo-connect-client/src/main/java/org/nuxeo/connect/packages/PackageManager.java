@@ -240,4 +240,8 @@ public interface PackageManager extends BasePackageManager {
      */
     boolean isInstalled(Package pkg);
 
+    /**
+     * @since 1.4
+     */
+    Map<String, DownloadablePackage> getAllPackagesByID();
 }

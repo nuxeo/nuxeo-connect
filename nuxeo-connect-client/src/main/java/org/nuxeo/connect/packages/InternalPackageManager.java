@@ -19,7 +19,6 @@
 package org.nuxeo.connect.packages;
 
 import java.util.List;
-import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.Package;
@@ -84,8 +83,4 @@ public interface InternalPackageManager extends PackageManager {
     List<Version> getAvailableVersion(String pkgName, VersionRange range,
             String targetPlatform);
 
-    /**
-     * @since 1.4
-     */
-    Map<String, DownloadablePackage> getAllPackagesByID();
 }
