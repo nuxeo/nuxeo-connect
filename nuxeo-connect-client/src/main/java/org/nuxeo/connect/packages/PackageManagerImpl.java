@@ -120,11 +120,7 @@ public class PackageManagerImpl implements InternalPackageManager {
                 packagesByName.put(name, pkg);
             }
         }
-
-        List<DownloadablePackage> resPackages = new ArrayList<DownloadablePackage>();
-        resPackages.addAll(packagesByName.values());
-
-        return resPackages;
+        return new ArrayList<DownloadablePackage>(packagesByName.values());
     }
 
     /**
@@ -133,6 +129,18 @@ public class PackageManagerImpl implements InternalPackageManager {
      *         not null
      */
     protected List<DownloadablePackage> getAllPackages(
+            List<PackageSource> sources, PackageType type) {
+        Map<String, DownloadablePackage> packagesById = getAllPackagesByID(
+                sources, type);
+        return new ArrayList<DownloadablePackage>(packagesById.values());
+    }
+
+    /**
+     * @since 1.4
+     * @return a Map of all packages from given sources filtered on type if not
+     *         null
+     */
+    protected Map<String, DownloadablePackage> getAllPackagesByID(
             List<PackageSource> sources, PackageType type) {
         Map<String, DownloadablePackage> packagesById = new HashMap<String, DownloadablePackage>();
         for (PackageSource source : sources) {
@@ -146,9 +154,39 @@ public class PackageManagerImpl implements InternalPackageManager {
                 packagesById.put(pkg.getId(), pkg);
             }
         }
-        List<DownloadablePackage> allPackages = new ArrayList<DownloadablePackage>();
-        allPackages.addAll(packagesById.values());
-        return allPackages;
+        return packagesById;
+    }
+
+    @Override
+    public Map<String, DownloadablePackage> getAllPackagesByID() {
+        return getAllPackagesByID(getAllSources(), null);
+    }
+
+    @Override
+    public Map<String, DownloadablePackage> getAllPackagesByName() {
+        return getAllPackagesByName(getAllSources(), null);
+    }
+
+    /**
+     * @since 1.4
+     * @return a Map of all packages from given sources filtered on type if not
+     *         null
+     */
+    protected Map<String, DownloadablePackage> getAllPackagesByName(
+            List<PackageSource> sources, PackageType type) {
+        Map<String, DownloadablePackage> packagesByName = new HashMap<String, DownloadablePackage>();
+        for (PackageSource source : sources) {
+            List<DownloadablePackage> packages = null;
+            if (type == null) {
+                packages = source.listPackages();
+            } else {
+                packages = source.listPackages(type);
+            }
+            for (DownloadablePackage pkg : packages) {
+                packagesByName.put(pkg.getName(), pkg);
+            }
+        }
+        return packagesByName;
     }
 
     public List<DownloadablePackage> findRemotePackages(String packageName) {
@@ -259,6 +297,9 @@ public class PackageManagerImpl implements InternalPackageManager {
         return versions;
     }
 
+    /**
+     * @return All packages merged by name, keeping the greater versions
+     */
     public List<DownloadablePackage> listPackages() {
         return doMergePackages(getAllSources(), null);
     }
@@ -645,13 +686,4 @@ public class PackageManagerImpl implements InternalPackageManager {
         return pus.isStarted(pkg.getId());
     }
 
-    @Override
-    public Map<String, DownloadablePackage> getAllPackagesByID() {
-        List<DownloadablePackage> allPackages = listAllPackages();
-        Map<String, DownloadablePackage> packagesByID = new HashMap<String, DownloadablePackage>();
-        for (DownloadablePackage pkg : allPackages) {
-            packagesByID.put(pkg.getId(), pkg);
-        }
-        return packagesByID;
-    }
 }

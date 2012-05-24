@@ -242,6 +242,13 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * @since 1.4
+     * @return a Map of all packages by ID
      */
     Map<String, DownloadablePackage> getAllPackagesByID();
+
+    /**
+     * @since 1.4
+     * @return a Map of all packages by Name
+     */
+    Map<String, DownloadablePackage> getAllPackagesByName();
 }
