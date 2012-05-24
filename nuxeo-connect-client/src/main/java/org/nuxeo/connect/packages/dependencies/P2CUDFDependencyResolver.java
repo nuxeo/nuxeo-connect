@@ -32,7 +32,7 @@ import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
 import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
 
 /**
@@ -44,14 +44,14 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
 
-    protected InternalPackageManager pm;
+    protected PackageManager pm;
 
     protected CUDFHelper cudfHelper;
 
     protected P2CUDFDependencyResolver() {
     }
 
-    public P2CUDFDependencyResolver(InternalPackageManager pm) {
+    public P2CUDFDependencyResolver(PackageManager pm) {
         this.pm = pm;
     }
 

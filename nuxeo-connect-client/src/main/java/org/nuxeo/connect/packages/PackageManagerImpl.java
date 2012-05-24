@@ -52,7 +52,7 @@ import org.nuxeo.connect.update.task.Task;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class PackageManagerImpl implements InternalPackageManager {
+public class PackageManagerImpl implements PackageManager {
 
     protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
 

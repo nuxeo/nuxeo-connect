@@ -41,7 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
@@ -106,7 +106,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
         // cudfHelper = getCUDFTestHelper(pm);
-        cudfHelper = new CUDFHelper((InternalPackageManager) pm);
+        cudfHelper = new CUDFHelper((PackageManager) pm);
         pcr = new Parser().parse(new AddSpaceInputStream(
                 this.getClass().getClassLoader().getResourceAsStream(
                         AbstractPackageManagerTestCase.TEST_DATA

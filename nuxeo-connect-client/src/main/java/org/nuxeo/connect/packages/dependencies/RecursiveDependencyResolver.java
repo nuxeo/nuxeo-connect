@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
@@ -50,7 +50,7 @@ public class RecursiveDependencyResolver {
 
     protected String targetPlatform;
 
-    protected InternalPackageManager pm;
+    protected PackageManager pm;
 
     protected boolean resolved = false;
 
@@ -65,7 +65,7 @@ public class RecursiveDependencyResolver {
     protected List<DownloadablePackage> installedPackages;
 
     public RecursiveDependencyResolver(String packageId,
-            InternalPackageManager pm, String targetPlatform) {
+            PackageManager pm, String targetPlatform) {
         this.packageId = packageId;
         this.pm = pm;
         this.targetPlatform = targetPlatform;

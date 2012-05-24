@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
@@ -42,11 +42,11 @@ import org.nuxeo.connect.update.Version;
  */
 public class LegacyDependencyResolver implements DependencyResolver {
 
-    protected InternalPackageManager pm;
+    protected PackageManager pm;
 
     protected static Log log = LogFactory.getLog(LegacyDependencyResolver.class);
 
-    public LegacyDependencyResolver(InternalPackageManager pm) {
+    public LegacyDependencyResolver(PackageManager pm) {
         this.pm = pm;
     }
 

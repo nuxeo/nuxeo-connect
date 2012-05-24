@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.InternalPackageManager;
+import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
@@ -47,7 +47,7 @@ public class CUDFHelper {
 
     public static final String newLine = System.getProperty("line.separator");
 
-    protected InternalPackageManager pm;
+    protected PackageManager pm;
 
     /**
      * Map of all NuxeoCUDFPackage per Nuxeo version, per package name
@@ -65,7 +65,7 @@ public class CUDFHelper {
 
     private String targetPlatform;
 
-    public CUDFHelper(InternalPackageManager pm) {
+    public CUDFHelper(PackageManager pm) {
         this.pm = pm;
     }
 

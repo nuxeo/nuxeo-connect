@@ -28,6 +28,8 @@ import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
+import org.nuxeo.connect.update.Version;
+import org.nuxeo.connect.update.VersionRange;
 
 /**
  * Service interface that wraps all {@link PackageSource} to provide an unified
@@ -251,4 +253,61 @@ public interface PackageManager extends BasePackageManager {
      * @return a Map of all packages by Name
      */
     Map<String, List<DownloadablePackage>> getAllPackagesByName();
+
+    /**
+     * Return the available {@link Version} for a given {@link Package} name.
+     * Versions are sorted in the "preferred order" :
+     * - already installed version (means no upgrade and no download)
+     * - already downloaded version (means no download)
+     * - remote versions sorted by version number (higher => last)
+     *
+     * @param pkgName
+     * @since 1.4
+     */
+    List<Version> getPreferedVersions(String pkgName);
+
+    /**
+     * Returns all remote {@link Package} versions for a given name
+     *
+     * @param packageName
+     * @since 1.4
+     */
+    List<DownloadablePackage> findRemotePackages(String packageName);
+
+    /**
+     * Find a {@link Package} by it's id
+     * (will find masked versions on the contrary of {@link PackageManager}
+     * getPackage
+     *
+     * @param packageId
+     * @since 1.4
+     */
+    DownloadablePackage findPackageById(String packageId);
+
+    /**
+     * Returns all local {@link Package} versions for a given name
+     *
+     * @param packageName
+     * @since 1.4
+     */
+    List<Version> findLocalPackageVersions(String packageName);
+
+    /**
+     * Returns all local {@link Package} installed versions for a given name
+     *
+     * @param packageName
+     * @since 1.4
+     */
+    List<Version> findLocalPackageInstalledVersions(String packageName);
+
+    /**
+     * Returns all {@link Package} versions for a given name and
+     * {@link VersionRange}
+     *
+     * @param packageName
+     * @since 1.4
+     */
+    List<Version> getAvailableVersion(String pkgName, VersionRange range,
+            String targetPlatform);
+
 }
