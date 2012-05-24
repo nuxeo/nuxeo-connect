@@ -130,6 +130,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
     @Test
     public void testInitMapping() throws Exception {
+        assertNotNull(cudfHelper.getCUDFFile());
         assertEquals(
                 "First nuxeo-dm package should be 5.5.0",
                 "5.5.0",

@@ -159,6 +159,7 @@ public class CUDFHelper {
      * @throws DependencyException
      */
     public String getCUDFFile() throws DependencyException {
+        initMapping();
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
@@ -242,7 +243,6 @@ public class CUDFHelper {
     public String getCUDFFile(PackageDependency[] pkgInstall,
             PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade)
             throws DependencyException {
-        initMapping();
         StringBuilder sb = new StringBuilder(getCUDFFile());
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
         sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall, true)
