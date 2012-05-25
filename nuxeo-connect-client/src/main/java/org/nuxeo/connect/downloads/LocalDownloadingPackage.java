@@ -130,7 +130,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     }
 
     public void run() {
-
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
@@ -145,7 +144,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                     method.addRequestHeader(headerName, headers.get(headerName));
                 }
             }
-
             int rc = 0;
             try {
                 rc = httpClient.executeMethod(method);
@@ -159,10 +157,10 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                     InputStream in = method.getResponseBodyAsStream();
                     saveStreamAsFile(in);
 
-                    completed = true;
                     registerDownloadedPackage();
                     ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
                     cdm.removeDownloadingPackage(getId());
+                    completed = true;
                 }
             } catch (Exception e) {
                 throw new ConnectServerError(
@@ -179,7 +177,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     }
 
     protected void registerDownloadedPackage() {
-
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         if (pus == null) {
             if (!NuxeoConnectClient.isTestModeSet()) {
@@ -187,15 +184,12 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
             }
             return;
         }
-
         try {
             pus.addPackage(file);
+            log.info("Adding " + getId());
         } catch (PackageException e) {
-            log.error(
-                    "Unable when adding package to PackageUpdateService ... exiting",
-                    e);
+            log.error(e);
         }
-
     }
 
     public boolean isCompleted() {
