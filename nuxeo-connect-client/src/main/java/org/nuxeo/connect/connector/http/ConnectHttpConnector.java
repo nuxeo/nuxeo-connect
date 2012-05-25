@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.connector.http;
@@ -26,8 +25,6 @@ import java.util.Map;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.NuxeoConnectClient;
@@ -43,21 +40,19 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.update.PackageType;
 
-
 /**
-*
-* Real Http based {@link ConnectConnector} implementation.
-* Manages communication with the Nuxeo Connect Server via JAX-RS
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*/
-public class ConnectHttpConnector extends AbstractConnectConnector implements ConnectConnector {
+ *
+ * Real HTTP based {@link ConnectConnector} implementation.
+ * Manages communication with the Nuxeo Connect Server via JAX-RS
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ */
+public class ConnectHttpConnector extends AbstractConnectConnector implements
+        ConnectConnector {
 
     public String overrideUrl = null;
 
-    protected static Log log = LogFactory.getLog(ConnectHttpConnector.class);
-
-    protected SubscriptionStatus cachedStatus=null;
+    protected SubscriptionStatus cachedStatus = null;
 
     protected boolean connectServerNotReachable;
 
@@ -68,7 +63,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
     protected long lastStatusFetchTime;
 
     protected String getBaseUrl() {
-        if (overrideUrl!=null) {
+        if (overrideUrl != null) {
             return overrideUrl;
         }
         return super.getBaseUrl();
@@ -80,105 +75,104 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
     }
 
     @Override
-    protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
-
+    protected ConnectServerResponse execServerCall(String url,
+            Map<String, String> headers) throws ConnectServerError {
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
+                10000);
         ProxyHelper.configureProxyIfNeeded(httpClient);
         HttpMethod method = new GetMethod(url);
-
         method.setFollowRedirects(true);
 
         for (String name : headers.keySet()) {
             method.addRequestHeader(name, headers.get(name));
         }
 
-        int rc=0;
-        try  {
+        int rc = 0;
+        try {
             rc = httpClient.executeMethod(method);
-            if (rc==200) {
+            if (rc == 200) {
                 return new ConnectHttpResponse(httpClient, method);
             } else {
                 String body = method.getResponseBodyAsString();
-                if (rc==401) {
-                    throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
+                if (rc == 401) {
+                    throw new ConnectSecurityError(
+                            "Connect server refused authentication (returned 401)");
                 }
                 try {
                     JSONObject obj = new JSONObject(body);
                     String message = obj.getString("message");
                     String errorClass = obj.getString("errorClass");
-
-                    ConnectServerError error = null;
-                    if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
+                    ConnectServerError error;
+                    if (ConnectSecurityError.class.getSimpleName().equals(
+                            errorClass)) {
                         error = new ConnectServerError(message);
-                    } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(errorClass)) {
+                    } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(
+                            errorClass)) {
                         error = new ConnectClientVersionMismatchError(message);
                     } else {
                         error = new ConnectServerError(message);
                     }
                     throw error;
-
-                }
-                catch (JSONException e) {
+                } catch (JSONException e) {
                     log.error("Unable to parse error returned by server", e);
                     throw new ConnectServerError("Server returned a code " + rc);
                 }
-
             }
-        }
-        catch (ConnectServerError cse) {
+        } catch (ConnectServerError cse) {
             method.releaseConnection();
             throw cse;
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             String exName = t.getClass().getName();
-            if (exName.startsWith("java.net") || exName.startsWith("org.apache.commons.httpclient")) {
+            if (exName.startsWith("java.net")
+                    || exName.startsWith("org.apache.commons.httpclient")) {
                 log.warn("Connect Server is not reachable");
                 method.releaseConnection();
                 throw new CanNotReachConnectServer(t.getMessage(), t);
             }
             method.releaseConnection();
-            throw new ConnectServerError("Error during communication with the Nuxeo Connect Server", t);
+            throw new ConnectServerError(
+                    "Error during communication with the Nuxeo Connect Server",
+                    t);
         }
     }
 
     protected int httpCacheDurationInMinutes() {
-
-        String cacheInMinutes = NuxeoConnectClient.getProperty(CONNECT_HTTP_CACHE_MINUTES_PROPERTY, "0");
+        String cacheInMinutes = NuxeoConnectClient.getProperty(
+                CONNECT_HTTP_CACHE_MINUTES_PROPERTY, "0");
         try {
             return Integer.parseInt(cacheInMinutes);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return 0;
         }
     }
 
     protected boolean useHttpCache() {
-        return httpCacheDurationInMinutes()>0;
+        return httpCacheDurationInMinutes() > 0;
     }
 
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
-
         if (!isConnectServerReachable()) {
-            throw new CanNotReachConnectServer("Connect server set as not reachable");
+            throw new CanNotReachConnectServer(
+                    "Connect server set as not reachable");
         }
 
-        if (useHttpCache() && cachedStatus!=null) {
-            if ((System.currentTimeMillis()-lastStatusFetchTime) < httpCacheDurationInMinutes()*60*1000) {
+        if (useHttpCache() && cachedStatus != null) {
+            if ((System.currentTimeMillis() - lastStatusFetchTime) < httpCacheDurationInMinutes() * 60 * 1000) {
                 return cachedStatus;
             }
         }
 
         try {
             SubscriptionStatus status = super.getConnectStatus();
-            if (!NuxeoConnectClient.isTestModeSet() && useHttpCache()) { // no cache for testing
-                cachedStatus=status;
+            if (!NuxeoConnectClient.isTestModeSet() && useHttpCache()) {
+                // no cache for testing
+                cachedStatus = status;
             }
-            lastStatusFetchTime=System.currentTimeMillis();
+            lastStatusFetchTime = System.currentTimeMillis();
             return status;
-        }
-        catch (CanNotReachConnectServer e) {
-            if (cachedStatus!=null) {
+        } catch (CanNotReachConnectServer e) {
+            if (cachedStatus != null) {
                 return cachedStatus;
             } else {
                 throw e;
@@ -196,7 +190,8 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements Co
 
     public DownloadingPackage getDownload(String id) throws ConnectServerError {
         if (!isConnectServerReachable()) {
-            throw new CanNotReachConnectServer("Connect server set as not reachable");
+            throw new CanNotReachConnectServer(
+                    "Connect server set as not reachable");
         }
         return super.getDownload(id);
     }

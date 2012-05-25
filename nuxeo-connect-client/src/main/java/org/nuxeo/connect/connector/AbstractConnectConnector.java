@@ -13,12 +13,14 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     bstefanescu, tdelprat, mguillaume
  */
 
 package org.nuxeo.connect.connector;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -28,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +49,7 @@ import org.nuxeo.connect.update.PackageType;
 /**
  * Base class for {@link ConnectConnector} implementers. Provides url binding
  * and marshaling logic.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public abstract class AbstractConnectConnector implements ConnectConnector {
@@ -62,12 +66,20 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     public static final long DEFAULT_CACHE_TIME_MS = 3600 * 1000;
 
+    /**
+     * @since 1.4
+     */
     public static final long DEFAULT_CACHE_TIME_MS_STUDIO = 300 * 1000;
+
+    protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
 
     protected String getBaseUrl() {
         return ConnectUrlConfig.getRegistredBaseUrl();
     }
 
+    /**
+     * @since 1.4
+     */
     protected File getCacheFileFor(PackageType type) {
         String connectUrlString = ConnectUrlConfig.getBaseUrl();
         String cacheDir = NuxeoConnectClient.getProperty(
@@ -96,6 +108,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
     }
 
+    @Override
     public void flushCache() {
         for (PackageType type : PackageType.values()) {
             File cacheFile = getCacheFileFor(type);
@@ -138,25 +151,22 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             id = URLEncoder.encode(id, "UTF-8");
             id = id.replace("+", "%20");
             // yerk, probably not the best way :(
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            log.error(e);
         }
         String url = getBaseUrl() + GET_DOWNLOAD_SUFFIX + "/" + id;
-
         ConnectServerResponse response = execCall(url);
-
         String json = response.getString();
-
         try {
             PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(
                     PackageDescriptor.class, json);
             if (pkg == null || pkg.getId() == null) {
                 throw new ConnectSecurityError(
-                        "Unable to parse server response : package has no id");
+                        "Unable to parse server response: package has no id");
             }
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
             return cdm.storeDownloadedBundle(pkg);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
             response.release();
@@ -165,28 +175,25 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     public List<DownloadablePackage> getDownloads(PackageType type)
             throws ConnectServerError {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         String json = null;
-
         String cacheTimeString = NuxeoConnectClient.getProperty(
                 CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, null);
         long cacheMaxAge;
         if (cacheTimeString == null) {
             cacheMaxAge = DEFAULT_CACHE_TIME_MS;
         } else {
-            cacheMaxAge = (long) Long.parseLong(cacheTimeString) * 60 * 1000;
+            cacheMaxAge = Long.parseLong(cacheTimeString) * 60 * 1000;
         }
         if (type == PackageType.STUDIO) {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }
-
         File cacheFile = getCacheFileFor(type);
 
         // Try reading from the cache first
-        Date NOW = new Date();
+        Date now = new Date();
         if (cacheFile.exists()
-                && ((NOW.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
+                && ((now.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
             try {
                 json = FileUtils.readFileToString(cacheFile);
                 JSONArray array = new JSONArray(json);
@@ -196,8 +203,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                             PackageDescriptor.class, ob));
                 }
             } catch (IOException e) {
-                // Issue reading the file
-                json = null;
+                // Issue reading the file (json is null)
             } catch (JSONException e) {
                 // Issue parsing the file
                 json = null;
@@ -205,8 +211,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             }
         }
 
-        // Fallback on the real source
-        if (json == null) {
+        if (json == null) { // Fallback on the real source
             String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/"
                     + type.getValue();
             ConnectServerResponse response = execCall(url);
@@ -229,7 +234,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                 // Can't cache - ignore
             }
         }
-
         return result;
     }
 
