@@ -245,18 +245,23 @@ public class DependencyResolution {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         if (isFailed()) {
-            sb.append("Failed to resolve dependencies: ");
+            sb.append("\nFailed to resolve dependencies: ");
             sb.append(failedMessage);
         } else if (!sorted) {
-            append(sb, allPackages, "Unsorted packages: ");
-        } else {
-            sb.append("Dependency resolution:\n");
-            append(sb, orderedInstallablePackages, "Installation order: ");
-            append(sb, localUnchangedPackages, "Unchanged packages: ");
-            append(sb, localPackagesToRemove, "Packages to uninstall: ");
-            append(sb, newPackagesToDownload, "Remote packages to install: ");
-            append(sb, localPackagesToInstall, "Local packages to install: ");
-            append(sb, localPackagesToUpgrade, "Packages to upgrade: ");
+            append(sb, allPackages, "\nUnsorted packages: ");
+        } else if (!orderedInstallablePackages.isEmpty()
+                || !localUnchangedPackages.isEmpty()
+                || !localPackagesToRemove.isEmpty()
+                || !newPackagesToDownload.isEmpty()
+                || !localPackagesToInstall.isEmpty()
+                || !localPackagesToUpgrade.isEmpty()) {
+            sb.append("\nDependency resolution:\n");
+            append(sb, orderedInstallablePackages, "  Installation order: ");
+            append(sb, localUnchangedPackages, "  Unchanged packages: ");
+            append(sb, localPackagesToRemove, "  Packages to uninstall: ");
+            append(sb, newPackagesToDownload, "  Remote packages to install: ");
+            append(sb, localPackagesToInstall, "  Local packages to install: ");
+            append(sb, localPackagesToUpgrade, "  Packages to upgrade: ");
         }
         return sb.toString();
     }
