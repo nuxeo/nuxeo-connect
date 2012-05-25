@@ -217,6 +217,9 @@ public class DependencyResolution {
         for (Entry<String, Version> entry : getLocalPackagesToInstall().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
+        for (Entry<String, Version> entry : getNewPackagesToDownload().entrySet()) {
+            res.add(entry.getKey() + "-" + entry.getValue().toString());
+        }
         Collections.sort(res);
         return res;
     }
