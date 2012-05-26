@@ -51,7 +51,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
-        assertEquals(2, updates.size());
+        assertEquals(1, updates.size());
 
         List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages();
         dumpPkgList("remoteOnly", remoteOnly);
@@ -93,9 +93,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
-        assertEquals(1, updates.size());
-
-        assertEquals("pkgA", updates.get(0).getName());
+        assertEquals(0, updates.size());
 
         List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages();
         dumpPkgList("remoteOnly", remoteOnly);
@@ -131,11 +129,12 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("updates", updates);
-        assertEquals(3, updates.size());
+        assertEquals(2, updates.size());
 
-        // check that one of them is actually a package downloaded but not
-        // installed
-        assertEquals(PackageState.DOWNLOADED, updates.get(0).getState());
+        // check that none of them is a package downloaded but not installed
+        for (DownloadablePackage update : updates) {
+            assertFalse(PackageState.DOWNLOADED == update.getState());
+        }
 
     }
 }

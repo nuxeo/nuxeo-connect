@@ -19,10 +19,13 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,9 +50,9 @@ import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
 
 /**
- *
+ * 
  * Nuxeo Component that implements {@link PackageManager}
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class PackageManagerImpl implements PackageManager {
@@ -107,17 +110,25 @@ public class PackageManagerImpl implements PackageManager {
 
     protected List<DownloadablePackage> doMergePackages(
             List<PackageSource> sources, PackageType type) {
+        return doMergePackages(sources, type, null);
+    }
+
+    protected List<DownloadablePackage> doMergePackages(
+            List<PackageSource> sources, PackageType type, String targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type);
         Map<String, DownloadablePackage> packagesByName = new HashMap<String, DownloadablePackage>();
         for (DownloadablePackage pkg : allPackages) {
-            String name = pkg.getName();
-            if (packagesByName.containsKey(name)) {
-                DownloadablePackage other = packagesByName.get(name);
-                if (pkg.getVersion().greaterThan(other.getVersion())) {
+            if ((targetPlatform == null)
+                    || (Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform))) {
+                String name = pkg.getName();
+                if (packagesByName.containsKey(name)) {
+                    DownloadablePackage other = packagesByName.get(name);
+                    if (pkg.getVersion().greaterThan(other.getVersion())) {
+                        packagesByName.put(name, pkg);
+                    }
+                } else {
                     packagesByName.put(name, pkg);
                 }
-            } else {
-                packagesByName.put(name, pkg);
             }
         }
         return new ArrayList<DownloadablePackage>(packagesByName.values());
@@ -130,8 +141,18 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected List<DownloadablePackage> getAllPackages(
             List<PackageSource> sources, PackageType type) {
+        return getAllPackages(sources, type, null);
+    }
+
+    /**
+     * @since 1.4
+     * @return All downloadable packages from given sources filtered on type if
+     *         not null
+     */
+    protected List<DownloadablePackage> getAllPackages(
+            List<PackageSource> sources, PackageType type, String targetPlatform) {
         Map<String, DownloadablePackage> packagesById = getAllPackagesByID(
-                sources, type);
+                sources, type, targetPlatform);
         return new ArrayList<DownloadablePackage>(packagesById.values());
     }
 
@@ -142,6 +163,16 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(
             List<PackageSource> sources, PackageType type) {
+        return getAllPackagesByID(sources, type, null);
+    }
+
+    /**
+     * @since 1.4
+     * @return a Map of all packages from given sources filtered on type and
+     *         target platform if not null
+     */
+    protected Map<String, DownloadablePackage> getAllPackagesByID(
+            List<PackageSource> sources, PackageType type, String targetPlatform) {
         Map<String, DownloadablePackage> packagesById = new HashMap<String, DownloadablePackage>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
@@ -151,7 +182,11 @@ public class PackageManagerImpl implements PackageManager {
                 packages = source.listPackages(type);
             }
             for (DownloadablePackage pkg : packages) {
-                packagesById.put(pkg.getId(), pkg);
+                if ((targetPlatform == null)
+                        || Arrays.asList(pkg.getTargetPlatforms()).contains(
+                                targetPlatform)) {
+                    packagesById.put(pkg.getId(), pkg);
+                }
             }
         }
         return packagesById;
@@ -384,37 +419,45 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public List<DownloadablePackage> listUpdatePackages() {
-        return listUpdatePackages(null);
+        return listUpdatePackages(null, null);
     }
 
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
-        List<DownloadablePackage> localPackages = doMergePackages(localSources,
+        return listUpdatePackages(type, null);
+    }
+
+    public List<DownloadablePackage> listUpdatePackages(String targetPlatform) {
+        return listUpdatePackages(null, targetPlatform);
+    }
+
+    public List<DownloadablePackage> listUpdatePackages(PackageType type,
+            String targetPlatform) {
+        List<DownloadablePackage> localPackages = getAllPackages(localSources,
                 type);
-        List<DownloadablePackage> remotePackages = listRemotePackages(type);
+        List<DownloadablePackage> availablePackages = doMergePackages(
+                getAllSources(), type, targetPlatform);
         List<DownloadablePackage> toUpdate = new ArrayList<DownloadablePackage>();
         List<String> toUpdateIds = new ArrayList<String>();
 
-        // take all the remote packages that correspond to an upgrade of a local
-        // package
+        // take all the available packages that correspond to an upgrade of an
+        // active local package and match the target platform
         for (DownloadablePackage pkg : localPackages) {
-            for (DownloadablePackage remotePkg : remotePackages) {
-                if (remotePkg.getName().equals(pkg.getName())) {
-                    if (remotePkg.getVersion() != null) {
-                        if (remotePkg.getVersion().greaterThan(pkg.getVersion())) {
-                            toUpdate.add(remotePkg);
-                            toUpdateIds.add(remotePkg.getId());
-                        } else if (remotePkg.getVersion().equals(
+            // Ignore upgrade check for unused packages
+            if ((pkg.getState() != PackageState.INSTALLING)
+                    && (pkg.getState() != PackageState.INSTALLED)
+                    && (pkg.getState() != PackageState.STARTED)) {
+                continue;
+            }
+            for (DownloadablePackage availablePackage : availablePackages) {
+                if (availablePackage.getName().equals(pkg.getName())) {
+                    if (availablePackage.getVersion() != null) {
+                        if (availablePackage.getVersion().greaterThan(
                                 pkg.getVersion())) {
-                            // also list update in progress
-                            if (pkg.getState() == PackageState.DOWNLOADING
-                                    || pkg.getState() == PackageState.DOWNLOADED
-                                    || pkg.getState() == PackageState.INSTALLING) {
-                                toUpdate.add(pkg);
-                                toUpdateIds.add(pkg.getId());
-                            }
+                            toUpdate.add(availablePackage);
+                            toUpdateIds.add(availablePackage.getId());
                         }
                     } else {
-                        log.warn("Package " + remotePkg.getId()
+                        log.warn("Package " + availablePackage.getId()
                                 + " has a null version");
                     }
                     break;
@@ -424,7 +467,8 @@ public class PackageManagerImpl implements PackageManager {
 
         if (type == null || type == PackageType.HOT_FIX) {
             // force addition of hot-fixes
-            List<DownloadablePackage> hotFixes = listRemotePackages(PackageType.HOT_FIX);
+            List<DownloadablePackage> hotFixes = getAllPackages(
+                    getAllSources(), PackageType.HOT_FIX, targetPlatform);
             for (DownloadablePackage pkg : hotFixes) {
                 // check it is not already in update list
                 if (!toUpdateIds.contains(pkg.getId())) {
@@ -445,6 +489,11 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
+
+        // Remove duplicates
+        Set<DownloadablePackage> updateSet = new LinkedHashSet<DownloadablePackage>(
+                toUpdate);
+        toUpdate = new ArrayList<DownloadablePackage>(updateSet);
 
         Collections.sort(toUpdate, new VersionPackageComparator());
         return toUpdate;

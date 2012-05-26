@@ -33,10 +33,9 @@ import org.nuxeo.connect.update.VersionRange;
 
 /**
  * Service interface that wraps all {@link PackageSource} to provide an unified
- * view
- * The main purpose of this interface is to provide listing methods that return
- * the most up to date version of packages for given filters
- *
+ * view The main purpose of this interface is to provide listing methods that
+ * return the most up to date version of packages for given filters
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface PackageManager extends BasePackageManager {
@@ -97,29 +96,43 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listRemotePackages(PackageType type);
 
     /**
-     * Lists all {@link DownloadablePackage} that are locally present
-     * and that can be updated by a higher version available on connect server.
+     * Lists all {@link DownloadablePackage} that are locally present and that
+     * can be updated by a higher version available on connect server.
      */
     List<DownloadablePackage> listUpdatePackages();
 
     /**
-     * Lists all {@link DownloadablePackage} that are locally present
-     * and that can be updated by a higher version available on connect server
-     * for a given {@link PackageType}.
+     * Lists all {@link DownloadablePackage} that are locally present and that
+     * can be updated by a higher version available on connect server for a
+     * given {@link PackageType}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type);
 
     /**
+     * Lists all {@link DownloadablePackage} that are locally present and that
+     * can be updated by a higher version available on connect server for a
+     * given {@link PackageType} and target platform.
+     */
+    List<DownloadablePackage> listUpdatePackages(String targetPlatform);
+
+    /**
+     * Lists all {@link DownloadablePackage} that are locally present and that
+     * can be updated by a higher version available on connect server for a
+     * given target platform.
+     */
+    List<DownloadablePackage> listUpdatePackages(PackageType type,
+            String targetPlatform);
+
+    /**
      * Lists most recent version of {@link DownloadablePackage} available only
-     * on the connect server
-     * (ie no local version).
+     * on the connect server (ie no local version).
      */
     List<DownloadablePackage> listOnlyRemotePackages();
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available only
-     * on the connect server (ie no local version)
-     * for a given {@link PackageType}.
+     * on the connect server (ie no local version) for a given
+     * {@link PackageType}.
      */
     List<DownloadablePackage> listOnlyRemotePackages(PackageType type);
 
@@ -130,8 +143,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Lists all versions of the studio packages associated to user account in
-     * remote and potentially
-     * overridden by a local package.
+     * remote and potentially overridden by a local package.
      */
     List<DownloadablePackage> listAllStudioRemoteOrLocalPackages();
 
@@ -149,7 +161,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Register a new {@link PackageSource}
-     *
+     * 
      * @param source
      * @param local
      */
@@ -157,25 +169,25 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Get the Download descriptor for a given package id
-     *
+     * 
      * @param packageId
-     *
+     * 
      * @throws Exception
      */
     DownloadingPackage download(String packageId) throws Exception;
 
     /**
      * Get the Download descriptors for a given list of package ids
-     *
+     * 
      * @param packageIds
-     *
+     * 
      * @throws Exception
      */
     List<DownloadingPackage> download(List<String> packageIds) throws Exception;
 
     /**
      * Start installation process via {@link PackageUpdateService}
-     *
+     * 
      * @param packageId Identifier of the {@link Package} to install
      * @param params Installation parameters (as collected via Wizard's form)
      * @throws Exception
@@ -184,7 +196,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Serial installation of several packages
-     *
+     * 
      * @param packageIds List of identifiers of the {@link Package}s to install
      * @param params Installation parameters (as collected via Wizard's form)
      * @throws Exception
@@ -199,14 +211,14 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Choose the resolver implementation
-     *
+     * 
      * @param resolverType the {@link DependencyResolver} to use
      */
     void setResolver(String resolverType);
 
     /**
      * Try to resolve dependencies of a given {@link Package}
-     *
+     * 
      * @param pkgId
      * @param targetPlatform (String representing the target platform or null
      */
@@ -225,7 +237,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns the packages uninstalled if the given {@link Package} is removed
-     *
+     * 
      * @param pkg the {@link Package} that is being uninstalled
      * @return List of all {@link DownloadablePackage} that must be uninstalled
      *         too
@@ -256,11 +268,11 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Return the available {@link Version} for a given {@link Package} name.
-     * Versions are sorted in the "preferred order" :
-     * - already installed version (means no upgrade and no download)
-     * - already downloaded version (means no download)
-     * - remote versions sorted by version number (higher => last)
-     *
+     * Versions are sorted in the "preferred order" : - already installed
+     * version (means no upgrade and no download) - already downloaded version
+     * (means no download) - remote versions sorted by version number (higher =>
+     * last)
+     * 
      * @param pkgName
      * @since 1.4
      */
@@ -268,17 +280,16 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all remote {@link Package} versions for a given name
-     *
+     * 
      * @param packageName
      * @since 1.4
      */
     List<DownloadablePackage> findRemotePackages(String packageName);
 
     /**
-     * Find a {@link Package} by it's id
-     * (will find masked versions on the contrary of {@link PackageManager}
-     * getPackage
-     *
+     * Find a {@link Package} by it's id (will find masked versions on the
+     * contrary of {@link PackageManager} getPackage
+     * 
      * @param packageId
      * @since 1.4
      */
@@ -286,7 +297,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all local {@link Package} versions for a given name
-     *
+     * 
      * @param packageName
      * @since 1.4
      */
@@ -294,7 +305,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all local {@link Package} installed versions for a given name
-     *
+     * 
      * @param packageName
      * @since 1.4
      */
@@ -303,7 +314,7 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all {@link Package} versions for a given name and
      * {@link VersionRange}
-     *
+     * 
      * @param packageName
      * @since 1.4
      */

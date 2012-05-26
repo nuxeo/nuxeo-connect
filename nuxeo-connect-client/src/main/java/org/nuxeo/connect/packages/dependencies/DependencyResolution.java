@@ -36,13 +36,13 @@ import org.nuxeo.connect.update.Version;
 
 /**
  * Represents the result of the dependencies resolution process :
- *
+ * 
  * - resolution succeed or not
- *
+ * 
  * - list of {@link Package} selected for update / install / remove
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
- *
+ * 
  */
 public class DependencyResolution {
 
@@ -225,12 +225,7 @@ public class DependencyResolution {
     }
 
     public List<String> getDownloadPackageIds() {
-        List<String> res = new ArrayList<String>();
-        for (Entry<String, Version> entry : getNewPackagesToDownload().entrySet()) {
-            res.add(entry.getKey() + "-" + entry.getValue().toString());
-        }
-        Collections.sort(res);
-        return res;
+        return allPackagesToDownload;
     }
 
     public List<String> getRemovePackageIds() {
