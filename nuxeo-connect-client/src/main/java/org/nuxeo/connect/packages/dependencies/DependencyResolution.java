@@ -68,6 +68,8 @@ public class DependencyResolution {
 
     protected List<String> orderedInstallablePackages = new ArrayList<String>();
 
+    protected List<String> orderedRemovablePackages = new ArrayList<String>();
+
     protected List<String> allPackagesToDownload = new ArrayList<String>();
 
     public DependencyResolution() {
@@ -118,7 +120,7 @@ public class DependencyResolution {
         if (!allPackages.containsKey(pkgName)) { // Add package
             log.debug("addPackage " + pkgName + " " + v);
             allPackages.put(pkgName, v);
-            orderedInstallablePackages.add(0, pkgName);
+            orderedInstallablePackages.add(0, pkgName + "-" + v.toString());
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with "
                     + allPackages.get(pkgName));
@@ -131,6 +133,7 @@ public class DependencyResolution {
     public void markPackageForRemoval(String pkgName, Version v) {
         log.debug("markPackageForRemoval " + pkgName + " " + v);
         localPackagesToRemove.put(pkgName, v);
+        orderedRemovablePackages.add(0, pkgName + "-" + v.toString());
     }
 
     public void sort(PackageManager pm) {
@@ -246,14 +249,14 @@ public class DependencyResolution {
             append(sb, allPackages, "\nUnsorted packages: ");
         } else if (!orderedInstallablePackages.isEmpty()
                 || !localUnchangedPackages.isEmpty()
-                || !localPackagesToRemove.isEmpty()
+                || !orderedRemovablePackages.isEmpty()
                 || !newPackagesToDownload.isEmpty()
                 || !localPackagesToInstall.isEmpty()
                 || !localPackagesToUpgrade.isEmpty()) {
             sb.append("\nDependency resolution:\n");
             append(sb, orderedInstallablePackages, "  Installation order: ");
             append(sb, localUnchangedPackages, "  Unchanged packages: ");
-            append(sb, localPackagesToRemove, "  Packages to uninstall: ");
+            append(sb, orderedRemovablePackages, "  Uninstallation order: ");
             append(sb, newPackagesToDownload, "  Remote packages to install: ");
             append(sb, localPackagesToInstall, "  Local packages to install: ");
             append(sb, localPackagesToUpgrade, "  Packages to upgrade: ");
@@ -302,12 +305,11 @@ public class DependencyResolution {
     }
 
     public List<String> getOrderedPackageIdsToInstall() {
-        List<String> pkgIds = new ArrayList<String>();
-        for (String pkgName : orderedInstallablePackages) {
-            String pkgId = pkgName + "-" + allPackages.get(pkgName).toString();
-            pkgIds.add(pkgId);
-        }
-        return pkgIds;
+        return orderedInstallablePackages;
+    }
+
+    public List<String> getOrderedPackageIdsToRemove() {
+        return orderedRemovablePackages;
     }
 
     public String getAllPackagesToDownloadAsString() {

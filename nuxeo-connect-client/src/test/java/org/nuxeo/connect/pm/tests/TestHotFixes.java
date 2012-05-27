@@ -43,7 +43,7 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
                 "hf11-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        String expectedOrder = "hf00/hf01/hf01PATCH/hf02/hf03/hf04/hf05/hf06/hf07/hf08/hf09/hf10/hf11";
+        String expectedOrder = "hf00-1.0.0/hf01-1.0.0/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.0.0/hf10-1.0.0/hf11-1.0.0";
         assertEquals(expectedOrder,
                 depResolution.getInstallationOrderAsString());
     }
