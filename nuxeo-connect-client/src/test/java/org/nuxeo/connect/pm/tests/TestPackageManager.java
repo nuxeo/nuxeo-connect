@@ -129,11 +129,13 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("updates", updates);
-        assertEquals(2, updates.size());
+        assertEquals(3, updates.size());
 
-        // check that none of them is a package downloaded but not installed
+        // check that none of them is already installed
         for (DownloadablePackage update : updates) {
-            assertFalse(PackageState.DOWNLOADED == update.getState());
+            assertFalse((update.getState() == PackageState.INSTALLING)
+                    || (update.getState() == PackageState.INSTALLED)
+                    || (update.getState() == PackageState.STARTED));
         }
 
     }

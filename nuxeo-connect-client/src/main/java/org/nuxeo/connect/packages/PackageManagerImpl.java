@@ -467,7 +467,7 @@ public class PackageManagerImpl implements PackageManager {
 
         if (type == null || type == PackageType.HOT_FIX) {
             // force addition of hot-fixes
-            List<DownloadablePackage> hotFixes = getAllPackages(
+            List<DownloadablePackage> hotFixes = doMergePackages(
                     getAllSources(), PackageType.HOT_FIX, targetPlatform);
             for (DownloadablePackage pkg : hotFixes) {
                 // check it is not already in update list
@@ -478,7 +478,11 @@ public class PackageManagerImpl implements PackageManager {
                         if (lpkg.getName().equals(pkg.getName())) {
                             if (lpkg.getVersion().greaterOrEqualThan(
                                     pkg.getVersion())) {
-                                alreadyInLocal = true;
+                                if ((lpkg.getState() == PackageState.INSTALLING)
+                                        || (lpkg.getState() == PackageState.INSTALLED)
+                                        || (lpkg.getState() == PackageState.STARTED)) {
+                                    alreadyInLocal = true;
+                                }
                             }
                             break;
                         }
