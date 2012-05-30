@@ -172,7 +172,6 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
     }
 
     private InstallableUnit getIU(String id) {
-        @SuppressWarnings("unchecked")
         Iterator<InstallableUnit> it = pcr.getInitialState().iterator();
         while (it.hasNext()) {
             InstallableUnit iu = it.next();
@@ -254,7 +253,6 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
     @Test
     public void testP2CUDFParserCheckRequest() {
-        @SuppressWarnings("unchecked")
         ArrayList<IRequiredCapability> requests = pcr.getAllRequests();
         assertNotNull(requests);
         assertTrue(requests.size() > 0);

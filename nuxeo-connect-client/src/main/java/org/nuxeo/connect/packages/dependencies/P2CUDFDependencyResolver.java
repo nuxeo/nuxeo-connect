@@ -69,10 +69,12 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         ProfileChangeRequest req = new Parser().parse(IOUtils.toInputStream(cudf));
         SolverConfiguration configuration = new SolverConfiguration(
                 SolverConfiguration.OBJ_ALL_CRITERIA);
-        if (log.isTraceEnabled()) {
-            configuration.verbose = true;
-            configuration.explain = true;
-        }
+        // Upgrade + verbose + explain is unsupported
+        // verbose + explain changes results
+        // if (log.isTraceEnabled()) {
+        // configuration.verbose = true;
+        // configuration.explain = true;
+        // }
         SimplePlanner planner = new SimplePlanner();
         planner.getSolutionFor(req, configuration);
         planner.stopSolver();
@@ -81,7 +83,6 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         } catch (InterruptedException e) {
             // Hazardous wait for the solver stop
         }
-        @SuppressWarnings("unchecked")
         Collection<InstallableUnit> solution = planner.getBestSolutionFoundSoFar();
         if (log.isTraceEnabled()) {
             log.trace(planner.getExplanation());

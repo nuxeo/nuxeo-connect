@@ -66,4 +66,5 @@ public class P2CUDFDependencyResolverTest extends
                         "nuxeo-dm-5.5.0" }),
                 resolution.getOrderedPackageIdsToInstall());
     }
+
 }

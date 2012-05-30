@@ -168,6 +168,10 @@ class NuxeoCUDFPackage {
         return pkg.getProvides();
     }
 
+    public String getNuxeoId() {
+        return pkg.getId();
+    }
+
     /**
      * @param packageDependency
      */
@@ -180,4 +184,5 @@ class NuxeoCUDFPackage {
             return dependency.getName();
         }
     }
+
 }
