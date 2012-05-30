@@ -36,13 +36,13 @@ import org.nuxeo.connect.update.Version;
 
 /**
  * Represents the result of the dependencies resolution process :
- * 
+ *
  * - resolution succeed or not
- * 
+ *
  * - list of {@link Package} selected for update / install / remove
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
- * 
+ *
  */
 public class DependencyResolution {
 
@@ -247,12 +247,7 @@ public class DependencyResolution {
             sb.append(failedMessage);
         } else if (!sorted) {
             append(sb, allPackages, "\nUnsorted packages: ");
-        } else if (!orderedInstallablePackages.isEmpty()
-                || !localUnchangedPackages.isEmpty()
-                || !orderedRemovablePackages.isEmpty()
-                || !newPackagesToDownload.isEmpty()
-                || !localPackagesToInstall.isEmpty()
-                || !localPackagesToUpgrade.isEmpty()) {
+        } else if (!isEmpty()) {
             sb.append("\nDependency resolution:\n");
             append(sb, orderedInstallablePackages, "  Installation order: ");
             append(sb, localUnchangedPackages, "  Unchanged packages: ");
@@ -319,6 +314,22 @@ public class DependencyResolution {
 
     public int getNbPackagesToDownload() {
         return allPackagesToDownload.size();
+    }
+
+    /**
+     * @since 1.4
+     */
+    public boolean isEmpty() {
+        if (!sorted) {
+            return allPackages.isEmpty();
+        } else {
+            return orderedInstallablePackages.isEmpty()
+                    && localUnchangedPackages.isEmpty()
+                    && orderedRemovablePackages.isEmpty()
+                    && newPackagesToDownload.isEmpty()
+                    && localPackagesToInstall.isEmpty()
+                    && localPackagesToUpgrade.isEmpty();
+        }
     }
 
 }
