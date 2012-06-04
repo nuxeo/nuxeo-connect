@@ -72,53 +72,6 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertEquals(6, depResolution.getNewPackagesToDownload().size());
     }
 
-    /**
-     * Loop dependency is not an issue for P2CUDFDependencyResolver
-     */
-    @Override
-    public void testLoopDetection() throws Exception {
-        depResolution = pm.resolveDependencies("G-1.1.0", null);
-        log.info(depResolution.toString());
-        assertFalse(depResolution.isFailed());
-        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(4, depResolution.getNewPackagesToDownload().size());
-        assertTrue(depResolution.getNewPackagesToDownload().containsKey("G"));
-        assertTrue(depResolution.getNewPackagesToDownload().containsKey("H"));
-    }
-
-    /**
-     * Missing (not installed) dependencies is not an issue for
-     * P2CUDFDependencyResolver
-     */
-    @Override
-    public void testMissingDep() throws Exception {
-        depResolution = pm.resolveDependencies("I-1.0.0", null);
-        log.info(depResolution.toString());
-        assertFalse(depResolution.isFailed());
-        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(3, depResolution.getNewPackagesToDownload().size());
-        assertTrue(depResolution.getNewPackagesToDownload().containsKey("I"));
-        assertTrue(depResolution.getNewPackagesToDownload().containsKey("Z1"));
-        assertTrue(depResolution.getNewPackagesToDownload().containsKey("Z2"));
-    }
-
-    /**
-     * There is no real conflict in that case; it would be better to have K and
-     * L (which J depends on) to exclusively depend on, respectively, versions
-     * 1.0.0 and 2.0.0 of M.
-     * TODO test that case
-     */
-    @Override
-    public void testConflictingDeps() throws Exception {
-        depResolution = pm.resolveDependencies("J-1.0.0", null);
-        log.info(depResolution.toString());
-        assertFalse(depResolution.isFailed());
-    }
-
     @Override
     public void test3LevelsDeps() throws Exception {
         depResolution = pm.resolveDependencies("O-1.0.0", null);

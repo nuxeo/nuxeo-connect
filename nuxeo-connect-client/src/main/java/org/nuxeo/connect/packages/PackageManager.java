@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.update.Package;
@@ -35,7 +36,7 @@ import org.nuxeo.connect.update.VersionRange;
  * Service interface that wraps all {@link PackageSource} to provide an unified
  * view The main purpose of this interface is to provide listing methods that
  * return the most up to date version of packages for given filters
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface PackageManager extends BasePackageManager {
@@ -161,7 +162,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Register a new {@link PackageSource}
-     * 
+     *
      * @param source
      * @param local
      */
@@ -169,25 +170,25 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Get the Download descriptor for a given package id
-     * 
+     *
      * @param packageId
-     * 
+     *
      * @throws Exception
      */
     DownloadingPackage download(String packageId) throws Exception;
 
     /**
      * Get the Download descriptors for a given list of package ids
-     * 
+     *
      * @param packageIds
-     * 
+     *
      * @throws Exception
      */
     List<DownloadingPackage> download(List<String> packageIds) throws Exception;
 
     /**
      * Start installation process via {@link PackageUpdateService}
-     * 
+     *
      * @param packageId Identifier of the {@link Package} to install
      * @param params Installation parameters (as collected via Wizard's form)
      * @throws Exception
@@ -196,7 +197,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Serial installation of several packages
-     * 
+     *
      * @param packageIds List of identifiers of the {@link Package}s to install
      * @param params Installation parameters (as collected via Wizard's form)
      * @throws Exception
@@ -211,14 +212,14 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Choose the resolver implementation
-     * 
+     *
      * @param resolverType the {@link DependencyResolver} to use
      */
     void setResolver(String resolverType);
 
     /**
      * Try to resolve dependencies of a given {@link Package}
-     * 
+     *
      * @param pkgId
      * @param targetPlatform (String representing the target platform or null
      */
@@ -237,7 +238,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns the packages uninstalled if the given {@link Package} is removed
-     * 
+     *
      * @param pkg the {@link Package} that is being uninstalled
      * @return List of all {@link DownloadablePackage} that must be uninstalled
      *         too
@@ -272,7 +273,7 @@ public interface PackageManager extends BasePackageManager {
      * version (means no upgrade and no download) - already downloaded version
      * (means no download) - remote versions sorted by version number (higher =>
      * last)
-     * 
+     *
      * @param pkgName
      * @since 1.4
      */
@@ -280,7 +281,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all remote {@link Package} versions for a given name
-     * 
+     *
      * @param packageName
      * @since 1.4
      */
@@ -289,7 +290,7 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Find a {@link Package} by it's id (will find masked versions on the
      * contrary of {@link PackageManager} getPackage
-     * 
+     *
      * @param packageId
      * @since 1.4
      */
@@ -297,7 +298,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all local {@link Package} versions for a given name
-     * 
+     *
      * @param packageName
      * @since 1.4
      */
@@ -305,7 +306,7 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns all local {@link Package} installed versions for a given name
-     * 
+     *
      * @param packageName
      * @since 1.4
      */
@@ -314,11 +315,20 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all {@link Package} versions for a given name and
      * {@link VersionRange}
-     * 
+     *
      * @param packageName
      * @since 1.4
      */
     List<Version> getAvailableVersion(String pkgName, VersionRange range,
             String targetPlatform);
+
+    /**
+     * Order dependencies to install and to remove.
+     *
+     * @param res DependencyResolution to be ordered
+     * @throws DependencyException
+     * @since 1.4
+     */
+    void order(DependencyResolution res) throws DependencyException;
 
 }

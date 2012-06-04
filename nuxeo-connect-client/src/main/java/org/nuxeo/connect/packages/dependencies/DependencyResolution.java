@@ -117,10 +117,19 @@ public class DependencyResolution {
     }
 
     public boolean addPackage(String pkgName, Version v) {
+        return addPackage(pkgName, v, false);
+    }
+
+    public synchronized boolean addPackage(String pkgName, Version v,
+            boolean fifo) {
         if (!allPackages.containsKey(pkgName)) { // Add package
             log.debug("addPackage " + pkgName + " " + v);
             allPackages.put(pkgName, v);
-            orderedInstallablePackages.add(0, pkgName + "-" + v.toString());
+            if (fifo) {
+                orderedInstallablePackages.add(pkgName + "-" + v.toString());
+            } else {
+                orderedInstallablePackages.add(0, pkgName + "-" + v.toString());
+            }
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with "
                     + allPackages.get(pkgName));
@@ -131,12 +140,21 @@ public class DependencyResolution {
     }
 
     public void markPackageForRemoval(String pkgName, Version v) {
-        log.debug("markPackageForRemoval " + pkgName + " " + v);
-        localPackagesToRemove.put(pkgName, v);
-        orderedRemovablePackages.add(0, pkgName + "-" + v.toString());
+        markPackageForRemoval(pkgName, v, false);
     }
 
-    public void sort(PackageManager pm) {
+    public synchronized void markPackageForRemoval(String pkgName, Version v,
+            boolean fifo) {
+        log.debug("markPackageForRemoval " + pkgName + " " + v);
+        localPackagesToRemove.put(pkgName, v);
+        if (fifo) {
+            orderedRemovablePackages.add(pkgName + "-" + v.toString());
+        } else {
+            orderedRemovablePackages.add(0, pkgName + "-" + v.toString());
+        }
+    }
+
+    public synchronized void sort(PackageManager pm) {
         localPackagesToUpgrade.clear();
         newPackagesToDownload.clear();
         localPackagesToInstall.clear();
@@ -193,10 +211,6 @@ public class DependencyResolution {
                 && localPackagesToInstall.isEmpty() && newPackagesToDownload.isEmpty());
     }
 
-    public List<String> getInstallationOrder() {
-        return orderedInstallablePackages;
-    }
-
     public List<String> getUnchangedPackageIds() {
         List<String> res = new ArrayList<String>();
         for (Entry<String, Version> entry : getLocalUnchangedPackages().entrySet()) {
@@ -240,7 +254,7 @@ public class DependencyResolution {
         return res;
     }
 
-    public String toString() {
+    public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
         if (isFailed()) {
             sb.append("\nFailed to resolve dependencies: ");
@@ -286,7 +300,7 @@ public class DependencyResolution {
         return sb;
     }
 
-    public String getInstallationOrderAsString() {
+    public synchronized String getInstallationOrderAsString() {
         return removeLineReturn(append(new StringBuffer(),
                 orderedInstallablePackages, ""));
     }
@@ -299,11 +313,11 @@ public class DependencyResolution {
         }
     }
 
-    public List<String> getOrderedPackageIdsToInstall() {
+    public synchronized List<String> getOrderedPackageIdsToInstall() {
         return orderedInstallablePackages;
     }
 
-    public List<String> getOrderedPackageIdsToRemove() {
+    public synchronized List<String> getOrderedPackageIdsToRemove() {
         return orderedRemovablePackages;
     }
 
@@ -320,16 +334,15 @@ public class DependencyResolution {
      * @since 1.4
      */
     public boolean isEmpty() {
-        if (!sorted) {
-            return allPackages.isEmpty();
-        } else {
-            return orderedInstallablePackages.isEmpty()
-                    && localUnchangedPackages.isEmpty()
-                    && orderedRemovablePackages.isEmpty()
-                    && newPackagesToDownload.isEmpty()
-                    && localPackagesToInstall.isEmpty()
-                    && localPackagesToUpgrade.isEmpty();
-        }
+        return allPackages.isEmpty();
+    }
+
+    /**
+     * @since 1.4
+     * @return true after {@link #sort(PackageManager)} successful call.
+     */
+    public boolean isSorted() {
+        return sorted;
     }
 
 }

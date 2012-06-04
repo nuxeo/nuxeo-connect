@@ -286,14 +286,13 @@ public class CUDFHelper {
             throw new DependencyException(res.failedMessage);
         }
         res.markAsSuccess();
-        res.sort(pm);
+        pm.order(res);
         return res;
     }
 
     /**
-     * TODO NXP-9268 should use results from {@link Criteria#NEW},
-     * {@value Criteria#NOTUPTODATE}, {@link Criteria#RECOMMENDED} and
-     * {@link Criteria#VERSION_CHANGED}
+     * TODO NXP-9268 should use results from {@value Criteria#NOTUPTODATE} and
+     * {@link Criteria#RECOMMENDED}
      *
      * @param res
      * @param details
@@ -307,18 +306,14 @@ public class CUDFHelper {
             NuxeoCUDFPackage pkg = getInstalledCUDFPackage(pkgName);
             if (pkg != null) {
                 res.markPackageForRemoval(pkg.getNuxeoName(),
-                        pkg.getNuxeoVersion());
+                        pkg.getNuxeoVersion(), true);
             }
         }
 
-        // Complete with additions
-        // details.get(Criteria.CHANGED).removeAll(details.get(Criteria.REMOVED));
-        // log.debug("changed-removed: " + details.get(Criteria.CHANGED));
         List<InstallableUnit> sortedSolution = new ArrayList<InstallableUnit>(
                 solution);
         Collections.sort(sortedSolution);
-        log.debug("Sorted solution: " + sortedSolution);
-        Collections.reverse(sortedSolution);
+        log.debug("Solution: " + sortedSolution);
 
         if (log.isTraceEnabled()) {
             log.trace("P2CUDF printed solution");
@@ -329,8 +324,6 @@ public class CUDFHelper {
             }
         }
 
-        // Map<String, NuxeoCUDFPackage> map = new LinkedHashMap<String,
-        // NuxeoCUDFPackage>();
         for (InstallableUnit iu : sortedSolution) {
             NuxeoCUDFPackage pkg = getCUDFPackage(iu.getId() + "-"
                     + iu.getVersion());
@@ -338,25 +331,15 @@ public class CUDFHelper {
                 log.warn("Couldn't find " + pkg);
                 continue;
             }
-            // if (details.get(Criteria.CHANGED).contains(iu.getId())
-            // && (!map.containsKey(pkg.getNuxeoName()) ||
-            // pkg.getNuxeoVersion().greaterThan(
-            // map.get(pkg.getNuxeoName()).getNuxeoVersion()))) {
-            // map.put(pkg.getNuxeoName(), pkg);
-            // }
             if (details.get(Criteria.NEW).contains(iu.getId())
                     || details.get(Criteria.VERSION_CHANGED).contains(
                             iu.getId())) {
-                if (!res.addPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
+                if (!res.addPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion(),
+                        true)) {
                     log.error("Failed to add " + pkg);
                 }
             }
         }
-        // for (NuxeoCUDFPackage pkg : map.values()) {
-        // if (!res.addPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
-        // break;
-        // }
-        // }
     }
 
     public void setTargetPlatform(String targetPlatform) {

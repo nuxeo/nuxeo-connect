@@ -44,7 +44,7 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         String expectedOrder = "hf00-1.0.0/hf01-1.0.0/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.0.0/hf10-1.0.0/hf11-1.0.0";
-        assertEquals(expectedOrder,
+        assertEquals("Bad dependencies order", expectedOrder,
                 depResolution.getInstallationOrderAsString());
     }
 

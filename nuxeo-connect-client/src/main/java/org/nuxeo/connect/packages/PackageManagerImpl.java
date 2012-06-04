@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +51,9 @@ import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
 
 /**
- * 
+ *
  * Nuxeo Component that implements {@link PackageManager}
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class PackageManagerImpl implements PackageManager {
@@ -746,4 +747,66 @@ public class PackageManagerImpl implements PackageManager {
         return pus.isStarted(pkg.getId());
     }
 
+    @Override
+    public void order(DependencyResolution res) throws DependencyException {
+        Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
+        synchronized (res) {
+            if (!res.isSorted()) {
+                res.sort(this);
+            }
+            List<String> installOrderList = res.getOrderedPackageIdsToInstall();
+            orderByDependencies(allPackagesByID, installOrderList);
+            List<String> removeOrder = res.getOrderedPackageIdsToRemove();
+            orderByDependencies(allPackagesByID, removeOrder);
+            Collections.reverse(removeOrder);
+        }
+    }
+
+    private void orderByDependencies(
+            Map<String, DownloadablePackage> allPackagesByID,
+            List<String> installOrderList) throws DependencyException {
+        Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
+        boolean hasChanged = true;
+        while (!installOrderList.isEmpty() && hasChanged) {
+            hasChanged = false;
+            for (String id : installOrderList) {
+                DownloadablePackage pkg = allPackagesByID.get(id);
+                if (pkg.getDependencies().length == 0) {
+                    // Add pkg to orderedMap if it has no dependencies
+                    orderedMap.put(id, pkg);
+                    hasChanged = true;
+                } else {
+                    // Add to orderedMap if all its dependencies are satisfied
+                    boolean allSatisfied = true;
+                    for (PackageDependency pkgDep : pkg.getDependencies()) {
+                        // is pkgDep satisfied in orderedMap?
+                        boolean satisfied = false;
+                        for (Package orderedPkg : orderedMap.values()) {
+                            if (pkgDep.getName().equals(orderedPkg.getName())
+                                    && pkgDep.getVersionRange().matchVersion(
+                                            orderedPkg.getVersion())) {
+                                satisfied = true;
+                                break;
+                            }
+                        }
+                        if (!satisfied) { // couldn't satisfy pkgDep
+                            allSatisfied = false;
+                            break;
+                        }
+                    }
+                    if (allSatisfied) {
+                        orderedMap.put(id, pkg);
+                        hasChanged = true;
+                    }
+                }
+            }
+            installOrderList.removeAll(orderedMap.keySet());
+        }
+        if (!installOrderList.isEmpty()) {
+            throw new DependencyException("Couldn't order " + installOrderList);
+        }
+        for (String id : orderedMap.keySet()) {
+            installOrderList.add(id);
+        }
+    }
 }
