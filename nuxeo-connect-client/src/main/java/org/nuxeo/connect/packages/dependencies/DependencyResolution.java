@@ -334,7 +334,16 @@ public class DependencyResolution {
      * @since 1.4
      */
     public boolean isEmpty() {
-        return allPackages.isEmpty();
+        if (!sorted) {
+            return allPackages.isEmpty();
+        } else {
+            return orderedInstallablePackages.isEmpty()
+                    && localUnchangedPackages.isEmpty()
+                    && orderedRemovablePackages.isEmpty()
+                    && newPackagesToDownload.isEmpty()
+                    && localPackagesToInstall.isEmpty()
+                    && localPackagesToUpgrade.isEmpty();
+        }
     }
 
     /**

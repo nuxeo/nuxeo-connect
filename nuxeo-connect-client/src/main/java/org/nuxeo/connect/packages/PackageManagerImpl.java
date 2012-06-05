@@ -754,8 +754,8 @@ public class PackageManagerImpl implements PackageManager {
             if (!res.isSorted()) {
                 res.sort(this);
             }
-            List<String> installOrderList = res.getOrderedPackageIdsToInstall();
-            orderByDependencies(allPackagesByID, installOrderList);
+            List<String> installOrder = res.getOrderedPackageIdsToInstall();
+            orderByDependencies(allPackagesByID, installOrder);
             List<String> removeOrder = res.getOrderedPackageIdsToRemove();
             orderByDependencies(allPackagesByID, removeOrder);
             Collections.reverse(removeOrder);
@@ -764,12 +764,12 @@ public class PackageManagerImpl implements PackageManager {
 
     private void orderByDependencies(
             Map<String, DownloadablePackage> allPackagesByID,
-            List<String> installOrderList) throws DependencyException {
+            List<String> orderedList) throws DependencyException {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
         boolean hasChanged = true;
-        while (!installOrderList.isEmpty() && hasChanged) {
+        while (!orderedList.isEmpty() && hasChanged) {
             hasChanged = false;
-            for (String id : installOrderList) {
+            for (String id : orderedList) {
                 DownloadablePackage pkg = allPackagesByID.get(id);
                 if (pkg.getDependencies().length == 0) {
                     // Add pkg to orderedMap if it has no dependencies
@@ -789,6 +789,16 @@ public class PackageManagerImpl implements PackageManager {
                                 break;
                             }
                         }
+                        // else, is pkgDep satisfied in already installed pkgs?
+                        if (!satisfied) {
+                            for (Version version : findLocalPackageInstalledVersions(pkgDep.getName())) {
+                                if (pkgDep.getVersionRange().matchVersion(
+                                        version)) {
+                                    satisfied = true;
+                                    break;
+                                }
+                            }
+                        }
                         if (!satisfied) { // couldn't satisfy pkgDep
                             allSatisfied = false;
                             break;
@@ -800,13 +810,13 @@ public class PackageManagerImpl implements PackageManager {
                     }
                 }
             }
-            installOrderList.removeAll(orderedMap.keySet());
+            orderedList.removeAll(orderedMap.keySet());
         }
-        if (!installOrderList.isEmpty()) {
-            throw new DependencyException("Couldn't order " + installOrderList);
+        if (!orderedList.isEmpty()) {
+            throw new DependencyException("Couldn't order " + orderedList);
         }
         for (String id : orderedMap.keySet()) {
-            installOrderList.add(id);
+            orderedList.add(id);
         }
     }
 }
