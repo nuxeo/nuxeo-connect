@@ -39,6 +39,10 @@ public class DummyPackageSource implements PackageSource {
         return null;
     }
 
+    public String getId() {
+        return "dummy";
+    }
+
     public List<DownloadablePackage> listPackages() {
         return pkgs;
     }

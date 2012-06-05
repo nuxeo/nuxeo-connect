@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -22,9 +22,9 @@ package org.nuxeo.connect.connector.http;
 import org.nuxeo.connect.NuxeoConnectClient;
 
 /**
- *
+ * 
  * Helper to manage URL configuration when accessing Nuxceo Connect Services
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectUrlConfig {
@@ -59,8 +59,6 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
-    public static final String CONNECT_REGISTRED_ROOT_PATH = "registred/";
-
     public static String getBaseUrl() {
         if (NuxeoConnectClient.isTestModeSet()) {
             return "http://127.0.0.1:8082/";
@@ -78,8 +76,8 @@ public class ConnectUrlConfig {
         return getBaseUrl() + CONNECT_ROOT_PATH;
     }
 
-    public static String getRegistredBaseUrl() {
-        return getRegistrationBaseUrl() + CONNECT_REGISTRED_ROOT_PATH;
+    public static String getSourceBaseUrl(String sourceId) {
+        return getRegistrationBaseUrl() + sourceId + '/';
     }
 
     // Proxy settings management

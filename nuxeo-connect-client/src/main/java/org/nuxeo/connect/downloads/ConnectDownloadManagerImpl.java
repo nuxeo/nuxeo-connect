@@ -36,18 +36,19 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
- *
+ * 
  * Implementation of the {@link ConnectDownloadManager} interface. This
  * implementation is accessed via {@link ConnectGatewayComponent}
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
-    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(25);
+    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
+            25);
 
     protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
-            TimeUnit.SECONDS, pendingDownloadTasks,new DaemonThreadFactory());
+            TimeUnit.SECONDS, pendingDownloadTasks, new DaemonThreadFactory());
 
     protected Map<String, DownloadingPackage> downloadingPackages = new HashMap<String, DownloadingPackage>();
 
@@ -58,10 +59,11 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         return result;
     }
 
-    public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
+    public DownloadingPackage storeDownloadedBundle(String sourceId,
+            PackageDescriptor descriptor) {
 
         LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
-                descriptor);
+                sourceId, descriptor);
         tpexec.execute(localPackage);
         downloadingPackages.put(localPackage.getId(), localPackage);
         return localPackage;
@@ -96,7 +98,8 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
             SecurityManager s = System.getSecurityManager();
             group = (s != null) ? s.getThreadGroup()
                     : Thread.currentThread().getThreadGroup();
-            namePrefix = "ConnectDownloadThread-" + poolNumber.incrementAndGet() + '-';
+            namePrefix = "ConnectDownloadThread-"
+                    + poolNumber.incrementAndGet() + '-';
         }
 
         @Override

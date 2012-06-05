@@ -51,9 +51,9 @@ import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
 
 /**
- *
+ * 
  * Nuxeo Component that implements {@link PackageManager}
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class PackageManagerImpl implements PackageManager {
@@ -67,6 +67,8 @@ public class PackageManagerImpl implements PackageManager {
     protected List<String> sourcesNames = new ArrayList<String>();
 
     protected Map<String, DownloadablePackage> cachedPackageList = null;
+
+    protected Map<String, String> packageSourceById = new HashMap<String, String>();
 
     protected DependencyResolver resolver;
 
@@ -187,6 +189,7 @@ public class PackageManagerImpl implements PackageManager {
                         || Arrays.asList(pkg.getTargetPlatforms()).contains(
                                 targetPlatform)) {
                     packagesById.put(pkg.getId(), pkg);
+                    packageSourceById.put(pkg.getId(), source.getId());
                 }
             }
         }
@@ -506,7 +509,8 @@ public class PackageManagerImpl implements PackageManager {
 
     public DownloadingPackage download(String packageId) throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        return crs.getConnector().getDownload(packageId);
+        return crs.getConnector().getDownload(packageSourceById.get(packageId),
+                packageId);
     }
 
     public List<DownloadingPackage> download(List<String> packageIds)

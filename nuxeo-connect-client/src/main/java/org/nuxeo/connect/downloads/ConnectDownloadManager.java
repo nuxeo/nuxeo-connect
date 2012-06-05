@@ -26,14 +26,15 @@ import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
  * Service interface to manage downloads of packages from Connect Site.
- *
+ * 
  * @author tiry
  */
 public interface ConnectDownloadManager {
 
     List<DownloadingPackage> listDownloadingPackages();
 
-    DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor);
+    DownloadingPackage storeDownloadedBundle(String sourceId,
+            PackageDescriptor descriptor);
 
     String getDownloadedBundleLocalStorage();
 

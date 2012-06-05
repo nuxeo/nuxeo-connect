@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -26,13 +26,16 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- * Interface for {@link Package} sources: classes providing access to {@link Package}.
- *
+ * Interface for {@link Package} sources: classes providing access to
+ * {@link Package}.
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface PackageSource {
 
     String getName();
+
+    String getId();
 
     List<DownloadablePackage> listPackages();
 

@@ -41,10 +41,10 @@ import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- *
- * Real HTTP based {@link ConnectConnector} implementation.
- * Manages communication with the Nuxeo Connect Server via JAX-RS
- *
+ * 
+ * Real HTTP based {@link ConnectConnector} implementation. Manages
+ * communication with the Nuxeo Connect Server via JAX-RS
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectHttpConnector extends AbstractConnectConnector implements
@@ -62,11 +62,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
 
     protected long lastStatusFetchTime;
 
-    protected String getBaseUrl() {
+    protected String getDefaultBaseUrl() {
         if (overrideUrl != null) {
             return overrideUrl;
         }
-        return super.getBaseUrl();
+        return super.getDefaultBaseUrl();
     }
 
     protected boolean isConnectServerReachable() {
@@ -180,20 +180,21 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
         }
     }
 
-    public List<DownloadablePackage> getDownloads(PackageType type)
-            throws ConnectServerError {
+    public List<DownloadablePackage> getDownloads(String sourceId,
+            PackageType type) throws ConnectServerError {
         if (!isConnectServerReachable()) {
             return new ArrayList<DownloadablePackage>();
         }
-        return super.getDownloads(type);
+        return super.getDownloads(sourceId, type);
     }
 
-    public DownloadingPackage getDownload(String id) throws ConnectServerError {
+    public DownloadingPackage getDownload(String sourceId, String id)
+            throws ConnectServerError {
         if (!isConnectServerReachable()) {
             throw new CanNotReachConnectServer(
                     "Connect server set as not reachable");
         }
-        return super.getDownload(id);
+        return super.getDownload(sourceId, id);
     }
 
 }

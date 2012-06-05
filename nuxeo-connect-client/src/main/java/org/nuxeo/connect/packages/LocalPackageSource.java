@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -34,7 +34,7 @@ import org.nuxeo.connect.update.PackageUpdateService;
 /**
  * {@link PackageSource} implementation for listing packages already downloaded
  * and potentially already installed.
- *
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class LocalPackageSource implements PackageSource {
@@ -43,6 +43,10 @@ public class LocalPackageSource implements PackageSource {
 
     public String getName() {
         return "Local";
+    }
+
+    public String getId() {
+        return "local";
     }
 
     public List<DownloadablePackage> listPackages() {
@@ -77,7 +81,7 @@ public class LocalPackageSource implements PackageSource {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
 
         for (DownloadablePackage pkg : all) {
-            if (pkg.getType()!=null && pkg.getType().equals(type)) {
+            if (pkg.getType() != null && pkg.getType().equals(type)) {
                 result.add(pkg);
             }
         }

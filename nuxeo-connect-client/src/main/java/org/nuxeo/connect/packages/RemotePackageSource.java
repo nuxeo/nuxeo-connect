@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,13 +32,18 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo Connect Server.
- *
+ * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo
+ * Connect Server.
+ * 
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class RemotePackageSource implements PackageSource {
 
     protected static final Log log = LogFactory.getLog(RemotePackageSource.class);
+
+    public static final String DEFAULT_REMOTE_SOURCE_ID = "registred";
+
+    protected String id;
 
     protected PackageListCache cache;
 
@@ -46,8 +51,17 @@ public class RemotePackageSource implements PackageSource {
         return "Connect Server";
     }
 
+    public String getId() {
+        return id;
+    }
+
     public RemotePackageSource() {
+        this(DEFAULT_REMOTE_SOURCE_ID);
+    }
+
+    public RemotePackageSource(String id) {
         cache = new PackageListCache();
+        this.id = id;
     }
 
     public List<DownloadablePackage> listPackages() {
@@ -66,7 +80,7 @@ public class RemotePackageSource implements PackageSource {
             try {
                 List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
                 if (pkgs == null) {
-                    pkgs = crs.getConnector().getDownloads(type);
+                    pkgs = crs.getConnector().getDownloads(id, type);
                     cache.add(pkgs, type.toString());
                 }
                 for (DownloadablePackage pkg : pkgs) {
