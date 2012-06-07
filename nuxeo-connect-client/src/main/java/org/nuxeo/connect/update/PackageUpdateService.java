@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu
+ *     bstefanescu, mguillaume, jcarsique
  */
 package org.nuxeo.connect.update;
 
@@ -184,5 +184,17 @@ public interface PackageUpdateService {
      * @return false if not started, including not existing (downloaded) at all.
      */
     boolean isStarted(String pkgId);
+
+    /**
+     * @since 1.4
+     * @return Packages registry file
+     */
+    File getRegistry();
+
+    /**
+     * @since 1.4
+     * @return Packages backup directory
+     */
+    File getBackupDir();
 
 }
