@@ -68,8 +68,6 @@ public class PackageManagerImpl implements PackageManager {
 
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
-    protected Map<String, String> packageSourceById = new HashMap<String, String>();
-
     protected DependencyResolver resolver;
 
     protected List<PackageSource> getAllSources() {
@@ -189,7 +187,6 @@ public class PackageManagerImpl implements PackageManager {
                         || Arrays.asList(pkg.getTargetPlatforms()).contains(
                                 targetPlatform)) {
                     packagesById.put(pkg.getId(), pkg);
-                    packageSourceById.put(pkg.getId(), source.getId());
                 }
             }
         }
@@ -509,8 +506,7 @@ public class PackageManagerImpl implements PackageManager {
 
     public DownloadingPackage download(String packageId) throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        return crs.getConnector().getDownload(packageSourceById.get(packageId),
-                packageId);
+        return crs.getConnector().getDownload(packageId);
     }
 
     public List<DownloadingPackage> download(List<String> packageIds)

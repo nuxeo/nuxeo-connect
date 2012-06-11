@@ -59,11 +59,10 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         return result;
     }
 
-    public DownloadingPackage storeDownloadedBundle(String sourceId,
-            PackageDescriptor descriptor) {
+    public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
 
         LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
-                sourceId, descriptor);
+                descriptor);
         tpexec.execute(localPackage);
         downloadingPackages.put(localPackage.getId(), localPackage);
         return localPackage;

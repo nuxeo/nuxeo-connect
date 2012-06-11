@@ -43,14 +43,14 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
+import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
-import org.nuxeo.connect.packages.RemotePackageSource;
 import org.nuxeo.connect.update.PackageType;
 
 /**
  * Base class for {@link ConnectConnector} implementers. Provides url binding
  * and marshaling logic.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public abstract class AbstractConnectConnector implements ConnectConnector {
@@ -72,24 +72,19 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      */
     public static final long DEFAULT_CACHE_TIME_MS_STUDIO = 300 * 1000;
 
-    protected Boolean flushRequested = false;
-
-    protected List<String> knownSources = new ArrayList<String>();
-
     protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
 
-    protected String getDefaultBaseUrl() {
-        return getBaseUrl(RemotePackageSource.DEFAULT_REMOTE_SOURCE_ID);
-    }
-
-    protected String getBaseUrl(String sourceId) {
-        return ConnectUrlConfig.getSourceBaseUrl(sourceId);
+    protected String getBaseUrl() {
+        if (LogicalInstanceIdentifier.isRegistered()) {
+            return ConnectUrlConfig.getRegistredBaseUrl();
+        }
+        return ConnectUrlConfig.getUnregisteredBaseUrl();
     }
 
     /**
      * @since 1.4
      */
-    protected File getCacheFileFor(String sourceId, PackageType type) {
+    protected File getCacheFileFor(PackageType type) {
         String connectUrlString = ConnectUrlConfig.getBaseUrl();
         String cacheDir = NuxeoConnectClient.getProperty(
                 NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
@@ -107,8 +102,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             }
             cachePrefix = cachePrefix
                     + connectUrl.getPath().replaceAll("/", "#");
-            String cacheFileName = cachePrefix + "_" + sourceId + "_"
-                    + type.toString() + ".json";
+            String cacheFileName = cachePrefix + "_" + type.toString()
+                    + ".json";
             return new File(cacheDir, cacheFileName);
         } catch (MalformedURLException e) {
             String fallbackFileName = connectUrlString + "_" + type.toString()
@@ -119,15 +114,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public void flushCache() {
-        flushRequested = true;
-        for (String knownSourceId : knownSources) {
-            flushCache(knownSourceId);
-        }
-    }
-
-    protected void flushCache(String sourceId) {
         for (PackageType type : PackageType.values()) {
-            File cacheFile = getCacheFileFor(sourceId, type);
+            File cacheFile = getCacheFileFor(type);
             FileUtils.deleteQuietly(cacheFile);
         }
     }
@@ -142,11 +130,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             Map<String, String> headers) throws ConnectServerError;
 
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
-
-        String url = getDefaultBaseUrl() + GET_STATUS_SUFFIX;
-
+        String url = getBaseUrl() + GET_STATUS_SUFFIX;
         ConnectServerResponse response = execCall(url);
-
         String json = response.getString();
         if (json == null) {
             throw new ConnectServerError("null response from server");
@@ -155,15 +140,13 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             return AbstractJSONSerializableData.loadFromJSON(
                     SubscriptionStatus.class, json);
         } catch (Throwable t) {
-            throw new ConnectServerError("Unable to parse response : " + json,
-                    t);
+            throw new ConnectServerError("Unable to parse response: " + json, t);
         } finally {
             response.release();
         }
     }
 
-    public DownloadingPackage getDownload(String sourceId, String id)
-            throws ConnectServerError {
+    public DownloadingPackage getDownload(String id) throws ConnectServerError {
         try {
             id = URLEncoder.encode(id, "UTF-8");
             id = id.replace("+", "%20");
@@ -171,7 +154,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         } catch (UnsupportedEncodingException e) {
             log.error(e);
         }
-        String url = getBaseUrl(sourceId) + GET_DOWNLOAD_SUFFIX + "/" + id;
+        String url = getBaseUrl() + GET_DOWNLOAD_SUFFIX + "/" + id;
         ConnectServerResponse response = execCall(url);
         String json = response.getString();
         try {
@@ -182,7 +165,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                         "Unable to parse server response: package has no id");
             }
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-            return cdm.storeDownloadedBundle(sourceId, pkg);
+            return cdm.storeDownloadedBundle(pkg);
         } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
@@ -190,8 +173,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
     }
 
-    public List<DownloadablePackage> getDownloads(String sourceId,
-            PackageType type) throws ConnectServerError {
+    public List<DownloadablePackage> getDownloads(PackageType type)
+            throws ConnectServerError {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         String json = null;
         String cacheTimeString = NuxeoConnectClient.getProperty(
@@ -205,15 +188,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         if (type == PackageType.STUDIO) {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }
-        File cacheFile = getCacheFileFor(sourceId, type);
-
-        // If this is a new source for the connector, flush if needed
-        if (!knownSources.contains(sourceId)) {
-            knownSources.add(sourceId);
-            if (flushRequested) {
-                flushCache(sourceId);
-            }
-        }
+        File cacheFile = getCacheFileFor(type);
 
         // Try reading from the cache first
         Date now = new Date();
@@ -237,7 +212,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
 
         if (json == null) { // Fallback on the real source
-            String url = getBaseUrl(sourceId) + GET_DOWNLOADS_SUFFIX + "/"
+            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/"
                     + type.getValue();
             ConnectServerResponse response = execCall(url);
             json = response.getString();

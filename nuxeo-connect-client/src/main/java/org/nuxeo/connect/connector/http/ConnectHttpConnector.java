@@ -62,11 +62,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
 
     protected long lastStatusFetchTime;
 
-    protected String getDefaultBaseUrl() {
+    protected String getBaseUrl() {
         if (overrideUrl != null) {
             return overrideUrl;
         }
-        return super.getDefaultBaseUrl();
+        return super.getBaseUrl();
     }
 
     protected boolean isConnectServerReachable() {
@@ -180,21 +180,20 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
         }
     }
 
-    public List<DownloadablePackage> getDownloads(String sourceId,
-            PackageType type) throws ConnectServerError {
+    public List<DownloadablePackage> getDownloads(PackageType type)
+            throws ConnectServerError {
         if (!isConnectServerReachable()) {
             return new ArrayList<DownloadablePackage>();
         }
-        return super.getDownloads(sourceId, type);
+        return super.getDownloads(type);
     }
 
-    public DownloadingPackage getDownload(String sourceId, String id)
-            throws ConnectServerError {
+    public DownloadingPackage getDownload(String id) throws ConnectServerError {
         if (!isConnectServerReachable()) {
             throw new CanNotReachConnectServer(
                     "Connect server set as not reachable");
         }
-        return super.getDownload(sourceId, id);
+        return super.getDownload(id);
     }
 
 }

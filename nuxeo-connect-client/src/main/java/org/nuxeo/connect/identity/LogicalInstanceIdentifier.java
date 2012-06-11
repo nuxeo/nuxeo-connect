@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.identity;
@@ -33,14 +32,15 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 
 /**
-*
-* Logical identifier for a Nuxeo Connect client subscription
-*
-* @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
-*/
+ *
+ * Logical identifier for a Nuxeo Connect client subscription
+ *
+ * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ */
 public class LogicalInstanceIdentifier {
 
     protected static final String KEY_FILE = "instance.clid";
+
     protected static final String NUXEO_DATA_DIR_KEY = "nuxeo.data.dir";
 
     public static class InvalidCLID extends Exception {
@@ -76,20 +76,18 @@ public class LogicalInstanceIdentifier {
 
     protected String CLID2 = null;
 
-    public LogicalInstanceIdentifier(String ID, String description) throws InvalidCLID {
+    public LogicalInstanceIdentifier(String ID, String description)
+            throws InvalidCLID {
         this(ID);
         this.instanceDescription = description;
     }
 
     public LogicalInstanceIdentifier(String ID) throws InvalidCLID {
-
         String[] parts = ID.split(ID_SEP);
         // XXX check on format via REGEXP
-
-        if (parts.length!=2) {
+        if (parts.length != 2) {
             throw new InvalidCLID("CLID is not of the right format");
         }
-
         CLID1 = parts[0];
         CLID2 = parts[1];
     }
@@ -123,45 +121,34 @@ public class LogicalInstanceIdentifier {
     }
 
     protected static String getSaveFileName(boolean load) {
-
-       // first look in Nuxeo Data dir
-       String path = NuxeoConnectClient.getProperty(NUXEO_DATA_DIR_KEY, NuxeoConnectClient.getHomePath());
-
-       if (path==null) {
-           path = System.getProperty("java.tmp.dir");
-       }
-       if (!path.endsWith(File.separator)) {
-           path = path + File.separator;
-       }
-
-       path = path + KEY_FILE;
-
-       if (!new File(path).exists() && load) {
-           // do fallback on RuntimeHome
-           path = NuxeoConnectClient.getHomePath() + KEY_FILE;
-       }
-
-       return path;
+        // first look in Nuxeo Data dir
+        String path = NuxeoConnectClient.getProperty(NUXEO_DATA_DIR_KEY,
+                NuxeoConnectClient.getHomePath());
+        if (path == null) {
+            path = System.getProperty("java.tmp.dir");
+        }
+        File keyFile = new File(path, KEY_FILE);
+        if (!keyFile.exists() && load) {
+            // do fallback on RuntimeHome
+            keyFile = new File(NuxeoConnectClient.getHomePath(), KEY_FILE);
+        }
+        return keyFile.getPath();
     }
 
-    public static void  cleanUp() {
+    public static void cleanUp() {
         instance = null;
-        File file  = new File(getSaveFileName(false));
+        File file = new File(getSaveFileName(false));
         if (file.exists()) {
             file.delete();
         }
     }
 
     public void save() throws IOException {
-
         String data = CLID1 + "\n" + CLID2 + "\n" + instanceDescription;
-
         if (USE_BASE64_SAVE) {
             data = Base64.encodeBytes(data.getBytes());
         }
-
         File file = new File(getSaveFileName(false));
-
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
@@ -176,13 +163,13 @@ public class LogicalInstanceIdentifier {
     protected static LogicalInstanceIdentifier instance;
 
     public static LogicalInstanceIdentifier instance() throws NoCLID {
-        if (instance==null) {
+        if (instance == null) {
             try {
                 instance = LogicalInstanceIdentifier.load();
             } catch (Exception e) {
                 throw new NoCLID("can not load CLID", e);
             }
-            if (instance==null) {
+            if (instance == null) {
                 throw new NoCLID("can not load CLID");
             }
         }
@@ -190,12 +177,10 @@ public class LogicalInstanceIdentifier {
     }
 
     public static void unload() throws Exception {
-        instance=null;
+        instance = null;
     }
 
     public static LogicalInstanceIdentifier load() throws Exception {
-
-
         File file = new File(getSaveFileName(true));
         if (!file.exists()) {
             return null;
@@ -204,12 +189,10 @@ public class LogicalInstanceIdentifier {
         List<String> lines = readLines(file);
 
         if (USE_BASE64_SAVE) {
-            byte[]  data = Base64.decode(lines.get(0));
+            byte[] data = Base64.decode(lines.get(0));
             String strData = new String(data);
             String[] parts = strData.split("\n");
-
             lines = new ArrayList<String>();
-
             for (String part : parts) {
                 lines.add(part);
             }
@@ -217,10 +200,8 @@ public class LogicalInstanceIdentifier {
 
         String id = lines.get(0) + ID_SEP + lines.get(1);
         String description = lines.get(2);
-
-        return new LogicalInstanceIdentifier(id,description);
+        return new LogicalInstanceIdentifier(id, description);
     }
-
 
     private static List<String> readLines(File file) throws IOException {
         List<String> lines = new ArrayList<String>();
@@ -243,6 +224,16 @@ public class LogicalInstanceIdentifier {
         return lines;
     }
 
-
+    /**
+     * @since 1.4
+     */
+    public static boolean isRegistered() {
+        try {
+            instance();
+            return true;
+        } catch (NoCLID e) {
+            return false;
+        }
+    }
 
 }

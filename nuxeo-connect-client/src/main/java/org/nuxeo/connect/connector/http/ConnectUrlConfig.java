@@ -22,9 +22,9 @@ package org.nuxeo.connect.connector.http;
 import org.nuxeo.connect.NuxeoConnectClient;
 
 /**
- * 
+ *
  * Helper to manage URL configuration when accessing Nuxceo Connect Services
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectUrlConfig {
@@ -59,6 +59,10 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
+    public static final String CONNECT_REGISTERED_ROOT_PATH = "registred/";
+
+    public static final String CONNECT_UNREGISTERED_ROOT_PATH = "unregistered/";
+
     public static String getBaseUrl() {
         if (NuxeoConnectClient.isTestModeSet()) {
             return "http://127.0.0.1:8082/";
@@ -76,12 +80,15 @@ public class ConnectUrlConfig {
         return getBaseUrl() + CONNECT_ROOT_PATH;
     }
 
-    public static String getSourceBaseUrl(String sourceId) {
-        return getRegistrationBaseUrl() + sourceId + '/';
+    public static String getRegistredBaseUrl() {
+        return getRegistrationBaseUrl() + CONNECT_REGISTERED_ROOT_PATH;
+    }
+
+    public static String getUnregisteredBaseUrl() {
+        return getRegistrationBaseUrl() + CONNECT_UNREGISTERED_ROOT_PATH;
     }
 
     // Proxy settings management
-
     protected static Boolean useProxy = null;
 
     protected static Boolean isProxyAuthenticated = null;

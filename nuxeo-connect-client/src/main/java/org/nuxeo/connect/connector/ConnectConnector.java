@@ -30,11 +30,9 @@ import org.nuxeo.connect.update.PackageType;
  */
 public interface ConnectConnector {
 
-    List<DownloadablePackage> getDownloads(String sourceId, PackageType type)
-            throws ConnectServerError;
+    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
 
-    DownloadingPackage getDownload(String sourceId, String id)
-            throws ConnectServerError;
+    DownloadingPackage getDownload(String id) throws ConnectServerError;
 
     SubscriptionStatus getConnectStatus() throws ConnectServerError;
 

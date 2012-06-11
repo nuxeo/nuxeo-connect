@@ -41,10 +41,6 @@ public class RemotePackageSource implements PackageSource {
 
     protected static final Log log = LogFactory.getLog(RemotePackageSource.class);
 
-    public static final String DEFAULT_REMOTE_SOURCE_ID = "registred";
-
-    protected String id;
-
     protected PackageListCache cache;
 
     public String getName() {
@@ -52,16 +48,11 @@ public class RemotePackageSource implements PackageSource {
     }
 
     public String getId() {
-        return id;
+        return "remote";
     }
 
     public RemotePackageSource() {
-        this(DEFAULT_REMOTE_SOURCE_ID);
-    }
-
-    public RemotePackageSource(String id) {
         cache = new PackageListCache();
-        this.id = id;
     }
 
     public List<DownloadablePackage> listPackages() {
@@ -80,7 +71,7 @@ public class RemotePackageSource implements PackageSource {
             try {
                 List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
                 if (pkgs == null) {
-                    pkgs = crs.getConnector().getDownloads(id, type);
+                    pkgs = crs.getConnector().getDownloads(type);
                     cache.add(pkgs, type.toString());
                 }
                 for (DownloadablePackage pkg : pkgs) {

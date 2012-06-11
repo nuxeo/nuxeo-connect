@@ -117,7 +117,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected boolean supportsHotReload;
 
-    @JSONExportMethod(name="dependencies")
+    @JSONExportMethod(name = "dependencies")
     protected JSONArray getDependenciesAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getDependencies()) {
@@ -126,7 +126,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="dependencies")
+    @JSONImportMethod(name = "dependencies")
     protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -135,7 +135,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setDependencies(deps);
     }
 
-    @JSONExportMethod(name="conflicts")
+    @JSONExportMethod(name = "conflicts")
     protected JSONArray getConflictsAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getConflicts()) {
@@ -144,7 +144,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="conflicts")
+    @JSONImportMethod(name = "conflicts")
     protected void setConflictsAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -153,7 +153,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setConflicts(deps);
     }
 
-    @JSONExportMethod(name="provides")
+    @JSONExportMethod(name = "provides")
     protected JSONArray getProvidesAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getProvides()) {
@@ -162,7 +162,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="provides")
+    @JSONImportMethod(name = "provides")
     protected void setProvidesAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -171,7 +171,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setProvides(deps);
     }
 
-    @JSONImportMethod(name="targetPlatforms")
+    @JSONImportMethod(name = "targetPlatforms")
     public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
         String[] targets = new String[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -182,7 +182,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @JSONImportMethod(name = "type")
     public void setTypeAsJSON(String strType) {
-        type=PackageType.getByValue(strType);
+        type = PackageType.getByValue(strType);
     }
 
     @JSONImportMethod(name = "version")
@@ -192,7 +192,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @JSONImportMethod(name = "productionState")
     public void setProductionStateAsJSON(String state) {
-       productionState = ProductionState.getByValue(state);
+        productionState = ProductionState.getByValue(state);
     }
 
     @JSONImportMethod(name = "nuxeoValidationState")
@@ -245,7 +245,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     public String getId() {
-        if (getVersion()==null) {
+        if (getVersion() == null) {
             return getName();
         } else {
             return getName() + "-" + getVersion();
@@ -289,6 +289,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         }
         return conflicts;
     }
+
     public PackageDependency[] getProvides() {
         if (provides == null) {
             return new PackageDependency[0];
@@ -324,12 +325,19 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return sourceSize;
     }
 
+    /**
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)}
+     *             instead.
+     */
     @Deprecated
     public static PackageDescriptor loadFromJSON(JSONObject json)
             throws JSONException {
         return PackageDescriptor.loadFromJSON(PackageDescriptor.class, json);
     }
 
+    /**
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
+     */
     @Deprecated
     public static PackageDescriptor loadFromJSON(String json)
             throws JSONException {
@@ -465,7 +473,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public ProductionState getProductionState() {
-        if (productionState==null) {
+        if (productionState == null) {
             return ProductionState.TESTING;
         } else {
             return productionState;
@@ -474,7 +482,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public NuxeoValidationState getValidationState() {
-        if (nuxeoValidationState==null) {
+        if (nuxeoValidationState == null) {
             return NuxeoValidationState.NONE;
         } else {
             return nuxeoValidationState;
@@ -495,7 +503,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.productionState = productionState;
     }
 
-    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
+    public void setNuxeoValidationState(
+            NuxeoValidationState nuxeoValidationState) {
         this.nuxeoValidationState = nuxeoValidationState;
     }
 

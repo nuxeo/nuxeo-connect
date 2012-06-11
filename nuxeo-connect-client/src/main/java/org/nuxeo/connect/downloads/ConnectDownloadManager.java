@@ -33,8 +33,7 @@ public interface ConnectDownloadManager {
 
     List<DownloadingPackage> listDownloadingPackages();
 
-    DownloadingPackage storeDownloadedBundle(String sourceId,
-            PackageDescriptor descriptor);
+    DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor);
 
     String getDownloadedBundleLocalStorage();
 

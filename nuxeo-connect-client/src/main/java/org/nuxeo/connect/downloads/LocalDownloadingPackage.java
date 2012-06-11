@@ -62,7 +62,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
     protected File file = null;
 
-    public LocalDownloadingPackage(String sourceId, PackageDescriptor descriptor) {
+    public LocalDownloadingPackage(PackageDescriptor descriptor) {
         super();
         this.classifier = descriptor.getClassifier();
         this.description = descriptor.getDescription();
