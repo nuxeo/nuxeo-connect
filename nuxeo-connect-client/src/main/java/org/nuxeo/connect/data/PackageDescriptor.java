@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.data;
@@ -30,6 +29,7 @@ import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
@@ -116,6 +116,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @JSONExportableField
     protected boolean supportsHotReload;
+
+    @JSONExportableField
+    protected PackageVisibility visibility;
 
     @JSONExportMethod(name = "dependencies")
     protected JSONArray getDependenciesAsJSON() {
@@ -514,6 +517,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public void setSupportsHotReload(boolean supportsHotReload) {
         this.supportsHotReload = supportsHotReload;
+    }
+
+    @Override
+    public PackageVisibility getVisibility() {
+        return visibility;
     }
 
 }

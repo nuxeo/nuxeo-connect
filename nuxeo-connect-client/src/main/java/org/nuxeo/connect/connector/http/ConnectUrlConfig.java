@@ -80,10 +80,16 @@ public class ConnectUrlConfig {
         return getBaseUrl() + CONNECT_ROOT_PATH;
     }
 
+    /**
+     * @since 1.4
+     */
     public static String getRegistredBaseUrl() {
         return getRegistrationBaseUrl() + CONNECT_REGISTERED_ROOT_PATH;
     }
 
+    /**
+     * @since 1.4
+     */
     public static String getUnregisteredBaseUrl() {
         return getRegistrationBaseUrl() + CONNECT_UNREGISTERED_ROOT_PATH;
     }

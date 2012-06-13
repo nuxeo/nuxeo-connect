@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,13 +12,15 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu
+ *     bstefanescu, jcarsique
  */
 package org.nuxeo.connect.update.model;
 
 import org.nuxeo.connect.update.NuxeoValidationState;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
@@ -30,22 +32,7 @@ import org.nuxeo.connect.update.task.Task;
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public interface PackageDefinition {
-
-    /**
-     * Get the package ID.
-     *
-     * The ID is a string composed from the package name and the package
-     * version: <code>name-version</code>
-     *
-     */
-    String getId();
-
-    /**
-     * Get the package name.
-     *
-     */
-    String getName();
+public interface PackageDefinition extends Package {
 
     /**
      * Set the package name.
@@ -55,23 +42,11 @@ public interface PackageDefinition {
     void setName(String name);
 
     /**
-     * Get the package version.
-     *
-     */
-    Version getVersion();
-
-    /**
      * Set the package version.
      *
      * @param version
      */
     void setVersion(Version version);
-
-    /**
-     * Get the package type.
-     *
-     */
-    PackageType getType();
 
     /**
      * Set the package type.
@@ -81,23 +56,11 @@ public interface PackageDefinition {
     void setType(PackageType type);
 
     /**
-     * Get the package title.
-     *
-     */
-    String getTitle();
-
-    /**
      * Set the package title.
      *
      * @param title
      */
     void setTitle(String title);
-
-    /**
-     * Get the package description.
-     *
-     */
-    String getDescription();
 
     /**
      * Set the package description.
@@ -107,12 +70,6 @@ public interface PackageDefinition {
     void setDescription(String description);
 
     /**
-     * Get the package classifier.
-     *
-     */
-    String getClassifier();
-
-    /**
      * Set the package classifier.
      *
      * @param classifier
@@ -120,27 +77,11 @@ public interface PackageDefinition {
     void setClassifier(String classifier);
 
     /**
-     * Get the package vendor string.
-     *
-     * The vendor represent the entity providing the package.
-     *
-     */
-    String getVendor();
-
-    /**
      * Set the package vendor string.
      *
      * @param vendor
      */
     void setVendor(String vendor);
-
-    /**
-     * Get an URL to a web page where more information can be found about the
-     * package.
-     *
-     * @return the package web page. may be null.
-     */
-    String getHomePage();
 
     /**
      * Set the package web page URL.
@@ -163,12 +104,6 @@ public interface PackageDefinition {
     void setLicense(String license);
 
     /**
-     * Get the package license URL. If no specified the license.txt file in the
-     * package is the license content.
-     */
-    String getLicenseUrl();
-
-    /**
      * Set the license URL.
      *
      * @param url
@@ -189,17 +124,6 @@ public interface PackageDefinition {
     void setPlatforms(String[] platforms);
 
     /**
-     * Get the package dependencies.
-     *
-     * The dependency value format is:
-     * <code>package_name[:package_min_version[:package_max_version]]</code> if
-     * no min and max version are specified the the last version should be used.
-     *
-     * @return an array of dependencies or null if no dependencies are set.
-     */
-    PackageDependency[] getDependencies();
-
-    /**
      * Set the package dependencies.
      *
      * @param deps
@@ -208,34 +132,12 @@ public interface PackageDefinition {
     void setDependencies(PackageDependency[] deps);
 
     /**
-     * Get the package conflicts.
-     *
-     * The conflict value format is:
-     * <code>package_name[:package_min_version[:package_max_version]]</code> if
-     * no min and max version are specified the the last version should be used.
-     *
-     * @return an array of conflicts or null if no conflicts are set.
-     */
-    PackageDependency[] getConflicts();
-
-    /**
      * Set the package conflicts.
      *
      * @param deps
      * @see #getConflicts()
      */
     void setConflicts(PackageDependency[] deps);
-
-    /**
-     * Get the package provides.
-     *
-     * The provide value format is:
-     * <code>package_name[:package_min_version[:package_max_version]]</code> if
-     * no min and max version are specified the the last version should be used.
-     *
-     * @return an array of provides or null if no provides are set.
-     */
-    PackageDependency[] getProvides();
 
     /**
      * Set the package provides.
@@ -307,32 +209,40 @@ public interface PackageDefinition {
     public String toXML();
 
     /**
-     * Get the production state of the package
-     *
-     */
-    public ProductionState getProductionState();
-
-    /**
-     * Get the validation state of the Package
-     */
-    public NuxeoValidationState getValidationState();
-
-    /**
-     * Test if Package is supported by Nuxeo
-     *
-     */
-    public boolean isSupported();
-
-    /**
-     * Test if package supports HotReload
-     *
-     */
-    public boolean supportsHotReload();
-
-    /**
      * Test if terms and conditions should be accepted by user
      *
      */
     public boolean requireTermsAndConditionsAcceptance();
+
+    /**
+     * @since 1.4
+     */
+    void setSupported(boolean supported);
+
+    /**
+     * @since 1.4
+     */
+    void setHotReloadSupport(boolean hotReloadSupport);
+
+    /**
+     * @since 1.4
+     */
+    void setValidationState(NuxeoValidationState validationState);
+
+    /**
+     * @since 1.4
+     */
+    void setProductionState(ProductionState productionState);
+
+    /**
+     * @since 1.4
+     */
+    void setRequireTermsAndConditionsAcceptance(
+            boolean requireTermsAndConditionsAcceptance);
+
+    /**
+     * @since 1.4
+     */
+    void setVisibility(PackageVisibility visibility);
 
 }

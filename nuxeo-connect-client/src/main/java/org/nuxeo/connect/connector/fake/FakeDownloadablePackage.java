@@ -25,12 +25,11 @@ import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
- *
- *
  * @since 1.4
  */
 public class FakeDownloadablePackage implements DownloadablePackage {
@@ -197,6 +196,11 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public void addConflict(PackageDependency conflict) {
         conflicts.add(conflict);
+    }
+
+    @Override
+    public PackageVisibility getVisibility() {
+        throw new UnsupportedOperationException();
     }
 
 }

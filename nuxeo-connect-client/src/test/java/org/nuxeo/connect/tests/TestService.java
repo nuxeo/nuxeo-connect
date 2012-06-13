@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
-import org.nuxeo.connect.connector.fake.UnregistredFakeConnector;
 import org.nuxeo.connect.connector.http.ConnectHttpConnector;
 import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.connector.test.ConnectTestConnector;
@@ -58,7 +57,9 @@ public class TestService extends TestCase {
         assertFalse(crs.isInstanceRegistred());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-        assertTrue(connector instanceof UnregistredFakeConnector);
+        // TODO NXP-9432
+        // assertTrue(connector instanceof UnregistredFakeConnector);
+        assertTrue(connector instanceof ConnectHttpConnector);
     }
 
     public void testServiceAsRegistered() throws Exception {

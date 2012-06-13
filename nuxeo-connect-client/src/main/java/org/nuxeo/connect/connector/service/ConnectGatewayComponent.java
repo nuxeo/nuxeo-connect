@@ -24,7 +24,6 @@ import java.util.List;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
-import org.nuxeo.connect.connector.fake.UnregistredFakeConnector;
 import org.nuxeo.connect.connector.http.ConnectHttpConnector;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -84,11 +83,12 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         }
 
         if (connector == null) {
-            if (LogicalInstanceIdentifier.isRegistered()) {
-                connector = new ConnectHttpConnector();
-            } else {
-                connector = new UnregistredFakeConnector();
-            }
+            // if (LogicalInstanceIdentifier.isRegistered()) {
+            connector = new ConnectHttpConnector();
+            // } else {
+            // TODO NXP-9432 use UnregistredFakeConnector?
+            // connector = new UnregistredFakeConnector();
+            // }
         }
         return connector;
     }

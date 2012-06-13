@@ -31,7 +31,6 @@ import org.nuxeo.connect.update.PackageType;
 public class TestFakeConnector extends TestCase {
 
     public void testFakeConnector() throws Exception {
-
         LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
                 "toto--titi", "myInstance");
         CLID.save();
