@@ -102,12 +102,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             }
             cachePrefix = cachePrefix
                     + connectUrl.getPath().replaceAll("/", "#");
-            String cacheFileName = cachePrefix + "_" + type.toString()
-                    + ".json";
+            String cacheFileName = cachePrefix + "_" + type + ".json";
             return new File(cacheDir, cacheFileName);
         } catch (MalformedURLException e) {
-            String fallbackFileName = connectUrlString + "_" + type.toString()
-                    + ".json";
+            String fallbackFileName = connectUrlString + "_" + type + ".json";
             return new File(cacheDir, fallbackFileName);
         }
     }
@@ -118,6 +116,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             File cacheFile = getCacheFileFor(type);
             FileUtils.deleteQuietly(cacheFile);
         }
+        FileUtils.deleteQuietly(getCacheFileFor(null));
     }
 
     protected ConnectServerResponse execCall(String url)
@@ -190,7 +189,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         } else {
             cacheMaxAge = Long.parseLong(cacheTimeString) * 60 * 1000;
         }
-        if (type == PackageType.STUDIO) {
+        if (type == null || type == PackageType.STUDIO) {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }
         File cacheFile = getCacheFileFor(type);
@@ -217,8 +216,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
 
         if (json == null) { // Fallback on the real source
-            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/"
-                    + type.getValue();
+            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + type;
             ConnectServerResponse response = execCall(url);
             json = response.getString();
             response.release();
@@ -241,5 +239,4 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
         return result;
     }
-
 }

@@ -83,12 +83,7 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         }
 
         if (connector == null) {
-            // if (LogicalInstanceIdentifier.isRegistered()) {
             connector = new ConnectHttpConnector();
-            // } else {
-            // TODO NXP-9432 use UnregistredFakeConnector?
-            // connector = new UnregistredFakeConnector();
-            // }
         }
         return connector;
     }

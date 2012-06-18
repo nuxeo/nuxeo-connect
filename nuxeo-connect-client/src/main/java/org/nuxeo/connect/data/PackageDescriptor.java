@@ -27,6 +27,7 @@ import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 import org.nuxeo.connect.update.NuxeoValidationState;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageVisibility;
@@ -120,6 +121,30 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected PackageVisibility visibility;
 
+    /**
+     * @since 1.10
+     */
+    public PackageDescriptor(Package descriptor) {
+        super();
+        this.classifier = descriptor.getClassifier();
+        // TODO NXP-9432 conflicts, dependencies?
+        this.description = descriptor.getDescription();
+        this.homePage = descriptor.getHomePage();
+        // TODO NXP-9432 licenseType, licenseUrl?
+        this.name = descriptor.getName();
+        // TODO NXP-9432 productionState, provides, state?
+        this.targetPlatforms = descriptor.getTargetPlatforms();
+        this.title = descriptor.getTitle();
+        this.type = descriptor.getType();
+        // TODO NXP-9432 validationState, vendor?
+        this.version = descriptor.getVersion();
+        this.visibility = descriptor.getVisibility();
+    }
+
+    public PackageDescriptor() {
+        super();
+    }
+
     @JSONExportMethod(name = "dependencies")
     protected JSONArray getDependenciesAsJSON() {
         JSONArray deps = new JSONArray();
@@ -188,6 +213,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         type = PackageType.getByValue(strType);
     }
 
+    @JSONImportMethod(name = "visibility")
+    public void setVisibilityAsJSON(String strVisibility) {
+        visibility = PackageVisibility.valueOf(strVisibility);
+    }
+
     @JSONImportMethod(name = "version")
     public void setVersionAsJSON(String v) {
         version = new Version(v);
@@ -235,18 +265,22 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.rating = rating;
     }
 
+    @Override
     public String getHomePage() {
         return homePage;
     }
 
+    @Override
     public String getClassifier() {
         return classifier;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public String getId() {
         if (getVersion() == null) {
             return getName();
@@ -255,30 +289,37 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         }
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getVendor() {
         return vendor;
     }
 
+    @Override
     public int getState() {
         return state;
     }
 
+    @Override
     public String getLicenseType() {
         return license;
     }
 
+    @Override
     public String getLicenseUrl() {
         return licenseUrl;
     }
 
+    @Override
     public String[] getTargetPlatforms() {
         return targetPlatforms;
     }
 
+    @Override
     public PackageDependency[] getDependencies() {
         if (dependencies == null) {
             return new PackageDependency[0];
@@ -286,6 +327,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return dependencies;
     }
 
+    @Override
     public PackageDependency[] getConflicts() {
         if (conflicts == null) {
             return new PackageDependency[0];
@@ -293,6 +335,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return conflicts;
     }
 
+    @Override
     public PackageDependency[] getProvides() {
         if (provides == null) {
             return new PackageDependency[0];
@@ -300,30 +343,37 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return provides;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
+    @Override
     public PackageType getType() {
         return type;
     }
 
+    @Override
     public Version getVersion() {
         return version;
     }
 
+    @Override
     public boolean isLocal() {
         return false;
     }
 
+    @Override
     public String getSourceDigest() {
         return sourceDigest;
     }
 
+    @Override
     public String getSourceUrl() {
         return sourceUrl;
     }
 
+    @Override
     public long getSourceSize() {
         return sourceSize;
     }
@@ -335,7 +385,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Deprecated
     public static PackageDescriptor loadFromJSON(JSONObject json)
             throws JSONException {
-        return PackageDescriptor.loadFromJSON(PackageDescriptor.class, json);
+        return loadFromJSON(PackageDescriptor.class, json);
     }
 
     /**
@@ -453,18 +503,22 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return sb.toString();
     }
 
+    @Override
     public int getCommentsNumber() {
         return commentsNumber;
     }
 
+    @Override
     public String getPictureUrl() {
         return pictureUrl;
     }
 
+    @Override
     public int getRating() {
         return rating;
     }
 
+    @Override
     public int getDownloadsCount() {
         return downloadsCount;
     }
@@ -522,6 +576,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Override
     public PackageVisibility getVisibility() {
         return visibility;
+    }
+
+    public void setVisibility(PackageVisibility visibility) {
+        this.visibility = visibility;
     }
 
 }

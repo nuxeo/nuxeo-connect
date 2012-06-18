@@ -31,8 +31,7 @@ public class NuxeoConnectClient {
 
     protected static final Log log = LogFactory.getLog(NuxeoConnectClient.class);
 
-    // TODO NXP-9432 increase version and keep compliance?
-    protected static final String PROTOCOL_VERSION = "1.0";
+    protected static final String PROTOCOL_VERSION = "1.4";
 
     protected static String buildVersion = null;
 

@@ -44,13 +44,13 @@ import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageUpdateService;
 
 /**
- * 
+ *
  * Implementation of the {@link DownloadingPackage} interface.
- * 
+ *
  * Encapsulate download management :
- * 
+ *
  * ( implements {@link Runnable} to be used in a {@link ThreadPoolExecutor})
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class LocalDownloadingPackage extends PackageDescriptor implements
@@ -63,15 +63,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     protected File file = null;
 
     public LocalDownloadingPackage(PackageDescriptor descriptor) {
-        super();
-        this.classifier = descriptor.getClassifier();
-        this.description = descriptor.getDescription();
-        this.homePage = descriptor.getHomePage();
-        this.name = descriptor.getName();
-        this.targetPlatforms = descriptor.getTargetPlatforms();
-        this.title = descriptor.getTitle();
-        this.type = descriptor.getType();
-        this.version = descriptor.getVersion();
+        super(descriptor);
         this.sourceUrl = ConnectUrlConfig.getDownloadBaseUrl()
                 + descriptor.getSourceUrl();
         this.sourceDigest = descriptor.getSourceDigest();

@@ -57,7 +57,6 @@ public class TestService extends TestCase {
         assertFalse(crs.isInstanceRegistred());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-        // TODO NXP-9432
         // assertTrue(connector instanceof UnregistredFakeConnector);
         assertTrue(connector instanceof ConnectHttpConnector);
     }

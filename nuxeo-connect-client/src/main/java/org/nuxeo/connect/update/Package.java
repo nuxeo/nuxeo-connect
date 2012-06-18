@@ -82,6 +82,8 @@ public interface Package {
      * @see PackageDependency
      * @see #getDependencies()
      * @see #getProvides()
+     *
+     * @since 1.3.3
      */
     PackageDependency[] getConflicts();
 
@@ -92,6 +94,7 @@ public interface Package {
      * @see PackageDependency
      * @see #getDependencies()
      * @see #getConflicts()
+     * @since 1.3.3
      */
     PackageDependency[] getProvides();
 
