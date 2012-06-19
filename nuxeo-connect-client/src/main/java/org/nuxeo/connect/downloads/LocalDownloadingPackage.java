@@ -93,8 +93,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
         String path = cdm.getDownloadedBundleLocalStorage();
 
-        path = path + getId();
-        file = new File(path);
+        file = new File(path, getId());
 
         OutputStream out = null;
         try {

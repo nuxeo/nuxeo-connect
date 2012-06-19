@@ -44,6 +44,8 @@ import org.nuxeo.connect.data.PackageDescriptor;
  */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
+    public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
+
     protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(25);
 
     protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
@@ -69,13 +71,13 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
     public String getDownloadedBundleLocalStorage() {
 
-        String path = NuxeoConnectClient.getHomePath();
-        path = path + "ConnectDownloads/";
-        File dir = new File(path);
-        if (!dir.exists()) {
-            dir.mkdir();
+        String tmpPath = NuxeoConnectClient.getProperty(
+                NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
+        File tmpDir = new File(tmpPath);
+        if (!tmpDir.exists()) {
+            tmpDir.mkdir();
         }
-        return path;
+        return tmpPath;
     }
 
     public void removeDownloadingPackage(String packageId) {
