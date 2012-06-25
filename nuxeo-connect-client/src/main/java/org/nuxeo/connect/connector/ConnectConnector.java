@@ -25,12 +25,18 @@ import org.nuxeo.connect.update.PackageType;
 
 /**
  * Interface for APIs exposed by the Connect Server.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public interface ConnectConnector {
 
-    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
+    /**
+     * @param type Can be null since 1.4
+     * @return All type packages or all packages if type is null.
+     * @throws ConnectServerError
+     */
+    List<DownloadablePackage> getDownloads(PackageType type)
+            throws ConnectServerError;
 
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 
