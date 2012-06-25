@@ -34,7 +34,7 @@ import org.nuxeo.connect.update.PackageUpdateService;
 /**
  * {@link PackageSource} implementation for listing packages already downloaded
  * and potentially already installed.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class LocalPackageSource implements PackageSource {
@@ -51,24 +51,19 @@ public class LocalPackageSource implements PackageSource {
 
     public List<DownloadablePackage> listPackages() {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
-
         if (pus == null) {
             log.error("Unable to locate PackageUpdateService");
             return result;
         }
-
         try {
             List<LocalPackage> pkgs = pus.getPackages();
-
             for (LocalPackage pkg : pkgs) {
                 result.add(new LocalPackageAsDownloadablePackage(pkg));
             }
         } catch (PackageException e) {
             log.error("Error when getting local packages", e);
         }
-
         return result;
     }
 
@@ -77,15 +72,12 @@ public class LocalPackageSource implements PackageSource {
         if (type == null) {
             return all;
         }
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (DownloadablePackage pkg : all) {
             if (pkg.getType() != null && pkg.getType().equals(type)) {
                 result.add(pkg);
             }
         }
-
         return result;
     }
 

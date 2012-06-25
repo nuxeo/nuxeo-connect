@@ -115,7 +115,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                     }
                     throw error;
                 } catch (JSONException e) {
-                    log.error("Can't parse server error " + rc, e);
+                    log.debug("Can't parse server error " + rc, e);
                     throw new ConnectServerError("Server returned a code " + rc);
                 }
             }

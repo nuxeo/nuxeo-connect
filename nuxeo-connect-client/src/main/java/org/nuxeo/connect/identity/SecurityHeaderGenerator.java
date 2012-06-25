@@ -37,6 +37,22 @@ public class SecurityHeaderGenerator {
     public static final String HASH_METHOD = "MD5";
 
     public static Map<String, String> getHeaders() throws ConnectSecurityError {
+        Map<String, String> headers;
+        if (LogicalInstanceIdentifier.isRegistered()) {
+            headers = getRegisteredHeaders();
+        } else {
+            headers = getAnonymousHeaders();
+        }
+        return headers;
+    }
+
+    /**
+     * Preferably use {@link #getHeaders()}
+     *
+     * @since 1.10
+     */
+    protected static Map<String, String> getRegisteredHeaders()
+            throws ConnectSecurityError {
         String CLID1;
         String CLID2;
         String CTID;
@@ -64,9 +80,11 @@ public class SecurityHeaderGenerator {
     }
 
     /**
+     * Preferably use {@link #getHeaders()}
+     *
      * @since 1.9
      */
-    public static Map<String, String> getAnonymousHeaders() {
+    protected static Map<String, String> getAnonymousHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put(ProtocolConst.VERSION_HEADER,
                 NuxeoConnectClient.getVersion());

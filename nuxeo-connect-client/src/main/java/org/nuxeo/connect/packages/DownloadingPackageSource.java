@@ -32,7 +32,7 @@ import org.nuxeo.connect.update.PackageType;
 
 /**
  * {@link PackageSource} implementation for listing packages being downloaded.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class DownloadingPackageSource implements PackageSource {
@@ -48,22 +48,18 @@ public class DownloadingPackageSource implements PackageSource {
     }
 
     public List<DownloadablePackage> listPackages() {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-
         List<DownloadingPackage> pkgs = cdm.listDownloadingPackages();
         for (DownloadablePackage pkg : pkgs) {
             result.add(pkg);
         }
-
         return result;
     }
 
     public List<DownloadablePackage> listPackages(PackageType type) {
         List<DownloadablePackage> all = listPackages();
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (DownloadablePackage pkg : all) {
             if (pkg.getType().equals(type)) {
                 result.add(pkg);

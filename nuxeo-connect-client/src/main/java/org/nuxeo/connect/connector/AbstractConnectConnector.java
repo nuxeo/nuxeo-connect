@@ -121,13 +121,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     protected ConnectServerResponse execCall(String url)
             throws ConnectServerError {
-        Map<String, String> headers;
-        if (LogicalInstanceIdentifier.isRegistered()) {
-            headers = SecurityHeaderGenerator.getHeaders();
-        } else {
-            headers = SecurityHeaderGenerator.getAnonymousHeaders();
-        }
-        return execServerCall(url, headers);
+        return execServerCall(url, SecurityHeaderGenerator.getHeaders());
     }
 
     protected abstract ConnectServerResponse execServerCall(String url,

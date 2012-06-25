@@ -331,4 +331,16 @@ public interface PackageManager extends BasePackageManager {
      */
     void order(DependencyResolution res) throws DependencyException;
 
+    /**
+     * @since 1.4
+     */
+    void cancelDownload(String pkgId);
+
+    /**
+     * @param pkgs the packages to sort
+     * @return The packages sorted by type, name, version
+     * @since 1.4
+     */
+    List<? extends Package> sort(List<? extends Package> pkgs);
+
 }

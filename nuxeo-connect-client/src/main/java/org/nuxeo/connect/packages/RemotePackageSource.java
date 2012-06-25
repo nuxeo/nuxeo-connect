@@ -34,7 +34,7 @@ import org.nuxeo.connect.update.PackageType;
 /**
  * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo
  * Connect Server.
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class RemotePackageSource implements PackageSource {
@@ -66,23 +66,20 @@ public class RemotePackageSource implements PackageSource {
     public List<DownloadablePackage> listPackages(PackageType type) {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
-        if (crs.isInstanceRegistred()) {
-            try {
-                List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
-                if (pkgs == null) {
-                    pkgs = crs.getConnector().getDownloads(type);
-                    cache.add(pkgs, type.toString());
-                }
-                for (DownloadablePackage pkg : pkgs) {
-                    result.add(pkg);
-                }
-            } catch (ConnectServerError e) {
-                log.error("Unable to fetch remote packages list", e);
-                // store an empty list to avoid calling back the server
-                // since anyway we probably have no connection ...
-                cache.add(new ArrayList<DownloadablePackage>(), type.toString());
+        try {
+            List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
+            if (pkgs == null) {
+                pkgs = crs.getConnector().getDownloads(type);
+                cache.add(pkgs, type.toString());
             }
+            for (DownloadablePackage pkg : pkgs) {
+                result.add(pkg);
+            }
+        } catch (ConnectServerError e) {
+            log.error("Unable to fetch remote packages list", e);
+            // store an empty list to avoid calling back the server
+            // since anyway we probably have no connection ...
+            cache.add(new ArrayList<DownloadablePackage>(), type.toString());
         }
         return result;
     }

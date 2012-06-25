@@ -21,6 +21,7 @@ package org.nuxeo.connect.packages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -33,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
@@ -51,9 +53,9 @@ import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
 
 /**
- * 
+ *
  * Nuxeo Component that implements {@link PackageManager}
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class PackageManagerImpl implements PackageManager {
@@ -117,22 +119,23 @@ public class PackageManagerImpl implements PackageManager {
     protected List<DownloadablePackage> doMergePackages(
             List<PackageSource> sources, PackageType type, String targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type);
-        Map<String, DownloadablePackage> packagesByName = new HashMap<String, DownloadablePackage>();
+        Map<String, DownloadablePackage> packagesByVisibilityAndName = new HashMap<String, DownloadablePackage>();
         for (DownloadablePackage pkg : allPackages) {
             if ((targetPlatform == null)
                     || (Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform))) {
-                String name = pkg.getName();
-                if (packagesByName.containsKey(name)) {
-                    DownloadablePackage other = packagesByName.get(name);
+                String key = pkg.getVisibility() + "-" + pkg.getName();
+                if (packagesByVisibilityAndName.containsKey(key)) {
+                    DownloadablePackage other = packagesByVisibilityAndName.get(key);
                     if (pkg.getVersion().greaterThan(other.getVersion())) {
-                        packagesByName.put(name, pkg);
+                        packagesByVisibilityAndName.put(key, pkg);
                     }
                 } else {
-                    packagesByName.put(name, pkg);
+                    packagesByVisibilityAndName.put(key, pkg);
                 }
             }
         }
-        return new ArrayList<DownloadablePackage>(packagesByName.values());
+        return new ArrayList<DownloadablePackage>(
+                packagesByVisibilityAndName.values());
     }
 
     /**
@@ -352,7 +355,6 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public List<DownloadablePackage> searchPackages(String searchExpr) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -528,7 +530,6 @@ public class PackageManagerImpl implements PackageManager {
             return;
         }
         LocalPackage pkg = pus.getPackage(packageId);
-
         Task installationTask = pkg.getInstallTask();
         installationTask.validate();
         installationTask.run(params);
@@ -581,9 +582,7 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public DownloadablePackage getPackage(String pkgId) {
-        // Merge is an issue for P2CUDFDependencyResolver, try with
-        // listAllPackages() instead of listPackages()
-        // List<DownloadablePackage> pkgs = listPackages();
+        // Merge is an issue for P2CUDFDependencyResolver
         List<DownloadablePackage> pkgs = listAllPackages();
         DownloadablePackage pkg = getPkgInList(pkgs, pkgId);
         if (pkg == null) {
@@ -598,11 +597,9 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type) {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         List<DownloadablePackage> all = listPackages(type);
         List<DownloadablePackage> remotes = listRemotePackages(type);
-
         for (DownloadablePackage pkg : all) {
             for (DownloadablePackage remote : remotes) {
                 if (remote.getName().equals(pkg.getName())) {
@@ -818,5 +815,28 @@ public class PackageManagerImpl implements PackageManager {
         for (String id : orderedMap.keySet()) {
             orderedList.add(id);
         }
+    }
+
+    @Override
+    public void cancelDownload(String pkgId) {
+        ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+        cdm.removeDownloadingPackage(pkgId);
+    }
+
+    @Override
+    public List<? extends Package> sort(List<? extends Package> pkgs) {
+        Collections.sort(pkgs, new Comparator<Package>() {
+            @Override
+            public int compare(Package arg0, Package arg1) {
+                if (!arg0.getType().equals(arg1.getType())) {
+                    return arg0.getType().compareTo(arg1.getType());
+                }
+                if (!arg0.getName().equals(arg1.getName())) {
+                    return arg0.getName().compareToIgnoreCase(arg1.getName());
+                }
+                return arg0.getVersion().compareTo(arg1.getVersion());
+            }
+        });
+        return pkgs;
     }
 }
