@@ -96,7 +96,7 @@ public class PackageManagerImpl implements PackageManager {
             log.warn("Resolver " + resolverType
                     + "is not supported - fallback on default resolver "
                     + DEFAULT_DEPENDENCY_RESOLVER);
-            resolver = new LegacyDependencyResolver(this);
+            resolver = new P2CUDFDependencyResolver(this);
         }
     }
 
