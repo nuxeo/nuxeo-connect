@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -82,6 +82,7 @@ public interface LocalPackage extends Package {
      * {@link PackageUpdateService#setPackageState(LocalPackage, int)} instead.
      *
      * @param state
+     * @see PackageState
      */
     void setState(int state);
 

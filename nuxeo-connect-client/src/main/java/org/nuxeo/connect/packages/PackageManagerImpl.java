@@ -21,7 +21,6 @@ package org.nuxeo.connect.packages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -45,6 +44,7 @@ import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -273,14 +273,16 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public DownloadablePackage findPackageById(String packageId) {
-        for (PackageSource source : localSources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getId().equals(packageId)) {
-                    return pkg;
-                }
-            }
+        DownloadablePackage pkg = findPackageById(packageId, localSources);
+        if (pkg == null) {
+            pkg = findPackageById(packageId, remoteSources);
         }
-        for (PackageSource source : remoteSources) {
+        return pkg;
+    }
+
+    public DownloadablePackage findPackageById(String packageId,
+            List<PackageSource> sources) {
+        for (PackageSource source : sources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getId().equals(packageId)) {
                     return pkg;
@@ -416,7 +418,6 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-
         Collections.sort(result, new VersionPackageComparator());
         return result;
     }
@@ -693,6 +694,25 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
+    public List<DownloadablePackage> getUninstallDependencies(Package pkg,
+            String targetPlatform) {
+        List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
+        DependencyResolution resolution = resolveDependencies(null,
+                Arrays.asList(new String[] { pkg.getName() }), null,
+                targetPlatform);
+        if (!resolution.isFailed() && !resolution.isEmpty()) {
+            List<String> idsToRemove = resolution.getOrderedPackageIdsToRemove();
+            idsToRemove.remove(pkg.getId());
+            for (String pkgIdToRemove : idsToRemove) {
+                packagesToUninstall.add(findPackageById(pkgIdToRemove,
+                        localSources));
+            }
+        }
+        return packagesToUninstall;
+    }
+
+    @Deprecated
+    @Override
     public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
         // This impl is clearly not very sharp
         List<String> pkgNamesToRemove = new ArrayList<String>();
@@ -712,7 +732,6 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-
         pkgNamesToRemove.remove(pkg.getName());
         List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
         for (String pkgName : pkgNamesToRemove) {
@@ -723,7 +742,6 @@ public class PackageManagerImpl implements PackageManager {
             }
 
         }
-
         return packagesToUninstall;
     }
 
@@ -825,18 +843,48 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<? extends Package> sort(List<? extends Package> pkgs) {
-        Collections.sort(pkgs, new Comparator<Package>() {
-            @Override
-            public int compare(Package arg0, Package arg1) {
-                if (!arg0.getType().equals(arg1.getType())) {
-                    return arg0.getType().compareTo(arg1.getType());
-                }
-                if (!arg0.getName().equals(arg1.getName())) {
-                    return arg0.getName().compareToIgnoreCase(arg1.getName());
-                }
-                return arg0.getVersion().compareTo(arg1.getVersion());
-            }
-        });
+        Collections.sort(pkgs, new PackageComparator());
         return pkgs;
+    }
+
+    @Override
+    public String getNonCompliant(List<String> packages, String targetPlatform)
+            throws PackageException {
+        for (String pkg : packages) {
+            if (!matchesPlatform(pkg, targetPlatform)) {
+                return pkg;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean matchesPlatform(String requestPkgStr, String targetPlatform)
+            throws PackageException {
+        Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
+        Map<String, List<DownloadablePackage>> allPackagesByName = getAllPackagesByName();
+        // Try ID match first
+        if (allPackagesByID.containsKey(requestPkgStr)) {
+            return allPackagesByID.get(requestPkgStr).getTargetPlatforms().length == 0
+                    || Arrays.asList(
+                            allPackagesByID.get(requestPkgStr).getTargetPlatforms()).contains(
+                            targetPlatform);
+        }
+        // Fallback on name match
+        List<DownloadablePackage> allPackagesForName = allPackagesByName.get(requestPkgStr);
+        if (allPackagesForName == null) {
+            throw new PackageException("Package not found: " + requestPkgStr);
+        }
+        for (DownloadablePackage pkg : allPackagesForName) {
+            if (requestPkgStr.equals(pkg.getName())) {
+                if (pkg.getTargetPlatforms().length == 0
+                        || Arrays.asList(pkg.getTargetPlatforms()).contains(
+                                targetPlatform)) {
+                    return true;
+                }
+            }
+        }
+        // No match or not compatible
+        return false;
     }
 }

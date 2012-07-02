@@ -100,6 +100,7 @@ public interface Package {
 
     /**
      * Gets the package life cycle status.
+     * @see PackageState
      */
     int getState();
 

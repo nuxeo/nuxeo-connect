@@ -27,6 +27,7 @@ import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.update.Package;
+import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
 import org.nuxeo.connect.update.Version;
@@ -242,8 +243,22 @@ public interface PackageManager extends BasePackageManager {
      * @param pkg the {@link Package} that is being uninstalled
      * @return List of all {@link DownloadablePackage} that must be uninstalled
      *         too
+     * @deprecated Since 1.4. Use
+     *             {@link #getUninstallDependencies(Package, String)} instead.
      */
+    @Deprecated
     List<DownloadablePackage> getUninstallDependencies(Package pkg);
+
+    /**
+     * @param pkg the {@link Package} that is being uninstalled
+     * @param targetPlatform If null, the constraint on target platform is
+     *            relaxed.
+     * @return List of all {@link DownloadablePackage} that must be uninstalled
+     *         too
+     * @since 1.4
+     */
+    List<DownloadablePackage> getUninstallDependencies(Package pkg,
+            String targetPlatform);
 
     /**
      * @return all the packages, in all versions, properly managing classifiers
@@ -342,5 +357,25 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4
      */
     List<? extends Package> sort(List<? extends Package> pkgs);
+
+    /**
+     * @param packages
+     * @param targetPlatform The target platform to be compliant with.
+     * @return First non compliant package found. Null if none.
+     * @throws PackageException
+     * @since 1.4
+     */
+    String getNonCompliant(List<String> packages, String targetPlatform)
+            throws PackageException;
+
+    /**
+     * @param requestPkgStr
+     * @param targetPlatform
+     * @return true if {@code requestPkgStr} is compliant with
+     *         {@code targetPlatform}
+     * @throws PackageException
+     */
+    boolean matchesPlatform(String requestPkgStr, String targetPlatform)
+            throws PackageException;
 
 }

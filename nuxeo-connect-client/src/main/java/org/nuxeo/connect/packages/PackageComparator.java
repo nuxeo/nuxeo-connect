@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,9 +12,10 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     Thierry Delprat, jcarsique
+ *     Julien Carsique
  *
  */
+
 package org.nuxeo.connect.packages;
 
 import java.util.Comparator;
@@ -24,13 +25,17 @@ import org.nuxeo.connect.update.Package;
 /**
  * Compares {@link Package} by ID (name+version)
  *
- * @since 1.3
+ * @since 1.4
  */
-public class VersionPackageComparator implements Comparator<Package> {
-
+public class PackageComparator implements Comparator<Package> {
     @Override
-    public int compare(Package p1, Package p2) {
-        return p1.getId().compareToIgnoreCase(p2.getId());
+    public int compare(Package arg0, Package arg1) {
+        if (!arg0.getType().equals(arg1.getType())) {
+            return arg0.getType().compareTo(arg1.getType());
+        }
+        if (!arg0.getName().equals(arg1.getName())) {
+            return arg0.getName().compareToIgnoreCase(arg1.getName());
+        }
+        return arg0.getVersion().compareTo(arg1.getVersion());
     }
-
 }
