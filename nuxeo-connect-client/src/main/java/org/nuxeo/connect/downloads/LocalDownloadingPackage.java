@@ -29,6 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,15 +64,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     protected File file = null;
 
     public LocalDownloadingPackage(PackageDescriptor descriptor) {
-        super();
-        this.classifier = descriptor.getClassifier();
-        this.description = descriptor.getDescription();
-        this.homePage = descriptor.getHomePage();
-        this.name = descriptor.getName();
-        this.targetPlatforms = descriptor.getTargetPlatforms();
-        this.title = descriptor.getTitle();
-        this.type = descriptor.getType();
-        this.version = descriptor.getVersion();
+        super(descriptor);
         this.sourceUrl = ConnectUrlConfig.getDownloadBaseUrl()
                 + descriptor.getSourceUrl();
         this.sourceDigest = descriptor.getSourceDigest();
@@ -88,13 +81,9 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     }
 
     protected void saveStreamAsFile(InputStream in) throws IOException {
-
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-
         String path = cdm.getDownloadedBundleLocalStorage();
-
         file = new File(path, getId());
-
         OutputStream out = null;
         try {
             out = new FileOutputStream(file);
@@ -135,7 +124,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         ProxyHelper.configureProxyIfNeeded(httpClient);
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
-
         try {
             if (!sourceUrl.contains("127.0.0.1:8082/test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
@@ -144,32 +132,28 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                 }
             }
             int rc = 0;
-            try {
-                rc = httpClient.executeMethod(method);
-                if (rc == 200) {
-                    if (sourceSize == 0) {
-                        Header clheader = method.getResponseHeader("content-length");
-                        if (clheader != null) {
-                            sourceSize = Long.parseLong(clheader.getValue());
-                        }
+            rc = httpClient.executeMethod(method);
+            if (rc == HttpStatus.SC_OK) {
+                if (sourceSize == 0) {
+                    Header clheader = method.getResponseHeader("content-length");
+                    if (clheader != null) {
+                        sourceSize = Long.parseLong(clheader.getValue());
                     }
-                    InputStream in = method.getResponseBodyAsStream();
-                    saveStreamAsFile(in);
-
-                    registerDownloadedPackage();
-                    ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-                    cdm.removeDownloadingPackage(getId());
-                    completed = true;
                 }
-            } catch (Exception e) {
-                throw new ConnectServerError(
-                        "Error during communication with the Nuxeo Connect Server",
-                        e);
-            } finally {
-                method.releaseConnection();
+                InputStream in = method.getResponseBodyAsStream();
+                saveStreamAsFile(in);
+                registerDownloadedPackage();
+                ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+                cdm.removeDownloadingPackage(getId());
+                completed = true;
+            } else {
+                throw new ConnectServerError("Connect server response code "
+                        + rc);
             }
         } catch (Exception e) {
-
+            log.error(
+                    "Error during communication with the Nuxeo Connect Server",
+                    e);
         } finally {
             method.releaseConnection();
         }

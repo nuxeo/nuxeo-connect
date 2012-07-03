@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -59,7 +59,9 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
-    public static final String CONNECT_REGISTRED_ROOT_PATH = "registred/";
+    public static final String CONNECT_REGISTERED_ROOT_PATH = "registred/";
+
+    public static final String CONNECT_UNREGISTERED_ROOT_PATH = "unregistered/";
 
     public static String getBaseUrl() {
         if (NuxeoConnectClient.isTestModeSet()) {
@@ -78,12 +80,21 @@ public class ConnectUrlConfig {
         return getBaseUrl() + CONNECT_ROOT_PATH;
     }
 
+    /**
+     * @since 1.4
+     */
     public static String getRegistredBaseUrl() {
-        return getRegistrationBaseUrl() + CONNECT_REGISTRED_ROOT_PATH;
+        return getRegistrationBaseUrl() + CONNECT_REGISTERED_ROOT_PATH;
+    }
+
+    /**
+     * @since 1.4
+     */
+    public static String getUnregisteredBaseUrl() {
+        return getRegistrationBaseUrl() + CONNECT_UNREGISTERED_ROOT_PATH;
     }
 
     // Proxy settings management
-
     protected static Boolean useProxy = null;
 
     protected static Boolean isProxyAuthenticated = null;

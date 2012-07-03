@@ -31,8 +31,8 @@ import org.nuxeo.connect.update.PackageType;
 public class TestFakeConnector extends TestCase {
 
     public void testFakeConnector() throws Exception {
-
-        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier("toto--titi", "myInstance");
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
+                "toto--titi", "myInstance");
         CLID.save();
 
         ConnectConnector connector = new ConnectTestConnector();
@@ -42,13 +42,11 @@ public class TestFakeConnector extends TestCase {
         assertNotNull(status);
         assertEquals("active", status.getContractStatus());
 
-
         List<DownloadablePackage> packages = connector.getDownloads(PackageType.HOT_FIX);
         assertNotNull(packages);
         assertEquals(2, packages.size());
         assertEquals("hot fix 1", packages.get(0).getTitle());
         assertEquals(PackageType.HOT_FIX, packages.get(0).getType());
-
 
         packages = connector.getDownloads(PackageType.STUDIO);
         assertNotNull(packages);

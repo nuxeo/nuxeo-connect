@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,35 +12,31 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
+ *     Julien Carsique
  *
- * $Id$
  */
 
-package org.nuxeo.connect.packages;
+package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.update.Package;
-import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.packages.PackageManager;
 
 /**
- * Interface for {@link Package} sources: classes providing access to
- * {@link Package}.
- * 
- * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ * @since 1.4
  */
-public interface PackageSource {
+public class TestUninstallCheckP2CUDF extends TestUninstallCheck {
 
-    String getName();
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
+    }
 
-    String getId();
-
-    List<DownloadablePackage> listPackages();
-
-    List<DownloadablePackage> listPackages(PackageType type);
-
-    void flushCache();
+    @Override
+    protected List<DownloadablePackage> performUninstall(DownloadablePackage pkg) {
+        return pm.getUninstallDependencies(pkg, null);
+    }
 
 }

@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
@@ -43,6 +44,7 @@ import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -117,22 +119,23 @@ public class PackageManagerImpl implements PackageManager {
     protected List<DownloadablePackage> doMergePackages(
             List<PackageSource> sources, PackageType type, String targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type);
-        Map<String, DownloadablePackage> packagesByName = new HashMap<String, DownloadablePackage>();
+        Map<String, DownloadablePackage> packagesByVisibilityAndName = new HashMap<String, DownloadablePackage>();
         for (DownloadablePackage pkg : allPackages) {
             if ((targetPlatform == null)
                     || (Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform))) {
-                String name = pkg.getName();
-                if (packagesByName.containsKey(name)) {
-                    DownloadablePackage other = packagesByName.get(name);
+                String key = pkg.getVisibility() + "-" + pkg.getName();
+                if (packagesByVisibilityAndName.containsKey(key)) {
+                    DownloadablePackage other = packagesByVisibilityAndName.get(key);
                     if (pkg.getVersion().greaterThan(other.getVersion())) {
-                        packagesByName.put(name, pkg);
+                        packagesByVisibilityAndName.put(key, pkg);
                     }
                 } else {
-                    packagesByName.put(name, pkg);
+                    packagesByVisibilityAndName.put(key, pkg);
                 }
             }
         }
-        return new ArrayList<DownloadablePackage>(packagesByName.values());
+        return new ArrayList<DownloadablePackage>(
+                packagesByVisibilityAndName.values());
     }
 
     /**
@@ -270,14 +273,16 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public DownloadablePackage findPackageById(String packageId) {
-        for (PackageSource source : localSources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getId().equals(packageId)) {
-                    return pkg;
-                }
-            }
+        DownloadablePackage pkg = findPackageById(packageId, localSources);
+        if (pkg == null) {
+            pkg = findPackageById(packageId, remoteSources);
         }
-        for (PackageSource source : remoteSources) {
+        return pkg;
+    }
+
+    public DownloadablePackage findPackageById(String packageId,
+            List<PackageSource> sources) {
+        for (PackageSource source : sources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getId().equals(packageId)) {
                     return pkg;
@@ -352,7 +357,6 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public List<DownloadablePackage> searchPackages(String searchExpr) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -414,7 +418,6 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-
         Collections.sort(result, new VersionPackageComparator());
         return result;
     }
@@ -528,7 +531,6 @@ public class PackageManagerImpl implements PackageManager {
             return;
         }
         LocalPackage pkg = pus.getPackage(packageId);
-
         Task installationTask = pkg.getInstallTask();
         installationTask.validate();
         installationTask.run(params);
@@ -581,9 +583,7 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public DownloadablePackage getPackage(String pkgId) {
-        // Merge is an issue for P2CUDFDependencyResolver, try with
-        // listAllPackages() instead of listPackages()
-        // List<DownloadablePackage> pkgs = listPackages();
+        // Merge is an issue for P2CUDFDependencyResolver
         List<DownloadablePackage> pkgs = listAllPackages();
         DownloadablePackage pkg = getPkgInList(pkgs, pkgId);
         if (pkg == null) {
@@ -598,11 +598,9 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type) {
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         List<DownloadablePackage> all = listPackages(type);
         List<DownloadablePackage> remotes = listRemotePackages(type);
-
         for (DownloadablePackage pkg : all) {
             for (DownloadablePackage remote : remotes) {
                 if (remote.getName().equals(pkg.getName())) {
@@ -696,6 +694,25 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
+    public List<DownloadablePackage> getUninstallDependencies(Package pkg,
+            String targetPlatform) {
+        List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
+        DependencyResolution resolution = resolveDependencies(null,
+                Arrays.asList(new String[] { pkg.getName() }), null,
+                targetPlatform);
+        if (!resolution.isFailed() && !resolution.isEmpty()) {
+            List<String> idsToRemove = resolution.getOrderedPackageIdsToRemove();
+            idsToRemove.remove(pkg.getId());
+            for (String pkgIdToRemove : idsToRemove) {
+                packagesToUninstall.add(findPackageById(pkgIdToRemove,
+                        localSources));
+            }
+        }
+        return packagesToUninstall;
+    }
+
+    @Deprecated
+    @Override
     public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
         // This impl is clearly not very sharp
         List<String> pkgNamesToRemove = new ArrayList<String>();
@@ -715,7 +732,6 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-
         pkgNamesToRemove.remove(pkg.getName());
         List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
         for (String pkgName : pkgNamesToRemove) {
@@ -726,7 +742,6 @@ public class PackageManagerImpl implements PackageManager {
             }
 
         }
-
         return packagesToUninstall;
     }
 
@@ -818,5 +833,58 @@ public class PackageManagerImpl implements PackageManager {
         for (String id : orderedMap.keySet()) {
             orderedList.add(id);
         }
+    }
+
+    @Override
+    public void cancelDownload(String pkgId) {
+        ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+        cdm.removeDownloadingPackage(pkgId);
+    }
+
+    @Override
+    public List<? extends Package> sort(List<? extends Package> pkgs) {
+        Collections.sort(pkgs, new PackageComparator());
+        return pkgs;
+    }
+
+    @Override
+    public String getNonCompliant(List<String> packages, String targetPlatform)
+            throws PackageException {
+        for (String pkg : packages) {
+            if (!matchesPlatform(pkg, targetPlatform)) {
+                return pkg;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean matchesPlatform(String requestPkgStr, String targetPlatform)
+            throws PackageException {
+        Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
+        Map<String, List<DownloadablePackage>> allPackagesByName = getAllPackagesByName();
+        // Try ID match first
+        if (allPackagesByID.containsKey(requestPkgStr)) {
+            return allPackagesByID.get(requestPkgStr).getTargetPlatforms().length == 0
+                    || Arrays.asList(
+                            allPackagesByID.get(requestPkgStr).getTargetPlatforms()).contains(
+                            targetPlatform);
+        }
+        // Fallback on name match
+        List<DownloadablePackage> allPackagesForName = allPackagesByName.get(requestPkgStr);
+        if (allPackagesForName == null) {
+            throw new PackageException("Package not found: " + requestPkgStr);
+        }
+        for (DownloadablePackage pkg : allPackagesForName) {
+            if (requestPkgStr.equals(pkg.getName())) {
+                if (pkg.getTargetPlatforms().length == 0
+                        || Arrays.asList(pkg.getTargetPlatforms()).contains(
+                                targetPlatform)) {
+                    return true;
+                }
+            }
+        }
+        // No match or not compatible
+        return false;
     }
 }

@@ -26,7 +26,7 @@ import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
  * Service interface to manage downloads of packages from Connect Site.
- *
+ * 
  * @author tiry
  */
 public interface ConnectDownloadManager {

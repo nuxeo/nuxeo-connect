@@ -264,11 +264,14 @@ public class DependencyResolution {
         } else if (!isEmpty()) {
             sb.append("\nDependency resolution:\n");
             append(sb, orderedInstallablePackages, "  Installation order: ");
-            append(sb, localUnchangedPackages, "  Unchanged packages: ");
             append(sb, orderedRemovablePackages, "  Uninstallation order: ");
-            append(sb, newPackagesToDownload, "  Remote packages to install: ");
-            append(sb, localPackagesToInstall, "  Local packages to install: ");
+            append(sb, localUnchangedPackages, "  Unchanged packages: ");
             append(sb, localPackagesToUpgrade, "  Packages to upgrade: ");
+            StringBuffer sb2 = new StringBuffer();
+            append(sb2, newPackagesToDownload, "  Remote packages to install: ");
+            append(sb2, localPackagesToInstall, "  Local packages to install: ");
+            append(sb2, localPackagesToRemove, "  Local packages to remove: ");
+            log.debug(sb2);
         }
         return sb.toString();
     }

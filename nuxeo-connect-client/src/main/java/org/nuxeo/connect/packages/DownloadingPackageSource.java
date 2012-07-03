@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -37,30 +37,29 @@ import org.nuxeo.connect.update.PackageType;
  */
 public class DownloadingPackageSource implements PackageSource {
 
-    protected static final Log log = LogFactory
-            .getLog(DownloadingPackageSource.class);
+    protected static final Log log = LogFactory.getLog(DownloadingPackageSource.class);
 
     public String getName() {
         return "Downloading";
     }
 
-    public List<DownloadablePackage> listPackages() {
+    public String getId() {
+        return "downloading";
+    }
 
+    public List<DownloadablePackage> listPackages() {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-
         List<DownloadingPackage> pkgs = cdm.listDownloadingPackages();
         for (DownloadablePackage pkg : pkgs) {
             result.add(pkg);
         }
-
         return result;
     }
 
     public List<DownloadablePackage> listPackages(PackageType type) {
         List<DownloadablePackage> all = listPackages();
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (DownloadablePackage pkg : all) {
             if (pkg.getType().equals(type)) {
                 result.add(pkg);

@@ -19,6 +19,7 @@ package org.nuxeo.connect.pm.tests;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.update.PackageState;
 
 public class TestUninstallCheck extends AbstractPackageManagerTestCase {
 
@@ -26,28 +27,30 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
     public void setUp() throws Exception {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("localuninstall.json");
-
         assertNotNull(local);
         assertTrue(local.size() > 0);
-
         pm.registerSource(new DummyPackageSource(local, false), true);
     }
 
     public void testUninstallDependencies() throws Exception {
         DownloadablePackage pkg = pm.getPackage("A-1.0.0");
         assertNotNull(pkg);
-
-        List<DownloadablePackage> pkgToRemove = pm.getUninstallDependencies(pkg);
+        List<DownloadablePackage> pkgToRemove = performUninstall(pkg);
         log.info(pkgToRemove);
-
+        assertFalse(pkgToRemove.contains(pkg));
         assertTrue(pkgToRemove.contains(pm.getPackage("B-1.0.0")));
         assertTrue(pkgToRemove.contains(pm.getPackage("C-1.0.0")));
         assertTrue(pkgToRemove.contains(pm.getPackage("D-1.0.0")));
         assertTrue(pkgToRemove.contains(pm.getPackage("E-1.0.0")));
         assertFalse(pkgToRemove.contains(pm.getPackage("F-1.0.0")));
-
         assertFalse(pkgToRemove.contains(pm.getPackage("G-1.0.0")));
-        assertTrue(pkgToRemove.contains(pm.getPackage("H-1.0.0")));
+        assertTrue(pm.getPackage("H-1.0.0").getState() != PackageState.INSTALLED
+                || pkgToRemove.contains(pm.getPackage("H-1.0.0")));
+    }
+
+    @SuppressWarnings("deprecation")
+    protected List<DownloadablePackage> performUninstall(DownloadablePackage pkg) {
+        return pm.getUninstallDependencies(pkg);
     }
 
 }

@@ -57,6 +57,7 @@ public interface PackageUpdateService {
      *
      * @param id
      * @param state
+     * @see PackageState
      */
     void setPackageState(LocalPackage pkg, int state) throws PackageException;
 

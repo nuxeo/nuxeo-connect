@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -45,26 +45,25 @@ public class LocalPackageSource implements PackageSource {
         return "Local";
     }
 
+    public String getId() {
+        return "local";
+    }
+
     public List<DownloadablePackage> listPackages() {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
-
         if (pus == null) {
             log.error("Unable to locate PackageUpdateService");
             return result;
         }
-
         try {
             List<LocalPackage> pkgs = pus.getPackages();
-
             for (LocalPackage pkg : pkgs) {
                 result.add(new LocalPackageAsDownloadablePackage(pkg));
             }
         } catch (PackageException e) {
             log.error("Error when getting local packages", e);
         }
-
         return result;
     }
 
@@ -73,15 +72,12 @@ public class LocalPackageSource implements PackageSource {
         if (type == null) {
             return all;
         }
-
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (DownloadablePackage pkg : all) {
-            if (pkg.getType()!=null && pkg.getType().equals(type)) {
+            if (pkg.getType() != null && pkg.getType().equals(type)) {
                 result.add(pkg);
             }
         }
-
         return result;
     }
 

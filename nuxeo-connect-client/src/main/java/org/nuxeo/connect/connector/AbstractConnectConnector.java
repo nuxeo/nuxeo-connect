@@ -43,6 +43,7 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
+import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
 import org.nuxeo.connect.update.PackageType;
 
@@ -74,7 +75,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
 
     protected String getBaseUrl() {
-        return ConnectUrlConfig.getRegistredBaseUrl();
+        if (LogicalInstanceIdentifier.isRegistered()) {
+            return ConnectUrlConfig.getRegistredBaseUrl();
+        }
+        return ConnectUrlConfig.getUnregisteredBaseUrl();
     }
 
     /**
@@ -98,12 +102,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             }
             cachePrefix = cachePrefix
                     + connectUrl.getPath().replaceAll("/", "#");
-            String cacheFileName = cachePrefix + "_" + type.toString()
-                    + ".json";
+            String cacheFileName = cachePrefix + "_" + type + ".json";
             return new File(cacheDir, cacheFileName);
         } catch (MalformedURLException e) {
-            String fallbackFileName = connectUrlString + "_" + type.toString()
-                    + ".json";
+            String fallbackFileName = connectUrlString + "_" + type + ".json";
             return new File(cacheDir, fallbackFileName);
         }
     }
@@ -114,23 +116,20 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             File cacheFile = getCacheFileFor(type);
             FileUtils.deleteQuietly(cacheFile);
         }
+        FileUtils.deleteQuietly(getCacheFileFor(null));
     }
 
     protected ConnectServerResponse execCall(String url)
             throws ConnectServerError {
-        Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
-        return execServerCall(url, headers);
+        return execServerCall(url, SecurityHeaderGenerator.getHeaders());
     }
 
     protected abstract ConnectServerResponse execServerCall(String url,
             Map<String, String> headers) throws ConnectServerError;
 
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
-
         String url = getBaseUrl() + GET_STATUS_SUFFIX;
-
         ConnectServerResponse response = execCall(url);
-
         String json = response.getString();
         if (json == null) {
             throw new ConnectServerError("null response from server");
@@ -139,8 +138,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             return AbstractJSONSerializableData.loadFromJSON(
                     SubscriptionStatus.class, json);
         } catch (Throwable t) {
-            throw new ConnectServerError("Unable to parse response : " + json,
-                    t);
+            throw new ConnectServerError("Unable to parse response: " + json, t);
         } finally {
             response.release();
         }
@@ -185,7 +183,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         } else {
             cacheMaxAge = Long.parseLong(cacheTimeString) * 60 * 1000;
         }
-        if (type == PackageType.STUDIO) {
+        if (type == null || type == PackageType.STUDIO) {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }
         File cacheFile = getCacheFileFor(type);
@@ -212,8 +210,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
 
         if (json == null) { // Fallback on the real source
-            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/"
-                    + type.getValue();
+            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + type;
             ConnectServerResponse response = execCall(url);
             json = response.getString();
             response.release();
@@ -236,5 +233,4 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
         return result;
     }
-
 }

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,13 +43,12 @@ import org.nuxeo.connect.update.PackageType;
 
 /**
  *
- * Real HTTP based {@link ConnectConnector} implementation.
- * Manages communication with the Nuxeo Connect Server via JAX-RS
+ * Real HTTP based {@link ConnectConnector} implementation. Manages
+ * communication with the Nuxeo Connect Server via JAX-RS
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class ConnectHttpConnector extends AbstractConnectConnector implements
-        ConnectConnector {
+public class ConnectHttpConnector extends AbstractConnectConnector {
 
     public String overrideUrl = null;
 
@@ -91,11 +91,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
         int rc = 0;
         try {
             rc = httpClient.executeMethod(method);
-            if (rc == 200) {
+            if (rc == HttpStatus.SC_OK) {
                 return new ConnectHttpResponse(httpClient, method);
             } else {
                 String body = method.getResponseBodyAsString();
-                if (rc == 401) {
+                if (rc == HttpStatus.SC_UNAUTHORIZED) {
                     throw new ConnectSecurityError(
                             "Connect server refused authentication (returned 401)");
                 }
@@ -115,7 +115,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector implements
                     }
                     throw error;
                 } catch (JSONException e) {
-                    log.error("Unable to parse error returned by server", e);
+                    log.debug("Can't parse server error " + rc, e);
                     throw new ConnectServerError("Server returned a code " + rc);
                 }
             }

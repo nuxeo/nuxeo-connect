@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2011 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -31,7 +31,7 @@ public class NuxeoConnectClient {
 
     protected static final Log log = LogFactory.getLog(NuxeoConnectClient.class);
 
-    protected static final String PROTOCOL_VERSION = "1.0";
+    protected static final String PROTOCOL_VERSION = "1.4";
 
     protected static String buildVersion = null;
 
@@ -80,7 +80,6 @@ public class NuxeoConnectClient {
     public static void resetPackageManager() {
         packageManager = null;
     }
-
 
     public static boolean isTestModeSet() {
         return cbHolder.isTestModeSet();

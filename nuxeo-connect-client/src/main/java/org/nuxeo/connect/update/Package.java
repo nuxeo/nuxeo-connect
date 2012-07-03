@@ -22,8 +22,10 @@ package org.nuxeo.connect.update;
 public interface Package {
 
     /**
-     * The package unique id. This is composed by the package name and version:
-     * <code>name-version</code>.
+     * Get the package unique ID.
+     *
+     * The ID is composed by the package name and version:
+     * <code>name-version</code>
      */
     String getId();
 
@@ -45,10 +47,11 @@ public interface Package {
     /**
      * The package type: addon, hotfix, etc.
      */
-    PackageType getType(); // TODO use enum
+    PackageType getType();
 
     /**
-     * Get the package vendor ID.
+     * Get the package vendor ID. The vendor represent the entity providing the
+     * package.
      */
     String getVendor();
 
@@ -63,34 +66,49 @@ public interface Package {
     String[] getTargetPlatforms();
 
     /**
-     * Gets the list of dependencies of this package. If no dependency
-     * exists,
-     * either null or an empty array is returned.
+     * Gets the list of package dependencies for this package. If no dependency
+     * exists, either null or an empty array is returned.
+     *
+     * @see PackageDependency
+     * @see #getConflicts()
+     * @see #getProvides()
      */
     PackageDependency[] getDependencies();
 
     /**
      * Gets the list of conflicts of this package. If no conflict
-     * exists,
-     * either null or an empty array is returned.
+     * exists, either null or an empty array is returned.
+     *
+     * @see PackageDependency
+     * @see #getDependencies()
+     * @see #getProvides()
+     *
+     * @since 1.3.3
      */
     PackageDependency[] getConflicts();
 
     /**
      * Gets the list of provides of this package. If no provide
-     * exists,
-     * either null or an empty array is returned.
+     * exists, either null or an empty array is returned.
+     *
+     * @see PackageDependency
+     * @see #getDependencies()
+     * @see #getConflicts()
+     * @since 1.3.3
      */
     PackageDependency[] getProvides();
 
     /**
      * Gets the package life cycle status.
+     * @see PackageState
      */
     int getState();
 
     /**
      * Get the URL where more information can be found about this package. Can
      * be null.
+     *
+     * @return The package web page URL. May be null.
      */
     String getHomePage();
 
@@ -137,5 +155,12 @@ public interface Package {
      * Test if the package is supported by Nuxeo
      */
     boolean isSupported();
+
+    /**
+     * The package visibility: marketplace, dev, public
+     *
+     * @since 1.4
+     */
+    PackageVisibility getVisibility();
 
 }

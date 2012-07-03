@@ -30,7 +30,13 @@ import org.nuxeo.connect.update.PackageType;
  */
 public interface ConnectConnector {
 
-    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
+    /**
+     * @param type Can be null since 1.4
+     * @return All type packages or all packages if type is null.
+     * @throws ConnectServerError
+     */
+    List<DownloadablePackage> getDownloads(PackageType type)
+            throws ConnectServerError;
 
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 

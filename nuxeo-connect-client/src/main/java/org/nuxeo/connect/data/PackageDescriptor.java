@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.data;
@@ -28,8 +27,10 @@ import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 import org.nuxeo.connect.update.NuxeoValidationState;
+import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
@@ -117,7 +118,34 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected boolean supportsHotReload;
 
-    @JSONExportMethod(name="dependencies")
+    @JSONExportableField
+    protected PackageVisibility visibility;
+
+    /**
+     * @since 1.10
+     */
+    public PackageDescriptor(Package descriptor) {
+        super();
+        this.classifier = descriptor.getClassifier();
+        // TODO NXP-9432 conflicts, dependencies?
+        this.description = descriptor.getDescription();
+        this.homePage = descriptor.getHomePage();
+        // TODO NXP-9432 licenseType, licenseUrl?
+        this.name = descriptor.getName();
+        // TODO NXP-9432 productionState, provides, state?
+        this.targetPlatforms = descriptor.getTargetPlatforms();
+        this.title = descriptor.getTitle();
+        this.type = descriptor.getType();
+        // TODO NXP-9432 validationState, vendor?
+        this.version = descriptor.getVersion();
+        this.visibility = descriptor.getVisibility();
+    }
+
+    public PackageDescriptor() {
+        super();
+    }
+
+    @JSONExportMethod(name = "dependencies")
     protected JSONArray getDependenciesAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getDependencies()) {
@@ -126,7 +154,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="dependencies")
+    @JSONImportMethod(name = "dependencies")
     protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -135,7 +163,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setDependencies(deps);
     }
 
-    @JSONExportMethod(name="conflicts")
+    @JSONExportMethod(name = "conflicts")
     protected JSONArray getConflictsAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getConflicts()) {
@@ -144,7 +172,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="conflicts")
+    @JSONImportMethod(name = "conflicts")
     protected void setConflictsAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -153,7 +181,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setConflicts(deps);
     }
 
-    @JSONExportMethod(name="provides")
+    @JSONExportMethod(name = "provides")
     protected JSONArray getProvidesAsJSON() {
         JSONArray deps = new JSONArray();
         for (PackageDependency dep : getProvides()) {
@@ -162,7 +190,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return deps;
     }
 
-    @JSONImportMethod(name="provides")
+    @JSONImportMethod(name = "provides")
     protected void setProvidesAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -171,7 +199,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setProvides(deps);
     }
 
-    @JSONImportMethod(name="targetPlatforms")
+    @JSONImportMethod(name = "targetPlatforms")
     public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
         String[] targets = new String[array.length()];
         for (int i = 0; i < array.length(); i++) {
@@ -182,7 +210,12 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @JSONImportMethod(name = "type")
     public void setTypeAsJSON(String strType) {
-        type=PackageType.getByValue(strType);
+        type = PackageType.getByValue(strType);
+    }
+
+    @JSONImportMethod(name = "visibility")
+    public void setVisibilityAsJSON(String strVisibility) {
+        visibility = PackageVisibility.valueOf(strVisibility);
     }
 
     @JSONImportMethod(name = "version")
@@ -192,7 +225,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @JSONImportMethod(name = "productionState")
     public void setProductionStateAsJSON(String state) {
-       productionState = ProductionState.getByValue(state);
+        productionState = ProductionState.getByValue(state);
     }
 
     @JSONImportMethod(name = "nuxeoValidationState")
@@ -232,50 +265,61 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.rating = rating;
     }
 
+    @Override
     public String getHomePage() {
         return homePage;
     }
 
+    @Override
     public String getClassifier() {
         return classifier;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public String getId() {
-        if (getVersion()==null) {
+        if (getVersion() == null) {
             return getName();
         } else {
             return getName() + "-" + getVersion();
         }
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getVendor() {
         return vendor;
     }
 
+    @Override
     public int getState() {
         return state;
     }
 
+    @Override
     public String getLicenseType() {
         return license;
     }
 
+    @Override
     public String getLicenseUrl() {
         return licenseUrl;
     }
 
+    @Override
     public String[] getTargetPlatforms() {
         return targetPlatforms;
     }
 
+    @Override
     public PackageDependency[] getDependencies() {
         if (dependencies == null) {
             return new PackageDependency[0];
@@ -283,12 +327,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return dependencies;
     }
 
+    @Override
     public PackageDependency[] getConflicts() {
         if (conflicts == null) {
             return new PackageDependency[0];
         }
         return conflicts;
     }
+
+    @Override
     public PackageDependency[] getProvides() {
         if (provides == null) {
             return new PackageDependency[0];
@@ -296,40 +343,54 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return provides;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
+    @Override
     public PackageType getType() {
         return type;
     }
 
+    @Override
     public Version getVersion() {
         return version;
     }
 
+    @Override
     public boolean isLocal() {
         return false;
     }
 
+    @Override
     public String getSourceDigest() {
         return sourceDigest;
     }
 
+    @Override
     public String getSourceUrl() {
         return sourceUrl;
     }
 
+    @Override
     public long getSourceSize() {
         return sourceSize;
     }
 
+    /**
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)}
+     *             instead.
+     */
     @Deprecated
     public static PackageDescriptor loadFromJSON(JSONObject json)
             throws JSONException {
-        return PackageDescriptor.loadFromJSON(PackageDescriptor.class, json);
+        return loadFromJSON(PackageDescriptor.class, json);
     }
 
+    /**
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
+     */
     @Deprecated
     public static PackageDescriptor loadFromJSON(String json)
             throws JSONException {
@@ -442,18 +503,22 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return sb.toString();
     }
 
+    @Override
     public int getCommentsNumber() {
         return commentsNumber;
     }
 
+    @Override
     public String getPictureUrl() {
         return pictureUrl;
     }
 
+    @Override
     public int getRating() {
         return rating;
     }
 
+    @Override
     public int getDownloadsCount() {
         return downloadsCount;
     }
@@ -465,7 +530,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public ProductionState getProductionState() {
-        if (productionState==null) {
+        if (productionState == null) {
             return ProductionState.TESTING;
         } else {
             return productionState;
@@ -474,7 +539,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public NuxeoValidationState getValidationState() {
-        if (nuxeoValidationState==null) {
+        if (nuxeoValidationState == null) {
             return NuxeoValidationState.NONE;
         } else {
             return nuxeoValidationState;
@@ -495,7 +560,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.productionState = productionState;
     }
 
-    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
+    public void setNuxeoValidationState(
+            NuxeoValidationState nuxeoValidationState) {
         this.nuxeoValidationState = nuxeoValidationState;
     }
 
@@ -505,6 +571,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public void setSupportsHotReload(boolean supportsHotReload) {
         this.supportsHotReload = supportsHotReload;
+    }
+
+    @Override
+    public PackageVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(PackageVisibility visibility) {
+        this.visibility = visibility;
     }
 
 }

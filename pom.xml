@@ -660,9 +660,9 @@
   </developers>
 
   <scm>
-    <connection>scm:hg:http://hg.nuxeo.org/nuxeo-connect</connection>
-    <developerConnection>scm:hg:https://hg.nuxeo.org/nuxeo-connect</developerConnection>
-    <url>http://hg.nuxeo.org/nuxeo-connect/</url>
+    <connection>scm:git:git://github.com/nuxeo/nuxeo-connect.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:nuxeo/nuxeo-connect.git</developerConnection>
+    <url>https://github.com/nuxeo/nuxeo-connect</url>
   </scm>
 
   <repositories>

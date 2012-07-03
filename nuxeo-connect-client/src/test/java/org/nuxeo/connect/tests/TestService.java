@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.tests;
@@ -25,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
-import org.nuxeo.connect.connector.fake.UnregistredFakeConnector;
 import org.nuxeo.connect.connector.http.ConnectHttpConnector;
 import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.connector.test.ConnectTestConnector;
@@ -56,63 +54,48 @@ public class TestService extends TestCase {
 
     public void testServiceAsUnregistered() {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
         assertFalse(crs.isInstanceRegistred());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-
-        assertTrue(connector instanceof UnregistredFakeConnector);
+        // assertTrue(connector instanceof UnregistredFakeConnector);
+        assertTrue(connector instanceof ConnectHttpConnector);
     }
 
-    public void testServiceAsRegistred() throws Exception {
+    public void testServiceAsRegistered() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
         assertFalse(crs.isInstanceRegistred());
 
         crs.localRegisterInstance("toto--titi", "my test server");
-
         assertTrue(crs.isInstanceRegistred());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-
         assertTrue(connector instanceof ConnectHttpConnector);
     }
 
     public void testServiceAsTest() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
         assertFalse(crs.isInstanceRegistred());
 
         ConnectGatewayComponent.testConnector = new ConnectTestConnector();
-
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-
         assertTrue(connector instanceof ConnectTestConnector);
     }
 
     public void testDownloadService() throws Exception {
-
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
         assertNotNull(cdm);
-
     }
 
     public void testPackageManagerSimple() throws Exception {
-
         PackageManager pm = NuxeoConnectClient.getPackageManager();
         assertNotNull(pm);
 
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
         crs.localRegisterInstance("toto--titi", "my test server");
-
         ConnectGatewayComponent.testConnector = new ConnectTestConnector();
         ConnectGatewayComponent.testConnector.flushCache();
-
         List<DownloadablePackage> pkgs = pm.listPackages();
-
         assertEquals(3, pkgs.size());
-
     }
 
 }

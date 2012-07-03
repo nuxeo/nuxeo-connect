@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,7 +32,8 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo Connect Server.
+ * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo
+ * Connect Server.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -44,6 +45,10 @@ public class RemotePackageSource implements PackageSource {
 
     public String getName() {
         return "Connect Server";
+    }
+
+    public String getId() {
+        return "remote";
     }
 
     public RemotePackageSource() {
@@ -61,23 +66,20 @@ public class RemotePackageSource implements PackageSource {
     public List<DownloadablePackage> listPackages(PackageType type) {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-
-        if (crs.isInstanceRegistred()) {
-            try {
-                List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
-                if (pkgs == null) {
-                    pkgs = crs.getConnector().getDownloads(type);
-                    cache.add(pkgs, type.toString());
-                }
-                for (DownloadablePackage pkg : pkgs) {
-                    result.add(pkg);
-                }
-            } catch (ConnectServerError e) {
-                log.error("Unable to fetch remote packages list", e);
-                // store an empty list to avoid calling back the server
-                // since anyway we probably have no connection ...
-                cache.add(new ArrayList<DownloadablePackage>(), type.toString());
+        try {
+            List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
+            if (pkgs == null) {
+                pkgs = crs.getConnector().getDownloads(type);
+                cache.add(pkgs, type.toString());
             }
+            for (DownloadablePackage pkg : pkgs) {
+                result.add(pkg);
+            }
+        } catch (ConnectServerError e) {
+            log.error("Unable to fetch remote packages list", e);
+            // store an empty list to avoid calling back the server
+            // since anyway we probably have no connection ...
+            cache.add(new ArrayList<DownloadablePackage>(), type.toString());
         }
         return result;
     }
