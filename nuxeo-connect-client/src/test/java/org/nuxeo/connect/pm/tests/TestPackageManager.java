@@ -25,7 +25,6 @@ import org.nuxeo.connect.update.PackageState;
 public class TestPackageManager extends AbstractPackageManagerTestCase {
 
     public void testPM() throws Exception {
-
         List<DownloadablePackage> local = getDownloads("local1.json");
         List<DownloadablePackage> remote = getDownloads("remote1.json");
 
@@ -64,7 +63,6 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
     }
 
     public void testPMLocalOverride() throws Exception {
-
         List<DownloadablePackage> local = getDownloads("local2.json");
         List<DownloadablePackage> remote = getDownloads("remote2.json");
 
@@ -89,7 +87,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         assertEquals(4, all.size());
 
         DownloadablePackage downloading = all.get(1);
-        assertEquals(2, downloading.getState());
+        assertEquals(PackageState.DOWNLOADING, downloading.getState());
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
@@ -103,8 +101,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         dumpPkgList("remoteOrLocal", remoteOrLocal);
         assertEquals(3, remoteOrLocal.size());
         downloading = remoteOrLocal.get(1);
-        assertEquals(2, downloading.getState());
-
+        assertEquals(PackageState.INSTALLED, downloading.getState());
     }
 
     public void testUpdateListing() throws Exception {
@@ -137,6 +134,5 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
                     || (update.getState() == PackageState.INSTALLED)
                     || (update.getState() == PackageState.STARTED));
         }
-
     }
 }
