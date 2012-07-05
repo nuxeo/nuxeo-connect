@@ -106,7 +106,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                     ConnectServerError error;
                     if (ConnectSecurityError.class.getSimpleName().equals(
                             errorClass)) {
-                        error = new ConnectServerError(message);
+                        error = new ConnectSecurityError(message);
                     } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(
                             errorClass)) {
                         error = new ConnectClientVersionMismatchError(message);

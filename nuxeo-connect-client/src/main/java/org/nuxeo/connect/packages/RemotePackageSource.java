@@ -76,9 +76,10 @@ public class RemotePackageSource implements PackageSource {
                 result.add(pkg);
             }
         } catch (ConnectServerError e) {
-            log.error("Unable to fetch remote packages list", e);
+            log.debug(e, e);
+            log.error("Unable to fetch remote packages list");
             // store an empty list to avoid calling back the server
-            // since anyway we probably have no connection ...
+            // since anyway we probably have no connection...
             cache.add(new ArrayList<DownloadablePackage>(), type.toString());
         }
         return result;
