@@ -125,10 +125,18 @@ public class PackageManagerImpl implements PackageManager {
             if (targetPlatform == null
                     || Arrays.asList(pkg.getTargetPlatforms()).contains(
                             targetPlatform)) {
-                // If targetPlatform == null, keep greater version per
-                // targetPlatform
                 String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
                         : pkg.getTargetPlatforms();
+                if (targetPlatform != null) {
+                    targetPlatforms = new String[] { targetPlatform };
+                } else {
+                    // keep greater version per package's targetPlatform
+                    targetPlatforms = pkg.getTargetPlatforms();
+                    if (targetPlatforms == null) {
+                        // if the package doesn't specify any target platform
+                        targetPlatforms = new String[] { null };
+                    }
+                }
                 for (String tp : targetPlatforms) {
                     Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
                     if (packagesById == null) {
