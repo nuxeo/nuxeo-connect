@@ -38,7 +38,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> remotes = pm.listRemotePackages();
         dumpPkgList("remote", remotes);
-        assertEquals(4, remotes.size());
+        assertEquals(5, remotes.size());
 
         List<DownloadablePackage> locals = pm.listLocalPackages();
         dumpPkgList("local", locals);
@@ -46,7 +46,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> all = pm.listPackages();
         dumpPkgList("all", all);
-        assertEquals(5, all.size());
+        assertEquals(7, all.size());
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
@@ -54,7 +54,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages();
         dumpPkgList("remoteOnly", remoteOnly);
-        assertEquals(3, remoteOnly.size());
+        assertEquals(4, remoteOnly.size());
 
         List<DownloadablePackage> studioOnly = pm.listAllStudioRemotePackages();
         dumpPkgList("studioOnly", studioOnly);

@@ -99,7 +99,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
     protected void dumpPkgList(String label, List<DownloadablePackage> pkgs) {
         StringBuffer sb = new StringBuffer();
         sb.append(label);
-        sb.append("=[");
+        sb.append("={");
         for (DownloadablePackage pkg : pkgs) {
             sb.append(pkg.getId());
             sb.append(" (");
@@ -109,9 +109,9 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
             sb.append(") ");
             sb.append(" [");
             sb.append(pkg.getState());
-            sb.append("] ,");
+            sb.append("], ");
         }
-        sb.append("]");
+        sb.append("}");
         log.info(sb.toString());
     }
 
