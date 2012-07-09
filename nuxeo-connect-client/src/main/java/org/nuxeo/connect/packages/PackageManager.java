@@ -65,9 +65,28 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all
-     * sources for a give {@link PackageType}.
+     * sources for given {@code targetPlatform}
+     *
+     * @since 1.4
+     */
+    List<DownloadablePackage> listPackages(String targetPlatform);
+
+    /**
+     * Returns most recent version of {@link DownloadablePackage} from all
+     * sources for a given {@link PackageType}.
      */
     List<DownloadablePackage> listPackages(PackageType type);
+
+    /**
+     * Returns most recent version of {@link DownloadablePackage} from all
+     * sources for given {@link PackageType} and {@code targetPlatform}
+     *
+     * @param pkgType
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listPackages(PackageType pkgType,
+            String targetPlatform);
 
     /**
      * Search for packages. (Currently not implemented)
@@ -76,12 +95,14 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Lists most recent version of {@link DownloadablePackage} locally present.
+     * Local packages are not merged/filtered on latest versions
      */
     List<DownloadablePackage> listLocalPackages();
 
     /**
      * Lists most recent version of {@link DownloadablePackage} locally present
-     * for a give {@link PackageType}.
+     * for a given {@link PackageType}.
+     * Local packages are not merged/filtered on latest versions
      */
     List<DownloadablePackage> listLocalPackages(PackageType type);
 
@@ -96,6 +117,17 @@ public interface PackageManager extends BasePackageManager {
      * connect server for a given {@link PackageType}.
      */
     List<DownloadablePackage> listRemotePackages(PackageType type);
+
+    /**
+     * Lists most recent version of {@link DownloadablePackage} available on
+     * connect server for a given {@link PackageType} and {@code targetPlatform}
+     *
+     * @param pkgType
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listRemotePackages(PackageType pkgType,
+            String targetPlatform);
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that
@@ -128,15 +160,44 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Lists most recent version of {@link DownloadablePackage} available only
      * on the connect server (ie no local version).
+     *
+     * @deprecated Since 1.4. Use {@link #listOnlyRemotePackages(String)}
+     *             instead.
      */
+    @Deprecated
     List<DownloadablePackage> listOnlyRemotePackages();
+
+    /**
+     * Lists most recent version of {@link DownloadablePackage} available only
+     * on the connect server (ie no local version).
+     *
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listOnlyRemotePackages(String targetPlatform);
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available only
      * on the connect server (ie no local version) for a given
      * {@link PackageType}.
+     *
+     * @deprecated Since 1.4. Use
+     *             {@link #listOnlyRemotePackages(PackageType, String)} instead.
      */
+    @Deprecated
     List<DownloadablePackage> listOnlyRemotePackages(PackageType type);
+
+    /**
+     * Lists most recent version of {@link DownloadablePackage} available only
+     * on the connect server (ie no local version) for a given
+     * {@link PackageType}.
+     *
+     * @param pkgType {@link PackageType}
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType,
+            String targetPlatform);
 
     /**
      * Lists all versions of the studio packages associated to user account.
@@ -152,14 +213,60 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Lists packages available in remote and potentially overridden by a local
      * package.
+     *
+     * @deprecated Since 1.4. Use {@link #listRemoteOrLocalPackages(String)}
+     *             instead.
      */
+    @Deprecated
     List<DownloadablePackage> listRemoteOrLocalPackages();
+
+    /**
+     * Lists packages available in remote and potentially overridden by a local
+     * package.
+     *
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listRemoteOrLocalPackages(String targetPlatform);
 
     /**
      * Lists packages availab.e in remote and potentially overridden by a local
      * package.
+     *
+     * @deprecated Since 1.4. Use
+     *             {@link #listRemoteOrLocalPackages(PackageType, String)}
+     *             instead.
      */
+    @Deprecated
     List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type);
+
+    /**
+     * Lists most recent version of {@link DownloadablePackage} available on
+     * connect server for a given {@link PackageType}.
+     *
+     * @param pkgType {@link PackageType}
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType,
+            String targetPlatform);
+
+    /**
+     * Lists all local or remote private packages, filtered on package type if
+     * {@code pkgType} is not null.
+     *
+     * @param pkgType {@link PackageType}
+     * @param targetPlatform
+     * @since 1.4
+     */
+    List<DownloadablePackage> listPrivatePackages(PackageType pkgType,
+            String targetPlatform);
+
+    /**
+     * @since 1.4
+     * @see #listPrivatePackages(PackageType, String)
+     */
+    List<DownloadablePackage> listPrivatePackages(String targetPlatform);
 
     /**
      * Register a new {@link PackageSource}

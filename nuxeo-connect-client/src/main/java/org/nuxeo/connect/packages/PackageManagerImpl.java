@@ -48,6 +48,7 @@ import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
+import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
@@ -89,6 +90,7 @@ public class PackageManagerImpl implements PackageManager {
     /**
      * @since 1.4
      */
+    @Override
     public void setResolver(String resolverType) {
         if (P2CUDF_DEPENDENCY_RESOLVER.equals(resolverType)) {
             resolver = new P2CUDFDependencyResolver(this);
@@ -111,31 +113,49 @@ public class PackageManagerImpl implements PackageManager {
         }
     }
 
-    protected List<DownloadablePackage> doMergePackages(
-            List<PackageSource> sources, PackageType type) {
-        return doMergePackages(sources, type, null);
-    }
-
+    /**
+     * Merge packages, keeping only greater versions
+     */
     protected List<DownloadablePackage> doMergePackages(
             List<PackageSource> sources, PackageType type, String targetPlatform) {
-        List<DownloadablePackage> allPackages = getAllPackages(sources, type);
-        Map<String, DownloadablePackage> packagesByVisibilityAndName = new HashMap<String, DownloadablePackage>();
+        List<DownloadablePackage> allPackages = getAllPackages(sources, type,
+                targetPlatform);
+        Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<String, Map<String, DownloadablePackage>>();
         for (DownloadablePackage pkg : allPackages) {
-            if ((targetPlatform == null)
-                    || (Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform))) {
-                String key = pkg.getVisibility() + "-" + pkg.getName();
-                if (packagesByVisibilityAndName.containsKey(key)) {
-                    DownloadablePackage other = packagesByVisibilityAndName.get(key);
-                    if (pkg.getVersion().greaterThan(other.getVersion())) {
-                        packagesByVisibilityAndName.put(key, pkg);
+            if (targetPlatform == null
+                    || Arrays.asList(pkg.getTargetPlatforms()).contains(
+                            targetPlatform)) {
+                // If targetPlatform == null, keep greater version per
+                // targetPlatform
+                String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
+                        : pkg.getTargetPlatforms();
+                for (String tp : targetPlatforms) {
+                    Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
+                    if (packagesById == null) {
+                        packagesById = new HashMap<String, DownloadablePackage>();
+                        packagesByIdAndTargetPlatform.put(tp, packagesById);
                     }
-                } else {
-                    packagesByVisibilityAndName.put(key, pkg);
+                    String key = pkg.getId();
+                    if (packagesById.containsKey(key)) {
+                        if (pkg.getVersion().greaterThan(
+                                packagesById.get(key).getVersion())) {
+                            packagesById.put(key, pkg);
+                        }
+                    } else {
+                        packagesById.put(key, pkg);
+                    }
                 }
             }
         }
-        return new ArrayList<DownloadablePackage>(
-                packagesByVisibilityAndName.values());
+        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        for (Map<String, DownloadablePackage> packagesById : packagesByIdAndTargetPlatform.values()) {
+            for (DownloadablePackage pkg : packagesById.values()) {
+                if (!result.contains(pkg)) {
+                    result.add(pkg);
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -235,6 +255,7 @@ public class PackageManagerImpl implements PackageManager {
         return packagesByName;
     }
 
+    @Override
     public List<DownloadablePackage> findRemotePackages(String packageName) {
         List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
         for (PackageSource source : remoteSources) {
@@ -247,6 +268,7 @@ public class PackageManagerImpl implements PackageManager {
         return pkgs;
     }
 
+    @Override
     public List<Version> findLocalPackageVersions(String packageName) {
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : localSources) {
@@ -259,6 +281,7 @@ public class PackageManagerImpl implements PackageManager {
         return versions;
     }
 
+    @Override
     public List<Version> findLocalPackageInstalledVersions(String packageName) {
         List<Version> versions = new ArrayList<Version>();
         for (PackageSource source : localSources) {
@@ -272,6 +295,7 @@ public class PackageManagerImpl implements PackageManager {
         return versions;
     }
 
+    @Override
     public DownloadablePackage findPackageById(String packageId) {
         DownloadablePackage pkg = findPackageById(packageId, localSources);
         if (pkg == null) {
@@ -280,7 +304,13 @@ public class PackageManagerImpl implements PackageManager {
         return pkg;
     }
 
-    public DownloadablePackage findPackageById(String packageId,
+    /**
+     * @since 1.4
+     * @param packageId Package ID to look for in {@code sources}
+     * @param sources
+     * @return The package searched by ID or null if not found.
+     */
+    protected DownloadablePackage findPackageById(String packageId,
             List<PackageSource> sources) {
         for (PackageSource source : sources) {
             for (DownloadablePackage pkg : source.listPackages()) {
@@ -292,12 +322,12 @@ public class PackageManagerImpl implements PackageManager {
         return null;
     }
 
+    @Override
     public List<Version> getPreferedVersions(String pkgName) {
         List<Version> versions = new ArrayList<Version>();
         List<Version> installedVersions = new ArrayList<Version>();
         List<Version> localVersions = new ArrayList<Version>();
         List<Version> remoteVersions = new ArrayList<Version>();
-
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)) {
@@ -316,17 +346,15 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-
         Collections.sort(localVersions);
         Collections.sort(remoteVersions);
-
         versions.addAll(installedVersions);
         versions.addAll(localVersions);
         versions.addAll(remoteVersions);
-
         return versions;
     }
 
+    @Override
     public List<Version> getAvailableVersion(String pkgName,
             VersionRange range, String targetPlatform) {
         List<Version> versions = new ArrayList<Version>();
@@ -345,21 +373,33 @@ public class PackageManagerImpl implements PackageManager {
         return versions;
     }
 
-    /**
-     * @return All packages merged by name, keeping the greater versions
-     */
+    @Override
     public List<DownloadablePackage> listPackages() {
-        return doMergePackages(getAllSources(), null);
+        return listPackages(null, null);
     }
 
+    @Override
+    public List<DownloadablePackage> listPackages(String targetPlatform) {
+        return listPackages(null, targetPlatform);
+    }
+
+    @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-        return doMergePackages(getAllSources(), type);
+        return listPackages(type, null);
     }
 
+    @Override
+    public List<DownloadablePackage> listPackages(PackageType pkgType,
+            String targetPlatform) {
+        return doMergePackages(getAllSources(), pkgType, targetPlatform);
+    }
+
+    @Override
     public List<DownloadablePackage> searchPackages(String searchExpr) {
         return null;
     }
 
+    @Override
     public void registerSource(PackageSource source, boolean local) {
         String name = source.getName();
         if (!sourcesNames.contains(name)) {
@@ -371,6 +411,7 @@ public class PackageManagerImpl implements PackageManager {
         }
     }
 
+    @Override
     public List<DownloadablePackage> listInstalledPackages() {
         List<DownloadablePackage> res = new ArrayList<DownloadablePackage>();
         for (PackageSource source : localSources) {
@@ -384,23 +425,31 @@ public class PackageManagerImpl implements PackageManager {
         return res;
     }
 
+    @Override
     public List<DownloadablePackage> listRemotePackages() {
-        return doMergePackages(remoteSources, null);
+        return listRemotePackages(null, null);
     }
 
-    public List<DownloadablePackage> listRemotePackages(PackageType type) {
-        List<DownloadablePackage> result = doMergePackages(remoteSources, type);
+    @Override
+    public List<DownloadablePackage> listRemotePackages(PackageType pkgType) {
+        return listRemotePackages(pkgType, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listRemotePackages(PackageType pkgType,
+            String targetPlatform) {
+        List<DownloadablePackage> result = doMergePackages(remoteSources,
+                pkgType, targetPlatform);
         Collections.sort(result, new VersionPackageComparator());
         return result;
     }
 
+    @Override
     public List<DownloadablePackage> listLocalPackages() {
         return listLocalPackages(null);
     }
 
-    /**
-     * for local package we don't merge / filter on latest versions
-     */
+    @Override
     public List<DownloadablePackage> listLocalPackages(PackageType type) {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         List<String> pkgIds = new ArrayList<String>();
@@ -422,18 +471,22 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
+    @Override
     public List<DownloadablePackage> listUpdatePackages() {
         return listUpdatePackages(null, null);
     }
 
+    @Override
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
         return listUpdatePackages(type, null);
     }
 
+    @Override
     public List<DownloadablePackage> listUpdatePackages(String targetPlatform) {
         return listUpdatePackages(null, targetPlatform);
     }
 
+    @Override
     public List<DownloadablePackage> listUpdatePackages(PackageType type,
             String targetPlatform) {
         List<DownloadablePackage> localPackages = getAllPackages(localSources,
@@ -507,11 +560,33 @@ public class PackageManagerImpl implements PackageManager {
         return toUpdate;
     }
 
+    @Override
+    public List<DownloadablePackage> listPrivatePackages(PackageType pkgType,
+            String targetPlatform) {
+        List<DownloadablePackage> allPackages = getAllPackages(getAllSources(),
+                pkgType, targetPlatform);
+        Collections.sort(allPackages, new VersionPackageComparator());
+        List<DownloadablePackage> allPrivatePackages = new ArrayList<DownloadablePackage>();
+        for (DownloadablePackage downloadablePackage : allPackages) {
+            if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
+                allPrivatePackages.add(downloadablePackage);
+            }
+        }
+        return allPrivatePackages;
+    }
+
+    @Override
+    public List<DownloadablePackage> listPrivatePackages(String targetPlatform) {
+        return listPrivatePackages(null, targetPlatform);
+    }
+
+    @Override
     public DownloadingPackage download(String packageId) throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         return crs.getConnector().getDownload(packageId);
     }
 
+    @Override
     public List<DownloadingPackage> download(List<String> packageIds)
             throws Exception {
         List<DownloadingPackage> downloadings = new ArrayList<DownloadingPackage>();
@@ -521,6 +596,7 @@ public class PackageManagerImpl implements PackageManager {
         return downloadings;
     }
 
+    @Override
     public void install(String packageId, Map<String, String> params)
             throws Exception {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
@@ -536,6 +612,7 @@ public class PackageManagerImpl implements PackageManager {
         installationTask.run(params);
     }
 
+    @Override
     public void install(List<String> packageIds, Map<String, String> params)
             throws Exception {
         for (String packageId : packageIds) {
@@ -577,11 +654,7 @@ public class PackageManagerImpl implements PackageManager {
         return getPkgInList(pkgs, pkgId);
     }
 
-    public DownloadablePackage resolvePackage(String pkgId) {
-        // get
-        return null;
-    }
-
+    @Override
     public DownloadablePackage getPackage(String pkgId) {
         // Merge is an issue for P2CUDFDependencyResolver
         List<DownloadablePackage> pkgs = listAllPackages();
@@ -593,17 +666,36 @@ public class PackageManagerImpl implements PackageManager {
         return pkg;
     }
 
+    @Deprecated
+    @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages() {
-        return listRemoteOrLocalPackages(null);
+        return listRemoteOrLocalPackages(null, null);
     }
 
-    public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type) {
+    @Deprecated
+    @Override
+    public List<DownloadablePackage> listRemoteOrLocalPackages(
+            PackageType pkgType) {
+        return listRemoteOrLocalPackages(pkgType, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listRemoteOrLocalPackages(
+            String targetPlatform) {
+        return listRemoteOrLocalPackages(null, targetPlatform);
+    }
+
+    @Override
+    public List<DownloadablePackage> listRemoteOrLocalPackages(
+            PackageType pkgType, String targetPlatform) {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-        List<DownloadablePackage> all = listPackages(type);
-        List<DownloadablePackage> remotes = listRemotePackages(type);
+        List<DownloadablePackage> all = listPackages(pkgType, targetPlatform);
+        List<DownloadablePackage> remotes = listRemotePackages(pkgType,
+                targetPlatform);
+        // Return only packages which are available on remote sources
         for (DownloadablePackage pkg : all) {
             for (DownloadablePackage remote : remotes) {
-                if (remote.getName().equals(pkg.getName())) {
+                if (remote.getId().equals(pkg.getId())) {
                     result.add(pkg);
                     break;
                 }
@@ -612,11 +704,11 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
+    @Override
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
         List<DownloadablePackage> remote = listAllStudioRemotePackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
         for (DownloadablePackage pkg : remote) {
             boolean found = false;
             for (DownloadablePackage lpkg : local) {
@@ -633,14 +725,30 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
+    @Deprecated
+    @Override
     public List<DownloadablePackage> listOnlyRemotePackages() {
-        return listOnlyRemotePackages(null);
+        return listOnlyRemotePackages(null, null);
     }
 
-    public List<DownloadablePackage> listOnlyRemotePackages(PackageType type) {
-        List<DownloadablePackage> result = listRemotePackages(type);
-        List<DownloadablePackage> local = listLocalPackages(type);
+    @Deprecated
+    @Override
+    public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType) {
+        return listOnlyRemotePackages(pkgType, null);
+    }
 
+    @Override
+    public List<DownloadablePackage> listOnlyRemotePackages(
+            String targetPlatform) {
+        return listOnlyRemotePackages(null, targetPlatform);
+    }
+
+    @Override
+    public List<DownloadablePackage> listOnlyRemotePackages(
+            PackageType pkgType, String targetPlatform) {
+        List<DownloadablePackage> result = listRemotePackages(pkgType,
+                targetPlatform);
+        List<DownloadablePackage> local = listLocalPackages(pkgType);
         for (DownloadablePackage pkg : local) {
             for (DownloadablePackage remote : result) {
                 if (remote.getName().equals(pkg.getName())) {
@@ -652,6 +760,7 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
+    @Override
     public List<DownloadablePackage> listAllStudioRemotePackages() {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         for (PackageSource source : remoteSources) {
@@ -661,6 +770,7 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
+    @Override
     public void flushCache() {
         for (PackageSource source : getAllSources()) {
             source.flushCache();
@@ -887,4 +997,5 @@ public class PackageManagerImpl implements PackageManager {
         // No match or not compatible
         return false;
     }
+
 }
