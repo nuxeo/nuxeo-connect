@@ -66,6 +66,10 @@ public class NuxeoConnectClient {
         return getConnectGatewayComponent().getDownloadManager();
     }
 
+    /**
+     * @FIXME JC: should throw NullPackageUpdateServiceException instead of
+     *        returning null. The same treatment is done by every caller.
+     */
     public static PackageUpdateService getPackageUpdateService() {
         return cbHolder.getUpdateService();
     }

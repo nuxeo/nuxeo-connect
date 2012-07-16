@@ -178,8 +178,8 @@ public class PackageManagerImpl implements PackageManager {
 
     /**
      * @since 1.4
-     * @return All downloadable packages from given sources filtered on type if
-     *         not null
+     * @return All downloadable packages from given sources, optionally filtered
+     *         on type and/or target platform if not null
      */
     protected List<DownloadablePackage> getAllPackages(
             List<PackageSource> sources, PackageType type, String targetPlatform) {
@@ -200,8 +200,8 @@ public class PackageManagerImpl implements PackageManager {
 
     /**
      * @since 1.4
-     * @return a Map of all packages from given sources filtered on type and
-     *         target platform if not null
+     * @return a Map of all packages from given sources, optionally filtered
+     *         on type and/or target platform if not null
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(
             List<PackageSource> sources, PackageType type, String targetPlatform) {

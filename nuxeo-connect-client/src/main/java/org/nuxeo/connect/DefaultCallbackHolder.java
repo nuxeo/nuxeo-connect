@@ -18,6 +18,18 @@ import org.nuxeo.connect.update.PackageUpdateService;
 
 public class DefaultCallbackHolder implements CallbackHolder {
 
+    private PackageUpdateService pus;
+
+    public DefaultCallbackHolder() {
+    }
+
+    /**
+     * @since 1.4
+     */
+    public DefaultCallbackHolder(PackageUpdateService pus) {
+        this.pus = pus;
+    }
+
     public String getHomePath() {
         return getProperty("java.io.tmpdir", null) + "/";
     }
@@ -33,6 +45,6 @@ public class DefaultCallbackHolder implements CallbackHolder {
 
     @Override
     public PackageUpdateService getUpdateService() {
-        return null;
+        return pus;
     }
 }
