@@ -49,7 +49,7 @@ public class SecurityHeaderGenerator {
     /**
      * Preferably use {@link #getHeaders()}
      *
-     * @since 1.10
+     * @since 1.4
      */
     protected static Map<String, String> getRegisteredHeaders()
             throws ConnectSecurityError {
@@ -82,7 +82,7 @@ public class SecurityHeaderGenerator {
     /**
      * Preferably use {@link #getHeaders()}
      *
-     * @since 1.9
+     * @since 1.4
      */
     protected static Map<String, String> getAnonymousHeaders() {
         Map<String, String> headers = new HashMap<String, String>();

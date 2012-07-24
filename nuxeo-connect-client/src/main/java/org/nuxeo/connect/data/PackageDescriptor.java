@@ -122,23 +122,28 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     protected PackageVisibility visibility;
 
     /**
-     * @since 1.10
+     * @since 1.4
      */
     public PackageDescriptor(Package descriptor) {
         super();
         this.classifier = descriptor.getClassifier();
-        // TODO NXP-9432 conflicts, dependencies?
+        this.dependencies = descriptor.getDependencies();
+        this.conflicts = descriptor.getConflicts();
         this.description = descriptor.getDescription();
         this.homePage = descriptor.getHomePage();
-        // TODO NXP-9432 licenseType, licenseUrl?
+        this.license = descriptor.getLicenseType();
+        this.licenseUrl = descriptor.getLicenseUrl();
         this.name = descriptor.getName();
-        // TODO NXP-9432 productionState, provides, state?
+        this.productionState = descriptor.getProductionState();
+        this.provides = descriptor.getProvides();
+        this.state = descriptor.getState();
         this.targetPlatforms = descriptor.getTargetPlatforms();
         this.title = descriptor.getTitle();
         this.type = descriptor.getType();
-        // TODO NXP-9432 validationState, vendor?
+        this.vendor = descriptor.getVendor();
         this.version = descriptor.getVersion();
         this.visibility = descriptor.getVisibility();
+        this.nuxeoValidationState = descriptor.getValidationState();
     }
 
     public PackageDescriptor() {
