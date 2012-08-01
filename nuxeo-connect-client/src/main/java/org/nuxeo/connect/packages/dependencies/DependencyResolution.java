@@ -166,7 +166,9 @@ public class DependencyResolution {
             List<Version> existingVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
             if (existingVersions.size() > 0
                     && !existingVersions.contains(pkg.getVersion())) {
-                localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
+                // localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
+                localPackagesToUpgrade.put(pkg.getName(),
+                        existingVersions.get(existingVersions.size() - 1));
                 if (pkg.getState() == PackageState.REMOTE) {
                     allPackagesToDownload.add(id);
                 }
@@ -248,6 +250,19 @@ public class DependencyResolution {
     public List<String> getRemovePackageIds() {
         List<String> res = new ArrayList<String>();
         for (Entry<String, Version> entry : getLocalPackagesToRemove().entrySet()) {
+            res.add(entry.getKey() + "-" + entry.getValue().toString());
+        }
+        Collections.sort(res);
+        return res;
+    }
+
+    /**
+     * @since 1.4.2
+     * @return List of already downloaded packages that need to be installed
+     */
+    public List<String> getLocalToInstallIds() {
+        List<String> res = new ArrayList<String>();
+        for (Entry<String, Version> entry : getLocalPackagesToInstall().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
         Collections.sort(res);
