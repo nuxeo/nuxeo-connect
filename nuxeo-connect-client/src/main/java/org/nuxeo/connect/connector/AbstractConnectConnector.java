@@ -72,6 +72,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      */
     public static final long DEFAULT_CACHE_TIME_MS_STUDIO = 300 * 1000;
 
+    public static final String CONNECT_SERVER_REACHABLE_PROPERTY = "org.nuxeo.connect.server.reachable";
+
     protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
 
     protected String getBaseUrl() {
@@ -145,6 +147,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     }
 
     public DownloadingPackage getDownload(String id) throws ConnectServerError {
+        if (!isConnectServerReachable()) {
+            throw new CanNotReachConnectServer(
+                    "Connect server set as not reachable");
+        }
         try {
             id = URLEncoder.encode(id, "UTF-8");
             id = id.replace("+", "%20");
@@ -173,6 +179,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     public List<DownloadablePackage> getDownloads(PackageType type)
             throws ConnectServerError {
+        if (!isConnectServerReachable()) {
+            return new ArrayList<DownloadablePackage>();
+        }
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         String json = null;
         String cacheTimeString = NuxeoConnectClient.getProperty(
@@ -232,5 +241,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             }
         }
         return result;
+    }
+
+    protected boolean isConnectServerReachable() {
+        return Boolean.parseBoolean(NuxeoConnectClient.getProperty(
+                CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
 }
