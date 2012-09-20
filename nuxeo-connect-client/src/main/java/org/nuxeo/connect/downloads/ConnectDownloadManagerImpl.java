@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 package org.nuxeo.connect.downloads;
 
@@ -36,32 +35,31 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
- * 
+ *
  * Implementation of the {@link ConnectDownloadManager} interface. This
  * implementation is accessed via {@link ConnectGatewayComponent}
- * 
+ *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
     public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
 
-    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(25);
+    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
+            25);
 
     protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
             TimeUnit.SECONDS, pendingDownloadTasks, new DaemonThreadFactory());
 
-    protected Map<String, DownloadingPackage> downloadingPackages = new HashMap<String, DownloadingPackage>();
+    protected Map<String, LocalDownloadingPackage> downloadingPackages = new HashMap<String, LocalDownloadingPackage>();
 
     public List<DownloadingPackage> listDownloadingPackages() {
-
         List<DownloadingPackage> result = new ArrayList<DownloadingPackage>();
         result.addAll(downloadingPackages.values());
         return result;
     }
 
     public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
-
         LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
                 descriptor);
         tpexec.execute(localPackage);
@@ -71,8 +69,8 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
     public String getDownloadedBundleLocalStorage() {
 
-        String tmpPath = NuxeoConnectClient.getProperty(
-                NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
+        String tmpPath = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY,
+                System.getProperty("java.io.tmpdir"));
         File tmpDir = new File(tmpPath);
         if (!tmpDir.exists()) {
             tmpDir.mkdir();
@@ -81,7 +79,11 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
     }
 
     public void removeDownloadingPackage(String packageId) {
-        downloadingPackages.remove(packageId);
+        LocalDownloadingPackage localPackage = downloadingPackages.remove(packageId);
+        if (localPackage != null) {
+            // avoid later run if cancelled but not yet started
+            tpexec.remove(localPackage);
+        }
     }
 
     protected static class DaemonThreadFactory implements ThreadFactory {

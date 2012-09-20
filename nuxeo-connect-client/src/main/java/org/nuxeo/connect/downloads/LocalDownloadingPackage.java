@@ -40,6 +40,7 @@ import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
+import org.nuxeo.connect.update.AlreadyExistsPackageException;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageUpdateService;
@@ -59,9 +60,9 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
     protected static final Log log = LogFactory.getLog(LocalDownloadingPackage.class);
 
-    protected boolean completed = false;
-
     protected File file = null;
+
+    private boolean completed = false;
 
     public LocalDownloadingPackage(PackageDescriptor descriptor) {
         super(descriptor);
@@ -69,15 +70,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                 + descriptor.getSourceUrl();
         this.sourceDigest = descriptor.getSourceDigest();
         this.sourceSize = descriptor.getSourceSize();
-    }
-
-    @Override
-    public int getState() {
-        if (completed) {
-            return PackageState.DOWNLOADED;
-        } else {
-            return PackageState.DOWNLOADING;
-        }
     }
 
     protected void saveStreamAsFile(InputStream in) throws IOException {
@@ -99,6 +91,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         }
     }
 
+    @Override
     public int getDownloadProgress() {
         if (file == null || !file.exists()) {
             return 0;
@@ -113,11 +106,14 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         return file;
     }
 
+    @Override
     public boolean isDigestOk() {
         return false;
     }
 
+    @Override
     public void run() {
+        state = PackageState.REMOTE;
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
@@ -125,6 +121,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
         try {
+            state = PackageState.DOWNLOADING;
             if (!sourceUrl.contains("127.0.0.1:8082/test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
                 for (String headerName : headers.keySet()) {
@@ -133,7 +130,8 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
             }
             int rc = 0;
             rc = httpClient.executeMethod(method);
-            if (rc == HttpStatus.SC_OK) {
+            switch (rc) {
+            case HttpStatus.SC_OK:
                 if (sourceSize == 0) {
                     Header clheader = method.getResponseHeader("content-length");
                     if (clheader != null) {
@@ -143,19 +141,31 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                 InputStream in = method.getResponseBodyAsStream();
                 saveStreamAsFile(in);
                 registerDownloadedPackage();
-                ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-                cdm.removeDownloadingPackage(getId());
-                completed = true;
-            } else {
-                throw new ConnectServerError("Connect server response code "
-                        + rc);
+                state = PackageState.DOWNLOADED;
+                break;
+
+            case HttpStatus.SC_NOT_FOUND:
+                throw new ConnectServerError(String.format(
+                        "Package not found (%s).", rc));
+            case HttpStatus.SC_FORBIDDEN:
+                throw new ConnectServerError(String.format(
+                        "Access refused (%s).", rc));
+            case HttpStatus.SC_UNAUTHORIZED:
+                throw new ConnectServerError(String.format(
+                        "Registration required (%s).", rc));
+            default:
+                throw new ConnectServerError(String.format(
+                        "Connect server HTTP response code %s.", rc));
             }
         } catch (Exception e) {
-            log.error(
-                    "Error during communication with the Nuxeo Connect Server",
-                    e);
+            state = PackageState.REMOTE;
+            log.debug(e, e);
+            errorMessage = e.getMessage();
         } finally {
+            ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+            cdm.removeDownloadingPackage(getId());
             method.releaseConnection();
+            completed = true;
         }
     }
 
@@ -168,13 +178,16 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
             return;
         }
         try {
-            pus.addPackage(file);
             log.info("Adding " + getId());
+            pus.addPackage(file);
+        } catch (AlreadyExistsPackageException e) {
+            log.error(e.getMessage());
         } catch (PackageException e) {
             log.error(e);
         }
     }
 
+    @Override
     public boolean isCompleted() {
         return completed;
     }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -41,5 +41,11 @@ public interface DownloadingPackage extends DownloadablePackage {
      * Return Download progress in %
      */
     int getDownloadProgress();
+
+    /**
+     * @return Error description in case of download failure
+     * @since 5.7
+     */
+    String getErrorMessage();
 
 }
