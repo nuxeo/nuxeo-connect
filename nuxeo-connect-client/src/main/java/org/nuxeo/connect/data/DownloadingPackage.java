@@ -44,7 +44,7 @@ public interface DownloadingPackage extends DownloadablePackage {
 
     /**
      * @return Error description in case of download failure
-     * @since 5.7
+     * @since 1.4.3
      */
     String getErrorMessage();
 
