@@ -16,6 +16,8 @@
  */
 package org.nuxeo.connect.update;
 
+import java.util.regex.Pattern;
+
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
@@ -27,6 +29,26 @@ public class Version implements Comparable<Version> {
     public static final String SNAPSHOT = "-SNAPSHOT";
 
     public final static Version ZERO = new Version(0);
+
+    /**
+     * @since 1.4.4
+     */
+    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC)|(rc)|(alpha)|(ALPHA)|(beta)|(BETA)\\d+)|([a-zA-Z][0-9]{8})).*$");
+
+    /**
+     * @since 1.4.4
+     */
+    protected boolean specialClassifier = false;
+
+    /**
+     * Special classifiers are considered as earlier than versions without
+     * classifier or with a non-special classifier
+     *
+     * @since 1.4.4
+     */
+    public boolean isSpecialClassifier() {
+        return specialClassifier;
+    }
 
     protected int major;
 
@@ -48,6 +70,7 @@ public class Version implements Comparable<Version> {
         if (p > 0) { // classifier found
             classifier = version.substring(p + 1);
             version = version.substring(0, p);
+            specialClassifier = SPECIAL_CLASSIFIER.matcher(classifier).matches();
         }
         p = version.indexOf('.', 0);
         if (p > -1) {
@@ -81,6 +104,9 @@ public class Version implements Comparable<Version> {
         this.minor = minor;
         this.patch = patch;
         this.classifier = classifier;
+        if (classifier != null) {
+            specialClassifier = SPECIAL_CLASSIFIER.matcher(classifier).matches();
+        }
     }
 
     public int major() {
@@ -137,7 +163,7 @@ public class Version implements Comparable<Version> {
         String oClassifier = (o.classifier == null) ? "" : o.classifier;
 
         if (mClassifier.equals(oClassifier)) {
-            if (new Boolean(snapshot).equals(o.isSnapshot())) {
+            if (snapshot == o.isSnapshot()) {
                 return 0;
             } else {
                 if (isSnapshot()) {
@@ -147,7 +173,14 @@ public class Version implements Comparable<Version> {
                 }
             }
         } else {
-            return mClassifier.compareTo(oClassifier);
+            if (specialClassifier && o.isSpecialClassifier()
+                    || !specialClassifier && !o.isSpecialClassifier()) {
+                return mClassifier.compareTo(oClassifier);
+            } else if (specialClassifier) {
+                return -1;
+            } else {
+                return 1;
+            }
         }
     }
 
