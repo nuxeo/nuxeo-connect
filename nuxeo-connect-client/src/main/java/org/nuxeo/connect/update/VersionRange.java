@@ -71,11 +71,10 @@ public class VersionRange {
             if (maxVersion != null) { // check range
                 return version.greaterOrEqualThan(minVersion)
                         && version.lessOrEqualsThan(maxVersion);
-            } else { // greater than min version
+            } else { // max version is null
                 return version.greaterOrEqualThan(minVersion);
             }
         } // else max version is not null
-        // less than maxVersion
         return version.lessOrEqualsThan(maxVersion);
     }
 
@@ -94,4 +93,17 @@ public class VersionRange {
         return Version.ZERO.toString() + ':' + maxVersion.toString();
     }
 
+    /**
+     * @since 1.4.4
+     * @return true if both version ranges overlap
+     */
+    public boolean matchVersionRange(VersionRange versionRange) {
+        Version oMinVersion = versionRange.getMinVersion();
+        Version oMaxVersion = versionRange.getMaxVersion();
+        return (minVersion == null && maxVersion == null)
+                || (minVersion != null && versionRange.matchVersion(minVersion))
+                || (maxVersion != null && versionRange.matchVersion(maxVersion))
+                || (oMinVersion != null && matchVersion(oMinVersion))
+                || (oMaxVersion != null && matchVersion(oMaxVersion));
+    }
 }

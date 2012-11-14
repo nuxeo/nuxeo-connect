@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -900,6 +901,7 @@ public class PackageManagerImpl implements PackageManager {
             List<String> orderedList) throws DependencyException {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
         boolean hasChanged = true;
+        Set<String> missingDeps = new HashSet<String>();
         while (!orderedList.isEmpty() && hasChanged) {
             hasChanged = false;
             for (String id : orderedList) {
@@ -915,10 +917,9 @@ public class PackageManagerImpl implements PackageManager {
                         // is pkgDep satisfied in orderedMap?
                         boolean satisfied = false;
                         for (Package orderedPkg : orderedMap.values()) {
-                            if (pkgDep.getName().equals(orderedPkg.getName())
-                                    && pkgDep.getVersionRange().matchVersion(
-                                            orderedPkg.getVersion())) {
+                            if (matchDependency(pkgDep, orderedPkg)) {
                                 satisfied = true;
+                                missingDeps.remove(pkgDep);
                                 break;
                             }
                         }
@@ -928,12 +929,14 @@ public class PackageManagerImpl implements PackageManager {
                                 if (pkgDep.getVersionRange().matchVersion(
                                         version)) {
                                     satisfied = true;
+                                    missingDeps.remove(pkgDep);
                                     break;
                                 }
                             }
                         }
                         if (!satisfied) { // couldn't satisfy pkgDep
                             allSatisfied = false;
+                            missingDeps.add(pkgDep.toString());
                             break;
                         }
                     }
@@ -946,11 +949,26 @@ public class PackageManagerImpl implements PackageManager {
             orderedList.removeAll(orderedMap.keySet());
         }
         if (!orderedList.isEmpty()) {
-            throw new DependencyException("Couldn't order " + orderedList);
+            throw new DependencyException(String.format(
+                    "Couldn't order %s missing %s.", orderedList, missingDeps));
         }
-        for (String id : orderedMap.keySet()) {
-            orderedList.add(id);
+        orderedList.addAll(orderedMap.keySet());
+    }
+
+    private boolean matchDependency(PackageDependency pkgDep, Package pkg) {
+        boolean match = pkgDep.getName().equals(pkg.getName())
+                && pkgDep.getVersionRange().matchVersion(pkg.getVersion());
+        if (!match && pkg.getProvides() != null) { // Look at provides
+            for (PackageDependency provide : pkg.getProvides()) {
+                if (pkgDep.getName().equals(provide.getName())
+                        && pkgDep.getVersionRange().matchVersionRange(
+                                provide.getVersionRange())) {
+                    match = true;
+                    break;
+                }
+            }
         }
+        return match;
     }
 
     @Override
