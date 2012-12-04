@@ -296,7 +296,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)
-                        && pkg.getState() >= PackageState.INSTALLING) {
+                        && pkg.getState() >= PackageState.INSTALLING.getValue()) {
                     versions.add(pkg.getVersion());
                 }
             }
@@ -340,7 +340,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)) {
-                    if (pkg.getState() == PackageState.INSTALLED) {
+                    if (pkg.getState() == PackageState.INSTALLED.getValue()) {
                         installedVersions.add(pkg.getVersion());
                     } else {
                         localVersions.add(pkg.getVersion());
@@ -425,7 +425,7 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> res = new ArrayList<DownloadablePackage>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getState() >= PackageState.INSTALLING) {
+                if (pkg.getState() >= PackageState.INSTALLING.getValue()) {
                     res.add(pkg);
                 }
             }
@@ -509,9 +509,9 @@ public class PackageManagerImpl implements PackageManager {
         // active local package and match the target platform
         for (DownloadablePackage pkg : localPackages) {
             // Ignore upgrade check for unused packages
-            if ((pkg.getState() != PackageState.INSTALLING)
-                    && (pkg.getState() != PackageState.INSTALLED)
-                    && (pkg.getState() != PackageState.STARTED)) {
+            if ((pkg.getState() != PackageState.INSTALLING.getValue())
+                    && (pkg.getState() != PackageState.INSTALLED.getValue())
+                    && (pkg.getState() != PackageState.STARTED.getValue())) {
                 continue;
             }
             for (DownloadablePackage availablePackage : availablePackages) {
@@ -544,9 +544,9 @@ public class PackageManagerImpl implements PackageManager {
                         if (lpkg.getName().equals(pkg.getName())) {
                             if (lpkg.getVersion().greaterOrEqualThan(
                                     pkg.getVersion())) {
-                                if ((lpkg.getState() == PackageState.INSTALLING)
-                                        || (lpkg.getState() == PackageState.INSTALLED)
-                                        || (lpkg.getState() == PackageState.STARTED)) {
+                                if ((lpkg.getState() == PackageState.INSTALLING.getValue())
+                                        || (lpkg.getState() == PackageState.INSTALLED.getValue())
+                                        || (lpkg.getState() == PackageState.STARTED.getValue())) {
                                     alreadyInLocal = true;
                                 }
                             }

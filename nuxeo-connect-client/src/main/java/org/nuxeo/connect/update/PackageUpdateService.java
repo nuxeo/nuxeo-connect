@@ -55,11 +55,22 @@ public interface PackageUpdateService {
     /**
      * Set the state for the given package.
      *
-     * @param id
+     * @param pkg
      * @param state
      * @see PackageState
+     * @deprecated Since 1.4.5. See
+     *             {@link #setPackageState(LocalPackage, PackageState)}
      */
+    @Deprecated
     void setPackageState(LocalPackage pkg, int state) throws PackageException;
+
+    /**
+     * @param pkg
+     * @param state
+     * @since 1.4.5
+     */
+    void setPackageState(LocalPackage pkg, PackageState state)
+            throws PackageException;
 
     /**
      * Add a new package to the packages registry given the package file (a zip

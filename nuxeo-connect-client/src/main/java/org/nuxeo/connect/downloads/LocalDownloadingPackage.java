@@ -113,7 +113,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
     @Override
     public void run() {
-        state = PackageState.REMOTE;
+        state = PackageState.REMOTE.getValue();
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
@@ -121,7 +121,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
         try {
-            state = PackageState.DOWNLOADING;
+            state = PackageState.DOWNLOADING.getValue();
             if (!sourceUrl.contains("127.0.0.1:8082/test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
                 for (String headerName : headers.keySet()) {
@@ -141,7 +141,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                 InputStream in = method.getResponseBodyAsStream();
                 saveStreamAsFile(in);
                 registerDownloadedPackage();
-                state = PackageState.DOWNLOADED;
+                state = PackageState.DOWNLOADED.getValue();
                 break;
 
             case HttpStatus.SC_NOT_FOUND:
@@ -158,7 +158,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                         "Connect server HTTP response code %s.", rc));
             }
         } catch (Exception e) {
-            state = PackageState.REMOTE;
+            state = PackageState.REMOTE.getValue();
             log.debug(e, e);
             errorMessage = e.getMessage();
         } finally {

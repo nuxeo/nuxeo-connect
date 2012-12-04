@@ -79,12 +79,28 @@ public interface LocalPackage extends Package {
     /**
      * Set the package state. This method is not updating the persistence area -
      * you must use
-     * {@link PackageUpdateService#setPackageState(LocalPackage, int)} instead.
+     * {@link PackageUpdateService#setPackageState(LocalPackage, PackageState)}
+     * instead.
+     *
+     * @deprecated Since 1.4.5. Set as deprecated because of the comment... In
+     *             any case, it should use a {@link PackageState} instead of
+     *             int.
      *
      * @param state
      * @see PackageState
      */
+    @Deprecated
     void setState(int state);
+
+    /**
+     * Set the package state. This method is not updating the persistence area -
+     * you must use
+     * {@link PackageUpdateService#setPackageState(LocalPackage, PackageState)}
+     * instead.
+     *
+     * @since 1.4.5
+     */
+    void setState(PackageState state);
 
     /**
      * Get the content of the license file.

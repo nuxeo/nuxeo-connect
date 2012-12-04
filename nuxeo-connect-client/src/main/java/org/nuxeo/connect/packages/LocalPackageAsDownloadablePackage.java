@@ -25,6 +25,7 @@ import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageData;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
@@ -90,7 +91,13 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
         return localPackage.getValidator();
     }
 
+    @Deprecated
     public void setState(int state) {
+        localPackage.setState(state);
+    }
+
+    @Override
+    public void setState(PackageState state) {
         localPackage.setState(state);
     }
 

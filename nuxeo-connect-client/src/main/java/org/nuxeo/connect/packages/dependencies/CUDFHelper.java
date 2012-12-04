@@ -18,6 +18,7 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
@@ -109,8 +112,12 @@ public class CUDFHelper {
             }
         }
         if (log.isDebugEnabled()) {
-            MapUtils.verbosePrint(System.out, "nuxeo2CUDFMap", nuxeo2CUDFMap);
-            MapUtils.verbosePrint(System.out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(outputStream);
+            MapUtils.verbosePrint(out, "nuxeo2CUDFMap", nuxeo2CUDFMap);
+            MapUtils.verbosePrint(out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
+            log.debug(outputStream.toString());
+            IOUtils.closeQuietly(out);
         }
     }
 

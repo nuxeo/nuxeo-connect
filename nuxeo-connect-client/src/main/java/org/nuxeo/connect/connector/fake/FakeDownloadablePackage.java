@@ -44,6 +44,32 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     private List<PackageDependency> conflicts = new ArrayList<PackageDependency>();
 
+    public String id;
+
+    public String title;
+
+    public String description;
+
+    public PackageType type;
+
+    public String vendor;
+
+    public List<String> targetPlatforms = new ArrayList<String>();
+
+    public int state;
+
+    public String homePage;
+
+    public String licenseType;
+
+    public String licenseUrl;
+
+    public ProductionState productionState;
+
+    public NuxeoValidationState validationState;
+
+    public PackageVisibility visibility;
+
     public FakeDownloadablePackage(String name, Version version) {
         this.name = name;
         this.version = version;
@@ -52,7 +78,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public String getId() {
-        throw new UnsupportedOperationException();
+        return id;
     }
 
     @Override
@@ -62,22 +88,22 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public String getTitle() {
-        throw new UnsupportedOperationException();
+        return title;
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException();
+        return description;
     }
 
     @Override
     public PackageType getType() {
-        throw new UnsupportedOperationException();
+        return type;
     }
 
     @Override
     public String getVendor() {
-        throw new UnsupportedOperationException();
+        return vendor;
     }
 
     @Override
@@ -87,7 +113,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public String[] getTargetPlatforms() {
-        throw new UnsupportedOperationException();
+        return targetPlatforms.toArray(new String[targetPlatforms.size()]);
     }
 
     @Override
@@ -107,22 +133,22 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public int getState() {
-        throw new UnsupportedOperationException();
+        return state;
     }
 
     @Override
     public String getHomePage() {
-        throw new UnsupportedOperationException();
+        return homePage;
     }
 
     @Override
     public String getLicenseType() {
-        throw new UnsupportedOperationException();
+        return licenseType;
     }
 
     @Override
     public String getLicenseUrl() {
-        throw new UnsupportedOperationException();
+        return licenseUrl;
     }
 
     @Override
@@ -137,22 +163,22 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public ProductionState getProductionState() {
-        throw new UnsupportedOperationException();
+        return productionState;
     }
 
     @Override
     public NuxeoValidationState getValidationState() {
-        throw new UnsupportedOperationException();
+        return validationState;
     }
 
     @Override
     public boolean supportsHotReload() {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override
     public boolean isSupported() {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override
@@ -200,7 +226,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public PackageVisibility getVisibility() {
-        throw new UnsupportedOperationException();
+        return visibility;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -45,13 +45,12 @@ public enum PackageType {
     }
 
     public static PackageType getByValue(String value) {
-        PackageType returnValue = null;
         for (final PackageType element : EnumSet.allOf(PackageType.class)) {
             if (element.toString().equals(value)) {
-                returnValue = element;
+                return element;
             }
         }
-        return returnValue;
+        return null;
     }
 
 }

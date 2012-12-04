@@ -92,7 +92,7 @@ public class TestSerialization extends TestCase {
         p.setRating(4);
         p.setDownloadsCount(1000);
         p.setPictureUrl("http://xxx");
-        p.setState(PackageState.INSTALLED);
+        p.setState(PackageState.INSTALLED.getValue());
 
         p.setNuxeoValidationState(NuxeoValidationState.NUXEO_CERTIFIED);
         p.setProductionState(ProductionState.PRODUCTION_READY);
@@ -124,7 +124,7 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getRating(), p2.getRating());
         assertEquals(p.getPictureUrl(), p2.getPictureUrl());
         assertEquals(p.getCommentsNumber(), p2.getCommentsNumber());
-        assertEquals(PackageState.INSTALLED, p2.getState());
+        assertEquals(PackageState.INSTALLED.getValue(), p2.getState());
         assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
         assertEquals(NuxeoValidationState.NUXEO_CERTIFIED,
                 p2.getValidationState());

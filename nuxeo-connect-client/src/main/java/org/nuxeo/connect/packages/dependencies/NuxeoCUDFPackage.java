@@ -65,7 +65,7 @@ class NuxeoCUDFPackage {
                 && "cmf".equalsIgnoreCase(pkg.getVersion().classifier())) {
             cudfName += "*" + pkg.getVersion().classifier();
         }
-        setInstalled(pkg.getState() == PackageState.STARTED);
+        setInstalled(pkg.getState() == PackageState.STARTED.getValue());
     }
 
     public String getCUDFName() {

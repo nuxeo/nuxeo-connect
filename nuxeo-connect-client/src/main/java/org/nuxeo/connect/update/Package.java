@@ -100,6 +100,9 @@ public interface Package {
 
     /**
      * Gets the package life cycle status.
+     *
+     * FIXME Should return a {@link PackageState} instead of int.
+     *
      * @see PackageState
      */
     int getState();

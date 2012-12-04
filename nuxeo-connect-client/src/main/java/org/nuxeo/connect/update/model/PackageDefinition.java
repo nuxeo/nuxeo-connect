@@ -93,15 +93,27 @@ public interface PackageDefinition extends Package {
 
     /**
      * Get the package license name. E.g. LGPL, BSD etc.
+     *
+     * @deprecated Since 1.4.5. Duplicates {@link #getLicenseType()}.
      */
+    @Deprecated
     String getLicense();
 
     /**
      * Set the package license name.
      *
      * @param license
+     * @deprecated Since 1.4.5. Duplicates {@link #setLicenseType(String)}.
      */
+    @Deprecated
     void setLicense(String license);
+
+    /**
+     * Set the package license name.
+     *
+     * @param license
+     */
+    void setLicenseType(String license);
 
     /**
      * Set the license URL.
@@ -112,7 +124,10 @@ public interface PackageDefinition extends Package {
 
     /**
      * Get the target platforms where this package may be installed.
+     *
+     * @deprecated Since 1.4.5. Duplicates {@link #getTargetPlatforms()}.
      */
+    @Deprecated
     String[] getPlatforms();
 
     /**
@@ -120,8 +135,19 @@ public interface PackageDefinition extends Package {
      *
      * @param platforms
      * @see #getPlatforms()
+     * @deprecated Since 1.4.5. Duplicates {@link #setTargetPlatforms(String[])}
+     *             .
      */
+    @Deprecated
     void setPlatforms(String[] platforms);
+
+    /**
+     * Set the target platforms of this package.
+     *
+     * @param platforms
+     * @see #getTargetPlatforms()
+     */
+    void setTargetPlatforms(String[] platforms);
 
     /**
      * Set the package dependencies.

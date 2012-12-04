@@ -25,6 +25,33 @@ package org.nuxeo.connect.update;
  */
 public enum PackageVisibility {
 
-    MARKETPLACE, DEV, PUBLIC, PRIVATE;
+    /**
+     * To avoid null value. Package visibility is unknown or unset.
+     *
+     * @since 1.4.5
+     */
+    UNKNOWN,
+
+    /**
+     * Package is publicly visible but download is restricted to registered
+     * users.
+     */
+    MARKETPLACE,
+
+    /**
+     * Package is visible in development channel. Download may be restricted.
+     */
+    DEV,
+
+    /**
+     * Package is visible and downloadable without restrictions.
+     */
+    PUBLIC,
+
+    /**
+     * Package visibility and download are restricted to a specific private
+     * channel.
+     */
+    PRIVATE;
 
 }

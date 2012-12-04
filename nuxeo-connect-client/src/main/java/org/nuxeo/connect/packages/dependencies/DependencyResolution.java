@@ -169,17 +169,17 @@ public class DependencyResolution {
                 // localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
                 localPackagesToUpgrade.put(pkg.getName(),
                         existingVersions.get(existingVersions.size() - 1));
-                if (pkg.getState() == PackageState.REMOTE) {
+                if (pkg.getState() == PackageState.REMOTE.getValue()) {
                     allPackagesToDownload.add(id);
                 }
             } else {
-                if (pkg.getState() == PackageState.REMOTE) {
+                if (pkg.getState() == PackageState.REMOTE.getValue()) {
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
                     allPackagesToDownload.add(id);
-                } else if (pkg.getState() > PackageState.REMOTE
-                        && pkg.getState() < PackageState.INSTALLING) {
+                } else if (pkg.getState() > PackageState.REMOTE.getValue()
+                        && pkg.getState() < PackageState.INSTALLING.getValue()) {
                     localPackagesToInstall.put(pkg.getName(), pkg.getVersion());
-                } else if (pkg.getState() > PackageState.INSTALLING) {
+                } else if (pkg.getState() > PackageState.INSTALLING.getValue()) {
                     localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
                 }
             }
