@@ -63,6 +63,16 @@ public class VersionRangeTest {
         assertTrue(vr10Max + " must match " + v10, vr10Max.matchVersion(v10));
         assertFalse(vr10Max + " must not match " + v12,
                 vr10Max.matchVersion(v12));
+
+        // Check SNAPSHOT keyword and date-based releases
+        VersionRange vr = new VersionRange("5.7-I20121210_0116:5.7");
+        assertTrue(vr.matchVersion(new Version("5.7-I20121210_0116")));
+        assertTrue(vr.matchVersion(new Version("5.7-SNAPSHOT")));
+        assertTrue(vr.matchVersion(new Version("5.7-I20130101_0101")));
+        assertFalse(vr.matchVersion(new Version("5.6-I20130101_0101")));
+        assertFalse(vr.matchVersion(new Version("5.6")));
+        assertFalse(vr.matchVersion(new Version("5.6-SNAPSHOT")));
+        assertFalse(vr.matchVersion(new Version("5.8")));
     }
 
     /**
