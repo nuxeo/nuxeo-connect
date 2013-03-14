@@ -49,7 +49,7 @@
       <dependency>
         <groupId>org.eclipse.equinox</groupId>
         <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
-        <version>1.15-NX</version>
+        <version>1.16-NX</version>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
