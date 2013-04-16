@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,21 +42,33 @@ public class TestVersions extends TestCase {
         versions.add(new Version("5.0.1-SNAPSHOT"));
         versions.add(new Version("5.0.1-CMF"));
         versions.add(new Version("5.0.1-CMF-SNAPSHOT"));
-
+        versions.add(new Version("5.0.1-beta"));
+        versions.add(new Version("5.0.1-BETA"));
+        versions.add(new Version("5.0.1-something"));
+        versions.add(new Version("5.0.1-anything"));
+        versions.add(new Version("5.0.1-I20130101"));
+        versions.add(new Version("5.0.1-I20121225"));
         Collections.shuffle(versions);
         Collections.sort(versions);
 
-        assertEquals(new Version("5"), versions.get(0));
-        assertEquals(new Version("5"), versions.get(1));
-        assertEquals(new Version("5"), versions.get(2));
-        assertEquals(new Version("5.0.1-SNAPSHOT"), versions.get(3));
-        assertEquals(new Version("5.0.1"), versions.get(4));
-        assertEquals(new Version("5.0.1-CMF-SNAPSHOT"), versions.get(5));
-        assertEquals(new Version("5.0.1-CMF"), versions.get(6));
-        assertEquals(new Version("5.2.1-RC1"), versions.get(7));
-        assertEquals(new Version("5.2.1-RC2"), versions.get(8));
-        assertEquals(new Version("5.2.1-SNAPSHOT"), versions.get(9));
-        assertEquals(new Version("5.2.1"), versions.get(10));
-
+        List<Version> expectedOrder = new ArrayList<Version>();
+        expectedOrder.add(new Version("5"));
+        expectedOrder.add(new Version("5"));
+        expectedOrder.add(new Version("5"));
+        expectedOrder.add(new Version("5.0.1-BETA"));
+        expectedOrder.add(new Version("5.0.1-I20121225"));
+        expectedOrder.add(new Version("5.0.1-I20130101"));
+        expectedOrder.add(new Version("5.0.1-beta"));
+        expectedOrder.add(new Version("5.0.1-SNAPSHOT"));
+        expectedOrder.add(new Version("5.0.1"));
+        expectedOrder.add(new Version("5.0.1-CMF-SNAPSHOT"));
+        expectedOrder.add(new Version("5.0.1-CMF"));
+        expectedOrder.add(new Version("5.0.1-anything"));
+        expectedOrder.add(new Version("5.0.1-something"));
+        expectedOrder.add(new Version("5.2.1-RC1"));
+        expectedOrder.add(new Version("5.2.1-RC2"));
+        expectedOrder.add(new Version("5.2.1-SNAPSHOT"));
+        expectedOrder.add(new Version("5.2.1"));
+        assertEquals(expectedOrder, versions);
     }
 }

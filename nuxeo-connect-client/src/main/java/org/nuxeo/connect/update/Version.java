@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,10 +18,15 @@ package org.nuxeo.connect.update;
 
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public class Version implements Comparable<Version> {
+
+    private static final Log log = LogFactory.getLog(Version.class);
 
     /**
      * @since 1.4
@@ -33,7 +38,7 @@ public class Version implements Comparable<Version> {
     /**
      * @since 1.4.4
      */
-    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC)|(rc)|(alpha)|(ALPHA)|(beta)|(BETA)\\d+)|([a-zA-Z][0-9]{8})).*$");
+    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC)|(rc)|(alpha)|(ALPHA)|(beta)|(BETA)\\d*)|([a-zA-Z][0-9]{8})).*$");
 
     /**
      * @since 1.4.4
@@ -146,6 +151,7 @@ public class Version implements Comparable<Version> {
     }
 
     public int compareTo(Version o) {
+        log.debug("Comparing " + this + " with " + o);
         int d = major - o.major;
         if (d != 0) {
             return d;
@@ -164,21 +170,27 @@ public class Version implements Comparable<Version> {
 
         if (mClassifier.equals(oClassifier)) {
             if (snapshot == o.isSnapshot()) {
+                log.debug(" case 1 => 0");
                 return 0;
             } else {
                 if (isSnapshot()) {
+                    log.debug(" case 2 => -1");
                     return -1;
                 } else {
+                    log.debug(" case 3 => 1");
                     return 1;
                 }
             }
         } else {
             if (specialClassifier && o.isSpecialClassifier()
                     || !specialClassifier && !o.isSpecialClassifier()) {
+                log.debug(" case 4 => compare classifiers");
                 return mClassifier.compareTo(oClassifier);
             } else if (specialClassifier) {
+                log.debug(" case 1 => -1");
                 return -1;
             } else {
+                log.debug(" case 6 => 1");
                 return 1;
             }
         }
@@ -206,14 +218,6 @@ public class Version implements Comparable<Version> {
             v = v + SNAPSHOT;
         }
         return v;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Version("1.0" + SNAPSHOT));
-        System.out.println(new Version("1" + SNAPSHOT));
-        System.out.println(new Version("1.0.0" + SNAPSHOT));
-        System.out.println(new Version(
-                new Version("1.0.0" + SNAPSHOT).toString()));
     }
 
     public boolean isSnapshot() {
