@@ -81,17 +81,78 @@
                 </filter>
               </filters>
               <relocations>
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/avalon/framework</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/avalon/framework</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/log4j</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/log4j</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/commons/codec</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/commons/codec</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/commons/httpclient</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/commons/httpclient</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/commons/io</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/commons/io</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/commons/logging</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/commons/logging</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/commons/collections</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/commons/collections</shadedPattern> -->
+                <!-- </relocation> -->
+                <!-- <relocation> -->
+                <!-- <pattern>org/apache/log</pattern> -->
+                <!-- <shadedPattern>hidden/org/apache/log</shadedPattern> -->
+                <!-- </relocation> -->
                 <relocation>
-                  <pattern>org</pattern>
-                  <shadedPattern>hidden.org</shadedPattern>
-                  <excludes>
-                    <exclude>org.nuxeo.**</exclude>
-                  </excludes>
+                  <pattern>org/osgi/framework</pattern>
+                  <shadedPattern>hidden/org/osgi/framework</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>freemarker</pattern>
-                  <shadedPattern>hidden.freemarker</shadedPattern>
+                  <pattern>org/osgi/service</pattern>
+                  <shadedPattern>hidden/org/osgi/service</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>org/json</pattern>
+                  <shadedPattern>hidden/org/json</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/sat4j</pattern>
+                  <shadedPattern>hidden/org/sat4j</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/eclipse/osgi/util</pattern>
+                  <shadedPattern>hidden/org/eclipse/osgi/util</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/eclipse/core/runtime</pattern>
+                  <shadedPattern>hidden/org/eclipse/core/runtime</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/eclipse/core/internal</pattern>
+                  <shadedPattern>hidden/org/eclipse/core/internal</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/eclipse/equinox/events</pattern>
+                  <shadedPattern>hidden/org/eclipse/equinox/events</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org/eclipse/equinox/p2/cudf</pattern>
+                  <shadedPattern>hidden/org/eclipse/equinox/p2/cudf</shadedPattern>
+                </relocation>
+                <!-- <relocation> -->
+                <!-- <pattern>freemarker</pattern> -->
+                <!-- <shadedPattern>hidden.freemarker</shadedPattern> -->
+                <!-- </relocation> -->
               </relocations>
             </configuration>
           </execution>
