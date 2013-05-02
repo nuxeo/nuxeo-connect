@@ -121,10 +121,10 @@
                   <pattern>org/osgi/service</pattern>
                   <shadedPattern>hidden/org/osgi/service</shadedPattern>
                 </relocation>
-                <relocation>
-                  <pattern>org/json</pattern>
-                  <shadedPattern>hidden/org/json</shadedPattern>
-                </relocation>
+                <!-- <relocation> -->
+                <!--  <pattern>org/json</pattern> -->
+                <!--  <shadedPattern>hidden/org/json</shadedPattern> -->
+                <!--</relocation> -->
                 <relocation>
                   <pattern>org/sat4j</pattern>
                   <shadedPattern>hidden/org/sat4j</shadedPattern>
