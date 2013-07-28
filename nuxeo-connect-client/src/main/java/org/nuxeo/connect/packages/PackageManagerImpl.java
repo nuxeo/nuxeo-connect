@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -998,29 +998,24 @@ public class PackageManagerImpl implements PackageManager {
     public boolean matchesPlatform(String requestPkgStr, String targetPlatform)
             throws PackageException {
         Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
-        Map<String, List<DownloadablePackage>> allPackagesByName = getAllPackagesByName();
         // Try ID match first
         if (allPackagesByID.containsKey(requestPkgStr)) {
-            return allPackagesByID.get(requestPkgStr).getTargetPlatforms().length == 0
-                    || Arrays.asList(
-                            allPackagesByID.get(requestPkgStr).getTargetPlatforms()).contains(
-                            targetPlatform);
+            return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
+                    allPackagesByID.get(requestPkgStr), targetPlatform);
         }
         // Fallback on name match
-        List<DownloadablePackage> allPackagesForName = allPackagesByName.get(requestPkgStr);
+        List<DownloadablePackage> allPackagesForName = getAllPackagesByName().get(
+                requestPkgStr);
         if (allPackagesForName == null) {
             throw new PackageException("Package not found: " + requestPkgStr);
         }
         for (DownloadablePackage pkg : allPackagesForName) {
-            if (requestPkgStr.equals(pkg.getName())) {
-                if (pkg.getTargetPlatforms().length == 0
-                        || Arrays.asList(pkg.getTargetPlatforms()).contains(
-                                targetPlatform)) {
-                    return true;
-                }
+            if (requestPkgStr.equals(pkg.getName())
+                    && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
+                            pkg, targetPlatform)) {
+                return true;
             }
         }
-        // No match or not compatible
         return false;
     }
 
