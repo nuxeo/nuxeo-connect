@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -24,6 +24,7 @@ import java.util.List;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
+import org.nuxeo.connect.update.PackageException;
 
 /**
  * @since 1.4
@@ -35,13 +36,12 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
         super.setUp();
         pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
         List<DownloadablePackage> local = getDownloads("local7.json");
-
         assertNotNull(local);
         assertTrue(local.size() > 0);
         pm.registerSource(new DummyPackageSource(local, true), true);
     }
 
-    public void testResolutionOrder() throws Exception {
+    public void testResolutionOrder() {
         DependencyResolution depResolution = pm.resolveDependencies(
                 Arrays.asList(new String[] { "nuxeo-poll" }), null, null, null);
         log.info(depResolution.toString());
@@ -51,6 +51,25 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
                 depResolution.getOrderedPackageIdsToInstall().get(0));
         assertEquals("nuxeo-poll-1.0.0",
                 depResolution.getOrderedPackageIdsToInstall().get(1));
+    }
+
+    public void testTargetPlatforms() throws PackageException {
+        assertTrue(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.5"));
+        assertFalse(pm.matchesPlatform("nuxeo-birt-integration-2.1.0",
+                "cap-5.6"));
+        // Such target platform is not valid...
+        assertTrue(pm.matchesPlatform("nuxeo-platform-user-registration-1.2.1",
+                "Nuxeo CAP 5.6"));
+        // Test wildcards
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
+                "cap-5.5.0-HF00"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
+                "cap-5.5.0-HF01"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
+                "cap-5.5.0-something"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
+                "cap-5.6.0"));
     }
 
 }
