@@ -30,12 +30,14 @@
       <artifactId>json</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.equinox</groupId>
       <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -45,6 +47,7 @@
         <artifactId>maven-shade-plugin</artifactId>
         <executions>
           <execution>
+            <id>shade-with-equinox</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
@@ -63,9 +66,22 @@
               <!-- <shadeSourcesContent>true</shadeSourcesContent> -->
               <createDependencyReducedPom>true</createDependencyReducedPom>
               <!-- <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope> -->
-              <!-- <promoteTransitiveDependencies>true</promoteTransitiveDependencies> -->
-              <shadedArtifactAttached>false</shadedArtifactAttached>
-              <!--shadedClassifierName>all</shadedClassifierName -->
+              <!-- <promoteTransitiveDependencies>false</promoteTransitiveDependencies> -->
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>with-equinox</shadedClassifierName>
+              <artifactSet>
+                <excludes>
+                  <exclude>commons-httpclient:commons-httpclient</exclude>
+                  <exclude>commons-collections:commons-collections</exclude>
+                  <exclude>commons-io:commons-io</exclude>
+                  <exclude>commons-codec:commons-codec</exclude>
+                  <exclude>commons-logging:commons-logging</exclude>
+                  <exclude>logkit:logkit</exclude>
+                  <exclude>avalon-framework:avalon-framework</exclude>
+                  <exclude>log4j:log4j</exclude>
+                  <exclude>org.json:json</exclude>
+                </excludes>
+              </artifactSet>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
@@ -77,38 +93,6 @@
                 </filter>
               </filters>
               <relocations>
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/avalon/framework</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/avalon/framework</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/log4j</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/log4j</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/commons/codec</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/commons/codec</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/commons/httpclient</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/commons/httpclient</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/commons/io</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/commons/io</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/commons/logging</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/commons/logging</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/commons/collections</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/commons/collections</shadedPattern> -->
-                <!-- </relocation> -->
-                <!-- <relocation> -->
-                <!-- <pattern>org/apache/log</pattern> -->
-                <!-- <shadedPattern>hidden/org/apache/log</shadedPattern> -->
-                <!-- </relocation> -->
                 <relocation>
                   <pattern>org/osgi/framework</pattern>
                   <shadedPattern>hidden/org/osgi/framework</shadedPattern>
@@ -117,10 +101,6 @@
                   <pattern>org/osgi/service</pattern>
                   <shadedPattern>hidden/org/osgi/service</shadedPattern>
                 </relocation>
-                <!-- <relocation> -->
-                <!--  <pattern>org/json</pattern> -->
-                <!--  <shadedPattern>hidden/org/json</shadedPattern> -->
-                <!--</relocation> -->
                 <relocation>
                   <pattern>org/sat4j</pattern>
                   <shadedPattern>hidden/org/sat4j</shadedPattern>
@@ -145,11 +125,42 @@
                   <pattern>org/eclipse/equinox/p2/cudf</pattern>
                   <shadedPattern>hidden/org/eclipse/equinox/p2/cudf</shadedPattern>
                 </relocation>
-                <!-- <relocation> -->
-                <!-- <pattern>freemarker</pattern> -->
-                <!-- <shadedPattern>hidden.freemarker</shadedPattern> -->
-                <!-- </relocation> -->
               </relocations>
+            </configuration>
+          </execution>
+          <execution>
+            <id>shade-standalone</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- merge services files -->
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"></transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"></transformer>
+                <!-- <transformer -->
+                <!-- implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"> -->
+                <!-- <addHeader>false</addHeader> -->
+                <!-- </transformer> -->
+              </transformers>
+              <!-- <createSourcesJar>true</createSourcesJar> -->
+              <!-- <shadeSourcesContent>true</shadeSourcesContent> -->
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <!-- <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope> -->
+              <!-- <promoteTransitiveDependencies>false</promoteTransitiveDependencies> -->
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>standalone</shadedClassifierName>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
