@@ -7,7 +7,7 @@ OS name: "mac os x" version: "10.8.4" arch: "x86_64" Family: "mac"
 [DEBUG] Building Maven user-level plugin registry from: '/Users/tom/.m2/plugin-registry.xml'
 [DEBUG] Building Maven global-level plugin registry from: '/usr/local/Cellar/maven2/2.2.1/libexec/conf/plugin-registry.xml'
 [INFO] Scanning for projects...
-[DEBUG] Searching for parent-POM: org.nuxeo.connect:nuxeo-connect-client-parent:pom:1.4.9-SNAPSHOT of project: null:nuxeo-connect-client:jar:null in relative path: ../pom.xml
+[DEBUG] Searching for parent-POM: org.nuxeo.connect:nuxeo-connect-client-parent:pom:1.4.10-SNAPSHOT of project: null:nuxeo-connect-client:jar:null in relative path: ../pom.xml
 [DEBUG] Using parent-POM from the project hierarchy at: '../pom.xml' for project: null:nuxeo-connect-client:jar:null
 [DEBUG] Adding managed dependencies for unknown:nuxeo-connect-client
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1
@@ -1088,9 +1088,9 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/surefire-reports/org.nuxeo.connect.packages.dependencies.CUDFHelperTest.txt
 [INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/surefire-reports/org.nuxeo.connect.connector.test.TestFakeConnector.txt
 [INFO] Deleting directory /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/surefire-reports
-[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/original-nuxeo-connect-client-1.4.9-SNAPSHOT.jar
-[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT.jar
-[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT-sources.jar
+[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/original-nuxeo-connect-client-1.4.10-SNAPSHOT.jar
+[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT.jar
+[INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT-sources.jar
 [INFO] Deleting file /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/maven-archiver/pom.properties
 [INFO] Deleting directory /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/maven-archiver
 [INFO] Deleting directory /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/generated-sources/test-annotations
@@ -1792,8 +1792,8 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) format = {0,date,yyyyMMdd-HHmmss}
 [DEBUG]   (f) getRevisionOnlyOnce = false
 [DEBUG]   (f) items = [timestamp]
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
-[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
 [DEBUG]   (s) scmDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG]   (f) timestampPropertyName = timestamp
@@ -2807,7 +2807,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 
 
 [DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-nuxeo-plugin:1.0.14:eclipse-version' -->
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG] -- end configuration --
 [INFO] [nuxeo:eclipse-version {execution: eclipsize-version}]
 [INFO] eclipseVersion:1.4.9.-SNAPSHOT
@@ -2894,7 +2894,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (s) includeEmptyDirs = false
 [DEBUG]   (s) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes
 [DEBUG]   (s) overwrite = false
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG]   (s) resources = [Resource {targetPath: null, filtering: false, FileSet {directory: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/main/resources, PatternSet [includes: {}, excludes: {}]}}]
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG] -- end configuration --
@@ -2915,7 +2915,7 @@ includes []
 [DEBUG] copy /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/main/resources/OSGI-INF/connect-packagemanager-service.xml to /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes/OSGI-INF/connect-packagemanager-service.xml
 [DEBUG] file runtimeserver-contrib.xml has a filtered file extension
 [DEBUG] copy /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/main/resources/OSGI-INF/runtimeserver-contrib.xml to /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes/OSGI-INF/runtimeserver-contrib.xml
-[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT (selected for null)
+[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT (selected for null)
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1:provided (selected for provided)
 [DEBUG]     commons-logging:commons-logging:jar:1.0.4:provided (applying version: 1.1)
 [DEBUG]     commons-logging:commons-logging:jar:1.1:provided (selected for provided)
@@ -3101,8 +3101,8 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) generatedSourcesDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/generated-sources/annotations
 [DEBUG]   (f) optimize = false
 [DEBUG]   (f) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes
-[DEBUG]   (f) outputFileName = nuxeo-connect-client-1.4.9-SNAPSHOT
-[DEBUG]   (f) projectArtifact = org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
+[DEBUG]   (f) outputFileName = nuxeo-connect-client-1.4.10-SNAPSHOT
+[DEBUG]   (f) projectArtifact = org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG]   (f) showDeprecation = false
 [DEBUG]   (f) showWarnings = false
@@ -3161,7 +3161,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (s) includeEmptyDirs = false
 [DEBUG]   (s) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes
 [DEBUG]   (s) overwrite = false
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG]   (s) resources = [Resource {targetPath: null, filtering: false, FileSet {directory: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/resources, PatternSet [includes: {}, excludes: {}]}}]
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG] -- end configuration --
@@ -3226,7 +3226,7 @@ includes []
 [DEBUG] copy /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/resources/test-data/requestRemove.cudf to /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes/test-data/requestRemove.cudf
 [DEBUG] file universe.cudf has a filtered file extension
 [DEBUG] copy /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/resources/test-data/universe.cudf to /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes/test-data/universe.cudf
-[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT (selected for null)
+[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT (selected for null)
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1:provided (selected for provided)
 [DEBUG]     commons-logging:commons-logging:jar:1.0.4:provided (applying version: 1.1)
 [DEBUG]     commons-logging:commons-logging:jar:1.1:provided (selected for provided)
@@ -3266,7 +3266,7 @@ includes []
 [DEBUG]   (f) generatedTestSourcesDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/generated-sources/test-annotations
 [DEBUG]   (f) optimize = false
 [DEBUG]   (f) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes
-[DEBUG]   (f) outputFileName = nuxeo-connect-client-1.4.9-SNAPSHOT
+[DEBUG]   (f) outputFileName = nuxeo-connect-client-1.4.10-SNAPSHOT
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG]   (f) showDeprecation = false
 [DEBUG]   (f) showWarnings = false
@@ -3323,7 +3323,7 @@ includes []
 [DEBUG] Command line options:
 [DEBUG] -d /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes -classpath /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes:/Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes:/Users/tom/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar:/Users/tom/.m2/repository/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:/Users/tom/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16.jar:/Users/tom/.m2/repository/logkit/logkit/1.0.1/logkit-1.0.1.jar:/Users/tom/.m2/repository/avalon-framework/avalon-framework/4.1.3/avalon-framework-4.1.3.jar:/Users/tom/.m2/repository/commons-codec/commons-codec/1.2/commons-codec-1.2.jar:/Users/tom/.m2/repository/commons-collections/commons-collections/3.2/commons-collections-3.2.jar:/Users/tom/.m2/repository/commons-io/commons-io/1.4/commons-io-1.4.jar:/Users/tom/.m2/repository/org/json/json/20070829/json-20070829.jar:/Users/tom/.m2/repository/junit/junit/4.8.1/junit-4.8.1.jar:/Users/tom/.m2/repository/org/eclipse/equinox/org.eclipse.equinox.p2.cudf/1.16-NX/org.eclipse.equinox.p2.cudf-1.16-NX.jar:/Users/tom/.m2/repository/org/sat4j/org.sat4j.pb/2.3.1/org.sat4j.pb-2.3.1.jar:/Users/tom/.m2/repository/org/sat4j/org.sat4j.core/2.3.1/org.sat4j.core-2.3.1.jar:/Users/tom/.m2/repository/org/eclipse/core/org.eclipse.core.jobs/3.5.0.v20100515/org.eclipse.core.jobs-3.5.0.v20100515.jar:/Users/tom/.m2/repository/org/eclipse/equinox/org.eclipse.equinox.common/3.6.0.v20100503/org.eclipse.equinox.common-3.6.0.v20100503.jar:/Users/tom/.m2/repository/org/osgi/osgi-core/4.1/osgi-core-4.1.jar:/Users/tom/.m2/repository/org/freemarker/freemarker/2.3.16/freemarker-2.3.16.jar: -sourcepath /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestHotFixesP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestInstallOfDeprecatedPkg.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestExclusionsP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/update/VersionRangeTest.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/packages/dependencies/P2CUDFDependencyResolverTest2.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/packages/dependencies/CUDFHelperTest.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestUninstallCheck.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestPackageDependencyResolutionP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestDowngradeP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestPackageDependencyResolution.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/packages/dependencies/P2CUDFDependencyResolverTest.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/tests/TestIDGens.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/DummyPackageSource.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/connector/test/ConnectTestConnector.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestPackageManager.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestRemoveP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/tests/TestService.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestUninstallCheckP2CUDF.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestHotFixes.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/connector/test/TestFakeConnector.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/AbstractPackageManagerTestCase.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestVersions.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/tests/TestSerialization.java /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestExclusions.java -s /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/generated-sources/test-annotations -g -nowarn -target 1.6 -source 1.6 -encoding UTF-8
 [INFO] Compiling 24 source files to /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/test-classes
-[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT (selected for null)
+[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT (selected for null)
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1:provided (selected for provided)
 [DEBUG]     commons-logging:commons-logging:jar:1.0.4:provided (applying version: 1.1)
 [DEBUG]     commons-logging:commons-logging:jar:1.1:provided (selected for provided)
@@ -3502,7 +3502,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) localRepository = Repository[local|file:///Users/tom/.m2/repository]
 [DEBUG]   (f) pluginArtifactMap = {org.apache.maven.surefire:surefire-booter=org.apache.maven.surefire:surefire-booter:jar:2.5:runtime, org.apache.maven.surefire:surefire-api=org.apache.maven.surefire:surefire-api:jar:2.5:runtime, org.codehaus.plexus:plexus-utils=org.codehaus.plexus:plexus-utils:jar:1.5.9:runtime, org.apache.maven:maven-plugin-api=org.apache.maven:maven-plugin-api:jar:2.0.9:runtime, org.apache.maven:maven-artifact=org.apache.maven:maven-artifact:jar:2.0.9:runtime, org.apache.maven:maven-project=org.apache.maven:maven-project:jar:2.0.9:runtime, org.apache.maven:maven-core=org.apache.maven:maven-core:jar:2.0.9:runtime, org.apache.maven:maven-toolchain=org.apache.maven:maven-toolchain:jar:2.0.9:runtime}
 [DEBUG]   (f) printSummary = true
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG]   (f) projectArtifactMap = {commons-httpclient:commons-httpclient=commons-httpclient:commons-httpclient:jar:3.1:provided, commons-logging:commons-logging=commons-logging:commons-logging:jar:1.1:compile, log4j:log4j=log4j:log4j:jar:1.2.16:compile, logkit:logkit=logkit:logkit:jar:1.0.1:compile, avalon-framework:avalon-framework=avalon-framework:avalon-framework:jar:4.1.3:compile, commons-codec:commons-codec=commons-codec:commons-codec:jar:1.2:provided, commons-collections:commons-collections=commons-collections:commons-collections:jar:3.2:provided, commons-io:commons-io=commons-io:commons-io:jar:1.4:provided, org.json:json=org.json:json:jar:20070829:provided, junit:junit=junit:junit:jar:4.8.1:test, org.eclipse.equinox:org.eclipse.equinox.p2.cudf=org.eclipse.equinox:org.eclipse.equinox.p2.cudf:jar:1.16-NX:compile, org.sat4j:org.sat4j.pb=org.sat4j:org.sat4j.pb:jar:2.3.1:compile, org.sat4j:org.sat4j.core=org.sat4j:org.sat4j.core:jar:2.3.1:compile, org.eclipse.core:org.eclipse.core.jobs=org.eclipse.core:org.eclipse.core.jobs:jar:3.5.0.v20100515:compile, org.eclipse.equinox:org.eclipse.equinox.common=org.eclipse.equinox:org.eclipse.equinox.common:jar:3.6.0.v20100503:compile, org.osgi:osgi-core=org.osgi:osgi-core:jar:4.1:compile, org.freemarker:freemarker=org.freemarker:freemarker:jar:2.3.16:compile}
 [DEBUG]   (f) redirectTestOutputToFile = false
 [DEBUG]   (f) remoteRepositories = [Repository[public|http://maven.nuxeo.org/nexus/content/groups/public], Repository[public-snapshot|http://maven.nuxeo.org/nexus/content/groups/public-snapshot], Repository[central|http://repo1.maven.org/maven2]]
@@ -17916,7 +17916,7 @@ Results :
 
 Tests run: 54, Failures: 0, Errors: 0, Skipped: 0
 
-[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT (selected for null)
+[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT (selected for null)
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1:provided (selected for provided)
 [DEBUG]     commons-logging:commons-logging:jar:1.0.4:provided (applying version: 1.1)
 [DEBUG]     commons-logging:commons-logging:jar:1.1:provided (selected for provided)
@@ -18055,15 +18055,15 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) archive = org.apache.maven.archiver.MavenArchiveConfiguration@6a52da3c
 [DEBUG]   (f) classesDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes
 [DEBUG]   (f) defaultManifestFile = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes/META-INF/MANIFEST.MF
-[DEBUG]   (f) finalName = nuxeo-connect-client-1.4.9-SNAPSHOT
+[DEBUG]   (f) finalName = nuxeo-connect-client-1.4.10-SNAPSHOT
 [DEBUG]   (f) forceCreation = false
 [DEBUG]   (f) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG]   (f) useDefaultManifestFile = false
 [DEBUG] -- end configuration --
 [INFO] [jar:jar {execution: default-jar}]
-[DEBUG] isUp2date: false (Destination /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT.jar not found.)
-[INFO] Building jar: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT.jar
+[DEBUG] isUp2date: false (Destination /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT.jar not found.)
+[INFO] Building jar: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT.jar
 [DEBUG] adding directory META-INF/
 [DEBUG] adding entry META-INF/MANIFEST.MF
 [DEBUG] adding directory org/
@@ -18198,8 +18198,8 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) format = {0,date,yyyyMMdd-HHmmss}
 [DEBUG]   (f) getRevisionOnlyOnce = false
 [DEBUG]   (f) items = [timestamp]
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
-[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
 [DEBUG]   (s) scmDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client
 [DEBUG]   (f) session = org.apache.maven.execution.MavenSession@5237ca27
 [DEBUG]   (f) timestampPropertyName = timestamp
@@ -18277,18 +18277,18 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) attach = true
 [DEBUG]   (f) defaultManifestFile = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/classes/META-INF/MANIFEST.MF
 [DEBUG]   (f) excludeResources = false
-[DEBUG]   (f) finalName = nuxeo-connect-client-1.4.9-SNAPSHOT
+[DEBUG]   (f) finalName = nuxeo-connect-client-1.4.10-SNAPSHOT
 [DEBUG]   (f) forceCreation = false
 [DEBUG]   (f) includePom = false
 [DEBUG]   (f) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
-[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) reactorProjects = [MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml]
 [DEBUG]   (f) useDefaultExcludes = true
 [DEBUG]   (f) useDefaultManifestFile = false
 [DEBUG] -- end configuration --
 [INFO] [source:jar {execution: attach-sources}]
-[DEBUG] isUp2date: false (Destination /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT-sources.jar not found.)
-[INFO] Building jar: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT-sources.jar
+[DEBUG] isUp2date: false (Destination /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT-sources.jar not found.)
+[INFO] Building jar: /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT-sources.jar
 [DEBUG] adding directory META-INF/
 [DEBUG] adding entry META-INF/MANIFEST.MF
 [DEBUG] adding directory org/
@@ -18403,7 +18403,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG] adding entry OSGI-INF/connect-gateway-service.xml
 [DEBUG] adding entry OSGI-INF/connect-packagemanager-service.xml
 [DEBUG] adding entry OSGI-INF/runtimeserver-contrib.xml
-[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT (selected for null)
+[DEBUG] org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT (selected for null)
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1:provided (selected for provided)
 [DEBUG]     commons-logging:commons-logging:jar:1.0.4:provided (applying version: 1.1)
 [DEBUG]     commons-logging:commons-logging:jar:1.1:provided (selected for provided)
@@ -18525,7 +18525,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) keepDependenciesWithProvidedScope = false
 [DEBUG]   (f) localRepository = Repository[local|file:///Users/tom/.m2/repository]
 [DEBUG]   (f) outputDirectory = /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target
-[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.9-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
+[DEBUG]   (f) project = MavenProject: org.nuxeo.connect:nuxeo-connect-client:1.4.10-SNAPSHOT @ /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/pom.xml
 [DEBUG]   (f) promoteTransitiveDependencies = false
 [DEBUG]   (f) pattern = org/osgi/framework
 [DEBUG]   (f) shadedPattern = hidden/org/osgi/framework
@@ -18563,7 +18563,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [INFO] Including org.osgi:osgi-core:jar:4.1 in the shaded jar.
 [INFO] Including org.freemarker:freemarker:jar:2.3.16 in the shaded jar.
 [INFO] Replacing original artifact with shaded artifact.
-[INFO] Replacing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT.jar with /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT-shaded.jar
+[INFO] Replacing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT.jar with /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT-shaded.jar
 [DEBUG] Adding managed dependencies for unknown:nuxeo-connect-client
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1
 [DEBUG]   commons-collections:commons-collections:jar:3.2
@@ -18575,9 +18575,9 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   commons-logging:commons-logging:jar:1.1
 [DEBUG]   log4j:log4j:jar:1.2.16
 [DEBUG] Dependency tree resolution listener events:
-[DEBUG] testArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
-[DEBUG] includeArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
-[DEBUG] startProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
+[DEBUG] testArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
+[DEBUG] includeArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
+[DEBUG] startProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
 [DEBUG]   testArtifact: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
 [DEBUG]   includeArtifact: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
 [DEBUG]   startProcessChildren: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
@@ -18626,7 +18626,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   includeArtifact: artifact=org.freemarker:freemarker:jar:2.3.16:compile
 [DEBUG]   startProcessChildren: artifact=org.freemarker:freemarker:jar:2.3.16:compile
 [DEBUG]   endProcessChildren: artifact=org.freemarker:freemarker:jar:2.3.16:compile
-[DEBUG] endProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
+[DEBUG] endProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
 [DEBUG] Adding managed dependencies for unknown:nuxeo-connect-client
 [DEBUG]   commons-httpclient:commons-httpclient:jar:3.1
 [DEBUG]   commons-collections:commons-collections:jar:3.2
@@ -18638,9 +18638,9 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   commons-logging:commons-logging:jar:1.1
 [DEBUG]   log4j:log4j:jar:1.2.16
 [DEBUG] Dependency tree resolution listener events:
-[DEBUG] testArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
-[DEBUG] includeArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
-[DEBUG] startProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
+[DEBUG] testArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
+[DEBUG] includeArtifact: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
+[DEBUG] startProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
 [DEBUG]   testArtifact: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
 [DEBUG]   includeArtifact: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
 [DEBUG]   startProcessChildren: artifact=commons-httpclient:commons-httpclient:jar:3.1:provided
@@ -18685,7 +18685,7 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   includeArtifact: artifact=org.freemarker:freemarker:jar:2.3.16:compile
 [DEBUG]   startProcessChildren: artifact=org.freemarker:freemarker:jar:2.3.16:compile
 [DEBUG]   endProcessChildren: artifact=org.freemarker:freemarker:jar:2.3.16:compile
-[DEBUG] endProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
+[DEBUG] endProcessChildren: artifact=org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
 [DEBUG] Plugin dependencies for:
 
 org.apache.maven.plugins:maven-install-plugin:2.3
@@ -18749,8 +18749,8 @@ These will use the artifact files already in the core ClassRealm instead, to all
 
 
 [DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-install-plugin:2.3:install' -->
-[DEBUG]   (f) artifact = org.nuxeo.connect:nuxeo-connect-client:jar:1.4.9-SNAPSHOT
-[DEBUG]   (f) attachedArtifacts = [org.nuxeo.connect:nuxeo-connect-client:java-source:sources:1.4.9-SNAPSHOT]
+[DEBUG]   (f) artifact = org.nuxeo.connect:nuxeo-connect-client:jar:1.4.10-SNAPSHOT
+[DEBUG]   (f) attachedArtifacts = [org.nuxeo.connect:nuxeo-connect-client:java-source:sources:1.4.10-SNAPSHOT]
 [DEBUG]   (f) createChecksum = false
 [DEBUG]   (f) localRepository = Repository[local|file:///Users/tom/.m2/repository]
 [DEBUG]   (f) packaging = jar
@@ -18758,8 +18758,8 @@ These will use the artifact files already in the core ClassRealm instead, to all
 [DEBUG]   (f) updateReleaseInfo = false
 [DEBUG] -- end configuration --
 [INFO] [install:install {execution: default-install}]
-[INFO] Installing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT.jar to /Users/tom/.m2/repository/org/nuxeo/connect/nuxeo-connect-client/1.4.9-SNAPSHOT/nuxeo-connect-client-1.4.9-SNAPSHOT.jar
-[INFO] Installing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.9-SNAPSHOT-sources.jar to /Users/tom/.m2/repository/org/nuxeo/connect/nuxeo-connect-client/1.4.9-SNAPSHOT/nuxeo-connect-client-1.4.9-SNAPSHOT-sources.jar
+[INFO] Installing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT.jar to /Users/tom/.m2/repository/org/nuxeo/connect/nuxeo-connect-client/1.4.10-SNAPSHOT/nuxeo-connect-client-1.4.10-SNAPSHOT.jar
+[INFO] Installing /Users/tom/work/code/nuxeo/addons/nuxeo-connect/nuxeo-connect-client/target/nuxeo-connect-client-1.4.10-SNAPSHOT-sources.jar to /Users/tom/.m2/repository/org/nuxeo/connect/nuxeo-connect-client/1.4.10-SNAPSHOT/nuxeo-connect-client-1.4.10-SNAPSHOT-sources.jar
 [INFO] ------------------------------------------------------------------------
 [1;32m[INFO] BUILD SUCCESS[0mFUL
 [INFO] ------------------------------------------------------------------------
