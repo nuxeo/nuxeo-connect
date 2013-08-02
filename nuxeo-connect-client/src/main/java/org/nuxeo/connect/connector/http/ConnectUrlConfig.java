@@ -35,6 +35,8 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_PROXY_HOST_PROPERTY = "org.nuxeo.connect.proxy.host";
 
+    public static final String CONNECT_PROXY_PAC_URL = "org.nuxeo.connect.proxy.pac.url";
+
     public static final String CONNECT_PROXY_PORT_PROPERTY = "org.nuxeo.connect.proxy.port";
 
     public static final String CONNECT_PROXY_LOGIN_PROPERTY = "org.nuxeo.connect.proxy.login";
@@ -56,8 +58,6 @@ public class ConnectUrlConfig {
     public static final String NUXEO_PROXY_NTLM_HOST = "nuxeo.http.proxy.ntlm.host";
 
     public static final String NUXEO_PROXY_NTLM_DOMAIN = "nuxeo.http.proxy.ntlm.domain";
-
-    public static final String NUXEO_PROXY_PAC_URL = "nuxeo.http.proxy.pac.url";
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
@@ -100,7 +100,7 @@ public class ConnectUrlConfig {
      * @since 1.4.9
      */
     public static String getProxyPacUrl() {
-        return NuxeoConnectClient.getProperty(NUXEO_PROXY_PAC_URL, null);
+        return NuxeoConnectClient.getProperty(CONNECT_PROXY_PAC_URL, null);
     }
 
     // Proxy settings management

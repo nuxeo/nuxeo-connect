@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Abstract class resolver to find which proxy to use with a configured proxy
  * pac. The proxy pac file is setted with
- * org.nuxeo.connect.connector.http.ConnectUrlConfig#NUXEO_PROXY_PAC_URL system
+ * org.nuxeo.connect.connector.http.ConnectUrlConfig#CONNECT_PROXY_PAC_URL system
  * property.
  *
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
