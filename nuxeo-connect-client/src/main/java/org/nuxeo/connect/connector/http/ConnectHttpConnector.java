@@ -68,7 +68,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
-        ProxyHelper.configureProxyIfNeeded(httpClient);
+        ProxyHelper.configureProxyIfNeeded(httpClient, url);
         HttpMethod method = new GetMethod(url);
         method.setFollowRedirects(true);
 

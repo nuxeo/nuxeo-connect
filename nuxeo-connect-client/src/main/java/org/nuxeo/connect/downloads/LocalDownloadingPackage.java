@@ -117,7 +117,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
-        ProxyHelper.configureProxyIfNeeded(httpClient);
+        ProxyHelper.configureProxyIfNeeded(httpClient, sourceUrl);
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
         try {

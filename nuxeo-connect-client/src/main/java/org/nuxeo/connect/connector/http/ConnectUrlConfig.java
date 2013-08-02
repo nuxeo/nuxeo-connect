@@ -57,6 +57,8 @@ public class ConnectUrlConfig {
 
     public static final String NUXEO_PROXY_NTLM_DOMAIN = "nuxeo.http.proxy.ntlm.domain";
 
+    public static final String NUXEO_PROXY_PAC_URL = "nuxeo.http.proxy.pac.url";
+
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
     public static final String CONNECT_REGISTERED_ROOT_PATH = "registred/";
@@ -94,10 +96,19 @@ public class ConnectUrlConfig {
         return getRegistrationBaseUrl() + CONNECT_UNREGISTERED_ROOT_PATH;
     }
 
+    /**
+     * @since 1.4.9
+     */
+    public static String getProxyPacUrl() {
+        return NuxeoConnectClient.getProperty(NUXEO_PROXY_PAC_URL, null);
+    }
+
     // Proxy settings management
     protected static Boolean useProxy = null;
 
     protected static Boolean isProxyAuthenticated = null;
+
+    protected static Boolean useProxyPac = null;
 
     public static boolean useProxy() {
         if (useProxy == null) {
@@ -108,7 +119,15 @@ public class ConnectUrlConfig {
                 useProxy = true;
             }
         }
-        return useProxy;
+        return useProxy || useProxyPac();
+    }
+
+    public static boolean useProxyPac() {
+        if (useProxyPac == null) {
+            String proxyPacUrl = getProxyPacUrl();
+            useProxyPac = proxyPacUrl != null && proxyPacUrl.length() > 0;
+        }
+        return useProxyPac;
     }
 
     public static boolean isProxyAuthenticated() {

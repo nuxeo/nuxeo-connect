@@ -56,7 +56,7 @@ public class RegistrationHelper {
     }
 
     protected static void configureHttpClient(HttpClient httpClient,
-            String login, String password) {
+            String url, String login, String password) {
         // Configure BA to access Connect for registration
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
@@ -65,14 +65,14 @@ public class RegistrationHelper {
         httpClient.getState().setCredentials(
                 new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
         // Configure the http proxy if needed
-        ProxyHelper.configureProxyIfNeeded(httpClient);
+        ProxyHelper.configureProxyIfNeeded(httpClient, url);
     }
 
     public static List<ConnectProject> getAvailableProjectsForRegistration(
             String login, String password) {
         String url = getBaseUrl() + GET_PROJECTS_SUFFIX;
         HttpClient httpClient = new HttpClient();
-        configureHttpClient(httpClient, login, password);
+        configureHttpClient(httpClient, url, login, password);
         HttpMethod method = new GetMethod(url);
         List<ConnectProject> result = new ArrayList<ConnectProject>();
         try {
@@ -101,7 +101,7 @@ public class RegistrationHelper {
             throws Exception {
         String url = getBaseUrl() + POST_REGISTER_SUFFIX;
         HttpClient httpClient = new HttpClient();
-        configureHttpClient(httpClient, login, password);
+        configureHttpClient(httpClient, url, login, password);
         PostMethod method = new PostMethod(url);
         NameValuePair project = new NameValuePair("projectId", prjId);
         NameValuePair desc = new NameValuePair("description", description);

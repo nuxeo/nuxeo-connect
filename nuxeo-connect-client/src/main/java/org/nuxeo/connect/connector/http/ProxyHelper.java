@@ -24,6 +24,9 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.nuxeo.connect.connector.http.proxy.ProxyPacResolver;
+import org.nuxeo.connect.connector.http.proxy.RhinoProxyPacResolver;
+
 /**
  * Helper class to handle the HTTP Configuration
  *
@@ -34,10 +37,23 @@ public class ProxyHelper {
 
     protected static boolean useNTLM = false;
 
-    public static void configureProxyIfNeeded(HttpClient httpClient) {
+    protected static ProxyPacResolver pacResolver = new RhinoProxyPacResolver();
+
+    protected static String PROXY_PAC_DIRECT = "DIRECT";
+
+    public static void configureProxyIfNeeded(HttpClient httpClient, String url) {
         if (ConnectUrlConfig.useProxy()) {
             // configure http proxy
-           httpClient.getHostConfiguration().setProxy(ConnectUrlConfig.getProxyHost(), ConnectUrlConfig.getProxyPort());
+            if (ConnectUrlConfig.useProxyPac()) {
+                String[] proxy = pacResolver.findProxy(url);
+                if (proxy != null) {
+                    httpClient.getHostConfiguration().setProxy(proxy[0], Integer.parseInt(proxy[1]));
+                }
+            }
+            else {
+                httpClient.getHostConfiguration().setProxy(ConnectUrlConfig.getProxyHost(), ConnectUrlConfig.getProxyPort());
+            }
+
            // configure proxy auth in BA
            if (ConnectUrlConfig.isProxyAuthenticated()) {
                if (ConnectUrlConfig.isProxyNTLM()) {
