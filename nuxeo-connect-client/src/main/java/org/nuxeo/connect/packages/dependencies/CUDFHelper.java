@@ -171,11 +171,11 @@ public class CUDFHelper {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
             sb.append(cudfPackage.getCUDFStanza());
             sb.append(NuxeoCUDFPackage.CUDF_DEPENDS
-                    + formatCUDF(cudfPackage.getDependencies(), false)
+                    + formatCUDF(cudfPackage.getDependencies(), false, true)
                     + newLine);
             // Add conflicts to other versions of the same package
             String conflictsFormatted = formatCUDF(cudfPackage.getConflicts(),
-                    false);
+                    false, false);
             conflictsFormatted += (conflictsFormatted.trim().length() > 0 ? ", "
                     : "")
                     + cudfPackage.getCUDFName()
@@ -184,14 +184,16 @@ public class CUDFHelper {
             sb.append(NuxeoCUDFPackage.CUDF_CONFLICTS + conflictsFormatted
                     + newLine);
             sb.append(NuxeoCUDFPackage.CUDF_PROVIDES
-                    + formatCUDF(cudfPackage.getProvides(), false) + newLine);
+                    + formatCUDF(cudfPackage.getProvides(), false, false)
+                    + newLine);
             sb.append(System.getProperty("line.separator"));
         }
         return sb.toString();
     }
 
     private String formatCUDF(PackageDependency[] dependencies,
-            boolean failOnError) throws DependencyException {
+            boolean failOnError, boolean warnOnError)
+            throws DependencyException {
         if (dependencies == null) {
             return "";
         }
@@ -204,10 +206,12 @@ public class CUDFHelper {
                         + " with target platform " + targetPlatform;
                 if (failOnError) {
                     throw new DependencyException(errMsg);
-                } else {
+                } else if (warnOnError) {
                     log.warn(errMsg);
-                    continue;
+                } else {
+                    log.debug(errMsg);
                 }
+                continue;
             }
             VersionRange versionRange = packageDependency.getVersionRange();
             int cudfMinVersion, cudfMaxVersion;
@@ -259,12 +263,12 @@ public class CUDFHelper {
             throws DependencyException {
         StringBuilder sb = new StringBuilder(getCUDFFile());
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall, true)
-                + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_REMOVE + formatCUDF(pkgRemove, true)
-                + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE + formatCUDF(pkgUpgrade, true)
-                + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_INSTALL
+                + formatCUDF(pkgInstall, true, true) + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_REMOVE
+                + formatCUDF(pkgRemove, true, true) + newLine);
+        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE
+                + formatCUDF(pkgUpgrade, true, true) + newLine);
         return sb.toString();
     }
 
