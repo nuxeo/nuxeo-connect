@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -55,6 +55,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         this.pm = pm;
     }
 
+    @Override
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) throws DependencyException {
@@ -113,6 +114,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         return list.toArray(new PackageDependency[list.size()]);
     }
 
+    @Override
     public DependencyResolution resolve(String pkgId, String targetPlatform)
             throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
