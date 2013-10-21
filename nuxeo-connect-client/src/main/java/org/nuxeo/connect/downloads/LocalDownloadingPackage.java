@@ -178,8 +178,8 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
             return;
         }
         try {
-            log.info("Adding " + getId());
             pus.addPackage(file);
+            log.info("Added " + getId());
         } catch (AlreadyExistsPackageException e) {
             log.error(e.getMessage());
         } catch (PackageException e) {
