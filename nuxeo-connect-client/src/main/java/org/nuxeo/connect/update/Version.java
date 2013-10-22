@@ -20,9 +20,28 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.nuxeo.connect.pm.tests.TestVersions;
 
 /**
- * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
+ * Those versions are used in the Marketplace packages. They are in the form
+ * major.minor.patch-classifier with some "special" classifiers which are "rc",
+ * "alpha", "beta" (upper or lower case), a letter followed by a date in the
+ * form AAAAMMDD (for instance "I20131022") and the SNAPSHOT classifier.<br>
+ * Order is the following:<br>
+ * <code>
+ * x.y.z-beta<br>
+ * x.y.z-r20131022<br>
+ * x.y.z-SNAPSHOT<br>
+ * x.y.z<br>
+ * x.y.z-anyclassifier<br>
+ * </code><br>
+ *
+ * Classifiers are alphabetically ordered between themselves.<br>
+ * Special classifiers are before the SNAPSHOT.<br>
+ * SNAPSHOT is always just before the release (without classifier).<br>
+ * Non-special classifiers are after the release.
+ *
+ * @see TestVersions
  */
 public class Version implements Comparable<Version> {
 
