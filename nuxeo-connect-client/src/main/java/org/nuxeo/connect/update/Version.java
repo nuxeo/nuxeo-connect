@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.connect.pm.tests.TestVersions;
 
 /**
  * Those versions are used in the Marketplace packages. They are in the form
@@ -39,9 +38,11 @@ import org.nuxeo.connect.pm.tests.TestVersions;
  * Classifiers are alphabetically ordered between themselves.<br>
  * Special classifiers are before the SNAPSHOT.<br>
  * SNAPSHOT is always just before the release (without classifier).<br>
- * Non-special classifiers are after the release.
+ * Non-special classifiers are after the release.<br>
  *
- * @see TestVersions
+ * See <a href=
+ * "https://github.com/nuxeo/nuxeo-connect/blob/master/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestVersions.java"
+ * >TestVersions</a>.
  */
 public class Version implements Comparable<Version> {
 
