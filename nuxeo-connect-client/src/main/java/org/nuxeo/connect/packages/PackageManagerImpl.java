@@ -296,7 +296,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)
-                        && pkg.getState() >= PackageState.INSTALLING.getValue()) {
+                        && PackageState.getByValue(pkg.getState()).isInstalled()) {
                     versions.add(pkg.getVersion());
                 }
             }
@@ -340,7 +340,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)) {
-                    if (pkg.getState() == PackageState.INSTALLED.getValue()) {
+                    if (PackageState.getByValue(pkg.getState()).isInstalled()) {
                         installedVersions.add(pkg.getVersion());
                     } else {
                         localVersions.add(pkg.getVersion());
@@ -425,7 +425,7 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> res = new ArrayList<DownloadablePackage>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getState() >= PackageState.INSTALLING.getValue()) {
+                if (PackageState.getByValue(pkg.getState()).isInstalled()) {
                     res.add(pkg);
                 }
             }
@@ -509,22 +509,19 @@ public class PackageManagerImpl implements PackageManager {
         // active local package and match the target platform
         for (DownloadablePackage pkg : localPackages) {
             // Ignore upgrade check for unused packages
-            if ((pkg.getState() != PackageState.INSTALLING.getValue())
-                    && (pkg.getState() != PackageState.INSTALLED.getValue())
-                    && (pkg.getState() != PackageState.STARTED.getValue())) {
+            if (!PackageState.getByValue(pkg.getState()).isInstalled()) {
                 continue;
             }
             for (DownloadablePackage availablePackage : availablePackages) {
-                if (availablePackage.getName().equals(pkg.getName())) {
-                    if (availablePackage.getVersion() != null) {
-                        if (availablePackage.getVersion().greaterThan(
-                                pkg.getVersion())) {
-                            toUpdate.add(availablePackage);
-                            toUpdateIds.add(availablePackage.getId());
-                        }
-                    } else {
-                        log.warn("Package " + availablePackage.getId()
-                                + " has a null version");
+                if (availablePackage.getName().equals(pkg.getName())
+                        && availablePackage.getVersion() != null) {
+                    if (availablePackage.getVersion().greaterThan(
+                            pkg.getVersion())
+                            || availablePackage.getVersion().isSnapshot()
+                            && availablePackage.getVersion().equalsTo(
+                                    pkg.getVersion())) {
+                        toUpdate.add(availablePackage);
+                        toUpdateIds.add(availablePackage.getId());
                     }
                     break;
                 }
@@ -544,9 +541,7 @@ public class PackageManagerImpl implements PackageManager {
                         if (lpkg.getName().equals(pkg.getName())) {
                             if (lpkg.getVersion().greaterOrEqualThan(
                                     pkg.getVersion())) {
-                                if ((lpkg.getState() == PackageState.INSTALLING.getValue())
-                                        || (lpkg.getState() == PackageState.INSTALLED.getValue())
-                                        || (lpkg.getState() == PackageState.STARTED.getValue())) {
+                                if (PackageState.getByValue(lpkg.getState()).isInstalled()) {
                                     alreadyInLocal = true;
                                 }
                             }

@@ -165,10 +165,34 @@ public class CUDFHelper {
      * @throws DependencyException
      */
     public String getCUDFFile() throws DependencyException {
+        return getCUDFFile(null);
+    }
+
+    /**
+     * @param exclusions Packages which will be arbitrarily set as not installed
+     *            if they are SNAPSHOT in order to allow their upgrade
+     * @return a CUDF universe as a String
+     * @throws DependencyException
+     *
+     * @since 1.4.11
+     */
+    public String getCUDFFile(PackageDependency[] exclusions)
+            throws DependencyException {
         initMapping();
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
+            // Exclude snapshots to allow upgrade
+            if (exclusions != null
+                    && cudfPackage.getNuxeoVersion().isSnapshot()) {
+                for (PackageDependency pkgDep : exclusions) {
+                    if (pkgDep.getName().equals(cudfPackage.getCUDFName())
+                            && pkgDep.getVersionRange().matchVersion(
+                                    cudfPackage.getNuxeoVersion())) {
+                        cudfPackage.setInstalled(false);
+                    }
+                }
+            }
             sb.append(cudfPackage.getCUDFStanza());
             sb.append(NuxeoCUDFPackage.CUDF_DEPENDS
                     + formatCUDF(cudfPackage.getDependencies(), false, true)
@@ -261,7 +285,7 @@ public class CUDFHelper {
     public String getCUDFFile(PackageDependency[] pkgInstall,
             PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade)
             throws DependencyException {
-        StringBuilder sb = new StringBuilder(getCUDFFile());
+        StringBuilder sb = new StringBuilder(getCUDFFile(pkgUpgrade));
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
         sb.append(NuxeoCUDFPackage.CUDF_INSTALL
                 + formatCUDF(pkgInstall, true, true) + newLine);

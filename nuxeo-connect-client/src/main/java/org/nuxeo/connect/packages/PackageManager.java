@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -391,10 +391,12 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Return the available {@link Version} for a given {@link Package} name.
-     * Versions are sorted in the "preferred order" : - already installed
-     * version (means no upgrade and no download) - already downloaded version
-     * (means no download) - remote versions sorted by version number (higher =>
-     * last)
+     * Versions are sorted in the "preferred order":
+     * <ul>
+     * <li>already installed version (means no upgrade and no download)</li>
+     * <li>already downloaded version (means no download)</li>
+     * <li>remote versions sorted by version number (higher => last)</li>
+     * </ul>
      *
      * @param pkgName
      * @since 1.4
