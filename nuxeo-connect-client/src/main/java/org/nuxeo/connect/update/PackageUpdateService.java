@@ -209,4 +209,11 @@ public interface PackageUpdateService {
      */
     File getBackupDir();
 
+    /**
+     * @return Last modification time of the given package; null if not
+     *         installed
+     * @since 1.4.11
+     */
+    String getInstallDate(String id);
+
 }
