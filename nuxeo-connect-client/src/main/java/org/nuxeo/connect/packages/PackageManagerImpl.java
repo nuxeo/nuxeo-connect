@@ -313,6 +313,16 @@ public class PackageManagerImpl implements PackageManager {
         return pkg;
     }
 
+    @Override
+    public DownloadablePackage findRemotePackageById(String packageId) {
+        return findPackageById(packageId, remoteSources);
+    }
+
+    @Override
+    public DownloadablePackage findLocalPackageById(String packageId) {
+        return findPackageById(packageId, localSources);
+    }
+
     /**
      * @since 1.4
      * @param packageId Package ID to look for in {@code sources}

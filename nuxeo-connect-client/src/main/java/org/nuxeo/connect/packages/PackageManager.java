@@ -487,4 +487,14 @@ public interface PackageManager extends BasePackageManager {
     boolean matchesPlatform(String requestPkgStr, String targetPlatform)
             throws PackageException;
 
+    /**
+     * @since 1.4.11
+     */
+    DownloadablePackage findRemotePackageById(String packageId);
+
+    /**
+     * @since 1.4.11
+     */
+    DownloadablePackage findLocalPackageById(String packageId);
+
 }
