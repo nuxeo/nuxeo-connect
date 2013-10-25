@@ -144,6 +144,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.version = descriptor.getVersion();
         this.visibility = descriptor.getVisibility();
         this.nuxeoValidationState = descriptor.getValidationState();
+        this.supported = descriptor.isSupported();
+        this.supportsHotReload = descriptor.supportsHotReload();
     }
 
     public PackageDescriptor() {
