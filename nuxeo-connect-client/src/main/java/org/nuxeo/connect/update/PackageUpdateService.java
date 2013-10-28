@@ -19,6 +19,7 @@ package org.nuxeo.connect.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 import org.nuxeo.connect.update.model.PackageDefinition;
@@ -214,6 +215,6 @@ public interface PackageUpdateService {
      *         installed
      * @since 1.4.11
      */
-    String getInstallDate(String id);
+    FileTime getInstallDate(String id);
 
 }
