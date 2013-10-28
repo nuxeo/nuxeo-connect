@@ -169,26 +169,31 @@ public class CUDFHelper {
     }
 
     /**
-     * @param exclusions Packages which will be arbitrarily set as not installed
+     * @param upgrades Packages which will be arbitrarily set as not installed
      *            if they are SNAPSHOT in order to allow their upgrade
      * @return a CUDF universe as a String
      * @throws DependencyException
      *
      * @since 1.4.11
      */
-    public String getCUDFFile(PackageDependency[] exclusions)
+    public String getCUDFFile(PackageDependency[] upgrades)
             throws DependencyException {
         initMapping();
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
-            // Exclude snapshots to allow upgrade
-            if (exclusions != null
-                    && cudfPackage.getNuxeoVersion().isSnapshot()) {
-                for (PackageDependency pkgDep : exclusions) {
-                    if (pkgDep.getName().equals(cudfPackage.getCUDFName())
-                            && pkgDep.getVersionRange().matchVersion(
+            // SNAPSHOT upgrade requires the package being not installed
+            if (upgrades != null && cudfPackage.getNuxeoVersion().isSnapshot()) {
+                for (PackageDependency upgrade : upgrades) {
+                    if (upgrade.getName().equals(cudfPackage.getCUDFName())
+                            && upgrade.getVersionRange().matchVersion(
                                     cudfPackage.getNuxeoVersion())) {
+                        DownloadablePackage pkgToUpgrade = pm.getRemotePackage(cudfPackage.getNuxeoId());
+                        if (pkgToUpgrade != null) {
+                            log.debug(String.format("Upgrade with remote %s",
+                                    pkgToUpgrade));
+                            cudfPackage.setPkg(pkgToUpgrade);
+                        }
                         cudfPackage.setInstalled(false);
                     }
                 }

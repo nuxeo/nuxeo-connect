@@ -658,11 +658,13 @@ public class PackageManagerImpl implements PackageManager {
         return null;
     }
 
+    @Override
     public DownloadablePackage getLocalPackage(String pkgId) {
         List<DownloadablePackage> pkgs = listLocalPackages();
         return getPkgInList(pkgs, pkgId);
     }
 
+    @Override
     public DownloadablePackage getRemotePackage(String pkgId) {
         List<DownloadablePackage> pkgs = listRemotePackages();
         return getPkgInList(pkgs, pkgId);

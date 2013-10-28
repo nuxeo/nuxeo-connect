@@ -497,4 +497,14 @@ public interface PackageManager extends BasePackageManager {
      */
     DownloadablePackage findLocalPackageById(String packageId);
 
+    /**
+     * @since 1.4.11
+     */
+    DownloadablePackage getRemotePackage(String pkgId);
+
+    /**
+     * @since 1.4.11
+     */
+    DownloadablePackage getLocalPackage(String pkgId);
+
 }
