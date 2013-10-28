@@ -878,6 +878,11 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public boolean isInstalled(Package pkg) {
+        return isInstalled(pkg.getId());
+    }
+
+    @Override
+    public boolean isInstalled(String pkgId) {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         if (pus == null) {
             if (!NuxeoConnectClient.isTestModeSet()) {
@@ -885,7 +890,7 @@ public class PackageManagerImpl implements PackageManager {
             }
             return false;
         }
-        return pus.isStarted(pkg.getId());
+        return pus.isStarted(pkgId);
     }
 
     @Override

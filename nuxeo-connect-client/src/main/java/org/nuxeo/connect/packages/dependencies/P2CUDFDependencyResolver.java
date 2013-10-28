@@ -119,7 +119,11 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
         pkgInstall.add(pkgId);
-        return resolve(pkgInstall, null, null, targetPlatform);
+        if (pm.isInstalled(pkgId)) { // upgrade
+            return resolve(null, null, pkgInstall, targetPlatform);
+        } else { // new install
+            return resolve(pkgInstall, null, null, targetPlatform);
+        }
     }
 
 }

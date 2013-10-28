@@ -507,4 +507,9 @@ public interface PackageManager extends BasePackageManager {
      */
     DownloadablePackage getLocalPackage(String pkgId);
 
+    /**
+     * @since 1.4.11
+     */
+    boolean isInstalled(String pkgId);
+
 }

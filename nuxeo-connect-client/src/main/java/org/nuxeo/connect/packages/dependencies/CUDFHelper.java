@@ -78,8 +78,25 @@ public class CUDFHelper {
      * @param packagesInRequest
      */
     public void initMapping() {
+        initMapping(null);
+    }
+
+    /**
+     * @param upgrades Packages for which we'll feed the CUDF universe with the
+     *            remote one if they're SNAPSHOT, in order to allow their
+     *            upgrade
+     *
+     * @since 1.4.11
+     */
+    public void initMapping(PackageDependency[] upgrades) {
         nuxeo2CUDFMap.clear();
         CUDF2NuxeoMap.clear();
+        Map<String, PackageDependency> upgradesMap = new HashMap<String, PackageDependency>();
+        if (upgrades != null) {
+            for (PackageDependency upgrade : upgrades) {
+                upgradesMap.put(upgrade.getName(), upgrade);
+            }
+        }
         List<DownloadablePackage> allPackages = getAllPackages();
         // for each unique "name-classifier", sort versions so we can attribute
         // them a "CUDF posint" version
@@ -91,6 +108,21 @@ public class CUDFHelper {
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
                             pkg, targetPlatform)) {
                 continue;
+            }
+
+            // SNAPSHOT upgrade requires referring the remote package
+            if (pkg.getVersion().isSnapshot() && pkg.isLocal()
+                    && upgradesMap.containsKey(pkg.getName())) {
+                PackageDependency upgrade = upgradesMap.get(pkg.getName());
+                if (upgrade.getVersionRange().matchVersion(pkg.getVersion())) {
+                    DownloadablePackage remotePackage = pm.getRemotePackage(pkg.getId());
+                    if (remotePackage != null) {
+                        log.debug(String.format("Upgrade with remote %s",
+                                remotePackage));
+                        pkg = remotePackage;
+                    }
+                }
+
             }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
@@ -111,6 +143,7 @@ public class CUDFHelper {
                         pkg.getCUDFName() + "-" + pkg.getCUDFVersion(), pkg);
             }
         }
+
         if (log.isDebugEnabled()) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(outputStream);
@@ -119,6 +152,7 @@ public class CUDFHelper {
             log.debug(outputStream.toString());
             IOUtils.closeQuietly(out);
         }
+
     }
 
     protected List<DownloadablePackage> getAllPackages() {
@@ -169,8 +203,7 @@ public class CUDFHelper {
     }
 
     /**
-     * @param upgrades Packages which will be arbitrarily set as not installed
-     *            if they are SNAPSHOT in order to allow their upgrade
+     * @param upgrades Packages
      * @return a CUDF universe as a String
      * @throws DependencyException
      *
@@ -178,26 +211,10 @@ public class CUDFHelper {
      */
     public String getCUDFFile(PackageDependency[] upgrades)
             throws DependencyException {
-        initMapping();
+        initMapping(upgrades);
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
-            // SNAPSHOT upgrade requires the package being not installed
-            if (upgrades != null && cudfPackage.getNuxeoVersion().isSnapshot()) {
-                for (PackageDependency upgrade : upgrades) {
-                    if (upgrade.getName().equals(cudfPackage.getCUDFName())
-                            && upgrade.getVersionRange().matchVersion(
-                                    cudfPackage.getNuxeoVersion())) {
-                        DownloadablePackage pkgToUpgrade = pm.getRemotePackage(cudfPackage.getNuxeoId());
-                        if (pkgToUpgrade != null) {
-                            log.debug(String.format("Upgrade with remote %s",
-                                    pkgToUpgrade));
-                            cudfPackage.setPkg(pkgToUpgrade);
-                        }
-                        cudfPackage.setInstalled(false);
-                    }
-                }
-            }
             sb.append(cudfPackage.getCUDFStanza());
             sb.append(NuxeoCUDFPackage.CUDF_DEPENDS
                     + formatCUDF(cudfPackage.getDependencies(), false, true)
