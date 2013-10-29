@@ -34,12 +34,12 @@ import org.apache.commons.logging.LogFactory;
  * x.y.z<br>
  * x.y.z-anyclassifier<br>
  * </code><br>
- *
+ * 
  * Classifiers are alphabetically ordered between themselves.<br>
  * Special classifiers are before the SNAPSHOT.<br>
  * SNAPSHOT is always just before the release (without classifier).<br>
  * Non-special classifiers are after the release.<br>
- *
+ * 
  * See <a href=
  * "https://github.com/nuxeo/nuxeo-connect/blob/master/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestVersions.java"
  * >TestVersions</a>.
@@ -68,7 +68,7 @@ public class Version implements Comparable<Version> {
     /**
      * Special classifiers are considered as earlier than versions without
      * classifier or with a non-special classifier
-     *
+     * 
      * @since 1.4.4
      */
     public boolean isSpecialClassifier() {
@@ -170,8 +170,9 @@ public class Version implements Comparable<Version> {
         return compareTo(v) >= 0;
     }
 
+    @Override
     public int compareTo(Version o) {
-        log.debug("Comparing " + this + " with " + o);
+        log.trace("Comparing " + this + " with " + o);
         int d = major - o.major;
         if (d != 0) {
             return d;
@@ -190,27 +191,27 @@ public class Version implements Comparable<Version> {
 
         if (mClassifier.equals(oClassifier)) {
             if (snapshot == o.isSnapshot()) {
-                log.debug(" case 1 => 0");
+                log.trace(" case 1 => 0");
                 return 0;
             } else {
                 if (isSnapshot()) {
-                    log.debug(" case 2 => -1");
+                    log.trace(" case 2 => -1");
                     return -1;
                 } else {
-                    log.debug(" case 3 => 1");
+                    log.trace(" case 3 => 1");
                     return 1;
                 }
             }
         } else {
             if (specialClassifier && o.isSpecialClassifier()
                     || !specialClassifier && !o.isSpecialClassifier()) {
-                log.debug(" case 4 => compare classifiers");
+                log.trace(" case 4 => compare classifiers");
                 return mClassifier.compareTo(oClassifier);
             } else if (specialClassifier) {
-                log.debug(" case 1 => -1");
+                log.trace(" case 1 => -1");
                 return -1;
             } else {
-                log.debug(" case 6 => 1");
+                log.trace(" case 6 => 1");
                 return 1;
             }
         }
@@ -227,6 +228,7 @@ public class Version implements Comparable<Version> {
         return (major << 16) | (minor << 8) | patch;
     }
 
+    @Override
     public String toString() {
         String v;
         if (classifier == null) {
