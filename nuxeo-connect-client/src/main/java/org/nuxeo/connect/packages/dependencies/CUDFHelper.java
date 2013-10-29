@@ -37,6 +37,7 @@ import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 
@@ -78,23 +79,50 @@ public class CUDFHelper {
      * @param packagesInRequest
      */
     public void initMapping() {
-        initMapping(null);
+        initMapping(null, null, null);
     }
 
     /**
      * @param upgrades Packages for which we'll feed the CUDF universe with the
      *            remote one if they're SNAPSHOT, in order to allow their
      *            upgrade
+     * @param installs
+     * @param removes
      *
      * @since 1.4.11
      */
-    public void initMapping(PackageDependency[] upgrades) {
+    public void initMapping(PackageDependency[] installs,
+            PackageDependency[] removes, PackageDependency[] upgrades) {
         nuxeo2CUDFMap.clear();
         CUDF2NuxeoMap.clear();
         Map<String, PackageDependency> upgradesMap = new HashMap<String, PackageDependency>();
+        List<String> involvedPackages = new ArrayList<String>();
         if (upgrades != null) {
             for (PackageDependency upgrade : upgrades) {
                 upgradesMap.put(upgrade.getName(), upgrade);
+                involvedPackages.add(upgrade.getName());
+            }
+        }
+        if (installs != null) {
+            for (PackageDependency install : installs) {
+                involvedPackages.add(install.getName());
+            }
+        }
+        if (removes != null) {
+            for (PackageDependency remove : removes) {
+                involvedPackages.add(remove.getName());
+            }
+        }
+        boolean isStudioInvolved = false;
+        List<DownloadablePackage> studioPackages = pm.listAllStudioRemoteOrLocalPackages();
+        studioInvolved:
+        for (String pkgName : involvedPackages) {
+            for (DownloadablePackage studioPackage : studioPackages) {
+                if (pkgName.equals(studioPackage.getName())) {
+                    // Found a Studio package in request
+                    isStudioInvolved = true;
+                    break studioInvolved;
+                }
             }
         }
         List<DownloadablePackage> allPackages = getAllPackages();
@@ -107,6 +135,10 @@ public class CUDFHelper {
                     && !pkg.isLocal()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
                             pkg, targetPlatform)) {
+                continue;
+            }
+            // ignore Studio packages if not directly involved
+            if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO) {
                 continue;
             }
 
@@ -122,7 +154,6 @@ public class CUDFHelper {
                         pkg = remotePackage;
                     }
                 }
-
             }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
@@ -199,19 +230,6 @@ public class CUDFHelper {
      * @throws DependencyException
      */
     public String getCUDFFile() throws DependencyException {
-        return getCUDFFile(null);
-    }
-
-    /**
-     * @param upgrades Packages
-     * @return a CUDF universe as a String
-     * @throws DependencyException
-     *
-     * @since 1.4.11
-     */
-    public String getCUDFFile(PackageDependency[] upgrades)
-            throws DependencyException {
-        initMapping(upgrades);
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
             NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
@@ -307,7 +325,8 @@ public class CUDFHelper {
     public String getCUDFFile(PackageDependency[] pkgInstall,
             PackageDependency[] pkgRemove, PackageDependency[] pkgUpgrade)
             throws DependencyException {
-        StringBuilder sb = new StringBuilder(getCUDFFile(pkgUpgrade));
+        initMapping(pkgInstall, pkgRemove, pkgUpgrade);
+        StringBuilder sb = new StringBuilder(getCUDFFile());
         sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
         sb.append(NuxeoCUDFPackage.CUDF_INSTALL
                 + formatCUDF(pkgInstall, true, true) + newLine);
@@ -396,7 +415,8 @@ public class CUDFHelper {
                     log.error("Failed to add " + pkg);
                 }
             } else if (!details.get(Criteria.REMOVED).contains(iu.getId())) {
-                if (!res.addUnchangedPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
+                if (!res.addUnchangedPackage(pkg.getNuxeoName(),
+                        pkg.getNuxeoVersion())) {
                     log.error("Failed to add " + pkg);
                 }
             } else {

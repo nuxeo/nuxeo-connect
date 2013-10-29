@@ -130,6 +130,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
     @Test
     public void testInitMapping() throws Exception {
+        cudfHelper.initMapping();
         assertNotNull(cudfHelper.getCUDFFile());
         assertEquals(
                 "First nuxeo-dm package should be 5.5.0",
@@ -151,6 +152,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
     @Test
     public void testGetCUDFFile() throws Exception {
+        cudfHelper.initMapping();
         BufferedReader gen = new BufferedReader(new StringReader(
                 cudfHelper.getCUDFFile()));
         BufferedReader ref = new BufferedReader(new InputStreamReader(
