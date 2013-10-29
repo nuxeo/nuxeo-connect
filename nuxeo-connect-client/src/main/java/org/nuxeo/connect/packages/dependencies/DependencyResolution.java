@@ -139,6 +139,23 @@ public class DependencyResolution {
         return !isFailed();
     }
 
+    /**
+     * @since 1.4.12
+     */
+    public boolean addUnchangedPackage(String pkgName, Version v) {
+        if (!allPackages.containsKey(pkgName)) { // Add package
+            log.debug("addPackage " + pkgName + " " + v);
+            allPackages.put(pkgName, v);
+            // orderedInstallablePackages.add(pkgName + "-" + v.toString());
+        } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
+            markAsFailed("addPackage conflict " + pkgName + " " + v + " with "
+                    + allPackages.get(pkgName));
+        } else { // Package already added in the same version
+            log.debug("addPackage ignored " + pkgName + " " + v);
+        }
+        return !isFailed();
+    }
+
     public void markPackageForRemoval(String pkgName, Version v) {
         markPackageForRemoval(pkgName, v, false);
     }
@@ -169,17 +186,16 @@ public class DependencyResolution {
                 // localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
                 localPackagesToUpgrade.put(pkg.getName(),
                         existingVersions.get(existingVersions.size() - 1));
-                if (pkg.getState() == PackageState.REMOTE.getValue()) {
+                if (PackageState.getByValue(pkg.getState()) == PackageState.REMOTE) {
                     allPackagesToDownload.add(id);
                 }
             } else {
-                if (pkg.getState() == PackageState.REMOTE.getValue()) {
+                if (PackageState.getByValue(pkg.getState()) == PackageState.REMOTE) {
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
                     allPackagesToDownload.add(id);
-                } else if (pkg.getState() > PackageState.REMOTE.getValue()
-                        && pkg.getState() < PackageState.INSTALLING.getValue()) {
+                } else if (!PackageState.getByValue(pkg.getState()).isInstalled()) {
                     localPackagesToInstall.put(pkg.getName(), pkg.getVersion());
-                } else if (pkg.getState() > PackageState.INSTALLING.getValue()) {
+                } else if (PackageState.getByValue(pkg.getState()).isInstalled()) {
                     localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
                 }
             }
@@ -269,6 +285,7 @@ public class DependencyResolution {
         return res;
     }
 
+    @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
         if (isFailed()) {

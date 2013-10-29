@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +46,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(5, depResolution.getNewPackagesToDownload().size());
     }
 
@@ -57,7 +57,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(3, depResolution.getNewPackagesToDownload().size());
     }
 
@@ -68,7 +68,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(6, depResolution.getNewPackagesToDownload().size());
     }
 
@@ -79,7 +79,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(7, depResolution.getNewPackagesToDownload().size());
     }
 
@@ -90,7 +90,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(3, depResolution.getNewPackagesToDownload().size());
     }
 
@@ -101,7 +101,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
@@ -113,7 +113,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
@@ -126,7 +126,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
@@ -135,7 +135,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(new Version("2.0.0"),
@@ -146,7 +146,7 @@ public class TestPackageDependencyResolutionP2CUDF extends
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(4, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(0, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(new Version("1.0.0"),

@@ -108,8 +108,8 @@ class NuxeoCUDFPackage {
 
     @Override
     public String toString() {
-        return "CUDF {" + cudfVersion + "}" + " Nuxeo {" + pkg.getVersion()
-                + "} " + pkg.getClass();
+        return getCUDFName() + " CUDF {" + cudfVersion + "}" + " Nuxeo {"
+                + pkg.getVersion() + "} " + pkg.getClass();
     }
 
     /**

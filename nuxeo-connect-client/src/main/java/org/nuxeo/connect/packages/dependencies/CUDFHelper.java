@@ -395,6 +395,12 @@ public class CUDFHelper {
                         true)) {
                     log.error("Failed to add " + pkg);
                 }
+            } else if (!details.get(Criteria.REMOVED).contains(iu.getId())) {
+                if (!res.addUnchangedPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
+                    log.error("Failed to add " + pkg);
+                }
+            } else {
+                log.debug("Ignored: " + pkg);
             }
         }
     }
