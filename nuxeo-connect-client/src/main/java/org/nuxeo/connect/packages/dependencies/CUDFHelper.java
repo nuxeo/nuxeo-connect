@@ -37,6 +37,7 @@ import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
@@ -115,8 +116,7 @@ public class CUDFHelper {
         }
         boolean isStudioInvolved = false;
         List<DownloadablePackage> studioPackages = pm.listAllStudioRemoteOrLocalPackages();
-        studioInvolved:
-        for (String pkgName : involvedPackages) {
+        studioInvolved: for (String pkgName : involvedPackages) {
             for (DownloadablePackage studioPackage : studioPackages) {
                 if (pkgName.equals(studioPackage.getName())) {
                     // Found a Studio package in request
@@ -137,8 +137,9 @@ public class CUDFHelper {
                             pkg, targetPlatform)) {
                 continue;
             }
-            // ignore Studio packages if not directly involved
-            if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO) {
+            // ignore Studio packages if not directly involved or installed
+            if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO
+                    && !PackageState.getByValue(pkg.getState()).isInstalled()) {
                 continue;
             }
 
