@@ -373,7 +373,6 @@ public class DependencyResolution {
             return allPackages.isEmpty();
         } else {
             return orderedInstallablePackages.isEmpty()
-                    && localUnchangedPackages.isEmpty()
                     && orderedRemovablePackages.isEmpty()
                     && newPackagesToDownload.isEmpty()
                     && localPackagesToInstall.isEmpty()
