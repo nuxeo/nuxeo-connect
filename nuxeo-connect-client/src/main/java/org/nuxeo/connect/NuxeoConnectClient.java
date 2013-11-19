@@ -47,6 +47,13 @@ public class NuxeoConnectClient {
         cbHolder = cb;
     }
 
+    /**
+     * @since 1.4.13
+     */
+    public static CallbackHolder getCallBackHolder() {
+        return cbHolder;
+    }
+
     protected static synchronized ConnectGatewayComponent getConnectGatewayComponent() {
         if (connectGatewayComponent == null) {
             connectGatewayComponent = new ConnectGatewayComponent();
@@ -66,11 +73,16 @@ public class NuxeoConnectClient {
         return getConnectGatewayComponent().getDownloadManager();
     }
 
-    /**
-     * @FIXME JC: should throw NullPackageUpdateServiceException instead of
-     *        returning null. The same treatment is done by every caller.
-     */
     public static PackageUpdateService getPackageUpdateService() {
+        if (cbHolder.getUpdateService() == null) {
+            if (isTestModeSet()) {
+                log.error("Initialize the mock update service with\n"
+                        + "((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(new MockPackageUpdateService(pm));");
+            } else {
+                throw new NullPointerException(
+                        "Can not locate PackageUpdateService, exiting");
+            }
+        }
         return cbHolder.getUpdateService();
     }
 
@@ -128,4 +140,5 @@ public class NuxeoConnectClient {
         return "protocol: " + getProtocolVersion() + " / build:"
                 + getBuildVersion();
     }
+
 }

@@ -26,7 +26,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
@@ -39,6 +38,7 @@ public class P2CUDFDependencyResolverTest extends
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -47,7 +47,6 @@ public class P2CUDFDependencyResolverTest extends
         DummyPackageSource source = new DummyPackageSource(local, true);
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
-        pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
     }
 
     @Test

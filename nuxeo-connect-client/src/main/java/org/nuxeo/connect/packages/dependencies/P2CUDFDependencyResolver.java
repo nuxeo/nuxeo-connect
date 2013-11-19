@@ -59,8 +59,18 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
+                CUDFHelper.defaultAllowSNAPSHOT);
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT)
+            throws DependencyException {
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setTargetPlatform(targetPlatform);
+        cudfHelper.setAllowSNAPSHOT(allowSNAPSHOT);
         // generate CUDF package universe and request stanza
         String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
                 str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
@@ -115,11 +125,12 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     }
 
     @Override
-    public DependencyResolution resolve(String pkgId, String targetPlatform)
-            throws DependencyException {
+    public DependencyResolution resolve(String pkgIdOrName,
+            String targetPlatform) throws DependencyException {
         List<String> pkgInstall = new ArrayList<String>();
-        pkgInstall.add(pkgId);
-        if (pm.isInstalled(pkgId)) { // upgrade
+        pkgInstall.add(pkgIdOrName);
+        if (pm.isInstalled(pkgIdOrName)
+                || !pm.findLocalPackageInstalledVersions(pkgIdOrName).isEmpty()) { // upgrade
             return resolve(null, null, pkgInstall, targetPlatform);
         } else { // new install
             return resolve(pkgInstall, null, null, targetPlatform);

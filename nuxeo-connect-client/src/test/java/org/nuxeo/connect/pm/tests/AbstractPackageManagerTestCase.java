@@ -27,13 +27,16 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.packages.PackageManagerImpl;
+import org.nuxeo.connect.update.MockPackageUpdateService;
 
 public abstract class AbstractPackageManagerTestCase extends TestCase {
 
@@ -69,13 +72,25 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         System.setProperty("org.nuxeo.connect.client.testMode", "true");
         LogicalInstanceIdentifier.cleanUp();
         pm = NuxeoConnectClient.getPackageManager();
-        pm.setResolver(PackageManager.LEGACY_DEPENDENCY_RESOLVER);
         assertNotNull(pm);
         ((PackageManagerImpl) pm).resetSources();
+        ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(new MockPackageUpdateService(
+                pm));
+
     }
 
     protected static List<DownloadablePackage> getDownloads(String filename)
-            throws Exception {
+            throws IOException, JSONException {
+        return getDownloads(filename, false);
+    }
+
+    /**
+     * @throws IOException
+     * @throws JSONException
+     * @since 1.4.13
+     */
+    protected static List<DownloadablePackage> getDownloads(String filename,
+            boolean isLocal) throws IOException, JSONException {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(
                 TEST_DATA + filename);
@@ -83,6 +98,9 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         for (String data : lines) {
             PackageDescriptor pkg = PackageDescriptor.loadFromJSON(
                     PackageDescriptor.class, new JSONObject(data));
+            if (isLocal) {
+                pkg.setLocal(true);
+            }
             result.add(pkg);
         }
         return result;

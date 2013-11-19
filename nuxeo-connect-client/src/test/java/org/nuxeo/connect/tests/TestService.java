@@ -22,6 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.http.ConnectHttpConnector;
@@ -32,6 +33,7 @@ import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
+import org.nuxeo.connect.update.MockPackageUpdateService;
 
 public class TestService extends TestCase {
 
@@ -42,6 +44,8 @@ public class TestService extends TestCase {
 
         LogicalInstanceIdentifier.cleanUp();
         NuxeoConnectClient.resetPackageManager();
+        ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(new MockPackageUpdateService(
+                NuxeoConnectClient.getPackageManager()));
     }
 
     public void testServiceLookup() {

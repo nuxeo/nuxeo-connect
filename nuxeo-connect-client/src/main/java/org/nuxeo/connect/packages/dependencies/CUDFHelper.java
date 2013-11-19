@@ -51,6 +51,15 @@ public class CUDFHelper {
 
     public static final String newLine = System.getProperty("line.separator");
 
+    /**
+     * Convenient default value about SNAPSHOT inclusion in the CUDF universe.
+     * Prefer use of parameter in the relevant methods.
+     *
+     * @since 1.4.13
+     * @see #initMapping(boolean)
+     */
+    public static boolean defaultAllowSNAPSHOT = false;
+
     protected PackageManager pm;
 
     /**
@@ -68,6 +77,8 @@ public class CUDFHelper {
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<String, NuxeoCUDFPackage>();
 
     private String targetPlatform;
+
+    private boolean allowSNAPSHOT = defaultAllowSNAPSHOT;
 
     public CUDFHelper(PackageManager pm) {
         this.pm = pm;
@@ -116,16 +127,15 @@ public class CUDFHelper {
         }
         boolean isStudioInvolved = false;
         List<DownloadablePackage> studioPackages = pm.listAllStudioRemoteOrLocalPackages();
-        studioInvolved: for (String pkgName : involvedPackages) {
-            for (DownloadablePackage studioPackage : studioPackages) {
-                if (pkgName.equals(studioPackage.getName())) {
-                    // Found a Studio package in request
-                    isStudioInvolved = true;
-                    break studioInvolved;
-                }
+        for (DownloadablePackage studioPackage : studioPackages) {
+            if (involvedPackages.contains(studioPackage.getName())) {
+                // Found a Studio package in request
+                isStudioInvolved = true;
+                break;
             }
         }
         List<DownloadablePackage> allPackages = getAllPackages();
+        List<String> installedSNAPSHOTPackages = getInstalledSNAPSHOTPackages();
         // for each unique "name-classifier", sort versions so we can attribute
         // them a "CUDF posint" version
         // populate Nuxeo2CUDFMap and the reverse CUDF2NuxeoMap
@@ -140,6 +150,13 @@ public class CUDFHelper {
             // ignore Studio packages if not directly involved or installed
             if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO
                     && !PackageState.getByValue(pkg.getState()).isInstalled()) {
+                continue;
+            }
+
+            // Exclude SNAPSHOT by default for non Studio packages
+            if (!allowSNAPSHOT && pkg.getVersion().isSnapshot()
+                    && pkg.getType() != PackageType.STUDIO
+                    && !installedSNAPSHOTPackages.contains(pkg.getName())) {
                 continue;
             }
 
@@ -184,7 +201,16 @@ public class CUDFHelper {
             log.debug(outputStream.toString());
             IOUtils.closeQuietly(out);
         }
+    }
 
+    private List<String> getInstalledSNAPSHOTPackages() {
+        List<String> installedSNAPSHOTPackages = new ArrayList<String>();
+        for (DownloadablePackage pkg : pm.listInstalledPackages()) {
+            if (pkg.getVersion().isSnapshot()) {
+                installedSNAPSHOTPackages.add(pkg.getName());
+            }
+        }
+        return installedSNAPSHOTPackages;
     }
 
     protected List<DownloadablePackage> getAllPackages() {
@@ -428,6 +454,13 @@ public class CUDFHelper {
 
     public void setTargetPlatform(String targetPlatform) {
         this.targetPlatform = targetPlatform;
+    }
+
+    /**
+     * @since 1.4.13
+     */
+    public void setAllowSNAPSHOT(boolean allowSNAPSHOT) {
+        this.allowSNAPSHOT = allowSNAPSHOT;
     }
 
 }

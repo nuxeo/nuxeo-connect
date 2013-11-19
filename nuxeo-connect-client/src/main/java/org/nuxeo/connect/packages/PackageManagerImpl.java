@@ -35,6 +35,7 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
+import org.nuxeo.connect.packages.dependencies.CUDFHelper;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
@@ -60,6 +61,7 @@ import org.nuxeo.connect.update.task.Task;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
+@SuppressWarnings("deprecation")
 public class PackageManagerImpl implements PackageManager {
 
     protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
@@ -268,6 +270,19 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> findRemotePackages(String packageName) {
         List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
         for (PackageSource source : remoteSources) {
+            for (DownloadablePackage pkg : source.listPackages()) {
+                if (pkg.getName().equals(packageName)) {
+                    pkgs.add(pkg);
+                }
+            }
+        }
+        return pkgs;
+    }
+
+    @Override
+    public List<DownloadablePackage> findLocalPackages(String packageName) {
+        List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
+        for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)) {
                     pkgs.add(pkg);
@@ -614,12 +629,6 @@ public class PackageManagerImpl implements PackageManager {
     public void install(String packageId, Map<String, String> params)
             throws Exception {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
-        if (pus == null) {
-            if (!NuxeoConnectClient.isTestModeSet()) {
-                log.error("Can not locate PackageUpdateService, exiting");
-            }
-            return;
-        }
         LocalPackage pkg = pus.getPackage(packageId);
         Task installationTask = pkg.getInstallTask();
         installationTask.validate();
@@ -797,23 +806,52 @@ public class PackageManagerImpl implements PackageManager {
     public DependencyResolution resolveDependencies(String pkgId,
             String targetPlatform) {
         try {
-            return resolver.resolve(pkgId, targetPlatform);
+            DependencyResolution resolution = resolver.resolve(pkgId,
+                    targetPlatform);
+            log.debug(beforeAfterResolutionToString(resolution));
+            return resolution;
         } catch (DependencyException e) {
             return new DependencyResolution(e);
         }
     }
 
     /**
+     * @return Packages list before and after given resolution
+     * @since 1.4.13
+     */
+    public String beforeAfterResolutionToString(DependencyResolution resolution) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Before: " + listInstalledPackages());
+        List<String> after = new ArrayList<String>();
+        after.addAll(resolution.getUnchangedPackageIds());
+        after.addAll(resolution.getInstallPackageIds());
+        Collections.sort(after);
+        sb.append("\nAfter:  " + after);
+        return sb.toString();
+    }
+
+    /**
      * @since 1.4
-     * @see PackageManager#resolveDependencies(List, List, List, String)
+     * @see PackageManager#resolveDependencies(List, List, List, String,
+     *      boolean)
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade,
+                targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+    }
+
+    @Override
+    public DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT) {
         try {
-            return resolver.resolve(pkgInstall, pkgRemove, pkgUpgrade,
-                    targetPlatform);
+            DependencyResolution resolution = resolver.resolve(pkgInstall,
+                    pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT);
+            log.debug(beforeAfterResolutionToString(resolution));
+            return resolution;
         } catch (DependencyException e) {
             return new DependencyResolution(e);
         }
@@ -823,9 +861,10 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> getUninstallDependencies(Package pkg,
             String targetPlatform) {
         List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
-        DependencyResolution resolution = resolveDependencies(null,
-                Arrays.asList(new String[] { pkg.getName() }), null,
-                targetPlatform);
+        List<String> removes = new ArrayList<String>();
+        removes.add(pkg.getName());
+        DependencyResolution resolution = resolveDependencies(null, removes,
+                null, targetPlatform);
         if (!resolution.isFailed() && !resolution.isEmpty()) {
             List<String> idsToRemove = resolution.getOrderedPackageIdsToRemove();
             idsToRemove.remove(pkg.getId());
@@ -883,14 +922,8 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public boolean isInstalled(String pkgId) {
-        PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
-        if (pus == null) {
-            if (!NuxeoConnectClient.isTestModeSet()) {
-                log.error("Can not locate PackageUpdateService, set package as not installed.");
-            }
-            return false;
-        }
-        return pus.isStarted(pkgId);
+        DownloadablePackage pkg = getLocalPackage(pkgId);
+        return (pkg != null && PackageState.getByValue(pkg.getState()).isInstalled());
     }
 
     @Override

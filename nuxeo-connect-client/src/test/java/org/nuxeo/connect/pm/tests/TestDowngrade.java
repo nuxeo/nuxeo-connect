@@ -22,18 +22,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
 /**
  * @since 1.4
  */
-public class TestDowngradeP2CUDF extends AbstractPackageManagerTestCase {
+public class TestDowngrade extends AbstractPackageManagerTestCase {
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
         List<DownloadablePackage> local = getDownloads("local5.json");
 
         assertNotNull(local);

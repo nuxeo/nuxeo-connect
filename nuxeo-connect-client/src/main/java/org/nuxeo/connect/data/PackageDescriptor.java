@@ -121,6 +121,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected PackageVisibility visibility;
 
+    private boolean local = false;
+
     /**
      * @since 1.4
      */
@@ -367,7 +369,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     @Override
     public boolean isLocal() {
-        return false;
+        return local;
+    }
+
+    public void setLocal(boolean isLocal) {
+        local = isLocal;
     }
 
     @Override

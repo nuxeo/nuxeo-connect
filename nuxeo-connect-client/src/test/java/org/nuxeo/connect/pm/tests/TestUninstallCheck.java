@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,10 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
+ *     Julien Carsique
+ *
  */
+
 package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
@@ -21,6 +23,9 @@ import java.util.List;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageState;
 
+/**
+ * @since 1.4
+ */
 public class TestUninstallCheck extends AbstractPackageManagerTestCase {
 
     @Override
@@ -48,9 +53,8 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
                 || pkgToRemove.contains(pm.getPackage("H-1.0.0")));
     }
 
-    @SuppressWarnings("deprecation")
     protected List<DownloadablePackage> performUninstall(DownloadablePackage pkg) {
-        return pm.getUninstallDependencies(pkg);
+        return pm.getUninstallDependencies(pkg, null);
     }
 
 }

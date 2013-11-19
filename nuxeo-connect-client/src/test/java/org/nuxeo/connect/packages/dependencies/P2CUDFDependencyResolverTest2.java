@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,7 +24,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
@@ -38,6 +37,7 @@ public class P2CUDFDependencyResolverTest2 extends
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -46,7 +46,6 @@ public class P2CUDFDependencyResolverTest2 extends
         DummyPackageSource source = new DummyPackageSource(local, true);
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
-        pm.setResolver(PackageManager.P2CUDF_DEPENDENCY_RESOLVER);
     }
 
     @Test

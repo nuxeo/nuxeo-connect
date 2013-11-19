@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,23 +30,41 @@ public class DummyPackageSource implements PackageSource {
 
     protected boolean local;
 
+    private String id = "dummy";
+
+    private String name = null;
+
     public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local) {
         this.pkgs = pkgs;
         this.local = local;
     }
 
+    /**
+     * @since 1.4.13
+     */
+    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local,
+            String id) {
+        this.pkgs = pkgs;
+        this.local = local;
+        this.id = id;
+    }
+
+    @Override
     public String getName() {
-        return null;
+        return name;
     }
 
+    @Override
     public String getId() {
-        return "dummy";
+        return id;
     }
 
+    @Override
     public List<DownloadablePackage> listPackages() {
         return pkgs;
     }
 
+    @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
 
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
@@ -68,6 +86,7 @@ public class DummyPackageSource implements PackageSource {
         }
     }
 
+    @Override
     public void flushCache() {
         // NOP
     }

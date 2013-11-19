@@ -16,6 +16,12 @@
   <logger name="org.nuxeo.connect">
     <level value="DEBUG" />
   </logger>
+  <logger name="org.nuxeo.connect.packages">
+    <level value="DEBUG" />
+  </logger>
+  <logger name="org.nuxeo.connect.packages.dependencies">
+    <level value="DEBUG" />
+  </logger>
 
   <!-- ======================= -->
   <!-- Setup the Root category -->

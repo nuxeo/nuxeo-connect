@@ -44,7 +44,9 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * @since 1.4
+     * @deprecated Use {@link #P2CUDF_DEPENDENCY_RESOLVER}
      */
+    @Deprecated
     public static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
 
     /**
@@ -511,5 +513,22 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4.11
      */
     boolean isInstalled(String pkgId);
+
+    /**
+     * @since 1.4.13
+     */
+    List<DownloadablePackage> findLocalPackages(String packageName);
+
+    /**
+     * @param allowSNAPSHOT Whether to allow SNAPSHOT versions or not. Even if
+     *            not allowed, SNAPSHOT versions of a given package will be
+     *            included if a SNAPSHOT version of that package is already
+     *            installed. There may be other acceptance cases.
+     *
+     * @since 1.4.13
+     */
+    DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT);
 
 }

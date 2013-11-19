@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,8 +38,10 @@ import org.nuxeo.connect.update.Version;
  * OSGi ...)
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
+ * @deprecated Since 1.4.13. Use {@link P2CUDFDependencyResolver}
  *
  */
+@Deprecated
 public class LegacyDependencyResolver implements DependencyResolver {
 
     protected PackageManager pm;
@@ -50,6 +52,7 @@ public class LegacyDependencyResolver implements DependencyResolver {
         this.pm = pm;
     }
 
+    @Override
     public DependencyResolution resolve(String pkgId, String targetPlatform)
             throws DependencyException {
         // compute possible dependency sets
@@ -127,6 +130,14 @@ public class LegacyDependencyResolver implements DependencyResolver {
                         targetPlatform, dc, path + dep.getName() + "/");
             }
         }
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT) {
+        throw new UnsupportedOperationException(
+                "Legacy resolver does not support advanced resolution method");
     }
 
 }

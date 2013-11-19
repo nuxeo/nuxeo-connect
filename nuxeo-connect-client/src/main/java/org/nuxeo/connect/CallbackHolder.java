@@ -25,4 +25,5 @@ public interface CallbackHolder {
     String getProperty(String key, String defaultValue);
 
     String getHomePath();
+
 }

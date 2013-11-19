@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.packages;
@@ -43,10 +42,12 @@ public class RemotePackageSource implements PackageSource {
 
     protected PackageListCache cache;
 
+    @Override
     public String getName() {
         return "Connect Server";
     }
 
+    @Override
     public String getId() {
         return "remote";
     }
@@ -55,6 +56,7 @@ public class RemotePackageSource implements PackageSource {
         cache = new PackageListCache();
     }
 
+    @Override
     public List<DownloadablePackage> listPackages() {
         List<DownloadablePackage> all = new ArrayList<DownloadablePackage>();
         for (PackageType type : PackageType.values()) {
@@ -63,6 +65,7 @@ public class RemotePackageSource implements PackageSource {
         return all;
     }
 
+    @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
@@ -85,6 +88,7 @@ public class RemotePackageSource implements PackageSource {
         return result;
     }
 
+    @Override
     public void flushCache() {
         // memory cache
         cache = new PackageListCache();

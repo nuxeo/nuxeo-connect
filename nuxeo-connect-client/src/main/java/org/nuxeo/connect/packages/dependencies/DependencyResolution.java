@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -180,23 +180,21 @@ public class DependencyResolution {
         for (String pkgName : allPackages.keySet()) {
             String id = pkgName + "-" + allPackages.get(pkgName).toString();
             DownloadablePackage pkg = pm.findPackageById(id);
-            List<Version> existingVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
-            if (existingVersions.size() > 0
-                    && !existingVersions.contains(pkg.getVersion())) {
-                // localPackagesToUpgrade.put(pkg.getName(), pkg.getVersion());
-                localPackagesToUpgrade.put(pkg.getName(),
-                        existingVersions.get(existingVersions.size() - 1));
-                if (PackageState.getByValue(pkg.getState()) == PackageState.REMOTE) {
-                    allPackagesToDownload.add(id);
-                }
+            List<Version> installedVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
+            if (PackageState.getByValue(pkg.getState()).isInstalled()) {
+                // Already installed in the wanted version, nothing to do
+                localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
             } else {
+                if (installedVersions.size() > 0) {
+                    // Upgrade case: already installed in other version(s)
+                    localPackagesToUpgrade.put(pkg.getName(),
+                            installedVersions.get(installedVersions.size() - 1));
+                }
                 if (PackageState.getByValue(pkg.getState()) == PackageState.REMOTE) {
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
                     allPackagesToDownload.add(id);
-                } else if (!PackageState.getByValue(pkg.getState()).isInstalled()) {
+                } else {
                     localPackagesToInstall.put(pkg.getName(), pkg.getVersion());
-                } else if (PackageState.getByValue(pkg.getState()).isInstalled()) {
-                    localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
                 }
             }
         }
@@ -295,15 +293,13 @@ public class DependencyResolution {
             append(sb, allPackages, "\nUnsorted packages: ");
         } else if (!isEmpty()) {
             sb.append("\nDependency resolution:\n");
-            append(sb, orderedInstallablePackages, "  Installation order: ");
-            append(sb, orderedRemovablePackages, "  Uninstallation order: ");
-            append(sb, localUnchangedPackages, "  Unchanged packages: ");
-            append(sb, localPackagesToUpgrade, "  Packages to upgrade: ");
-            StringBuffer sb2 = new StringBuffer();
-            append(sb2, newPackagesToDownload, "  Remote packages to install: ");
-            append(sb2, localPackagesToInstall, "  Local packages to install: ");
-            append(sb2, localPackagesToRemove, "  Local packages to remove: ");
-            log.debug(sb2);
+            append(sb, orderedInstallablePackages, "Installation order");
+            append(sb, orderedRemovablePackages, "Uninstallation order");
+            append(sb, localUnchangedPackages, "Unchanged packages");
+            append(sb, localPackagesToUpgrade, "Packages to upgrade");
+            append(sb, newPackagesToDownload, "Packages to download");
+            append(sb, localPackagesToInstall, "Local packages to install");
+            append(sb, localPackagesToRemove, "Local packages to remove");
         }
         return sb.toString();
     }
@@ -311,7 +307,7 @@ public class DependencyResolution {
     private StringBuffer append(StringBuffer sb, Map<String, Version> pkgMap,
             String title) {
         if (!pkgMap.isEmpty()) {
-            sb.append(title);
+            append(sb, title, pkgMap.size());
             for (String pkgName : pkgMap.keySet()) {
                 sb.append(pkgName);
                 sb.append(":");
@@ -326,13 +322,19 @@ public class DependencyResolution {
     private StringBuffer append(StringBuffer sb, List<String> pkgList,
             String title) {
         if (!pkgList.isEmpty()) {
-            sb.append(title);
+            append(sb, title, pkgList.size());
             for (String pkg : pkgList) {
                 sb.append(pkg + "/");
             }
             sb.replace(sb.length() - 1, sb.length(), "\n");
         }
         return sb;
+    }
+
+    private void append(StringBuffer sb, String title, int size) {
+        if (title.length() > 0) {
+            sb.append(String.format("  %-30s ", title + " (" + size + "):"));
+        }
     }
 
     public synchronized String getInstallationOrderAsString() {

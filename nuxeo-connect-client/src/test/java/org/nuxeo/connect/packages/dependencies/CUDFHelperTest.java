@@ -106,6 +106,7 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         pm.registerSource(source, true);
         pm.registerSource(new DummyPackageSource(remote, false), false);
         cudfHelper = new CUDFHelper(pm);
+        cudfHelper.setAllowSNAPSHOT(true);
         pcr = new Parser().parse(new AddSpaceInputStream(
                 this.getClass().getClassLoader().getResourceAsStream(
                         AbstractPackageManagerTestCase.TEST_DATA
