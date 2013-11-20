@@ -59,6 +59,19 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertTrue(depResolution.isValidated());
         // requireChanges is true because of automatic upgrade
         // assertFalse(depResolution.requireChanges());
+
+        List<String> installs = new ArrayList<String>();
+        installs.add("A-1.0.1-SNAPSHOT");
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(2, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(new Version("1.0.1-SNAPSHOT"),
+                depResolution.getLocalPackagesToInstall().get("A"));
+        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
     public void testBWithoutSNAPSHOT() throws Exception {
@@ -84,6 +97,8 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(2, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.1"),
+                depResolution.getNewPackagesToDownload().get("B"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
@@ -138,6 +153,19 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(2, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.1"),
+                depResolution.getNewPackagesToDownload().get("C"));
+        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
+
+        depResolution = pm.resolveDependencies("C-1.0.1-SNAPSHOT", null);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(2, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(new Version("1.0.1-SNAPSHOT"),
+                depResolution.getLocalPackagesToInstall().get("C"));
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
@@ -163,6 +191,8 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.2-SNAPSHOT"),
+                depResolution.getNewPackagesToDownload().get("A"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
@@ -185,6 +215,8 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(new Version("1.0.2-SNAPSHOT"),
+                depResolution.getLocalPackagesToInstall().get("B"));
         assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
@@ -199,6 +231,8 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(2, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.1"),
+                depResolution.getNewPackagesToDownload().get("B"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
@@ -217,14 +251,15 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
 
         installs = new ArrayList<String>();
         installs.add("C-1.0.1");
-        depResolution = pm.resolveDependencies(installs,
-                null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
         assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(2, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.1"),
+                depResolution.getNewPackagesToDownload().get("C"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 

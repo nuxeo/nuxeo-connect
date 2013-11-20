@@ -109,20 +109,24 @@ public class CUDFHelper {
         CUDF2NuxeoMap.clear();
         Map<String, PackageDependency> upgradesMap = new HashMap<String, PackageDependency>();
         List<String> involvedPackages = new ArrayList<String>();
+        List<String> installedOrRequiredSNAPSHOTPackages = new ArrayList<String>();
         if (upgrades != null) {
             for (PackageDependency upgrade : upgrades) {
                 upgradesMap.put(upgrade.getName(), upgrade);
                 involvedPackages.add(upgrade.getName());
+                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, upgrade);
             }
         }
         if (installs != null) {
             for (PackageDependency install : installs) {
                 involvedPackages.add(install.getName());
+                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, install);
             }
         }
         if (removes != null) {
             for (PackageDependency remove : removes) {
                 involvedPackages.add(remove.getName());
+                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, remove);
             }
         }
         boolean isStudioInvolved = false;
@@ -135,7 +139,7 @@ public class CUDFHelper {
             }
         }
         List<DownloadablePackage> allPackages = getAllPackages();
-        List<String> installedSNAPSHOTPackages = getInstalledSNAPSHOTPackages();
+        installedOrRequiredSNAPSHOTPackages.addAll(getInstalledSNAPSHOTPackages());
         // for each unique "name-classifier", sort versions so we can attribute
         // them a "CUDF posint" version
         // populate Nuxeo2CUDFMap and the reverse CUDF2NuxeoMap
@@ -145,18 +149,22 @@ public class CUDFHelper {
                     && !pkg.isLocal()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
                             pkg, targetPlatform)) {
+                log.debug("Ignore " + pkg + " (incompatible target platform)");
                 continue;
             }
             // ignore Studio packages if not directly involved or installed
             if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO
                     && !PackageState.getByValue(pkg.getState()).isInstalled()) {
+                log.debug("Ignore " + pkg + " (not involved in request)");
                 continue;
             }
 
             // Exclude SNAPSHOT by default for non Studio packages
-            if (!allowSNAPSHOT && pkg.getVersion().isSnapshot()
+            if (!allowSNAPSHOT
+                    && pkg.getVersion().isSnapshot()
                     && pkg.getType() != PackageType.STUDIO
-                    && !installedSNAPSHOTPackages.contains(pkg.getName())) {
+                    && !installedOrRequiredSNAPSHOTPackages.contains(pkg.getName())) {
+                log.debug("Ignore " + pkg + " (excluded SNAPSHOT)");
                 continue;
             }
 
@@ -200,6 +208,17 @@ public class CUDFHelper {
             MapUtils.verbosePrint(out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
             log.debug(outputStream.toString());
             IOUtils.closeQuietly(out);
+        }
+    }
+
+    protected void addIfSNAPSHOT(
+            List<String> installedOrRequiredSNAPSHOTPackages,
+            PackageDependency pd) {
+        Version minVersion = pd.getVersionRange().getMinVersion();
+        Version maxVersion = pd.getVersionRange().getMaxVersion();
+        if (minVersion != null && minVersion.isSnapshot() || maxVersion != null
+                && maxVersion.isSnapshot()) {
+            installedOrRequiredSNAPSHOTPackages.add(pd.getName());
         }
     }
 
