@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -840,16 +840,25 @@ public class PackageManagerImpl implements PackageManager {
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) {
         return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade,
-                targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+                targetPlatform, CUDFHelper.defaultAllowSNAPSHOT, true);
     }
 
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade,
+                targetPlatform, allowSNAPSHOT, true);
+    }
+
+    @Override
+    public DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) {
         try {
             DependencyResolution resolution = resolver.resolve(pkgInstall,
-                    pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT);
+                    pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep);
+
             log.debug(beforeAfterResolutionToString(resolution));
             return resolution;
         } catch (DependencyException e) {

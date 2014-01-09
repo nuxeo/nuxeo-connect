@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -66,11 +66,20 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     @Override
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT)
+            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
+                allowSNAPSHOT, true );
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep)
             throws DependencyException {
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setTargetPlatform(targetPlatform);
         cudfHelper.setAllowSNAPSHOT(allowSNAPSHOT);
+        cudfHelper.setKeep(doKeep);
         // generate CUDF package universe and request stanza
         String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
                 str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
@@ -103,6 +112,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         }
         DependencyResolution resolution = cudfHelper.buildResolution(solution,
                 planner.getSolutionDetails());
+        // TODO NXP-13340 : fix "to install" depending on keep & already installed packages
         return resolution;
     }
 

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -79,6 +79,17 @@ public class CUDFHelper {
     private String targetPlatform;
 
     private boolean allowSNAPSHOT = defaultAllowSNAPSHOT;
+
+    private boolean keep = true;
+
+    /**
+     *
+     * @since 5.9.2
+     * @param keep Whether to keep the installed packages in the resolution
+     */
+    public void setKeep(boolean keep) {
+        this.keep = keep;
+    }
 
     public CUDFHelper(PackageManager pm) {
         this.pm = pm;
@@ -182,6 +193,9 @@ public class CUDFHelper {
                 }
             }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
+            if (!keep  && !involvedPackages.contains(pkg.getName())) {
+                nuxeoCUDFPackage.setInstalled(false);
+            }
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
             if (pkgVersions == null) {
                 pkgVersions = new TreeMap<Version, NuxeoCUDFPackage>();

@@ -48,4 +48,13 @@ public interface DependencyResolver {
             String targetPlatform, boolean allowSNAPSHOT)
             throws DependencyException;
 
+    /**
+     * @throws DependencyException
+     * @since 1.4.14
+     */
+    public DependencyResolution resolve(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep)
+                    throws DependencyException;
+
 }

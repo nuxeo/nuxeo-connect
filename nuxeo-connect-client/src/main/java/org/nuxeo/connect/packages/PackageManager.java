@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -530,5 +530,18 @@ public interface PackageManager extends BasePackageManager {
     DependencyResolution resolveDependencies(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT);
+
+    /**
+     * @param allowSNAPSHOT Whether to allow SNAPSHOT versions or not. Even if
+     *            not allowed, SNAPSHOT versions of a given package will be
+     *            included if a SNAPSHOT version of that package is already
+     *            installed. There may be other acceptance cases.
+     * @param doKeep Whether to keep the installed versions in the resolution.
+     *
+     * @since 1.4.14
+     */
+    DependencyResolution resolveDependencies(List<String> pkgInstall,
+            List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep);
 
 }
