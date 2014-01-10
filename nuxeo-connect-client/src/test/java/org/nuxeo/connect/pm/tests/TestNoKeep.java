@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -45,8 +45,26 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
-    public void testInstallBC() throws Exception {
+    public void testInstallBD() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep2.json");
+        List<DownloadablePackage> remote = getDownloads("remoteNoKeep2.json");
+        pm.registerSource(new DummyPackageSource(local, true), true);
+        pm.registerSource(new DummyPackageSource(remote, false), true);
+        List<String> pkgToSet = new ArrayList<String>();
+        pkgToSet.add("B");
+        pkgToSet.add("D");
+        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(1, depResolution.getLocalPackagesToRemove().size());
+    }
+
+    public void testInstallAB() throws Exception {
+        List<DownloadablePackage> local = getDownloads("localNoKeep3.json");
         pm.registerSource(new DummyPackageSource(local, true), true);
         List<String> pkgToSet = new ArrayList<String>();
         pkgToSet.add("B");
@@ -54,10 +72,11 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(0, depResolution.getLocalUnchangedPackages().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
+
 
 }

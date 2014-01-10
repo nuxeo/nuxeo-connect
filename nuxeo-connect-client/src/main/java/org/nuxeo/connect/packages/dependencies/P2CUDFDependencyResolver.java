@@ -34,6 +34,7 @@ import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.Version;
 
 /**
  * This implementation uses the p2cudf resolver to solve complex dependencies
@@ -112,7 +113,27 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         }
         DependencyResolution resolution = cudfHelper.buildResolution(solution,
                 planner.getSolutionDetails());
-        // TODO NXP-13340 : fix "to install" depending on keep & already installed packages
+        if (!doKeep) {
+            // Make subresolution to remove all packages that are not part of our target list
+            List<String> subInstall = new ArrayList<String>();
+            List<String> subRemove = new ArrayList<String>();
+            for (Map.Entry<String, Version> e : resolution.localPackagesToInstall.entrySet()) {
+                subInstall.add(e.getKey() + '-' + e.getValue().toString());
+            }
+            for (Map.Entry<String, Version> e : resolution.localUnchangedPackages.entrySet()) {
+                subInstall.add(e.getKey() + '-' + e.getValue().toString());
+            }
+            for (Map.Entry<String, Version> e : resolution.newPackagesToDownload.entrySet()) {
+                subInstall.add(e.getKey() + '-' + e.getValue().toString());
+            }
+            for (DownloadablePackage pkg : pm.listInstalledPackages()) {
+                String pkgId = pkg.getId();
+                if (!subInstall.contains(pkgId)) {
+                    subRemove.add(pkgId);
+                }
+            }
+            resolution = resolve(subInstall, subRemove, null, targetPlatform, allowSNAPSHOT, true);
+        }
         return resolution;
     }
 

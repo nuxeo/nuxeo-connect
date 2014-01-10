@@ -1,0 +1,5 @@
+{"name":"A","version":"1.0.0","dependencies":[],"state":5,"type":"addon"}
+{"name":"A","version":"2.0.0","dependencies":[],"state":2,"type":"addon"}
+{"name":"B","version":"1.0.0","dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
+{"name":"B","version":"2.0.0","dependencies":["A:2.0.0:2.0.0"],"state":2,"type":"addon"}
+{"name":"C","version":"1.0.0","dependencies":[],"state":2,"type":"addon"}
