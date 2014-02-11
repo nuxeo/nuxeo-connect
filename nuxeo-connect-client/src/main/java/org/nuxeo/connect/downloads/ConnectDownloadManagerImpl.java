@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -43,22 +43,27 @@ import org.nuxeo.connect.data.PackageDescriptor;
  */
 public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
+    public static final int PENDING_DOWNLOAD_CAPACITY = 80;
+
     public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
 
     protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
-            25);
+            PENDING_DOWNLOAD_CAPACITY);
 
-    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(1, 5, 300,
-            TimeUnit.SECONDS, pendingDownloadTasks, new DaemonThreadFactory());
+    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(0, 5, 0L,
+            TimeUnit.SECONDS, pendingDownloadTasks, new DaemonThreadFactory(),
+            new ThreadPoolExecutor.CallerRunsPolicy());
 
     protected Map<String, LocalDownloadingPackage> downloadingPackages = new HashMap<String, LocalDownloadingPackage>();
 
+    @Override
     public List<DownloadingPackage> listDownloadingPackages() {
         List<DownloadingPackage> result = new ArrayList<DownloadingPackage>();
         result.addAll(downloadingPackages.values());
         return result;
     }
 
+    @Override
     public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
         LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
                 descriptor);
@@ -67,6 +72,7 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         return localPackage;
     }
 
+    @Override
     public String getDownloadedBundleLocalStorage() {
 
         String tmpPath = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY,
@@ -78,6 +84,7 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         return tmpPath;
     }
 
+    @Override
     public void removeDownloadingPackage(String packageId) {
         LocalDownloadingPackage localPackage = downloadingPackages.remove(packageId);
         if (localPackage != null) {
