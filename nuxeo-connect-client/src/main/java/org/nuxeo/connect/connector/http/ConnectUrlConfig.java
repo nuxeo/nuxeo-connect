@@ -97,7 +97,7 @@ public class ConnectUrlConfig {
     }
 
     /**
-     * @since 1.4.9
+     * @since 1.4.15
      */
     public static String getProxyPacUrl() {
         return NuxeoConnectClient.getProperty(CONNECT_PROXY_PAC_URL, null);

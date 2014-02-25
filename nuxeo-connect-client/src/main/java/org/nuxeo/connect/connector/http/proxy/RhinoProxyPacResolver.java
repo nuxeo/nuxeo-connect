@@ -1,3 +1,22 @@
+/*
+ * (C) Copyright 2006-2014 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Nuxeo - initial API and implementation
+ *
+ * $Id$
+ */
+
 package org.nuxeo.connect.connector.http.proxy;
 
 import java.io.IOException;
@@ -27,6 +46,7 @@ import org.nuxeo.connect.connector.http.ConnectUrlConfig;
  * The execution engine to resolve needed proxy using Mozilla Rhino.
  *
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
+ * @since 1.4.15
  */
 public class RhinoProxyPacResolver extends ProxyPacResolver {
 
@@ -61,10 +81,8 @@ public class RhinoProxyPacResolver extends ProxyPacResolver {
             return ((String) ctx.evaluateString(scope,
                     String.format(EXEC_PAC_FUNC, url, getHost(url)),
                     "function call", 0, null)).split(";");
-        } catch (IOException io) {
+        } catch (IOException | RhinoException io) {
             log.warn(io, io);
-        } catch (RhinoException re) {
-            log.warn(re, re);
         } finally {
             Context.exit();
         }
@@ -106,8 +124,8 @@ public class RhinoProxyPacResolver extends ProxyPacResolver {
                 if (objects.length > 0) {
                     return InetAddress.getByName((String) objects[0]).getHostAddress();
                 }
-            } catch (UnknownHostException ignored) {
-                //
+            } catch (UnknownHostException e) {
+                log.debug(e);
             }
             return null;
         }
