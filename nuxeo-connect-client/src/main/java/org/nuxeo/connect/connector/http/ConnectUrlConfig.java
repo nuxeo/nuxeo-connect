@@ -35,6 +35,9 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_PROXY_HOST_PROPERTY = "org.nuxeo.connect.proxy.host";
 
+    /*
+     * @since 1.4.15
+     */
     public static final String CONNECT_PROXY_PAC_URL = "org.nuxeo.connect.proxy.pac.url";
 
     public static final String CONNECT_PROXY_PORT_PROPERTY = "org.nuxeo.connect.proxy.port";
