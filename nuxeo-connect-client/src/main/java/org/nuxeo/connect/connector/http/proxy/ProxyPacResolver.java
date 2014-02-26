@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.connector.http.proxy;
@@ -27,7 +26,8 @@ import java.util.regex.Pattern;
 /**
  * Abstract class resolver to find which proxy to use with a configured proxy
  * pac. The proxy pac file is setted with
- * org.nuxeo.connect.connector.http.ConnectUrlConfig#CONNECT_PROXY_PAC_URL system
+ * org.nuxeo.connect.connector.http.ConnectUrlConfig#CONNECT_PROXY_PAC_URL
+ * system
  * property.
  *
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>

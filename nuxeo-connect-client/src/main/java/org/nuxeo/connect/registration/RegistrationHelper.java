@@ -4,7 +4,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,9 +15,9 @@
  *     Nuxeo - initial API and implementation
  *
  */
-
 package org.nuxeo.connect.registration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +30,8 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,6 +52,8 @@ public class RegistrationHelper {
     public static final String GET_PROJECTS_SUFFIX = "getAvailableProjectsForRegistration";
 
     public static final String POST_REGISTER_SUFFIX = "remoteRegisterInstance";
+
+    protected static final Log log = LogFactory.getLog(RegistrationHelper.class);
 
     protected static String getBaseUrl() {
         return ConnectUrlConfig.getRegistrationBaseUrl();
@@ -74,22 +78,20 @@ public class RegistrationHelper {
         HttpClient httpClient = new HttpClient();
         configureHttpClient(httpClient, url, login, password);
         HttpMethod method = new GetMethod(url);
-        List<ConnectProject> result = new ArrayList<ConnectProject>();
+        List<ConnectProject> result = new ArrayList<>();
         try {
             int rc = httpClient.executeMethod(method);
             if (rc == HttpStatus.SC_OK) {
                 String json = method.getResponseBodyAsString();
-                try {
-                    JSONArray array = new JSONArray(json);
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject ob = (JSONObject) array.get(i);
-                        result.add(AbstractJSONSerializableData.loadFromJSON(
-                                ConnectProject.class, ob));
-                    }
-                } catch (JSONException e) {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject ob = (JSONObject) array.get(i);
+                    result.add(AbstractJSONSerializableData.loadFromJSON(
+                            ConnectProject.class, ob));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | JSONException e) {
+            log.debug(e, e);
         } finally {
             method.releaseConnection();
         }
@@ -115,7 +117,8 @@ public class RegistrationHelper {
             if (rc == HttpStatus.SC_OK) {
                 return method.getResponseBodyAsString();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            log.debug(e, e);
         } finally {
             method.releaseConnection();
         }

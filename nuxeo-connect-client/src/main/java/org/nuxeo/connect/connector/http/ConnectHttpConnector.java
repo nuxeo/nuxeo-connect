@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -55,6 +55,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
 
     protected long lastStatusFetchTime;
 
+    @Override
     protected String getBaseUrl() {
         if (overrideUrl != null) {
             return overrideUrl;
@@ -139,6 +140,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         return httpCacheDurationInMinutes() > 0;
     }
 
+    @Override
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
         if (!isConnectServerReachable()) {
             throw new CanNotReachConnectServer(

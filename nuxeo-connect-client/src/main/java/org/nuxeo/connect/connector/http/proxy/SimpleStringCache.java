@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,9 +14,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
-
 package org.nuxeo.connect.connector.http.proxy;
 
 import java.util.Date;
@@ -42,7 +40,7 @@ public class SimpleStringCache {
         this.duration = duration * 60 * 1000;
     }
 
-    public void saveValue(String value) {
+    public void saveValue(@SuppressWarnings("hiding") String value) {
         this.value = value;
         lastSetTime = new Date().getTime();
     }

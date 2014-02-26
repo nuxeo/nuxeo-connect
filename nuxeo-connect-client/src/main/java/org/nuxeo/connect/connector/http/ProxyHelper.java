@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.connector.http;
@@ -47,23 +46,34 @@ public class ProxyHelper {
             if (ConnectUrlConfig.useProxyPac()) {
                 String[] proxy = pacResolver.findProxy(url);
                 if (proxy != null) {
-                    httpClient.getHostConfiguration().setProxy(proxy[0], Integer.parseInt(proxy[1]));
+                    httpClient.getHostConfiguration().setProxy(proxy[0],
+                            Integer.parseInt(proxy[1]));
                 }
-            }
-            else {
-                httpClient.getHostConfiguration().setProxy(ConnectUrlConfig.getProxyHost(), ConnectUrlConfig.getProxyPort());
+            } else {
+                httpClient.getHostConfiguration().setProxy(
+                        ConnectUrlConfig.getProxyHost(),
+                        ConnectUrlConfig.getProxyPort());
             }
 
-           // configure proxy auth in BA
-           if (ConnectUrlConfig.isProxyAuthenticated()) {
-               if (ConnectUrlConfig.isProxyNTLM()) {
-                   NTCredentials ntlmCredential = new NTCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword(), ConnectUrlConfig.getProxyNTLMHost(), ConnectUrlConfig.getProxyNTLMDomain());
-                   httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ntlmCredential);
-               } else {
-                   Credentials ba = new UsernamePasswordCredentials(ConnectUrlConfig.getProxyLogin(), ConnectUrlConfig.getProxyPassword());
-                   httpClient.getState().setProxyCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
-               }
-           }
+            // configure proxy auth in BA
+            if (ConnectUrlConfig.isProxyAuthenticated()) {
+                if (ConnectUrlConfig.isProxyNTLM()) {
+                    NTCredentials ntlmCredential = new NTCredentials(
+                            ConnectUrlConfig.getProxyLogin(),
+                            ConnectUrlConfig.getProxyPassword(),
+                            ConnectUrlConfig.getProxyNTLMHost(),
+                            ConnectUrlConfig.getProxyNTLMDomain());
+                    httpClient.getState().setProxyCredentials(
+                            new AuthScope(null, -1, AuthScope.ANY_REALM),
+                            ntlmCredential);
+                } else {
+                    Credentials ba = new UsernamePasswordCredentials(
+                            ConnectUrlConfig.getProxyLogin(),
+                            ConnectUrlConfig.getProxyPassword());
+                    httpClient.getState().setProxyCredentials(
+                            new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+                }
+            }
         }
     }
 }

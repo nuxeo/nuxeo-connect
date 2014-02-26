@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,9 +14,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
-
 package org.nuxeo.connect.connector.http.proxy;
 
 import java.io.IOException;
@@ -40,7 +38,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
-
 
 /**
  * The execution engine to resolve needed proxy using Mozilla Rhino.
@@ -117,6 +114,8 @@ public class RhinoProxyPacResolver extends ProxyPacResolver {
     }
 
     protected class DnsResolveFunction extends BaseFunction {
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Object call(Context context, Scriptable scriptable,
                 Scriptable scriptable2, Object[] objects) {
@@ -125,13 +124,15 @@ public class RhinoProxyPacResolver extends ProxyPacResolver {
                     return InetAddress.getByName((String) objects[0]).getHostAddress();
                 }
             } catch (UnknownHostException e) {
-                log.debug(e);
+                log.debug(e, e);
             }
             return null;
         }
     }
 
     protected class MyIpAddressFunction extends BaseFunction {
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Object call(Context context, Scriptable scriptable,
                 Scriptable scriptable2, Object[] objects) {

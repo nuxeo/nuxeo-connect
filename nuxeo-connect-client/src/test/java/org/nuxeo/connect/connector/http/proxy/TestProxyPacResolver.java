@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.connector.http.proxy;
@@ -22,12 +21,11 @@ package org.nuxeo.connect.connector.http.proxy;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.nuxeo.connect.connector.http.proxy.ProxyPacResolver.parseProxyInfos;
+import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
