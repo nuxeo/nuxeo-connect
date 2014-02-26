@@ -36,7 +36,7 @@ public class ConnectUrlConfig {
     /*
      * @since 1.4.15
      */
-    public static final String CONNECT_PROXY_PAC_URL = "org.nuxeo.connect.proxy.pac.url";
+    public static final String NUXEO_PROXY_PAC_URL = "nuxeo.http.proxy.pac.url";
 
     public static final String CONNECT_PROXY_PORT_PROPERTY = "org.nuxeo.connect.proxy.port";
 
@@ -101,7 +101,7 @@ public class ConnectUrlConfig {
      * @since 1.4.15
      */
     public static String getProxyPacUrl() {
-        return NuxeoConnectClient.getProperty(CONNECT_PROXY_PAC_URL, null);
+        return NuxeoConnectClient.getProperty(NUXEO_PROXY_PAC_URL, null);
     }
 
     // Proxy settings management
