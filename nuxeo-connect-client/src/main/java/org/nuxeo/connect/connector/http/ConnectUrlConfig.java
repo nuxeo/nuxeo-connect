@@ -31,21 +31,45 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_URL_PROPERTY = "org.nuxeo.connect.url";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_HOST_PROPERTY = "org.nuxeo.connect.proxy.host";
 
-    /*
+    /**
      * @since 1.4.15
      */
     public static final String NUXEO_PROXY_PAC_URL = "nuxeo.http.proxy.pac.url";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_PORT_PROPERTY = "org.nuxeo.connect.proxy.port";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_LOGIN_PROPERTY = "org.nuxeo.connect.proxy.login";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_PASSWORD_PROPERTY = "org.nuxeo.connect.proxy.password";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_NTLM_HOST = "org.nuxeo.connect.proxy.ntlm.host";
 
+    /**
+     * @deprecated Since 1.4.15
+     */
+    @Deprecated
     public static final String CONNECT_PROXY_NTLM_DOMAIN = "org.nuxeo.connect.proxy.ntlm.domain";
 
     public static final String NUXEO_PROXY_HOST_PROPERTY = "nuxeo.http.proxy.host";
