@@ -734,17 +734,17 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> remote = listAllStudioRemotePackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
         List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-        for (DownloadablePackage pkg : remote) {
-            boolean found = false;
+        result.addAll(local);
+        for (DownloadablePackage rpkg : remote) {
+            boolean foundLocal = false;
             for (DownloadablePackage lpkg : local) {
-                if (lpkg.getId().equals(pkg.getId())) {
-                    result.add(lpkg);
-                    found = true;
+                if (lpkg.getId().equals(rpkg.getId())) {
+                    foundLocal = true;
                     break;
                 }
             }
-            if (!found) {
-                result.add(pkg);
+            if (!foundLocal) {
+                result.add(rpkg);
             }
         }
         return result;
@@ -857,7 +857,8 @@ public class PackageManagerImpl implements PackageManager {
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) {
         try {
             DependencyResolution resolution = resolver.resolve(pkgInstall,
-                    pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep);
+                    pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT,
+                    doKeep);
 
             log.debug(beforeAfterResolutionToString(resolution));
             return resolution;

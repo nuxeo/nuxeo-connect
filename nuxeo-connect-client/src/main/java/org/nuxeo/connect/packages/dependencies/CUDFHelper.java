@@ -193,7 +193,7 @@ public class CUDFHelper {
                 }
             }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
-            if (!keep  && !involvedPackages.contains(pkg.getName())) {
+            if (!keep && !involvedPackages.contains(pkg.getName())) {
                 nuxeoCUDFPackage.setInstalled(false);
             }
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
