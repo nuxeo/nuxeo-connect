@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -19,7 +19,8 @@ package org.nuxeo.connect.packages.dependencies;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
-import org.nuxeo.connect.data.DownloadablePackage;
+
+import org.nuxeo.connect.update.Package;
 
 /**
  *
@@ -28,8 +29,8 @@ import org.nuxeo.connect.data.DownloadablePackage;
  */
 public class TargetPlatformFilterHelper {
 
-    public static boolean isCompatibleWithTargetPlatform(
-            DownloadablePackage pkg, String targetPlatform) {
+    public static boolean isCompatibleWithTargetPlatform(Package pkg,
+            String targetPlatform) {
         if (targetPlatform == null || pkg.getTargetPlatforms() == null
                 || pkg.getTargetPlatforms().length == 0) {
             return true;
