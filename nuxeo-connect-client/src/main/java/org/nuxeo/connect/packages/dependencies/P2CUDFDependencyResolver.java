@@ -31,6 +31,7 @@ import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
 import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
@@ -67,9 +68,10 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     @Override
     public DependencyResolution resolve(List<String> pkgInstall,
             List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException {
+            String targetPlatform, boolean allowSNAPSHOT)
+            throws DependencyException {
         return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                allowSNAPSHOT, true );
+                allowSNAPSHOT, true);
     }
 
     @Override
@@ -114,9 +116,10 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         DependencyResolution resolution = cudfHelper.buildResolution(solution,
                 planner.getSolutionDetails());
         if (!doKeep) {
-            // Make subresolution to remove all packages that are not part of our target list
-            List<String> subInstall = new ArrayList<String>();
-            List<String> subRemove = new ArrayList<String>();
+            // Make sub-resolution to remove all packages that are not part of
+            // our target list
+            List<String> subInstall = new ArrayList<>();
+            List<String> subRemove = new ArrayList<>();
             for (Map.Entry<String, Version> e : resolution.localPackagesToInstall.entrySet()) {
                 subInstall.add(e.getKey() + '-' + e.getValue().toString());
             }
@@ -132,13 +135,14 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
                     subRemove.add(pkgId);
                 }
             }
-            resolution = resolve(subInstall, subRemove, null, targetPlatform, allowSNAPSHOT, true);
+            resolution = resolve(subInstall, subRemove, null, targetPlatform,
+                    allowSNAPSHOT, true);
         }
         return resolution;
     }
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {
-        List<PackageDependency> list = new ArrayList<PackageDependency>();
+        List<PackageDependency> list = new ArrayList<>();
         if (pkgList == null || pkgList.size() == 0) {
             return list.toArray(new PackageDependency[0]);
         }
@@ -158,12 +162,14 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     @Override
     public DependencyResolution resolve(String pkgIdOrName,
             String targetPlatform) throws DependencyException {
-        List<String> pkgInstall = new ArrayList<String>();
+        List<String> pkgInstall = new ArrayList<>();
         pkgInstall.add(pkgIdOrName);
         if (pm.isInstalled(pkgIdOrName)
-                || !pm.findLocalPackageInstalledVersions(pkgIdOrName).isEmpty()) { // upgrade
+                || !pm.findLocalPackageInstalledVersions(pkgIdOrName).isEmpty()) {
+            // upgrade
             return resolve(null, null, pkgInstall, targetPlatform);
-        } else { // new install
+        } else {
+            // new install
             return resolve(pkgInstall, null, null, targetPlatform);
         }
     }

@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,9 +40,9 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     private String classifier;
 
-    private List<PackageDependency> dependencies = new ArrayList<PackageDependency>();
+    private List<PackageDependency> dependencies = new ArrayList<>();
 
-    private List<PackageDependency> conflicts = new ArrayList<PackageDependency>();
+    private List<PackageDependency> conflicts = new ArrayList<>();
 
     public String id;
 
@@ -54,7 +54,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public String vendor;
 
-    public List<String> targetPlatforms = new ArrayList<String>();
+    public List<String> targetPlatforms = new ArrayList<>();
 
     public int state;
 

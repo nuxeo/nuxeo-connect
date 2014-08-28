@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -47,7 +48,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
     public static final String TEST_DATA = "test-data/";
 
     protected static List<String> readLines(InputStream in) throws IOException {
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(in));
@@ -91,7 +92,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
      */
     protected static List<DownloadablePackage> getDownloads(String filename,
             boolean isLocal) throws IOException, JSONException {
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(
                 TEST_DATA + filename);
         List<String> lines = readLines(is);

@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.tests;
@@ -28,6 +27,7 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
+
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.PackageDescriptor;
@@ -44,9 +44,7 @@ public class TestSerialization extends TestCase {
     private static final Log log = LogFactory.getLog(TestSerialization.class);
 
     public void testSerializeSubscriptionStatus() throws JSONException {
-
         SubscriptionStatus status = new SubscriptionStatus();
-
         status.setEndDate("25/11/2011");
         status.setContractStatus("OK");
         status.setDescription("MyInstance");
@@ -54,7 +52,6 @@ public class TestSerialization extends TestCase {
         status.setMessage("Yo");
 
         String json = status.serializeAsJSON();
-
         assertNotNull(json);
         log.info(json);
 
@@ -73,7 +70,7 @@ public class TestSerialization extends TestCase {
 
         PackageDescriptor p = new PackageDescriptor();
 
-        List<String> targets = new ArrayList<String>();
+        List<String> targets = new ArrayList<>();
         targets.add("5.3.0");
         targets.add("5.3.1");
         PackageDependency[] deps = {

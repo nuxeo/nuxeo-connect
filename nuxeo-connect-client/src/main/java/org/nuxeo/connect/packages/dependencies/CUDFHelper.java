@@ -67,14 +67,14 @@ public class CUDFHelper {
      *
      * nuxeo2CUDFMap = { "pkgName", { nuxeoVersion, NuxeoCUDFPackage }}
      */
-    protected Map<String, Map<Version, NuxeoCUDFPackage>> nuxeo2CUDFMap = new HashMap<String, Map<Version, NuxeoCUDFPackage>>();
+    protected Map<String, Map<Version, NuxeoCUDFPackage>> nuxeo2CUDFMap = new HashMap<>();
 
     /**
      * Map of all NuxeoCUDFPackage per CUDF unique ID (pkgName-pkgCUDFVersion)
      *
      * CUDF2NuxeoMap = { "pkgName-pkgCUDFVersion", NuxeoCUDFPackage }
      */
-    protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<String, NuxeoCUDFPackage>();
+    protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<>();
 
     private String targetPlatform;
 
@@ -118,9 +118,9 @@ public class CUDFHelper {
             PackageDependency[] removes, PackageDependency[] upgrades) {
         nuxeo2CUDFMap.clear();
         CUDF2NuxeoMap.clear();
-        Map<String, PackageDependency> upgradesMap = new HashMap<String, PackageDependency>();
-        List<String> involvedPackages = new ArrayList<String>();
-        List<String> installedOrRequiredSNAPSHOTPackages = new ArrayList<String>();
+        Map<String, PackageDependency> upgradesMap = new HashMap<>();
+        List<String> involvedPackages = new ArrayList<>();
+        List<String> installedOrRequiredSNAPSHOTPackages = new ArrayList<>();
         if (upgrades != null) {
             for (PackageDependency upgrade : upgrades) {
                 upgradesMap.put(upgrade.getName(), upgrade);
@@ -198,7 +198,7 @@ public class CUDFHelper {
             }
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
             if (pkgVersions == null) {
-                pkgVersions = new TreeMap<Version, NuxeoCUDFPackage>();
+                pkgVersions = new TreeMap<>();
                 nuxeo2CUDFMap.put(nuxeoCUDFPackage.getCUDFName(), pkgVersions);
             }
             pkgVersions.put(nuxeoCUDFPackage.getNuxeoVersion(),
@@ -237,7 +237,7 @@ public class CUDFHelper {
     }
 
     private List<String> getInstalledSNAPSHOTPackages() {
-        List<String> installedSNAPSHOTPackages = new ArrayList<String>();
+        List<String> installedSNAPSHOTPackages = new ArrayList<>();
         for (DownloadablePackage pkg : pm.listInstalledPackages()) {
             if (pkg.getVersion().isSnapshot()) {
                 installedSNAPSHOTPackages.add(pkg.getName());
@@ -446,8 +446,7 @@ public class CUDFHelper {
             }
         }
 
-        List<InstallableUnit> sortedSolution = new ArrayList<InstallableUnit>(
-                solution);
+        List<InstallableUnit> sortedSolution = new ArrayList<>(solution);
         Collections.sort(sortedSolution);
         log.debug("Solution: " + sortedSolution);
 

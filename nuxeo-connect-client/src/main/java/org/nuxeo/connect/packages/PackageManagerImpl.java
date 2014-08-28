@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
@@ -66,18 +67,18 @@ public class PackageManagerImpl implements PackageManager {
 
     protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
 
-    protected List<PackageSource> localSources = new ArrayList<PackageSource>();
+    protected List<PackageSource> localSources = new ArrayList<>();
 
-    protected List<PackageSource> remoteSources = new ArrayList<PackageSource>();
+    protected List<PackageSource> remoteSources = new ArrayList<>();
 
-    protected List<String> sourcesNames = new ArrayList<String>();
+    protected List<String> sourcesNames = new ArrayList<>();
 
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
     protected DependencyResolver resolver;
 
     protected List<PackageSource> getAllSources() {
-        List<PackageSource> allSources = new ArrayList<PackageSource>();
+        List<PackageSource> allSources = new ArrayList<>();
         allSources.addAll(remoteSources);
         allSources.addAll(localSources);
         return allSources;
@@ -123,7 +124,7 @@ public class PackageManagerImpl implements PackageManager {
             List<PackageSource> sources, PackageType type, String targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type,
                 targetPlatform);
-        Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<String, Map<String, DownloadablePackage>>();
+        Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<>();
         for (DownloadablePackage pkg : allPackages) {
             if (targetPlatform == null
                     || Arrays.asList(pkg.getTargetPlatforms()).contains(
@@ -143,7 +144,7 @@ public class PackageManagerImpl implements PackageManager {
                 for (String tp : targetPlatforms) {
                     Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
                     if (packagesById == null) {
-                        packagesById = new HashMap<String, DownloadablePackage>();
+                        packagesById = new HashMap<>();
                         packagesByIdAndTargetPlatform.put(tp, packagesById);
                     }
                     String key = pkg.getId();
@@ -158,7 +159,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         for (Map<String, DownloadablePackage> packagesById : packagesByIdAndTargetPlatform.values()) {
             for (DownloadablePackage pkg : packagesById.values()) {
                 if (!result.contains(pkg)) {
@@ -188,7 +189,7 @@ public class PackageManagerImpl implements PackageManager {
             List<PackageSource> sources, PackageType type, String targetPlatform) {
         Map<String, DownloadablePackage> packagesById = getAllPackagesByID(
                 sources, type, targetPlatform);
-        return new ArrayList<DownloadablePackage>(packagesById.values());
+        return new ArrayList<>(packagesById.values());
     }
 
     /**
@@ -208,7 +209,7 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(
             List<PackageSource> sources, PackageType type, String targetPlatform) {
-        Map<String, DownloadablePackage> packagesById = new HashMap<String, DownloadablePackage>();
+        Map<String, DownloadablePackage> packagesById = new HashMap<>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
             if (type == null) {
@@ -244,7 +245,7 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected Map<String, List<DownloadablePackage>> getAllPackagesByName(
             List<PackageSource> sources, PackageType type) {
-        Map<String, List<DownloadablePackage>> packagesByName = new HashMap<String, List<DownloadablePackage>>();
+        Map<String, List<DownloadablePackage>> packagesByName = new HashMap<>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
             if (type == null) {
@@ -255,7 +256,7 @@ public class PackageManagerImpl implements PackageManager {
             for (DownloadablePackage pkg : packages) {
                 List<DownloadablePackage> pkgsForName;
                 if (!packagesByName.containsKey(pkg.getName())) {
-                    pkgsForName = new ArrayList<DownloadablePackage>();
+                    pkgsForName = new ArrayList<>();
                     packagesByName.put(pkg.getName(), pkgsForName);
                 } else {
                     pkgsForName = packagesByName.get(pkg.getName());
@@ -268,7 +269,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> findRemotePackages(String packageName) {
-        List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : remoteSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)) {
@@ -281,7 +282,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> findLocalPackages(String packageName) {
-        List<DownloadablePackage> pkgs = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)) {
@@ -294,7 +295,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<Version> findLocalPackageVersions(String packageName) {
-        List<Version> versions = new ArrayList<Version>();
+        List<Version> versions = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)) {
@@ -307,7 +308,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<Version> findLocalPackageInstalledVersions(String packageName) {
-        List<Version> versions = new ArrayList<Version>();
+        List<Version> versions = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)
@@ -358,10 +359,10 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<Version> getPreferedVersions(String pkgName) {
-        List<Version> versions = new ArrayList<Version>();
-        List<Version> installedVersions = new ArrayList<Version>();
-        List<Version> localVersions = new ArrayList<Version>();
-        List<Version> remoteVersions = new ArrayList<Version>();
+        List<Version> versions = new ArrayList<>();
+        List<Version> installedVersions = new ArrayList<>();
+        List<Version> localVersions = new ArrayList<>();
+        List<Version> remoteVersions = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)) {
@@ -391,7 +392,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<Version> getAvailableVersion(String pkgName,
             VersionRange range, String targetPlatform) {
-        List<Version> versions = new ArrayList<Version>();
+        List<Version> versions = new ArrayList<>();
         for (PackageSource source : getAllSources()) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)
@@ -447,7 +448,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listInstalledPackages() {
-        List<DownloadablePackage> res = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> res = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (PackageState.getByValue(pkg.getState()).isInstalled()) {
@@ -485,8 +486,8 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listLocalPackages(PackageType type) {
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-        List<String> pkgIds = new ArrayList<String>();
+        List<DownloadablePackage> result = new ArrayList<>();
+        List<String> pkgIds = new ArrayList<>();
         for (PackageSource source : localSources) {
             List<DownloadablePackage> pkgs = null;
             if (type == null) {
@@ -527,8 +528,8 @@ public class PackageManagerImpl implements PackageManager {
                 type);
         List<DownloadablePackage> availablePackages = doMergePackages(
                 getAllSources(), type, targetPlatform);
-        List<DownloadablePackage> toUpdate = new ArrayList<DownloadablePackage>();
-        List<String> toUpdateIds = new ArrayList<String>();
+        List<DownloadablePackage> toUpdate = new ArrayList<>();
+        List<String> toUpdateIds = new ArrayList<>();
 
         // take all the available packages that correspond to an upgrade of an
         // active local package and match the target platform
@@ -581,9 +582,8 @@ public class PackageManagerImpl implements PackageManager {
         }
 
         // Remove duplicates
-        Set<DownloadablePackage> updateSet = new LinkedHashSet<DownloadablePackage>(
-                toUpdate);
-        toUpdate = new ArrayList<DownloadablePackage>(updateSet);
+        Set<DownloadablePackage> updateSet = new LinkedHashSet<>(toUpdate);
+        toUpdate = new ArrayList<>(updateSet);
 
         Collections.sort(toUpdate, new VersionPackageComparator());
         return toUpdate;
@@ -595,7 +595,7 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> allPackages = getAllPackages(getAllSources(),
                 pkgType, targetPlatform);
         Collections.sort(allPackages, new VersionPackageComparator());
-        List<DownloadablePackage> allPrivatePackages = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
             if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
                 allPrivatePackages.add(downloadablePackage);
@@ -618,7 +618,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadingPackage> download(List<String> packageIds)
             throws Exception {
-        List<DownloadingPackage> downloadings = new ArrayList<DownloadingPackage>();
+        List<DownloadingPackage> downloadings = new ArrayList<>();
         for (String packageId : packageIds) {
             downloadings.add(download(packageId));
         }
@@ -649,7 +649,7 @@ public class PackageManagerImpl implements PackageManager {
 
     protected Map<String, DownloadablePackage> getCachedPackageList() {
         if (cachedPackageList == null) {
-            cachedPackageList = new HashMap<String, DownloadablePackage>();
+            cachedPackageList = new HashMap<>();
         }
         for (DownloadablePackage pkg : listPackages()) {
             cachedPackageList.put(pkg.getId(), pkg);
@@ -713,7 +713,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages(
             PackageType pkgType, String targetPlatform) {
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         List<DownloadablePackage> all = listPackages(pkgType, targetPlatform);
         List<DownloadablePackage> remotes = listRemotePackages(pkgType,
                 targetPlatform);
@@ -733,7 +733,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
         List<DownloadablePackage> remote = listAllStudioRemotePackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         result.addAll(local);
         for (DownloadablePackage rpkg : remote) {
             boolean foundLocal = false;
@@ -787,7 +787,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listAllStudioRemotePackages() {
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         for (PackageSource source : remoteSources) {
             List<DownloadablePackage> packages = source.listPackages(PackageType.STUDIO);
             result.addAll(packages);
@@ -822,7 +822,7 @@ public class PackageManagerImpl implements PackageManager {
     public String beforeAfterResolutionToString(DependencyResolution resolution) {
         StringBuilder sb = new StringBuilder();
         sb.append("Before: " + listInstalledPackages());
-        List<String> after = new ArrayList<String>();
+        List<String> after = new ArrayList<>();
         after.addAll(resolution.getUnchangedPackageIds());
         after.addAll(resolution.getInstallPackageIds());
         Collections.sort(after);
@@ -870,8 +870,8 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadablePackage> getUninstallDependencies(Package pkg,
             String targetPlatform) {
-        List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
-        List<String> removes = new ArrayList<String>();
+        List<DownloadablePackage> packagesToUninstall = new ArrayList<>();
+        List<String> removes = new ArrayList<>();
         removes.add(pkg.getName());
         DependencyResolution resolution = resolveDependencies(null, removes,
                 null, targetPlatform);
@@ -890,7 +890,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
         // This impl is clearly not very sharp
-        List<String> pkgNamesToRemove = new ArrayList<String>();
+        List<String> pkgNamesToRemove = new ArrayList<>();
         List<DownloadablePackage> installedPackages = listInstalledPackages();
         int nbImpactedPackages = 0;
         pkgNamesToRemove.add(pkg.getName());
@@ -908,7 +908,7 @@ public class PackageManagerImpl implements PackageManager {
             }
         }
         pkgNamesToRemove.remove(pkg.getName());
-        List<DownloadablePackage> packagesToUninstall = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> packagesToUninstall = new ArrayList<>();
         for (String pkgName : pkgNamesToRemove) {
             for (Version v : findLocalPackageInstalledVersions(pkgName)) {
                 DownloadablePackage p = getLocalPackage(pkgName + "-"
@@ -956,7 +956,7 @@ public class PackageManagerImpl implements PackageManager {
             List<String> orderedList) throws DependencyException {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
         boolean hasChanged = true;
-        Set<String> missingDeps = new HashSet<String>();
+        Set<String> missingDeps = new HashSet<>();
         while (!orderedList.isEmpty() && hasChanged) {
             hasChanged = false;
             for (String id : orderedList) {

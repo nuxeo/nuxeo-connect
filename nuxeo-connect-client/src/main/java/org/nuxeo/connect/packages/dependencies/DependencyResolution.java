@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
@@ -54,23 +55,23 @@ public class DependencyResolution {
 
     protected String failedMessage;
 
-    protected Map<String, Version> allPackages = new HashMap<String, Version>();
+    protected Map<String, Version> allPackages = new HashMap<>();
 
-    protected Map<String, Version> newPackagesToDownload = new HashMap<String, Version>();
+    protected Map<String, Version> newPackagesToDownload = new HashMap<>();
 
-    protected Map<String, Version> localPackagesToInstall = new HashMap<String, Version>();
+    protected Map<String, Version> localPackagesToInstall = new HashMap<>();
 
-    protected Map<String, Version> localPackagesToUpgrade = new HashMap<String, Version>();
+    protected Map<String, Version> localPackagesToUpgrade = new HashMap<>();
 
-    protected Map<String, Version> localPackagesToRemove = new HashMap<String, Version>();
+    protected Map<String, Version> localPackagesToRemove = new HashMap<>();
 
-    protected Map<String, Version> localUnchangedPackages = new HashMap<String, Version>();
+    protected Map<String, Version> localUnchangedPackages = new HashMap<>();
 
-    protected List<String> orderedInstallablePackages = new ArrayList<String>();
+    protected List<String> orderedInstallablePackages = new ArrayList<>();
 
-    protected List<String> orderedRemovablePackages = new ArrayList<String>();
+    protected List<String> orderedRemovablePackages = new ArrayList<>();
 
-    protected List<String> allPackagesToDownload = new ArrayList<String>();
+    protected List<String> allPackagesToDownload = new ArrayList<>();
 
     public DependencyResolution() {
 
@@ -228,7 +229,7 @@ public class DependencyResolution {
     }
 
     public List<String> getUnchangedPackageIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for (Entry<String, Version> entry : getLocalUnchangedPackages().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
@@ -237,7 +238,7 @@ public class DependencyResolution {
     }
 
     public List<String> getUpgradePackageIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for (Entry<String, Version> entry : getLocalPackagesToUpgrade().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
@@ -246,7 +247,7 @@ public class DependencyResolution {
     }
 
     public List<String> getInstallPackageIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for (Entry<String, Version> entry : getLocalPackagesToInstall().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
@@ -262,7 +263,7 @@ public class DependencyResolution {
     }
 
     public List<String> getRemovePackageIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for (Entry<String, Version> entry : getLocalPackagesToRemove().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
@@ -275,7 +276,7 @@ public class DependencyResolution {
      * @return List of already downloaded packages that need to be installed
      */
     public List<String> getLocalToInstallIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for (Entry<String, Version> entry : getLocalPackagesToInstall().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
