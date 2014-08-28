@@ -48,7 +48,6 @@ import org.nuxeo.connect.update.LocalPackage;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
-import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
 import org.nuxeo.connect.update.PackageVisibility;
@@ -312,7 +311,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(packageName)
-                        && PackageState.getByValue(pkg.getState()).isInstalled()) {
+                        && pkg.getPackageState().isInstalled()) {
                     versions.add(pkg.getVersion());
                 }
             }
@@ -366,7 +365,7 @@ public class PackageManagerImpl implements PackageManager {
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
                 if (pkg.getName().equals(pkgName)) {
-                    if (PackageState.getByValue(pkg.getState()).isInstalled()) {
+                    if (pkg.getPackageState().isInstalled()) {
                         installedVersions.add(pkg.getVersion());
                     } else {
                         localVersions.add(pkg.getVersion());
@@ -451,7 +450,7 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> res = new ArrayList<>();
         for (PackageSource source : localSources) {
             for (DownloadablePackage pkg : source.listPackages()) {
-                if (PackageState.getByValue(pkg.getState()).isInstalled()) {
+                if (pkg.getPackageState().isInstalled()) {
                     res.add(pkg);
                 }
             }
@@ -535,7 +534,7 @@ public class PackageManagerImpl implements PackageManager {
         // active local package and match the target platform
         for (DownloadablePackage pkg : localPackages) {
             // Ignore upgrade check for unused packages
-            if (!PackageState.getByValue(pkg.getState()).isInstalled()) {
+            if (!pkg.getPackageState().isInstalled()) {
                 continue;
             }
             for (DownloadablePackage availablePackage : availablePackages) {
@@ -567,7 +566,7 @@ public class PackageManagerImpl implements PackageManager {
                         if (lpkg.getName().equals(pkg.getName())) {
                             if (lpkg.getVersion().greaterOrEqualThan(
                                     pkg.getVersion())) {
-                                if (PackageState.getByValue(lpkg.getState()).isInstalled()) {
+                                if (lpkg.getPackageState().isInstalled()) {
                                     alreadyInLocal = true;
                                 }
                             }
@@ -933,7 +932,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public boolean isInstalled(String pkgId) {
         DownloadablePackage pkg = getLocalPackage(pkgId);
-        return (pkg != null && PackageState.getByValue(pkg.getState()).isInstalled());
+        return (pkg != null && pkg.getPackageState().isInstalled());
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
@@ -79,7 +80,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     protected String vendor;
 
     @JSONExportableField
-    protected int state;
+    protected PackageState packageState;
 
     @JSONExportableField
     protected String license;
@@ -162,7 +163,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.name = descriptor.getName();
         this.productionState = descriptor.getProductionState();
         this.provides = descriptor.getProvides();
-        this.state = descriptor.getState();
+        this.packageState = descriptor.getPackageState();
         this.targetPlatforms = descriptor.getTargetPlatforms();
         this.title = descriptor.getTitle();
         this.type = descriptor.getType();
@@ -187,7 +188,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Override
     public PackageDependency[] getConflicts() {
         if (conflicts == null) {
-            return new PackageDependency[0];
+            conflicts = new PackageDependency[0];
         }
         return conflicts;
     }
@@ -203,23 +204,20 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public String getConflictsAsString() {
         StringBuilder sb = new StringBuilder();
-
         if (conflicts == null || conflicts.length == 0) {
             return "";
         }
-
         for (PackageDependency dep : getConflicts()) {
             sb.append(dep.toString());
             sb.append(",");
         }
-
         return sb.toString();
     }
 
     @Override
     public PackageDependency[] getDependencies() {
         if (dependencies == null) {
-            return new PackageDependency[0];
+            dependencies = new PackageDependency[0];
         }
         return dependencies;
     }
@@ -235,16 +233,13 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public String getDependenciesAsString() {
         StringBuilder sb = new StringBuilder();
-
         if (dependencies == null || dependencies.length == 0) {
             return "";
         }
-
         for (PackageDependency dep : getDependencies()) {
             sb.append(dep.toString());
             sb.append(",");
         }
-
         return sb.toString();
     }
 
@@ -288,6 +283,14 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     @Override
+    public PackageState getPackageState() {
+        if (packageState == null) {
+            packageState = PackageState.UNKNOWN;
+        }
+        return packageState;
+    }
+
+    @Override
     public String getPictureUrl() {
         return pictureUrl;
     }
@@ -295,16 +298,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Override
     public ProductionState getProductionState() {
         if (productionState == null) {
-            return ProductionState.TESTING;
-        } else {
-            return productionState;
+            productionState = ProductionState.TESTING;
         }
+        return productionState;
     }
 
     @Override
     public PackageDependency[] getProvides() {
         if (provides == null) {
-            return new PackageDependency[0];
+            provides = new PackageDependency[0];
         }
         return provides;
     }
@@ -320,16 +322,13 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     public String getProvidesAsString() {
         StringBuilder sb = new StringBuilder();
-
         if (provides == null || provides.length == 0) {
             return "";
         }
-
         for (PackageDependency dep : getProvides()) {
             sb.append(dep.toString());
             sb.append(",");
         }
-
         return sb.toString();
     }
 
@@ -353,9 +352,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return sourceUrl;
     }
 
+    @Deprecated
     @Override
     public int getState() {
-        return state;
+        return packageState.getValue();
     }
 
     @Override
@@ -376,10 +376,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Override
     public NuxeoValidationState getValidationState() {
         if (nuxeoValidationState == null) {
-            return NuxeoValidationState.NONE;
-        } else {
-            return nuxeoValidationState;
+            nuxeoValidationState = NuxeoValidationState.NONE;
         }
+        return nuxeoValidationState;
     }
 
     @Override
@@ -479,6 +478,20 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         nuxeoValidationState = NuxeoValidationState.getByValue(state);
     }
 
+    public void setPackageState(PackageState state) {
+        this.packageState = state;
+    }
+
+    @JSONImportMethod(name = "state")
+    public void setPackageState(int state) {
+        this.packageState = PackageState.getByValue(state);
+    }
+
+    @JSONImportMethod(name = "packageState")
+    public void setPackageStateAsJSON(String state) {
+        setPackageState(PackageState.getByLabel(state));
+    }
+
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
     }
@@ -521,8 +534,13 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.sourceUrl = sourceUrl;
     }
 
+    /**
+     * @deprecated Since 5.9.6. Use {@link #setPackageState(PackageState)}
+     *             instead.
+     */
+    @Deprecated
     public void setState(int state) {
-        this.state = state;
+        this.packageState = PackageState.getByValue(state);
     }
 
     public void setSupported(boolean supported) {

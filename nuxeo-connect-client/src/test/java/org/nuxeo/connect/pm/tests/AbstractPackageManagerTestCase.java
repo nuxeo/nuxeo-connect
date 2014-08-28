@@ -127,7 +127,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
             sb.append(pkg.getVersion().toString());
             sb.append(") ");
             sb.append(" [");
-            sb.append(pkg.getState());
+            sb.append(pkg.getPackageState());
             sb.append("], ");
         }
         sb.append("}");

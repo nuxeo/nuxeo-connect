@@ -101,11 +101,18 @@ public interface Package {
     /**
      * Gets the package life cycle status.
      *
-     * FIXME Should return a {@link PackageState} instead of int.
+     * @see PackageState
+     * @deprecated Since 5.9.6. Use {@link #getPackageState()} instead.
+     */
+    @Deprecated
+    int getState();
+
+    /**
+     * Gets the package life cycle status.
      *
      * @see PackageState
      */
-    int getState();
+    PackageState getPackageState();
 
     /**
      * Get the URL where more information can be found about this package. Can

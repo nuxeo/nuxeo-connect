@@ -34,10 +34,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
-import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
@@ -165,7 +165,7 @@ public class CUDFHelper {
             }
             // ignore Studio packages if not directly involved or installed
             if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO
-                    && !PackageState.getByValue(pkg.getState()).isInstalled()) {
+                    && !pkg.getPackageState().isInstalled()) {
                 log.debug("Ignore " + pkg + " (not involved in request)");
                 continue;
             }

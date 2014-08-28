@@ -154,9 +154,15 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
         return localPackage.getName();
     }
 
+    @Deprecated
     @Override
     public int getState() {
         return localPackage.getState();
+    }
+
+    @Override
+    public PackageState getPackageState() {
+        return localPackage.getPackageState();
     }
 
     @Override

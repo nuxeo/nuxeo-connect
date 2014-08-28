@@ -49,7 +49,7 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
         assertTrue(pkgToRemove.contains(pm.getPackage("E-1.0.0")));
         assertFalse(pkgToRemove.contains(pm.getPackage("F-1.0.0")));
         assertFalse(pkgToRemove.contains(pm.getPackage("G-1.0.0")));
-        assertTrue(pm.getPackage("H-1.0.0").getState() != PackageState.INSTALLED.getValue()
+        assertTrue(pm.getPackage("H-1.0.0").getPackageState() != PackageState.INSTALLED
                 || pkgToRemove.contains(pm.getPackage("H-1.0.0")));
     }
 

@@ -67,50 +67,45 @@ public class TestSerialization extends TestCase {
     }
 
     public void testSerializePackage() throws Exception {
-
         PackageDescriptor p = new PackageDescriptor();
-
-        List<String> targets = new ArrayList<>();
-        targets.add("5.3.0");
-        targets.add("5.3.1");
-        PackageDependency[] deps = {
-                new PackageDependency("my-package:1.1:1.2"),
-                new PackageDependency("my-package:2.0:2.2") };
         p.setClassifier("MyClassifier");
         p.setDescription("MyDescription");
         p.setHomePage("http://www.nuxeo.org");
         p.setName("testPackage");
+        List<String> targets = new ArrayList<>();
+        targets.add("5.3.0");
+        targets.add("5.3.1");
         p.setTargetPlatforms(targets);
         p.setTitle("My Title");
         p.setType(PackageType.STUDIO);
         p.setVersion(new Version(1, 0, 2));
+        PackageDependency[] deps = {
+                new PackageDependency("my-package:1.1:1.2"),
+                new PackageDependency("my-package:2.0:2.2") };
         p.setDependencies(deps);
         p.setCommentsNumber(8);
         p.setRating(4);
         p.setDownloadsCount(1000);
         p.setPictureUrl("http://xxx");
-        p.setState(PackageState.INSTALLED.getValue());
-
+        p.setPackageState(PackageState.INSTALLED);
         p.setNuxeoValidationState(NuxeoValidationState.NUXEO_CERTIFIED);
         p.setProductionState(ProductionState.PRODUCTION_READY);
         p.setSupported(true);
         p.setSupportsHotReload(true);
 
         String json = p.serializeAsJSON();
-
         assertNotNull(json);
         log.info(json);
 
         PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(
                 PackageDescriptor.class, json);
         assertNotNull(p2);
-
         assertEquals(p.getHomePage(), p2.getHomePage());
         assertEquals(p.getDescription(), p2.getDescription());
         assertEquals(p.getClassifier(), p2.getClassifier());
         assertEquals(p.getId(), p2.getId());
         assertEquals(p.getName(), p2.getName());
-        assertEquals(p.getState(), p2.getState());
+        assertEquals(p.getPackageState(), p2.getPackageState());
         assertEquals(p.getTitle(), p2.getTitle());
         assertEquals(Arrays.asList(p.getTargetPlatforms()).toString(),
                 Arrays.asList(p2.getTargetPlatforms()).toString());
@@ -121,7 +116,7 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getRating(), p2.getRating());
         assertEquals(p.getPictureUrl(), p2.getPictureUrl());
         assertEquals(p.getCommentsNumber(), p2.getCommentsNumber());
-        assertEquals(PackageState.INSTALLED.getValue(), p2.getState());
+        assertEquals(PackageState.INSTALLED, p2.getPackageState());
         assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
         assertEquals(NuxeoValidationState.NUXEO_CERTIFIED,
                 p2.getValidationState());

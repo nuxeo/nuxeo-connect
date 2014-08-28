@@ -88,8 +88,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         assertEquals(4, all.size());
 
         DownloadablePackage downloading = all.get(1);
-        assertEquals(PackageState.DOWNLOADING.getValue(),
-                downloading.getState());
+        assertEquals(PackageState.DOWNLOADING, downloading.getPackageState());
 
         List<DownloadablePackage> updates = pm.listUpdatePackages();
         dumpPkgList("update", updates);
@@ -105,7 +104,7 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         dumpPkgList("remoteOrLocal", remoteOrLocal);
         assertEquals(3, remoteOrLocal.size());
         downloading = remoteOrLocal.get(1);
-        assertEquals(PackageState.INSTALLED.getValue(), downloading.getState());
+        assertEquals(PackageState.INSTALLED, downloading.getPackageState());
     }
 
     public void testUpdateListing() throws Exception {
@@ -134,9 +133,9 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
 
         // check that none of them is already installed
         for (DownloadablePackage update : updates) {
-            assertFalse((update.getState() == PackageState.INSTALLING.getValue())
-                    || (update.getState() == PackageState.INSTALLED.getValue())
-                    || (update.getState() == PackageState.STARTED.getValue()));
+            assertFalse((update.getPackageState() == PackageState.INSTALLING)
+                    || (update.getPackageState() == PackageState.INSTALLED)
+                    || (update.getPackageState() == PackageState.STARTED));
         }
     }
 }

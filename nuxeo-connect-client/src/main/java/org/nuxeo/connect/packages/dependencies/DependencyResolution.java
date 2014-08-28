@@ -182,7 +182,7 @@ public class DependencyResolution {
             String id = pkgName + "-" + allPackages.get(pkgName).toString();
             DownloadablePackage pkg = pm.findPackageById(id);
             List<Version> installedVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
-            if (PackageState.getByValue(pkg.getState()).isInstalled()) {
+            if (pkg.getPackageState().isInstalled()) {
                 // Already installed in the wanted version, nothing to do
                 localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
             } else {
@@ -191,7 +191,7 @@ public class DependencyResolution {
                     localPackagesToUpgrade.put(pkg.getName(),
                             installedVersions.get(installedVersions.size() - 1));
                 }
-                if (PackageState.getByValue(pkg.getState()) == PackageState.REMOTE) {
+                if (pkg.getPackageState() == PackageState.REMOTE) {
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
                     allPackagesToDownload.add(id);
                 } else {

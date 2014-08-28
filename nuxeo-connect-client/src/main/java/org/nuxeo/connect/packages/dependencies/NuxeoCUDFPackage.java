@@ -22,7 +22,6 @@ import java.util.Arrays;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageDependency;
-import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.Version;
 
 class NuxeoCUDFPackage {
@@ -65,7 +64,7 @@ class NuxeoCUDFPackage {
                 && "cmf".equalsIgnoreCase(pkg.getVersion().classifier())) {
             cudfName += "*" + pkg.getVersion().classifier();
         }
-        setInstalled(PackageState.getByValue(pkg.getState()).isInstalled());
+        setInstalled(pkg.getPackageState().isInstalled());
     }
 
     /**
@@ -76,7 +75,7 @@ class NuxeoCUDFPackage {
     public void setPkg(DownloadablePackage pkg) {
         this.pkg = pkg;
         cudfName = pkg.getName();
-        setInstalled(PackageState.getByValue(pkg.getState()).isInstalled());
+        setInstalled(pkg.getPackageState().isInstalled());
     }
 
     public String getCUDFName() {

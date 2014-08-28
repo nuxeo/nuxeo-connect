@@ -24,6 +24,7 @@ import java.util.List;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
@@ -56,7 +57,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public List<String> targetPlatforms = new ArrayList<>();
 
-    public int state;
+    public PackageState packageState = PackageState.UNKNOWN;
 
     public String homePage;
 
@@ -131,9 +132,15 @@ public class FakeDownloadablePackage implements DownloadablePackage {
         return null;
     }
 
+    @Deprecated
     @Override
     public int getState() {
-        return state;
+        return packageState.getValue();
+    }
+
+    @Override
+    public PackageState getPackageState() {
+        return packageState;
     }
 
     @Override
