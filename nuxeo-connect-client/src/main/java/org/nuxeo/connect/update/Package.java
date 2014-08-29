@@ -102,7 +102,7 @@ public interface Package {
      * Gets the package life cycle status.
      *
      * @see PackageState
-     * @deprecated Since 5.9.6. Use {@link #getPackageState()} instead.
+     * @deprecated Since 1.4.17. Use {@link #getPackageState()} instead.
      */
     @Deprecated
     int getState();
@@ -110,6 +110,7 @@ public interface Package {
     /**
      * Gets the package life cycle status.
      *
+     * @since 1.4.17
      * @see PackageState
      */
     PackageState getPackageState();

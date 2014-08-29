@@ -282,6 +282,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return name;
     }
 
+    /**
+     * @since 1.4.17
+     */
     @Override
     public PackageState getPackageState() {
         if (packageState == null) {
@@ -478,15 +481,24 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         nuxeoValidationState = NuxeoValidationState.getByValue(state);
     }
 
+    /**
+     * @since 1.4.17
+     */
     public void setPackageState(PackageState state) {
         this.packageState = state;
     }
 
+    /**
+     * @since 1.4.17
+     */
     @JSONImportMethod(name = "state")
     public void setPackageState(int state) {
         this.packageState = PackageState.getByValue(state);
     }
 
+    /**
+     * @since 1.4.17
+     */
     @JSONImportMethod(name = "packageState")
     public void setPackageStateAsJSON(String state) {
         setPackageState(PackageState.getByLabel(state));
@@ -535,7 +547,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     /**
-     * @deprecated Since 5.9.6. Use {@link #setPackageState(PackageState)}
+     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)}
      *             instead.
      */
     @Deprecated
