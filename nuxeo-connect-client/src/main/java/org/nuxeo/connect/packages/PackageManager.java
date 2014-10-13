@@ -476,7 +476,18 @@ public interface PackageManager extends BasePackageManager {
      * @throws PackageException
      * @since 1.4
      */
+    @Deprecated
     String getNonCompliant(List<String> packages, String targetPlatform)
+            throws PackageException;
+
+    /**
+     * @param packages
+     * @param targetPlatform The target platform to be compliant with.
+     * @return List of non compliant packages. Empty list if none.
+     * @throws PackageException
+     * @since 1.4.17
+     */
+    List<String> getNonCompliantList(List<String> packages, String targetPlatform)
             throws PackageException;
 
     /**

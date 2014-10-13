@@ -1049,6 +1049,18 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
+    public List<String> getNonCompliantList(List<String> packages, String targetPlatform)
+            throws PackageException {
+        List<String> nonCompliant = new ArrayList<String>();
+        for (String pkg : packages) {
+            if (!matchesPlatform(pkg, targetPlatform)) {
+                nonCompliant.add(pkg);
+            }
+        }
+        return nonCompliant;
+    }
+
+    @Override
     public boolean matchesPlatform(String requestPkgStr, String targetPlatform)
             throws PackageException {
         Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
