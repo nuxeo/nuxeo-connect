@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-20124 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +21,7 @@ package org.nuxeo.connect.identity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +65,7 @@ public class LogicalInstanceIdentifier {
         }
     }
 
-    protected static final String ID_SEP = "--";
+    public static final String ID_SEP = "--";
 
     public static boolean USE_BASE64_SAVE = false;
 
@@ -165,12 +166,9 @@ public class LogicalInstanceIdentifier {
     public static LogicalInstanceIdentifier instance() throws NoCLID {
         if (instance == null) {
             try {
-                instance = LogicalInstanceIdentifier.load();
-            } catch (Exception e) {
+                LogicalInstanceIdentifier.load();
+            } catch (IOException | InvalidCLID e) {
                 throw new NoCLID("can not load CLID", e);
-            }
-            if (instance == null) {
-                throw new NoCLID("can not load CLID");
             }
         }
         return instance;
@@ -180,31 +178,40 @@ public class LogicalInstanceIdentifier {
         instance = null;
     }
 
-    public static LogicalInstanceIdentifier load() throws Exception {
-        File file = new File(getSaveFileName(true));
+    /**
+     * @throws IOException
+     * @throws InvalidCLID
+     * @since 1.4.17
+     */
+    public static LogicalInstanceIdentifier load(String path)
+            throws IOException, InvalidCLID {
+        File file = new File(path);
         if (!file.exists()) {
-            return null;
+            throw new FileNotFoundException(path);
         }
-
         List<String> lines = readLines(file);
-
         if (USE_BASE64_SAVE) {
             byte[] data = Base64.decode(lines.get(0));
             String strData = new String(data);
             String[] parts = strData.split("\n");
-            lines = new ArrayList<String>();
+            lines = new ArrayList<>();
             for (String part : parts) {
                 lines.add(part);
             }
         }
-
         String id = lines.get(0) + ID_SEP + lines.get(1);
         String description = lines.get(2);
-        return new LogicalInstanceIdentifier(id, description);
+        instance = new LogicalInstanceIdentifier(id, description);
+        return instance;
+    }
+
+    public static LogicalInstanceIdentifier load() throws IOException,
+            InvalidCLID {
+        return load(getSaveFileName(true));
     }
 
     private static List<String> readLines(File file) throws IOException {
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         BufferedReader reader = null;
         try {
             InputStream in = new FileInputStream(file);
