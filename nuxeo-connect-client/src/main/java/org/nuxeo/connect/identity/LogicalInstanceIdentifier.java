@@ -80,7 +80,7 @@ public class LogicalInstanceIdentifier {
     public LogicalInstanceIdentifier(String ID, String description)
             throws InvalidCLID {
         this(ID);
-        this.instanceDescription = description;
+        instanceDescription = description;
     }
 
     public LogicalInstanceIdentifier(String ID) throws InvalidCLID {
@@ -145,7 +145,7 @@ public class LogicalInstanceIdentifier {
     }
 
     public void save() throws IOException {
-        String data = CLID1 + "\n" + CLID2 + "\n" + instanceDescription;
+        String data = CLID1 + "\n" + CLID2 + "\n" + instanceDescription + "\n";
         if (USE_BASE64_SAVE) {
             data = Base64.encodeBytes(data.getBytes());
         }
@@ -200,7 +200,7 @@ public class LogicalInstanceIdentifier {
             }
         }
         String id = lines.get(0) + ID_SEP + lines.get(1);
-        String description = lines.get(2);
+        String description = lines.size() > 2 ? lines.get(2) : "";
         instance = new LogicalInstanceIdentifier(id, description);
         return instance;
     }

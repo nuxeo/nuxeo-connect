@@ -28,6 +28,7 @@ import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
 public class TestIDGens extends TestCase {
 
+    private static final String TOTO_TITI = "toto--titi";
     private static final Log log = LogFactory.getLog(TestIDGens.class);
 
     public void testCTIDGen() throws Exception {
@@ -46,9 +47,7 @@ public class TestIDGens extends TestCase {
 
     }
 
-    protected void dotestCLID() throws Exception {
-        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
-                "toto--titi", "myInstance");
+    protected void dotestCLID(LogicalInstanceIdentifier CLID) throws Exception {
 
         CLID.save();
 
@@ -62,12 +61,24 @@ public class TestIDGens extends TestCase {
                 CLID2.getInstanceDescription());
     }
 
-    public void testCLID() throws Exception {
+    public void testCLIDPlainText() throws Exception {
 
         LogicalInstanceIdentifier.USE_BASE64_SAVE = false;
-        dotestCLID();
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
+                TOTO_TITI, "myInstance");
 
+        dotestCLID(CLID);
+    }
+
+    public void testCLIDEncoded() throws Exception {
         LogicalInstanceIdentifier.USE_BASE64_SAVE = true;
-        dotestCLID();
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(
+                TOTO_TITI, "myInstance");
+        dotestCLID(CLID);
+    }
+
+    public void testCanReloadEmptyDescriptionCLID() throws Exception {
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(TOTO_TITI);
+        dotestCLID(CLID);
     }
 }
