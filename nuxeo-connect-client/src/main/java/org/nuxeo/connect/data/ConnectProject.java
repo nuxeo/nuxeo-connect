@@ -34,6 +34,9 @@ public class ConnectProject extends AbstractJSONSerializableData {
     protected String name;
 
     @JSONExportableField
+    protected String symbolicName;
+
+    @JSONExportableField
     protected String uuid;
 
     public String getName() {
@@ -50,6 +53,14 @@ public class ConnectProject extends AbstractJSONSerializableData {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getSymbolicName() {
+        return symbolicName;
+    }
+
+    public void setSymbolicName(String symbolicName) {
+        this.symbolicName = symbolicName;
     }
 
     @Deprecated
@@ -73,6 +84,8 @@ public class ConnectProject extends AbstractJSONSerializableData {
         }
 
         sb.append(name);
+        sb.append("\n");
+        sb.append(symbolicName);
         sb.append("\n");
         sb.append(uuid);
         sb.append("\n");
