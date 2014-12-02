@@ -21,6 +21,7 @@ package org.nuxeo.connect.packages;
 import java.util.List;
 import java.util.Map;
 
+import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
@@ -282,38 +283,34 @@ public interface PackageManager extends BasePackageManager {
      * Get the Download descriptor for a given package id
      *
      * @param packageId
-     *
-     * @throws Exception
      */
-    DownloadingPackage download(String packageId) throws Exception;
+    DownloadingPackage download(String packageId) throws ConnectServerError;
 
     /**
      * Get the Download descriptors for a given list of package ids
      *
      * @param packageIds
-     *
-     * @throws Exception
      */
-    List<DownloadingPackage> download(List<String> packageIds) throws Exception;
+    List<DownloadingPackage> download(List<String> packageIds)
+            throws ConnectServerError;
 
     /**
      * Start installation process via {@link PackageUpdateService}
      *
      * @param packageId Identifier of the {@link Package} to install
      * @param params Installation parameters (as collected via Wizard's form)
-     * @throws Exception
      */
-    void install(String packageId, Map<String, String> params) throws Exception;
+    void install(String packageId, Map<String, String> params)
+            throws PackageException;
 
     /**
      * Serial installation of several packages
      *
      * @param packageIds List of identifiers of the {@link Package}s to install
      * @param params Installation parameters (as collected via Wizard's form)
-     * @throws Exception
      */
     void install(List<String> packageIds, Map<String, String> params)
-            throws Exception;
+            throws PackageException;
 
     /**
      * Flushes the caches used on remote {@link PackageSource}

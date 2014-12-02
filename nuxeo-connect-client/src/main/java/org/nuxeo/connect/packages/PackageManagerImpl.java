@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.connect.NuxeoConnectClient;
+import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -609,14 +609,15 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public DownloadingPackage download(String packageId) throws Exception {
+    public DownloadingPackage download(String packageId)
+            throws ConnectServerError {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         return crs.getConnector().getDownload(packageId);
     }
 
     @Override
     public List<DownloadingPackage> download(List<String> packageIds)
-            throws Exception {
+            throws ConnectServerError {
         List<DownloadingPackage> downloadings = new ArrayList<>();
         for (String packageId : packageIds) {
             downloadings.add(download(packageId));
@@ -626,7 +627,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public void install(String packageId, Map<String, String> params)
-            throws Exception {
+            throws PackageException {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         LocalPackage pkg = pus.getPackage(packageId);
         Task installationTask = pkg.getInstallTask();
@@ -636,7 +637,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public void install(List<String> packageIds, Map<String, String> params)
-            throws Exception {
+            throws PackageException {
         for (String packageId : packageIds) {
             install(packageId, params);
         }
