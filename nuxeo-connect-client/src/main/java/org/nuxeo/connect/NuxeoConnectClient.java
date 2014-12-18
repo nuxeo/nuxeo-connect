@@ -54,7 +54,7 @@ public class NuxeoConnectClient {
         return cbHolder;
     }
 
-    protected static synchronized ConnectGatewayComponent getConnectGatewayComponent() {
+    public static synchronized ConnectGatewayComponent getConnectGatewayComponent() {
         if (connectGatewayComponent == null) {
             connectGatewayComponent = new ConnectGatewayComponent();
         }
@@ -79,8 +79,7 @@ public class NuxeoConnectClient {
                 log.error("Initialize the mock update service with\n"
                         + "((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(new MockPackageUpdateService(pm));");
             } else {
-                throw new NullPointerException(
-                        "Can not locate PackageUpdateService, exiting");
+                throw new NullPointerException("Can not locate PackageUpdateService, exiting");
             }
         }
         return cbHolder.getUpdateService();
@@ -121,8 +120,7 @@ public class NuxeoConnectClient {
                 if (pomStream == null) {
                     buildVersion = "Unknown (no pom)";
                 } else {
-                    PropertyResourceBundle prb = new PropertyResourceBundle(
-                            pomStream);
+                    PropertyResourceBundle prb = new PropertyResourceBundle(pomStream);
                     buildVersion = prb.getString("version");
                     if (buildVersion == null) {
                         buildVersion = "Unknown (not found)";
@@ -137,8 +135,7 @@ public class NuxeoConnectClient {
     }
 
     public static String getVersion() {
-        return "protocol: " + getProtocolVersion() + " / build:"
-                + getBuildVersion();
+        return "protocol: " + getProtocolVersion() + " / build:" + getBuildVersion();
     }
 
 }

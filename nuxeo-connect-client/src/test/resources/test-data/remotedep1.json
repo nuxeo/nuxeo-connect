@@ -34,3 +34,9 @@
 {"version":"1.0.0","name":"PF2","targetPlatforms":["5.3.0"],"dependencies":[],"state":0,"type":"addon"}
 {"version":"2.0.0","name":"PF2","targetPlatforms":["5.3.1"],"dependencies":[],"state":0,"type":"addon"}
 {"version":"1.0.1","name":"NXBT-654.3","targetPlatforms":["5.8.0"],"state":0,"type":"addon"}
+{"version":"1.0","name":"NXBT-872-S1","targetPlatforms":["5.8.0"],"state":0,"type":"studio"}
+{"version":"1.1","name":"NXBT-872-S1","targetPlatforms":["6.0"],"state":0,"type":"studio"}
+{"version":"1.2-SNAPSHOT","name":"NXBT-872-S1","targetPlatforms":["6.0"],"state":0,"type":"studio"}
+{"version":"1.0","name":"NXBT-872-S2","targetPlatforms":["6.0"],"state":0,"type":"studio"}
+{"version":"1.1-SNAPSHOT","name":"NXBT-872-S2","targetPlatforms":["6.0"],"state":0,"type":"studio"}
+{"version":"2.0","name":"NXBT-872-S2","targetPlatforms":["6.0"],"state":0,"type":"studio"}

@@ -26,7 +26,6 @@ import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.http.ConnectHttpConnector;
-import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.connector.test.ConnectTestConnector;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -61,7 +60,6 @@ public class TestService extends TestCase {
         assertFalse(crs.isInstanceRegistred());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
-        // assertTrue(connector instanceof UnregistredFakeConnector);
         assertTrue(connector instanceof ConnectHttpConnector);
     }
 
@@ -80,9 +78,11 @@ public class TestService extends TestCase {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         assertFalse(crs.isInstanceRegistred());
 
-        ConnectGatewayComponent.testConnector = new ConnectTestConnector();
+        ConnectConnector oldTestConnector = NuxeoConnectClient.getConnectGatewayComponent().getTestConnector();
+        NuxeoConnectClient.getConnectGatewayComponent().setTestConnector(new ConnectTestConnector());
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
         assertTrue(connector instanceof ConnectTestConnector);
+        NuxeoConnectClient.getConnectGatewayComponent().setTestConnector(oldTestConnector);
     }
 
     public void testDownloadService() throws Exception {
@@ -96,10 +96,12 @@ public class TestService extends TestCase {
 
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         crs.localRegisterInstance("toto--titi", "my test server");
-        ConnectGatewayComponent.testConnector = new ConnectTestConnector();
-        ConnectGatewayComponent.testConnector.flushCache();
+        ConnectConnector oldTestConnector = NuxeoConnectClient.getConnectGatewayComponent().getTestConnector();
+        NuxeoConnectClient.getConnectGatewayComponent().setTestConnector(new ConnectTestConnector());
+        NuxeoConnectClient.getConnectGatewayComponent().getTestConnector().flushCache();
         List<DownloadablePackage> pkgs = pm.listPackages();
         assertEquals(3, pkgs.size());
+        NuxeoConnectClient.getConnectGatewayComponent().setTestConnector(oldTestConnector);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -110,6 +110,25 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
         assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(11, depResolution.getNewPackagesToDownload().size());
+    }
+
+    /**
+     * @since 1.4.18
+     */
+    // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0]
+    // {"version":"1.0","name":"NXBT-872","targetPlatforms":["6.0"],"dependencies":["NXBT-872-S1","NXBT-872-S2:2.0"],"state":2,"type":"addon"}
+    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.1-SNAPSHOT,
+    // NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, NXBT-872-1.0.0, NXBT-872-S1-1.2.0-SNAPSHOT,
+    // NXBT-872-S2-2.0.0]
+    public void testStudioDeps() throws Exception {
+        depResolution = pm.resolveDependencies("NXBT-872", "6.0");
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(4, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(3, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(5, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(2, depResolution.getNewPackagesToDownload().size());
     }
 
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,

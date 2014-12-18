@@ -39,35 +39,32 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
         pm.registerSource(new DummyPackageSource(local, true), true);
     }
 
+    // Before: []
+    // {"targetPlatforms":["cap-5.5"],"state":0,"type":"addon","version":"1.0.0","dependencies":["nuxeo-content-browser:1.0.0:1.0.0"],"name":"nuxeo-poll"},
+    // {"targetPlatforms":[],"state":0,"type":"addon","version":"1.0.0","name":"nuxeo-content-browser"},
+    // {"targetPlatforms":["cap-5.6"],"state":0,"type":"addon","version":"5.6.0","name":"nuxeo-dm","conflicts":["nuxeo-cmf"],"provides":["nuxeo-content-browser:1.0.0:1.0.0"]},
+    // After: [nuxeo-dm-5.6.0, nuxeo-poll-1.0.0]
     public void testResolutionOrder() {
-        DependencyResolution depResolution = pm.resolveDependencies(
-                Arrays.asList(new String[] { "nuxeo-poll" }), null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList(new String[] { "nuxeo-poll" }), null,
+                null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getOrderedPackageIdsToInstall().size());
-        assertEquals("nuxeo-dm-5.6.0",
-                depResolution.getOrderedPackageIdsToInstall().get(0));
-        assertEquals("nuxeo-poll-1.0.0",
-                depResolution.getOrderedPackageIdsToInstall().get(1));
+        assertEquals("nuxeo-dm-5.6.0", depResolution.getOrderedPackageIdsToInstall().get(0));
+        assertEquals("nuxeo-poll-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(1));
     }
 
     public void testTargetPlatforms() throws PackageException {
         assertTrue(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.5"));
-        assertFalse(pm.matchesPlatform("nuxeo-birt-integration-2.1.0",
-                "cap-5.6"));
+        assertFalse(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.6"));
         // Such target platform is not valid...
-        assertTrue(pm.matchesPlatform("nuxeo-platform-user-registration-1.2.1",
-                "Nuxeo CAP 5.6"));
+        assertTrue(pm.matchesPlatform("nuxeo-platform-user-registration-1.2.1", "Nuxeo CAP 5.6"));
         // Test wildcards
         assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5"));
-        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
-                "cap-5.5.0-HF00"));
-        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
-                "cap-5.5.0-HF01"));
-        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
-                "cap-5.5.0-something"));
-        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0",
-                "cap-5.6.0"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF00"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF01"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-something"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.6.0"));
     }
 
 }

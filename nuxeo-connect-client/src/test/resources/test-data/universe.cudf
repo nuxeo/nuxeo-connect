@@ -19,13 +19,6 @@ depends:
 conflicts: nuxeo-content-browser*cmf, nuxeo-content-browser != 1
 provides:
 
-package: nuxeo-dam
-version: 1
-installed: false
-depends: nuxeo-content-browser = 1
-conflicts: nuxeo-dam != 1
-provides:
-
 package: nuxeo-content-browser*cmf
 version: 1
 installed: true
@@ -38,32 +31,4 @@ version: 3
 installed: false
 depends: nuxeo-content-browser*cmf = 1
 conflicts: nuxeo-cmf != 3
-provides:
-
-package: nuxeo-dm
-version: 2
-installed: false
-depends: nuxeo-content-browser = 1
-conflicts: nuxeo-dm != 2
-provides:
-
-package: nuxeo-sc
-version: 1
-installed: false
-depends: nuxeo-dm = 1
-conflicts: nuxeo-sc != 1
-provides:
-
-package: nuxeo-dm
-version: 3
-installed: false
-depends: nuxeo-content-browser = 1
-conflicts: nuxeo-dm != 3
-provides:
-
-package: nuxeo-dm
-version: 1
-installed: false
-depends: nuxeo-content-browser = 1
-conflicts: nuxeo-dm != 1
 provides:

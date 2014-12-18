@@ -47,7 +47,15 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
 
     protected ConnectDownloadManager downloadManager = null;
 
-    public static ConnectConnector testConnector = null;
+    protected ConnectConnector testConnector = null;
+
+    public ConnectConnector getTestConnector() {
+        return testConnector;
+    }
+
+    public void setTestConnector(ConnectConnector testConnector) {
+        this.testConnector = testConnector;
+    }
 
     protected TechnicalInstanceIdentifier ctid = new TechnicalInstanceIdentifier();
 

@@ -12,3 +12,4 @@
 {"version":"1.0.0","name":"NXBT-654.3","targetPlatforms":["5.8.0"],"state":5,"type":"addon"}
 {"version":"1.0.1-SNAPSHOT","name":"NXBT-654.3","targetPlatforms":["5.8.0"],"state":2,"type":"addon"}
 {"version":"1.0.2-SNAPSHOT","name":"NXBT-654.3","targetPlatforms":["5.8.0"],"state":2,"type":"addon"}
+{"version":"1.0","name":"NXBT-872","targetPlatforms":["6.0"],"dependencies":["NXBT-872-S1","NXBT-872-S2:2.0"],"state":2,"type":"addon"}

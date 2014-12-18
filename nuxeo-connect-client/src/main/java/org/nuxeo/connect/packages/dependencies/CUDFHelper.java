@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.MapUtils;
@@ -112,53 +114,70 @@ public class CUDFHelper {
         nuxeo2CUDFMap.clear();
         CUDF2NuxeoMap.clear();
         Map<String, PackageDependency> upgradesMap = new HashMap<>();
-        List<String> involvedPackages = new ArrayList<>();
+        Set<String> involvedPackages = new HashSet<>();
         List<String> installedOrRequiredSNAPSHOTPackages = new ArrayList<>();
         if (upgrades != null) {
-            for (PackageDependency upgrade : upgrades) {
-                upgradesMap.put(upgrade.getName(), upgrade);
-                involvedPackages.add(upgrade.getName());
-                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, upgrade);
-            }
+            computeInvolvedPackages(upgrades, upgradesMap, involvedPackages, installedOrRequiredSNAPSHOTPackages);
         }
         if (installs != null) {
-            for (PackageDependency install : installs) {
-                involvedPackages.add(install.getName());
-                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, install);
-            }
+            computeInvolvedPackages(installs, involvedPackages, installedOrRequiredSNAPSHOTPackages);
         }
         if (removes != null) {
-            for (PackageDependency remove : removes) {
-                involvedPackages.add(remove.getName());
-                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, remove);
-            }
+            computeInvolvedPackages(removes, involvedPackages, installedOrRequiredSNAPSHOTPackages);
         }
-        boolean isStudioInvolved = false;
-        List<DownloadablePackage> studioPackages = pm.listAllStudioRemoteOrLocalPackages();
-        for (DownloadablePackage studioPackage : studioPackages) {
-            if (involvedPackages.contains(studioPackage.getName())) {
-                // Found a Studio package in request
-                isStudioInvolved = true;
-                break;
-            }
-        }
+
+        // Build a map <pkgName,pkg>
         List<DownloadablePackage> allPackages = getAllPackages();
+        Map<String, List<DownloadablePackage>> allPackagesMap = new HashMap<>();
+        for (DownloadablePackage pkg : allPackages) {
+            String key = pkg.getName();
+            List<DownloadablePackage> list;
+            if (!allPackagesMap.containsKey(key)) {
+                list = new ArrayList<>();
+                allPackagesMap.put(key, list);
+            } else {
+                list = allPackagesMap.get(key);
+            }
+            list.add(pkg);
+            // in the mean time, add installed packages to the involved packages list
+            if (keep && pkg.getPackageState().isInstalled()) {
+                involvedPackages.add(pkg.getName());
+            }
+        }
+        for (DownloadablePackage pkg : allPackages) {
+            computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg, allPackagesMap);
+        }
         installedOrRequiredSNAPSHOTPackages.addAll(getInstalledSNAPSHOTPackages());
         // for each unique "name-classifier", sort versions so we can attribute them a "CUDF posint" version populate
         // Nuxeo2CUDFMap and the reverse CUDF2NuxeoMap
         for (DownloadablePackage pkg : allPackages) {
+            // ignore not involved packages
+            if (!involvedPackages.contains(pkg.getName())) {
+                if (installedOrRequiredSNAPSHOTPackages.contains(pkg.getName())) {
+                    log.error("Ignore installedOrRequiredSNAPSHOTPackage " + pkg);
+                }
+
+                // check provides
+                boolean involved = false;
+                PackageDependency[] provides = pkg.getProvides();
+                for (PackageDependency provide : provides) {
+                    if (involvedPackages.contains(provide.getName())) {
+                        involved = true;
+                        break;
+                    }
+                }
+                if (!involved) {
+                    log.debug("Ignore " + pkg + " (not involved by request)");
+                    continue;
+                }
+            }
+
             // ignore incompatible packages when a targetPlatform is set
             if (targetPlatform != null && !pkg.isLocal()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                 log.debug("Ignore " + pkg + " (incompatible target platform)");
                 continue;
             }
-            // ignore Studio packages if not directly involved or installed
-            if (!isStudioInvolved && pkg.getType() == PackageType.STUDIO && !pkg.getPackageState().isInstalled()) {
-                log.debug("Ignore " + pkg + " (not involved in request)");
-                continue;
-            }
-
             // Exclude SNAPSHOT by default for non Studio packages
             if (!allowSNAPSHOT && pkg.getVersion().isSnapshot() && pkg.getType() != PackageType.STUDIO
                     && !installedOrRequiredSNAPSHOTPackages.contains(pkg.getName())) {
@@ -178,9 +197,9 @@ public class CUDFHelper {
                 }
             }
             NuxeoCUDFPackage nuxeoCUDFPackage = new NuxeoCUDFPackage(pkg);
-            if (!keep && !involvedPackages.contains(pkg.getName())) {
-                nuxeoCUDFPackage.setInstalled(false);
-            }
+            // if (!keep && !involvedPackages.contains(pkg.getName())) {
+            // nuxeoCUDFPackage.setInstalled(false);
+            // }
             Map<Version, NuxeoCUDFPackage> pkgVersions = nuxeo2CUDFMap.get(nuxeoCUDFPackage.getCUDFName());
             if (pkgVersions == null) {
                 pkgVersions = new TreeMap<>();
@@ -205,6 +224,77 @@ public class CUDFHelper {
             MapUtils.verbosePrint(out, "CUDF2NuxeoMap", CUDF2NuxeoMap);
             log.debug(outputStream.toString());
             IOUtils.closeQuietly(out);
+        }
+    }
+
+    /**
+     * Parse request to compute the list of directly involved packages
+     *
+     * @since 1.4.18
+     */
+    protected void computeInvolvedPackages(PackageDependency[] packageDependencies, Set<String> involvedPackages,
+            List<String> installedOrRequiredSNAPSHOTPackages) {
+        computeInvolvedPackages(packageDependencies, null, involvedPackages, installedOrRequiredSNAPSHOTPackages);
+    }
+
+    /**
+     * Parse request to compute the list of directly involved packages
+     *
+     * @since 1.4.18
+     */
+    protected void computeInvolvedPackages(PackageDependency[] packageDependencies,
+            Map<String, PackageDependency> upgradesMap, Set<String> involvedPackages,
+            List<String> installedOrRequiredSNAPSHOTPackages) {
+        for (PackageDependency packageDependency : packageDependencies) {
+            if (upgradesMap != null) {
+                upgradesMap.put(packageDependency.getName(), packageDependency);
+            }
+            involvedPackages.add(packageDependency.getName());
+            addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, packageDependency);
+        }
+    }
+
+    /**
+     * Browse the given package's "dependencies", "conflicts" and "provides" to populate the list of involved packages
+     *
+     * @param installedOrRequiredSNAPSHOTPackages
+     * @since 1.4.18
+     */
+    protected void computeInvolvedReferences(Set<String> involvedPackages,
+            List<String> installedOrRequiredSNAPSHOTPackages, DownloadablePackage pkg,
+            Map<String, List<DownloadablePackage>> allPackagesMap) {
+        if (involvedPackages.contains(pkg.getName())) {
+            computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getDependencies(),
+                    allPackagesMap);
+            computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getConflicts(),
+                    allPackagesMap);
+            for (PackageDependency pkgDep : pkg.getProvides()) {
+                involvedPackages.add(pkgDep.getName());
+            }
+        }
+    }
+
+    /**
+     * Browse the given packages' "dependencies", "conflicts" and "provides" to populate the list of involved packages
+     *
+     * @since 1.4.18
+     */
+    protected void computeInvolvedReferences(Set<String> involvedPackages,
+            List<String> installedOrRequiredSNAPSHOTPackages, PackageDependency[] pkgDeps,
+            Map<String, List<DownloadablePackage>> allPackagesMap) {
+        for (PackageDependency pkgDep : pkgDeps) {
+            if (involvedPackages.add(pkgDep.getName())) {
+                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, pkgDep);
+                List<DownloadablePackage> downloadablePkgDeps = allPackagesMap.get(pkgDep.getName());
+                if (downloadablePkgDeps == null) {
+                    log.warn("Unknown dependency: " + pkgDep);
+                    continue;
+                }
+                for (DownloadablePackage downloadablePkgDep : downloadablePkgDeps) {
+                    computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages,
+                            downloadablePkgDep, allPackagesMap);
+                }
+            }
         }
     }
 
