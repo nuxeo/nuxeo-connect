@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -31,8 +31,7 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo
- * Connect Server.
+ * Implements {@link PackageSource} for remote {@link Package} hosted on Nuxeo Connect Server.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -58,7 +57,7 @@ public class RemotePackageSource implements PackageSource {
 
     @Override
     public List<DownloadablePackage> listPackages() {
-        List<DownloadablePackage> all = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> all = new ArrayList<>();
         for (PackageType type : PackageType.values()) {
             all.addAll(listPackages(type));
         }
@@ -67,11 +66,11 @@ public class RemotePackageSource implements PackageSource {
 
     @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-        ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+        List<DownloadablePackage> result = new ArrayList<>();
         try {
             List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
             if (pkgs == null) {
+                ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
                 pkgs = crs.getConnector().getDownloads(type);
                 cache.add(pkgs, type.toString());
             }

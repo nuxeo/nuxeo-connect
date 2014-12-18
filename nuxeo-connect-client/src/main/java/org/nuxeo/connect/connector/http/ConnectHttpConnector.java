@@ -37,9 +37,8 @@ import org.nuxeo.connect.connector.ConnectServerResponse;
 import org.nuxeo.connect.data.SubscriptionStatus;
 
 /**
- *
- * Real HTTP based {@link ConnectConnector} implementation. Manages
- * communication with the Nuxeo Connect Server via JAX-RS
+ * Real HTTP based {@link ConnectConnector} implementation. Manages communication with the Nuxeo Connect Server via
+ * JAX-RS
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -64,11 +63,9 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
     }
 
     @Override
-    protected ConnectServerResponse execServerCall(String url,
-            Map<String, String> headers) throws ConnectServerError {
+    protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
-                10000);
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
         ProxyHelper.configureProxyIfNeeded(httpClient, url);
         HttpMethod method = new GetMethod(url);
         method.setFollowRedirects(true);
@@ -85,19 +82,16 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             } else {
                 String body = method.getResponseBodyAsString();
                 if (rc == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new ConnectSecurityError(
-                            "Connect server refused authentication (returned 401)");
+                    throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
                 }
                 try {
                     JSONObject obj = new JSONObject(body);
                     String message = obj.getString("message");
                     String errorClass = obj.getString("errorClass");
                     ConnectServerError error;
-                    if (ConnectSecurityError.class.getSimpleName().equals(
-                            errorClass)) {
+                    if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
                         error = new ConnectSecurityError(message);
-                    } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(
-                            errorClass)) {
+                    } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(errorClass)) {
                         error = new ConnectClientVersionMismatchError(message);
                     } else {
                         error = new ConnectServerError(message);
@@ -113,22 +107,18 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             throw cse;
         } catch (Throwable t) {
             String exName = t.getClass().getName();
-            if (exName.startsWith("java.net")
-                    || exName.startsWith("org.apache.commons.httpclient")) {
+            if (exName.startsWith("java.net") || exName.startsWith("org.apache.commons.httpclient")) {
                 log.warn("Connect Server is not reachable");
                 method.releaseConnection();
                 throw new CanNotReachConnectServer(t.getMessage(), t);
             }
             method.releaseConnection();
-            throw new ConnectServerError(
-                    "Error during communication with the Nuxeo Connect Server",
-                    t);
+            throw new ConnectServerError("Error during communication with the Nuxeo Connect Server", t);
         }
     }
 
     protected int httpCacheDurationInMinutes() {
-        String cacheInMinutes = NuxeoConnectClient.getProperty(
-                CONNECT_HTTP_CACHE_MINUTES_PROPERTY, "0");
+        String cacheInMinutes = NuxeoConnectClient.getProperty(CONNECT_HTTP_CACHE_MINUTES_PROPERTY, "0");
         try {
             return Integer.parseInt(cacheInMinutes);
         } catch (NumberFormatException e) {
@@ -143,8 +133,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
     @Override
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
         if (!isConnectServerReachable()) {
-            throw new CanNotReachConnectServer(
-                    "Connect server set as not reachable");
+            throw new CanNotReachConnectServer("Connect server set as not reachable");
         }
 
         if (useHttpCache() && cachedStatus != null) {

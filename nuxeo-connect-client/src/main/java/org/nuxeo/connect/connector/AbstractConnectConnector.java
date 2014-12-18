@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,8 +48,7 @@ import org.nuxeo.connect.identity.SecurityHeaderGenerator;
 import org.nuxeo.connect.update.PackageType;
 
 /**
- * Base class for {@link ConnectConnector} implementers. Provides url binding
- * and marshaling logic.
+ * Base class for {@link ConnectConnector} implementers. Provides url binding and marshaling logic.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -88,8 +87,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      */
     protected File getCacheFileFor(PackageType type) {
         String connectUrlString = ConnectUrlConfig.getBaseUrl();
-        String cacheDir = NuxeoConnectClient.getProperty(
-                NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
+        String cacheDir = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
         try {
             URL connectUrl = new URL(connectUrlString);
             String cachePrefix = connectUrl.getHost() + "_";
@@ -102,8 +100,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             } else {
                 cachePrefix = cachePrefix + Integer.toString(port) + "_";
             }
-            cachePrefix = cachePrefix
-                    + connectUrl.getPath().replaceAll("/", "#");
+            cachePrefix = cachePrefix + connectUrl.getPath().replaceAll("/", "#");
             String cacheFileName = cachePrefix + "_" + type + ".json";
             return new File(cacheDir, cacheFileName);
         } catch (MalformedURLException e) {
@@ -121,14 +118,14 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         FileUtils.deleteQuietly(getCacheFileFor(null));
     }
 
-    protected ConnectServerResponse execCall(String url)
-            throws ConnectServerError {
+    protected ConnectServerResponse execCall(String url) throws ConnectServerError {
         return execServerCall(url, SecurityHeaderGenerator.getHeaders());
     }
 
-    protected abstract ConnectServerResponse execServerCall(String url,
-            Map<String, String> headers) throws ConnectServerError;
+    protected abstract ConnectServerResponse execServerCall(String url, Map<String, String> headers)
+            throws ConnectServerError;
 
+    @Override
     public SubscriptionStatus getConnectStatus() throws ConnectServerError {
         String url = getBaseUrl() + GET_STATUS_SUFFIX;
         ConnectServerResponse response = execCall(url);
@@ -137,8 +134,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             throw new ConnectServerError("null response from server");
         }
         try {
-            return AbstractJSONSerializableData.loadFromJSON(
-                    SubscriptionStatus.class, json);
+            return AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
         } catch (Throwable t) {
             throw new ConnectServerError("Unable to parse response: " + json, t);
         } finally {
@@ -146,10 +142,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
     }
 
+    @Override
     public DownloadingPackage getDownload(String id) throws ConnectServerError {
         if (!isConnectServerReachable()) {
-            throw new CanNotReachConnectServer(
-                    "Connect server set as not reachable");
+            throw new CanNotReachConnectServer("Connect server set as not reachable");
         }
         try {
             id = URLEncoder.encode(id, "UTF-8");
@@ -162,11 +158,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         ConnectServerResponse response = execCall(url);
         String json = response.getString();
         try {
-            PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(
-                    PackageDescriptor.class, json);
+            PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
             if (pkg == null || pkg.getId() == null) {
-                throw new ConnectSecurityError(
-                        "Unable to parse server response: package has no id");
+                throw new ConnectSecurityError("Unable to parse server response: package has no id");
             }
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
             return cdm.storeDownloadedBundle(pkg);
@@ -177,15 +171,14 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
     }
 
-    public List<DownloadablePackage> getDownloads(PackageType type)
-            throws ConnectServerError {
+    @Override
+    public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
         if (!isConnectServerReachable()) {
-            return new ArrayList<DownloadablePackage>();
+            return new ArrayList<>();
         }
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
+        List<DownloadablePackage> result = new ArrayList<>();
         String json = null;
-        String cacheTimeString = NuxeoConnectClient.getProperty(
-                CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, null);
+        String cacheTimeString = NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, null);
         long cacheMaxAge;
         if (cacheTimeString == null) {
             cacheMaxAge = DEFAULT_CACHE_TIME_MS;
@@ -199,22 +192,20 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
         // Try reading from the cache first
         Date now = new Date();
-        if (cacheFile.exists()
-                && ((now.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
+        if (cacheFile.exists() && ((now.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
             try {
                 json = FileUtils.readFileToString(cacheFile);
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject ob = (JSONObject) array.get(i);
-                    result.add(AbstractJSONSerializableData.loadFromJSON(
-                            PackageDescriptor.class, ob));
+                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
                 }
             } catch (IOException e) {
                 // Issue reading the file (json is null)
             } catch (JSONException e) {
                 // Issue parsing the file
                 json = null;
-                result = new ArrayList<DownloadablePackage>();
+                result = new ArrayList<>();
             }
         }
 
@@ -227,8 +218,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject ob = (JSONObject) array.get(i);
-                    result.add(AbstractJSONSerializableData.loadFromJSON(
-                            PackageDescriptor.class, ob));
+                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
                 }
             } catch (JSONException e) {
                 throw new ConnectServerError("Unable to parse response", e);
@@ -244,7 +234,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     }
 
     protected boolean isConnectServerReachable() {
-        return Boolean.parseBoolean(NuxeoConnectClient.getProperty(
-                CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
+        return Boolean.parseBoolean(NuxeoConnectClient.getProperty(CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
 }

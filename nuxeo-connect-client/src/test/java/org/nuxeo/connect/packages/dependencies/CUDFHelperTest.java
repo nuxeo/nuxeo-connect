@@ -45,16 +45,13 @@ import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
 
 /**
- *
- *
  * @since 1.4
  */
 public class CUDFHelperTest extends AbstractPackageManagerTestCase {
 
     /**
-     * Add a space at the end of lines ending with ':'. That is made at runtime
-     * because we don't want to rely on ending spaces in the test resource file
-     * which may (should) be trimmed by editors.
+     * Add a space at the end of lines ending with ':'. That is made at runtime because we don't want to rely on ending
+     * spaces in the test resource file which may (should) be trimmed by editors.
      */
     public class AddSpaceInputStream extends InputStream {
 
@@ -107,18 +104,12 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         pm.registerSource(new DummyPackageSource(remote, false), false);
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setAllowSNAPSHOT(true);
-        pcr = new Parser().parse(new AddSpaceInputStream(
-                this.getClass().getClassLoader().getResourceAsStream(
-                        AbstractPackageManagerTestCase.TEST_DATA
-                                + "request.cudf")));
-        pcr2 = new Parser().parse(new AddSpaceInputStream(
-                this.getClass().getClassLoader().getResourceAsStream(
-                        AbstractPackageManagerTestCase.TEST_DATA
-                                + "request2.cudf")));
-        pcrRemove = new Parser().parse(new AddSpaceInputStream(
-                this.getClass().getClassLoader().getResourceAsStream(
-                        AbstractPackageManagerTestCase.TEST_DATA
-                                + "requestRemove.cudf")));
+        pcr = new Parser().parse(new AddSpaceInputStream(this.getClass().getClassLoader().getResourceAsStream(
+                AbstractPackageManagerTestCase.TEST_DATA + "request.cudf")));
+        pcr2 = new Parser().parse(new AddSpaceInputStream(this.getClass().getClassLoader().getResourceAsStream(
+                AbstractPackageManagerTestCase.TEST_DATA + "request2.cudf")));
+        pcrRemove = new Parser().parse(new AddSpaceInputStream(this.getClass().getClassLoader().getResourceAsStream(
+                AbstractPackageManagerTestCase.TEST_DATA + "requestRemove.cudf")));
     }
 
     /**
@@ -133,18 +124,14 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
     public void testInitMapping() throws Exception {
         cudfHelper.initMapping();
         assertNotNull(cudfHelper.getCUDFFile());
-        assertEquals(
-                "First nuxeo-dm package should be 5.5.0",
-                "5.5.0",
-                cudfHelper.getCUDFPackage("nuxeo-dm-1").getNuxeoVersion().toString());
-        assertEquals(
-                "Second nuxeo-dm package should be 5.6.0-SNAPSHOT",
-                "5.6.0-SNAPSHOT",
-                cudfHelper.getCUDFPackage("nuxeo-dm-2").getNuxeoVersion().toString());
-        assertEquals(
-                "Third nuxeo-dm package should be 5.6.0",
-                "5.6.0",
-                cudfHelper.getCUDFPackage("nuxeo-dm-3").getNuxeoVersion().toString());
+        assertNull("nuxeo-dm packages should be ignored (not involved by request)",
+                cudfHelper.getCUDFPackage("nuxeo-dm-1"));
+        assertEquals("First nuxeo-cmf package should be 5.5.0", "5.5.0",
+                cudfHelper.getCUDFPackage("nuxeo-cmf-1").getNuxeoVersion().toString());
+        assertEquals("Second nuxeo-cmf package should be 5.6.0-SNAPSHOT", "5.6.0-SNAPSHOT",
+                cudfHelper.getCUDFPackage("nuxeo-cmf-2").getNuxeoVersion().toString());
+        assertEquals("Third nuxeo-cmf package should be 5.6.0", "5.6.0",
+                cudfHelper.getCUDFPackage("nuxeo-cmf-3").getNuxeoVersion().toString());
         assertEquals("There must be one nuxeo-content-browser package", 1,
                 cudfHelper.getCUDFPackages("nuxeo-content-browser").size());
         assertEquals("There must be one nuxeo-content-browser*cmf package", 1,
@@ -154,19 +141,16 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
     @Test
     public void testGetCUDFFile() throws Exception {
         cudfHelper.initMapping();
-        BufferedReader gen = new BufferedReader(new StringReader(
-                cudfHelper.getCUDFFile()));
+        BufferedReader gen = new BufferedReader(new StringReader(cudfHelper.getCUDFFile()));
         BufferedReader ref = new BufferedReader(new InputStreamReader(
                 CUDFHelperTest.class.getClassLoader().getResourceAsStream(
-                        AbstractPackageManagerTestCase.TEST_DATA
-                                + "universe.cudf")));
+                        AbstractPackageManagerTestCase.TEST_DATA + "universe.cudf")));
         try {
             int i = 1;
             while (gen.ready() && ref.ready()) {
                 String generatedLine = gen.readLine().trim();
-                assertEquals(
-                        "Generated CUDF universe different than reference at line "
-                                + i, ref.readLine().trim(), generatedLine);
+                assertEquals("Generated CUDF universe different than reference at line " + i, ref.readLine().trim(),
+                        generatedLine);
                 i++;
             }
             assertFalse(gen.ready() && ref.ready());
@@ -180,43 +164,41 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         Iterator<InstallableUnit> it = pcr.getInitialState().iterator();
         while (it.hasNext()) {
             InstallableUnit iu = it.next();
-            if (id.equals(iu.getId()))
+            if (id.equals(iu.getId())) {
                 return iu;
+            }
         }
         fail("Can't find: " + id);
         return null;
     }
 
     @SuppressWarnings("unused")
-    private void assertNotRequirement(IRequiredCapability asserted,
-            IRequiredCapability[] reqs) {
+    private void assertNotRequirement(IRequiredCapability asserted, IRequiredCapability[] reqs) {
         for (int i = 0; i < reqs.length; i++) {
             if (asserted.getName().equals(reqs[i].getName())) {
-                if (asserted.getRange().equals(reqs[i].getRange())
-                        && asserted.getArity() == reqs[i].getArity()
-                        && asserted.isNegation() == reqs[i].isNegation())
+                if (asserted.getRange().equals(reqs[i].getRange()) && asserted.getArity() == reqs[i].getArity()
+                        && asserted.isNegation() == reqs[i].isNegation()) {
                     fail("Requirement not expected:" + asserted);
+                }
             }
         }
     }
 
-    private void assertRequirement(String message,
-            IRequiredCapability asserted, IRequiredCapability[] reqs) {
+    private void assertRequirement(String message, IRequiredCapability asserted, IRequiredCapability[] reqs) {
         boolean found = false;
         for (int i = 0; i < reqs.length; i++) {
             if (asserted.getName().equals(reqs[i].getName())) {
-                if (asserted.getRange().equals(reqs[i].getRange())
-                        && asserted.getArity() == reqs[i].getArity()
-                        && asserted.isNegation() == reqs[i].isNegation())
+                if (asserted.getRange().equals(reqs[i].getRange()) && asserted.getArity() == reqs[i].getArity()
+                        && asserted.isNegation() == reqs[i].isNegation()) {
                     found = true;
+                }
             }
         }
         assertEquals(message, true, found);
     }
 
     @SuppressWarnings("unused")
-    private void assertProvide(String message, IProvidedCapability asserted,
-            IProvidedCapability[] caps) {
+    private void assertProvide(String message, IProvidedCapability asserted, IProvidedCapability[] caps) {
         boolean found = true;
         for (int i = 0; i < caps.length; i++) {
             if (asserted.getName().equals(caps[i].getName())) {
@@ -229,29 +211,20 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
     @Test
     public void testP2CUDFParserCheckPackages() {
         InstallableUnit iu = getIU("nuxeo-dm");
-        assertRequirement(
-                "nuxeo-dm must conflict with nuxeo-cmf in all versions",
-                new NotRequirement(new RequiredCapability("nuxeo-cmf",
-                        VersionRange.emptyRange)), iu.getRequiredCapabilities());
+        assertRequirement("nuxeo-dm must conflict with nuxeo-cmf in all versions", new NotRequirement(
+                new RequiredCapability("nuxeo-cmf", VersionRange.emptyRange)), iu.getRequiredCapabilities());
         assertEquals("Wrong nuxeo-dm version", "1", iu.getVersion().toString());
         assertFalse("nuxeo-dm is not installed", iu.isInstalled());
 
         iu = getIU("nuxeo-social-collaboration");
-        assertRequirement(
-                "nuxeo-social-collaboration must depend on nuxeo-dm 1",
-                new RequiredCapability("nuxeo-dm", new VersionRange(
-                        new org.eclipse.equinox.p2.cudf.metadata.Version(1))),
-                iu.getRequiredCapabilities());
-        assertEquals("Wrong nuxeo-social-collaboration version", "1",
-                iu.getVersion().toString());
-        assertFalse("nuxeo-social-collaboration is not installed",
-                iu.isInstalled());
+        assertRequirement("nuxeo-social-collaboration must depend on nuxeo-dm 1", new RequiredCapability("nuxeo-dm",
+                new VersionRange(new org.eclipse.equinox.p2.cudf.metadata.Version(1))), iu.getRequiredCapabilities());
+        assertEquals("Wrong nuxeo-social-collaboration version", "1", iu.getVersion().toString());
+        assertFalse("nuxeo-social-collaboration is not installed", iu.isInstalled());
 
         iu = getIU("nuxeo-cmf");
-        assertRequirement(
-                "nuxeo-cmf must conflict with nuxeo-dm in all versions",
-                new NotRequirement(new RequiredCapability("nuxeo-dm",
-                        VersionRange.emptyRange)), iu.getRequiredCapabilities());
+        assertRequirement("nuxeo-cmf must conflict with nuxeo-dm in all versions", new NotRequirement(
+                new RequiredCapability("nuxeo-dm", VersionRange.emptyRange)), iu.getRequiredCapabilities());
         assertEquals("Wrong nuxeo-cmf version", "1", iu.getVersion().toString());
         assertTrue("nuxeo-cmf is installed", iu.isInstalled());
     }
@@ -261,21 +234,16 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         ArrayList<IRequiredCapability> requests = pcr.getAllRequests();
         assertNotNull(requests);
         assertTrue(requests.size() > 0);
-        SolverConfiguration configuration = new SolverConfiguration(
-                SolverConfiguration.OBJ_PARANOID);
+        SolverConfiguration configuration = new SolverConfiguration(SolverConfiguration.OBJ_PARANOID);
         Object result = new SimplePlanner().getSolutionFor(pcr, configuration);
-        assertEquals(
-                "[nuxeo-addon 1, nuxeo-dm 1, nuxeo-social-collaboration 1, nuxeo-independent-addon 1]",
+        assertEquals("[nuxeo-addon 1, nuxeo-dm 1, nuxeo-social-collaboration 1, nuxeo-independent-addon 1]",
                 result.toString());
 
-        configuration = new SolverConfiguration(
-                SolverConfiguration.OBJ_PARANOID);
+        configuration = new SolverConfiguration(SolverConfiguration.OBJ_PARANOID);
         result = new SimplePlanner().getSolutionFor(pcr2, configuration);
-        assertEquals("[nuxeo-cmf 1, nuxeo-independent-addon 1]",
-                result.toString());
+        assertEquals("[nuxeo-cmf 1, nuxeo-independent-addon 1]", result.toString());
 
-        configuration = new SolverConfiguration(
-                SolverConfiguration.OBJ_PARANOID);
+        configuration = new SolverConfiguration(SolverConfiguration.OBJ_PARANOID);
         result = new SimplePlanner().getSolutionFor(pcrRemove, configuration);
         assertEquals("[nuxeo-independent-addon 1]", result.toString());
     }

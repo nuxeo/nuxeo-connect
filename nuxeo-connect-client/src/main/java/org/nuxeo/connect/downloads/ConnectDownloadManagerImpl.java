@@ -4,7 +4,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,9 +35,8 @@ import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 
 /**
- *
- * Implementation of the {@link ConnectDownloadManager} interface. This
- * implementation is accessed via {@link ConnectGatewayComponent}
+ * Implementation of the {@link ConnectDownloadManager} interface. This implementation is accessed via
+ * {@link ConnectGatewayComponent}
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -47,26 +46,23 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
     public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
 
-    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<Runnable>(
-            PENDING_DOWNLOAD_CAPACITY);
+    protected BlockingQueue<Runnable> pendingDownloadTasks = new ArrayBlockingQueue<>(PENDING_DOWNLOAD_CAPACITY);
 
-    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(0, 5, 0L,
-            TimeUnit.SECONDS, pendingDownloadTasks, new DaemonThreadFactory(),
-            new ThreadPoolExecutor.CallerRunsPolicy());
+    protected ThreadPoolExecutor tpexec = new ThreadPoolExecutor(0, 5, 0L, TimeUnit.SECONDS, pendingDownloadTasks,
+            new DaemonThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy());
 
-    protected Map<String, LocalDownloadingPackage> downloadingPackages = new HashMap<String, LocalDownloadingPackage>();
+    protected Map<String, LocalDownloadingPackage> downloadingPackages = new HashMap<>();
 
     @Override
     public List<DownloadingPackage> listDownloadingPackages() {
-        List<DownloadingPackage> result = new ArrayList<DownloadingPackage>();
+        List<DownloadingPackage> result = new ArrayList<>();
         result.addAll(downloadingPackages.values());
         return result;
     }
 
     @Override
     public DownloadingPackage storeDownloadedBundle(PackageDescriptor descriptor) {
-        LocalDownloadingPackage localPackage = new LocalDownloadingPackage(
-                descriptor);
+        LocalDownloadingPackage localPackage = new LocalDownloadingPackage(descriptor);
         tpexec.execute(localPackage);
         downloadingPackages.put(localPackage.getId(), localPackage);
         return localPackage;
@@ -75,8 +71,7 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
     @Override
     public String getDownloadedBundleLocalStorage() {
 
-        String tmpPath = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY,
-                System.getProperty("java.io.tmpdir"));
+        String tmpPath = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
         File tmpDir = new File(tmpPath);
         if (!tmpDir.exists()) {
             tmpDir.mkdir();
@@ -105,10 +100,8 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
 
         public DaemonThreadFactory() {
             SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup()
-                    : Thread.currentThread().getThreadGroup();
-            namePrefix = "ConnectDownloadThread-"
-                    + poolNumber.incrementAndGet() + '-';
+            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            namePrefix = "ConnectDownloadThread-" + poolNumber.incrementAndGet() + '-';
         }
 
         @Override

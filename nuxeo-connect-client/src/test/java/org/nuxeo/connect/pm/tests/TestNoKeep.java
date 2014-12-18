@@ -30,10 +30,13 @@ import org.nuxeo.connect.packages.dependencies.DependencyResolution;
  */
 public class TestNoKeep extends AbstractPackageManagerTestCase {
 
+    // Before: []
+    // {"name":"B","version":"1.0.0","dependencies":["A:1.0.0:1.0.0"],"state":2,"type":"addon"}
+    // After: [A-1.0.0, B-1.0.0]
     public void testInstallB() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep1.json");
         pm.registerSource(new DummyPackageSource(local, true), true);
-        List<String> pkgToSet = new ArrayList<String>();
+        List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
         log.info(depResolution.toString());
@@ -45,12 +48,16 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
+    // Before: [A-1.0.0, B-1.0.0, C-1.0.0]
+    // {"name":"B","version":"1.0.0","dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
+    // {"name":"D","version":"1.0.0","dependencies":[],"state":0,"type":"addon"}
+    // After: [A-1.0.0, B-1.0.0, D-1.0.0]
     public void testInstallBD() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep2.json");
         List<DownloadablePackage> remote = getDownloads("remoteNoKeep2.json");
         pm.registerSource(new DummyPackageSource(local, true), true);
         pm.registerSource(new DummyPackageSource(remote, false), true);
-        List<String> pkgToSet = new ArrayList<String>();
+        List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         pkgToSet.add("D");
         DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
@@ -63,10 +70,13 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         assertEquals(1, depResolution.getLocalPackagesToRemove().size());
     }
 
+    // Before: [A-1.0.0, B-1.0.0]
+    // {"name":"B","version":"1.0.0","dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
+    // After: [A-2.0.0, B-2.0.0]
     public void testInstallAB() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep3.json");
         pm.registerSource(new DummyPackageSource(local, true), true);
-        List<String> pkgToSet = new ArrayList<String>();
+        List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
         log.info(depResolution.toString());
@@ -77,6 +87,5 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
-
 
 }

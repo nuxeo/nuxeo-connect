@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -42,8 +42,7 @@ public class DummyPackageSource implements PackageSource {
     /**
      * @since 1.4.13
      */
-    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local,
-            String id) {
+    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local, String id) {
         this.pkgs = pkgs;
         this.local = local;
         this.id = id;
@@ -66,9 +65,7 @@ public class DummyPackageSource implements PackageSource {
 
     @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-
-        List<DownloadablePackage> result = new ArrayList<DownloadablePackage>();
-
+        List<DownloadablePackage> result = new ArrayList<>();
         for (DownloadablePackage pkg : pkgs) {
             if (type.equals(pkg.getType())) {
                 result.add(pkg);

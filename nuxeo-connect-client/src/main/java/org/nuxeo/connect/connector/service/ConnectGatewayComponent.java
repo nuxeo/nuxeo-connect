@@ -36,9 +36,8 @@ import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.registration.RegistrationHelper;
 
 /**
- *
- * Implementation of the {@link ConnectRegistrationService} Also provides access
- * to {@link ConnectConnector} and {@link ConnectDownloadManager} services
+ * Implementation of the {@link ConnectRegistrationService} Also provides access to {@link ConnectConnector} and
+ * {@link ConnectDownloadManager} services
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -52,10 +51,12 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
 
     protected TechnicalInstanceIdentifier ctid = new TechnicalInstanceIdentifier();
 
+    @Override
     public TechnicalInstanceIdentifier getCTID() {
         return ctid;
     }
 
+    @Override
     public LogicalInstanceIdentifier getCLID() {
         try {
             return LogicalInstanceIdentifier.instance();
@@ -64,18 +65,19 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         }
     }
 
-    public void localRegisterInstance(String strCLID, String description)
-            throws InvalidCLID, IOException {
-        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(strCLID,
-                description);
+    @Override
+    public void localRegisterInstance(String strCLID, String description) throws InvalidCLID, IOException {
+        LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(strCLID, description);
         CLID.save();
         connector = null;
     }
 
+    @Override
     public boolean isInstanceRegistred() {
         return LogicalInstanceIdentifier.isRegistered();
     }
 
+    @Override
     public ConnectConnector getConnector() {
         // for Unit tests
         if (NuxeoConnectClient.isTestModeSet() && testConnector != null) {
@@ -95,17 +97,15 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         return downloadManager;
     }
 
-    public List<ConnectProject> getAvailableProjectsForRegistration(
-            String login, String password) throws Exception {
-        return RegistrationHelper.getAvailableProjectsForRegistration(login,
-                password);
+    @Override
+    public List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) throws Exception {
+        return RegistrationHelper.getAvailableProjectsForRegistration(login, password);
     }
 
-    public void remoteRegisterInstance(String login, String password,
-            String prjId, NuxeoClientInstanceType type, String description)
-            throws Exception {
-        String strCLID = RegistrationHelper.remoteRegisterInstance(login,
-                password, prjId, type, description);
+    @Override
+    public void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
+            String description) throws Exception {
+        String strCLID = RegistrationHelper.remoteRegisterInstance(login, password, prjId, type, description);
         if (strCLID != null) {
             localRegisterInstance(strCLID, description);
         }

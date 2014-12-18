@@ -47,17 +47,12 @@ import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageUpdateService;
 
 /**
- *
- * Implementation of the {@link DownloadingPackage} interface.
- *
- * Encapsulate download management :
- *
- * ( implements {@link Runnable} to be used in a {@link ThreadPoolExecutor})
+ * Implementation of the {@link DownloadingPackage} interface. Encapsulate download management : ( implements
+ * {@link Runnable} to be used in a {@link ThreadPoolExecutor})
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class LocalDownloadingPackage extends PackageDescriptor implements
-        DownloadingPackage, Runnable {
+public class LocalDownloadingPackage extends PackageDescriptor implements DownloadingPackage, Runnable {
 
     protected static final Log log = LogFactory.getLog(LocalDownloadingPackage.class);
 
@@ -67,10 +62,9 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
 
     public LocalDownloadingPackage(PackageDescriptor descriptor) {
         super(descriptor);
-        this.sourceUrl = ConnectUrlConfig.getDownloadBaseUrl()
-                + descriptor.getSourceUrl();
-        this.sourceDigest = descriptor.getSourceDigest();
-        this.sourceSize = descriptor.getSourceSize();
+        sourceUrl = ConnectUrlConfig.getDownloadBaseUrl() + descriptor.getSourceUrl();
+        sourceDigest = descriptor.getSourceDigest();
+        sourceSize = descriptor.getSourceSize();
     }
 
     protected void saveStreamAsFile(InputStream in) throws IOException {
@@ -116,8 +110,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
     public void run() {
         setPackageState(PackageState.REMOTE);
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
-                10000);
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
         ProxyHelper.configureProxyIfNeeded(httpClient, sourceUrl);
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
@@ -146,19 +139,15 @@ public class LocalDownloadingPackage extends PackageDescriptor implements
                 break;
 
             case HttpStatus.SC_NOT_FOUND:
-                throw new ConnectServerError(String.format(
-                        "Package not found (%s).", rc));
+                throw new ConnectServerError(String.format("Package not found (%s).", rc));
             case HttpStatus.SC_FORBIDDEN:
-                throw new ConnectServerError(String.format(
-                        "Access refused (%s).", rc));
+                throw new ConnectServerError(String.format("Access refused (%s).", rc));
             case HttpStatus.SC_UNAUTHORIZED:
-                throw new ConnectServerError(String.format(
-                        "Registration required (%s).", rc));
+                throw new ConnectServerError(String.format("Registration required (%s).", rc));
             default:
-                throw new ConnectServerError(String.format(
-                        "Connect server HTTP response code %s.", rc));
+                throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
             }
-        } catch (Exception e) {
+        } catch (ConnectServerError | IOException e) {
             setPackageState(PackageState.REMOTE);
             log.debug(e, e);
             errorMessage = e.getMessage();
