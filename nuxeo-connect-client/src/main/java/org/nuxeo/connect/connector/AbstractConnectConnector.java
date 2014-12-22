@@ -147,6 +147,11 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         if (!isConnectServerReachable()) {
             throw new CanNotReachConnectServer("Connect server set as not reachable");
         }
+        ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+        DownloadingPackage downloadingPackage = cdm.getDownloadingPackage(id);
+        if (downloadingPackage != null) {
+            return downloadingPackage;
+        }
         try {
             id = URLEncoder.encode(id, "UTF-8");
             id = id.replace("+", "%20");
@@ -155,20 +160,26 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             log.error(e);
         }
         String url = getBaseUrl() + GET_DOWNLOAD_SUFFIX + "/" + id;
-        ConnectServerResponse response = execCall(url);
-        String json = response.getString();
+        ConnectServerResponse response = null;
+        PackageDescriptor pkg = null;
         try {
-            PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
-            if (pkg == null || pkg.getId() == null) {
-                throw new ConnectSecurityError("Unable to parse server response: package has no id");
+            response = execCall(url);
+            String json = response.getString();
+            if (json == null) { // Not found
+                return null;
             }
-            ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-            return cdm.storeDownloadedBundle(pkg);
+            pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
         } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
-            response.release();
+            if (response != null) {
+                response.release();
+            }
         }
+        if (pkg == null || pkg.getId() == null) {
+            throw new ConnectSecurityError("Unable to parse server response: package has no id");
+        }
+        return cdm.storeDownloadedBundle(pkg);
     }
 
     @Override

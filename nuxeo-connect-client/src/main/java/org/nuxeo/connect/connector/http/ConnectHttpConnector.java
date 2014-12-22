@@ -26,6 +26,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.CanNotReachConnectServer;
@@ -77,7 +78,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         int rc = 0;
         try {
             rc = httpClient.executeMethod(method);
-            if (rc == HttpStatus.SC_OK) {
+            if (rc == HttpStatus.SC_OK || rc == HttpStatus.SC_NO_CONTENT || rc == HttpStatus.SC_NOT_FOUND) {
                 return new ConnectHttpResponse(httpClient, method);
             } else {
                 String body = method.getResponseBodyAsString();

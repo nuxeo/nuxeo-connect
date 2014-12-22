@@ -34,12 +34,12 @@ import org.apache.commons.logging.LogFactory;
  * x.y.z<br>
  * x.y.z-anyclassifier<br>
  * </code><br>
- * 
+ *
  * Classifiers are alphabetically ordered between themselves.<br>
  * Special classifiers are before the SNAPSHOT.<br>
  * SNAPSHOT is always just before the release (without classifier).<br>
  * Non-special classifiers are after the release.<br>
- * 
+ *
  * See <a href=
  * "https://github.com/nuxeo/nuxeo-connect/blob/master/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestVersions.java"
  * >TestVersions</a>.
@@ -58,7 +58,7 @@ public class Version implements Comparable<Version> {
     /**
      * @since 1.4.4
      */
-    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC)|(rc)|(alpha)|(ALPHA)|(beta)|(BETA)\\d*)|([a-zA-Z][0-9]{8})).*$");
+    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC|rc|alpha|ALPHA|beta|BETA)\\d*)|([a-zA-Z][0-9]{8})).*$");
 
     /**
      * @since 1.4.4
@@ -68,7 +68,7 @@ public class Version implements Comparable<Version> {
     /**
      * Special classifiers are considered as earlier than versions without
      * classifier or with a non-special classifier
-     * 
+     *
      * @since 1.4.4
      */
     public boolean isSpecialClassifier() {

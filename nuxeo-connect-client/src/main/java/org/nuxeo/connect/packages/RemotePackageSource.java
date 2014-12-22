@@ -19,10 +19,12 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -79,7 +81,7 @@ public class RemotePackageSource implements PackageSource {
             }
         } catch (ConnectServerError e) {
             log.debug(e, e);
-            log.warn("Unable to fetch remote packages list");
+            log.warn("Unable to fetch remote packages list (see debug logs for details)");
             // store an empty list to avoid calling back the server
             // since anyway we probably have no connection...
             cache.add(new ArrayList<DownloadablePackage>(), type.toString());
@@ -94,6 +96,37 @@ public class RemotePackageSource implements PackageSource {
         // disk cache
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         crs.getConnector().flushCache();
+    }
+
+    @Override
+    public DownloadablePackage getPackageById(String packageId) {
+        DownloadablePackage pkg = cache.getPackageByID(packageId);
+        if (pkg == null) {
+            ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+            try {
+                pkg = crs.getConnector().getDownload(packageId);
+            } catch (ConnectServerError e) {
+                log.debug(e, e);
+                log.warn("Unable to fetch remote package " + packageId + " (see debug logs for details)");
+            }
+            if (pkg != null) {
+                cache.add(pkg);
+            }
+        }
+        return pkg;
+    }
+
+    @Override
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
+        List<DownloadablePackage> result = new ArrayList<>();
+        for (PackageType type : PackageType.values()) {
+            for (DownloadablePackage pkg : listPackages(type)) {
+                if (packageName.equals(pkg.getName())) {
+                    result.add(pkg);
+                }
+            }
+        }
+        return result;
     }
 
 }

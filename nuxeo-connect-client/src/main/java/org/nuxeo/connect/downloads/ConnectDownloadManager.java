@@ -39,4 +39,9 @@ public interface ConnectDownloadManager {
 
     void removeDownloadingPackage(String packageId);
 
+    /**
+     * @since 1.4.18
+     */
+    DownloadingPackage getDownloadingPackage(String packageId);
+
 }

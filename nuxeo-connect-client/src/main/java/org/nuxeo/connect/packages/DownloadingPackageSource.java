@@ -19,6 +19,7 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -53,10 +54,7 @@ public class DownloadingPackageSource implements PackageSource {
     public List<DownloadablePackage> listPackages() {
         List<DownloadablePackage> result = new ArrayList<>();
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
-        List<DownloadingPackage> pkgs = cdm.listDownloadingPackages();
-        for (DownloadablePackage pkg : pkgs) {
-            result.add(pkg);
-        }
+        result.addAll(cdm.listDownloadingPackages());
         return result;
     }
 
@@ -74,6 +72,24 @@ public class DownloadingPackageSource implements PackageSource {
     @Override
     public void flushCache() {
         // NOP
+    }
+
+    @Override
+    public DownloadablePackage getPackageById(String packageId) {
+        ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
+        DownloadingPackage pkg = cdm.getDownloadingPackage(packageId);
+        return pkg;
+    }
+
+    @Override
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
+        List<DownloadablePackage> result = new ArrayList<>();
+        for (DownloadablePackage pkg : listPackages()) {
+            if (packageName.equals(pkg.getName())) {
+                result.add(pkg);
+            }
+        }
+        return result;
     }
 
 }

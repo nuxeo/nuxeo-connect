@@ -18,6 +18,7 @@
 
 package org.nuxeo.connect.packages;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -40,5 +41,15 @@ public interface PackageSource {
     List<DownloadablePackage> listPackages(PackageType type);
 
     void flushCache();
+
+    /**
+     * @since 1.4.18
+     */
+    DownloadablePackage getPackageById(String packageId);
+
+    /**
+     * @since 1.4.18
+     */
+    Collection<? extends DownloadablePackage> listPackagesByName(String packageName);
 
 }

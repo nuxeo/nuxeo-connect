@@ -18,6 +18,7 @@
 package org.nuxeo.connect.pm.tests;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -89,6 +90,27 @@ public class DummyPackageSource implements PackageSource {
     }
 
     public void reset(List<DownloadablePackage> packages) {
-        this.pkgs = packages;
+        pkgs = packages;
+    }
+
+    @Override
+    public DownloadablePackage getPackageById(String packageId) {
+        for (DownloadablePackage pkg : pkgs) {
+            if (packageId.equals(pkg.getId())) {
+                return pkg;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
+        List<DownloadablePackage> result = new ArrayList<>();
+        for (DownloadablePackage pkg : pkgs) {
+            if (packageName.equals(pkg.getName())) {
+                result.add(pkg);
+            }
+        }
+        return result;
     }
 }

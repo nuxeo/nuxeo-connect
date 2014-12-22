@@ -254,11 +254,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> findRemotePackages(String packageName) {
         List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getName().equals(packageName)) {
-                    pkgs.add(pkg);
-                }
-            }
+            pkgs.addAll(source.listPackagesByName(packageName));
         }
         return pkgs;
     }
@@ -329,10 +325,9 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected DownloadablePackage findPackageById(String packageId, List<PackageSource> sources) {
         for (PackageSource source : sources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getId().equals(packageId)) {
-                    return pkg;
-                }
+            DownloadablePackage pkg = source.getPackageById(packageId);
+            if (pkg != null) {
+                return pkg;
             }
         }
         return null;
@@ -345,21 +340,17 @@ public class PackageManagerImpl implements PackageManager {
         List<Version> localVersions = new ArrayList<>();
         List<Version> remoteVersions = new ArrayList<>();
         for (PackageSource source : localSources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getName().equals(pkgName)) {
-                    if (pkg.getPackageState().isInstalled()) {
-                        installedVersions.add(pkg.getVersion());
-                    } else {
-                        localVersions.add(pkg.getVersion());
-                    }
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
+                if (pkg.getPackageState().isInstalled()) {
+                    installedVersions.add(pkg.getVersion());
+                } else {
+                    localVersions.add(pkg.getVersion());
                 }
             }
         }
         for (PackageSource source : remoteSources) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getName().equals(pkgName)) {
-                    remoteVersions.add(pkg.getVersion());
-                }
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
+                remoteVersions.add(pkg.getVersion());
             }
         }
         Collections.sort(localVersions);
@@ -374,8 +365,8 @@ public class PackageManagerImpl implements PackageManager {
     public List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform) {
         List<Version> versions = new ArrayList<>();
         for (PackageSource source : getAllSources()) {
-            for (DownloadablePackage pkg : source.listPackages()) {
-                if (pkg.getName().equals(pkgName) && range.matchVersion(pkg.getVersion())
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
+                if (range.matchVersion(pkg.getVersion())
                         && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                     if (!versions.contains(pkg.getVersion())) {
                         versions.add(pkg.getVersion());
@@ -584,7 +575,12 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadingPackage> download(List<String> packageIds) throws ConnectServerError {
         List<DownloadingPackage> downloadings = new ArrayList<>();
         for (String packageId : packageIds) {
-            downloadings.add(download(packageId));
+            DownloadingPackage download = download(packageId);
+            if (download != null) {
+                downloadings.add(download);
+            } else {
+                log.error("Download failed for " + packageId);
+            }
         }
         return downloadings;
     }
@@ -823,7 +819,12 @@ public class PackageManagerImpl implements PackageManager {
             List<String> idsToRemove = resolution.getOrderedPackageIdsToRemove();
             idsToRemove.remove(pkg.getId());
             for (String pkgIdToRemove : idsToRemove) {
-                packagesToUninstall.add(findPackageById(pkgIdToRemove, localSources));
+                DownloadablePackage localPackage = findPackageById(pkgIdToRemove, localSources);
+                if (localPackage != null) {
+                    packagesToUninstall.add(localPackage);
+                } else {
+                    log.error("Missing local package to remove: " + pkgIdToRemove);
+                }
             }
         }
         return packagesToUninstall;

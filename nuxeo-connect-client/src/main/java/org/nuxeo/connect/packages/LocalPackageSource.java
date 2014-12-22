@@ -19,10 +19,12 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.LocalPackage;
@@ -82,6 +84,32 @@ public class LocalPackageSource implements PackageSource {
     @Override
     public void flushCache() {
         // NOP
+    }
+
+    @Override
+    public LocalPackageAsDownloadablePackage getPackageById(String packageId) {
+        PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
+        LocalPackageAsDownloadablePackage pkg = null;
+        try {
+            LocalPackage localPackage = pus.getPackage(packageId);
+            if (localPackage != null) {
+                pkg = new LocalPackageAsDownloadablePackage(localPackage);
+            }
+        } catch (PackageException e) {
+            log.error("Error when getting local package " + packageId, e);
+        }
+        return pkg;
+    }
+
+    @Override
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
+        List<DownloadablePackage> result = new ArrayList<>();
+        for (DownloadablePackage pkg : listPackages()) {
+            if (packageName.equals(pkg.getName())) {
+                result.add(pkg);
+            }
+        }
+        return result;
     }
 
 }

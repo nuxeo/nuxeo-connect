@@ -114,4 +114,9 @@ public class ConnectDownloadManagerImpl implements ConnectDownloadManager {
         }
 
     }
+
+    @Override
+    public LocalDownloadingPackage getDownloadingPackage(String packageId) {
+        return downloadingPackages.get(packageId);
+    }
 }
