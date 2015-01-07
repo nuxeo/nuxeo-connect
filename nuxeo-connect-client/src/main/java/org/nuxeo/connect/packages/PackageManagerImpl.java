@@ -19,7 +19,6 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,18 +119,11 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type, targetPlatform);
         Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<String, Map<String, DownloadablePackage>>();
         for (DownloadablePackage pkg : allPackages) {
-            if (targetPlatform == null || Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform)) {
+            if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                 String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
                         : pkg.getTargetPlatforms();
-                if (targetPlatform != null) {
-                    targetPlatforms = new String[] { targetPlatform };
-                } else {
-                    // keep greater version per package's targetPlatform
-                    targetPlatforms = pkg.getTargetPlatforms();
-                    if (targetPlatforms == null) {
-                        // if the package doesn't specify any target platform
-                        targetPlatforms = new String[] { null };
-                    }
+                if (targetPlatforms == null) { // if the package doesn't specify any target platform
+                    targetPlatforms = new String[] { null };
                 }
                 for (String tp : targetPlatforms) {
                     Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
@@ -203,7 +195,7 @@ public class PackageManagerImpl implements PackageManager {
                 packages = source.listPackages(type);
             }
             for (DownloadablePackage pkg : packages) {
-                if ((targetPlatform == null) || Arrays.asList(pkg.getTargetPlatforms()).contains(targetPlatform)) {
+                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                     packagesById.put(pkg.getId(), pkg);
                 }
             }
