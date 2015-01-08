@@ -53,6 +53,10 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
 
     public static final String CONNECT_HTTP_CACHE_MINUTES_PROPERTY = "org.nuxeo.connect.http.cache.duration";
 
+    public static final String CONNECT_HTTP_TIMEOUT = "org.nuxeo.connect.http.timeout";
+
+    protected int connectHttpTimeout = Integer.parseInt(NuxeoConnectClient.getProperty(CONNECT_HTTP_TIMEOUT, "10000"));
+
     protected long lastStatusFetchTime;
 
     @Override
@@ -66,7 +70,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
     @Override
     protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(connectHttpTimeout);
         ProxyHelper.configureProxyIfNeeded(httpClient, url);
         HttpMethod method = new GetMethod(url);
         method.setFollowRedirects(true);
@@ -78,14 +82,19 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         int rc = 0;
         try {
             rc = httpClient.executeMethod(method);
-            if (rc == HttpStatus.SC_OK || rc == HttpStatus.SC_NO_CONTENT || rc == HttpStatus.SC_NOT_FOUND) {
+            switch (rc) {
+            case HttpStatus.SC_OK:
+            case HttpStatus.SC_NO_CONTENT:
+            case HttpStatus.SC_NOT_FOUND:
                 return new ConnectHttpResponse(httpClient, method);
-            } else {
-                String body = method.getResponseBodyAsString();
-                if (rc == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
-                }
+            case HttpStatus.SC_UNAUTHORIZED:
+                throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
+            case HttpStatus.SC_GATEWAY_TIMEOUT:
+            case HttpStatus.SC_REQUEST_TIMEOUT:
+                throw new ConnectServerError("Timeout " + rc);
+            default:
                 try {
+                    String body = method.getResponseBodyAsString();
                     JSONObject obj = new JSONObject(body);
                     String message = obj.getString("message");
                     String errorClass = obj.getString("errorClass");
