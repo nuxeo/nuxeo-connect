@@ -2,6 +2,7 @@ package org.nuxeo.connect.update;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,12 @@ public class PackageUtilsTest {
             assertEquals("FooBar", PackageUtils.getPackageName(packageId));
         }
         assertFalse(PackageUtils.isValidPackageId("somePackageName"));
+        assertTrue(PackageUtils.isValidPackageId("somePackageName-1.0.0"));
         assertEquals("somePackageName", PackageUtils.getPackageName("somePackageName-3.2.10"));
         assertEquals("3.2.10", PackageUtils.getPackageVersion("somePackageName-3.2.10"));
+
+        String packageId = "name.with.dot-and-dash-0.0.1";
+        assertEquals("name.with.dot-and-dash", PackageUtils.getPackageName(packageId));
+        assertEquals("0.0.1", PackageUtils.getPackageVersion(packageId));
     }
 }

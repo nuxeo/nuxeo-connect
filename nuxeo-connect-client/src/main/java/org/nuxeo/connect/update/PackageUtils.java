@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  */
 public class PackageUtils {
 
-    public static final String SYMBOLIC_NAME_PATTERN = "[a-zA-Z_]+[0-9a-zA-Z_-]*";
+    public static final String SYMBOLIC_NAME_PATTERN = "[a-zA-Z_]+.*";
 
     public static final String VERSION_PATTERN = "\\d+\\.\\d+\\.\\d+(-.+)?";
 
