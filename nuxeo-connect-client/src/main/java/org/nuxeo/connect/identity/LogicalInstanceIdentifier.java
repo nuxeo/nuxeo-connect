@@ -33,7 +33,6 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 
 /**
- *
  * Logical identifier for a Nuxeo Connect client subscription
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
@@ -77,8 +76,7 @@ public class LogicalInstanceIdentifier {
 
     protected String CLID2 = null;
 
-    public LogicalInstanceIdentifier(String ID, String description)
-            throws InvalidCLID {
+    public LogicalInstanceIdentifier(String ID, String description) throws InvalidCLID {
         this(ID);
         instanceDescription = description;
     }
@@ -123,8 +121,7 @@ public class LogicalInstanceIdentifier {
 
     protected static String getSaveFileName(boolean load) {
         // first look in Nuxeo Data dir
-        String path = NuxeoConnectClient.getProperty(NUXEO_DATA_DIR_KEY,
-                NuxeoConnectClient.getHomePath());
+        String path = NuxeoConnectClient.getProperty(NUXEO_DATA_DIR_KEY, NuxeoConnectClient.getHomePath());
         if (path == null) {
             path = System.getProperty("java.tmp.dir");
         }
@@ -183,8 +180,7 @@ public class LogicalInstanceIdentifier {
      * @throws InvalidCLID
      * @since 1.4.17
      */
-    public static LogicalInstanceIdentifier load(String path)
-            throws IOException, InvalidCLID {
+    public static LogicalInstanceIdentifier load(String path) throws IOException, InvalidCLID {
         File file = new File(path);
         if (!file.exists()) {
             throw new FileNotFoundException(path);
@@ -205,8 +201,7 @@ public class LogicalInstanceIdentifier {
         return instance;
     }
 
-    public static LogicalInstanceIdentifier load() throws IOException,
-            InvalidCLID {
+    public static LogicalInstanceIdentifier load() throws IOException, InvalidCLID {
         return load(getSaveFileName(true));
     }
 
