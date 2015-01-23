@@ -196,6 +196,10 @@ public class LogicalInstanceIdentifier {
             }
         }
 
+        if(lines.size() < 2) {
+            throw new InvalidCLID(String.format("CLID file (%s) is invalid",path));
+        }
+
         String id = lines.get(0) + ID_SEP + lines.get(1);
         String description = lines.size() > 2 ? lines.get(2) : "";
         instance = new LogicalInstanceIdentifier(id, description);
