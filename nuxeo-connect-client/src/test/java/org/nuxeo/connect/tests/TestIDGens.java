@@ -18,23 +18,27 @@
 
 package org.nuxeo.connect.tests;
 
-import java.io.IOException;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier.InvalidCLID;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
-public class TestIDGens extends TestCase {
+public class TestIDGens {
 
     private static final String TOTO_TITI = "toto--titi";
 
     private static final Log log = LogFactory.getLog(TestIDGens.class);
 
+    @Test
     public void testCTIDGen() {
         TechnicalInstanceIdentifier ctid = new TechnicalInstanceIdentifier();
         String ctId1 = ctid.getCTID();
@@ -53,21 +57,35 @@ public class TestIDGens extends TestCase {
         assertEquals(CLID.getInstanceDescription(), CLID2.getInstanceDescription());
     }
 
+    @Test
     public void testCLIDPlainText() throws InvalidCLID, IOException {
         LogicalInstanceIdentifier.USE_BASE64_SAVE = false;
         LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(TOTO_TITI, "myInstance");
         dotestCLID(CLID);
     }
 
+    @Test
     public void testCLIDEncoded() throws InvalidCLID, IOException {
         LogicalInstanceIdentifier.USE_BASE64_SAVE = true;
         LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(TOTO_TITI, "myInstance");
         dotestCLID(CLID);
     }
 
+    @Test
     public void testCanReloadEmptyDescriptionCLID() throws InvalidCLID, IOException {
         LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier(TOTO_TITI);
         dotestCLID(CLID);
+    }
+
+    @Test(expected = InvalidCLID.class)
+    public void testInvalidCLID() throws IOException, InvalidCLID {
+        Path tempCLID = Files.createTempFile("instance", ".clid");
+        Files.write(tempCLID, "invalid CLID with only one line".getBytes());
+        try {
+            LogicalInstanceIdentifier.load(tempCLID.toString());
+        } finally {
+            Files.delete(tempCLID);
+        }
     }
 
 }
