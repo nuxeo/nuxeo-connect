@@ -219,16 +219,6 @@
           <version>2.5</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.myfaces.tobago</groupId>
-          <artifactId>maven-apt-plugin</artifactId>
-          <version>1.0.25</version>
-          <configuration>
-            <generated>/target/generated/</generated>
-            <nocompile>true</nocompile>
-            <target>1.5</target>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>1.5</version>
