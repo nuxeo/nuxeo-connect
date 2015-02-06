@@ -416,7 +416,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(res, new VersionPackageComparator());
+        Collections.sort(res, new PackageComparator());
         return res;
     }
 
@@ -433,7 +433,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadablePackage> listRemotePackages(PackageType pkgType, String targetPlatform) {
         List<DownloadablePackage> result = doMergePackages(remoteSources, pkgType, targetPlatform);
-        Collections.sort(result, new VersionPackageComparator());
+        Collections.sort(result, new PackageComparator());
         return result;
     }
 
@@ -460,7 +460,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(result, new VersionPackageComparator());
+        Collections.sort(result, new PackageComparator());
         return result;
     }
 
@@ -534,15 +534,14 @@ public class PackageManagerImpl implements PackageManager {
         // Remove duplicates
         Set<DownloadablePackage> updateSet = new LinkedHashSet<>(toUpdate);
         toUpdate = new ArrayList<>(updateSet);
-
-        Collections.sort(toUpdate, new VersionPackageComparator());
+        Collections.sort(toUpdate, new PackageComparator());
         return toUpdate;
     }
 
     @Override
     public List<DownloadablePackage> listPrivatePackages(PackageType pkgType, String targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(getAllSources(), pkgType, targetPlatform);
-        Collections.sort(allPackages, new VersionPackageComparator());
+        Collections.sort(allPackages, new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
             if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
