@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -44,13 +44,11 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
     }
 
     public void testResolutionOrder() throws Exception {
-        DependencyResolution depResolution = pm.resolveDependencies(
-                "hf11-1.0.0", null);
+        DependencyResolution depResolution = pm.resolveDependencies("hf11-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         String expectedOrder = "hf00-1.0.0/hf01-1.0.0/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.0.0/hf10-1.0.0/hf11-1.0.0";
-        assertEquals("Bad dependencies order", expectedOrder,
-                depResolution.getInstallationOrderAsString());
+        assertEquals("Bad dependencies order", expectedOrder, depResolution.getInstallationOrderAsString());
     }
 
 }

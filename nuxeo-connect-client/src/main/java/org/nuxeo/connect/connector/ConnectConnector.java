@@ -35,8 +35,7 @@ public interface ConnectConnector {
      * @return All type packages or all packages if type is null.
      * @throws ConnectServerError
      */
-    List<DownloadablePackage> getDownloads(PackageType type)
-            throws ConnectServerError;
+    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
 
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 

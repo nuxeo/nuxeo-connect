@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -41,34 +41,26 @@ public class TestRemoveP2CUDF extends AbstractPackageManagerTestCase {
     }
 
     public void testResolutionOrder() throws Exception {
-        List<String> uninstalls = new ArrayList<String>();
+        List<String> uninstalls = new ArrayList<>();
         uninstalls.add("nuxeo-content-browser:1.0.0");
         // SNAPSHOT allowed
-        DependencyResolution depResolution = pm.resolveDependencies(null,
-                uninstalls, null, null, true);
+        DependencyResolution depResolution = pm.resolveDependencies(null, uninstalls, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(3, depResolution.getRemovePackageIds().size());
         assertEquals(
                 "[nuxeo-social-collaboration-5.6.0-SNAPSHOT, nuxeo-dm-5.6.0-SNAPSHOT, nuxeo-content-browser-1.1.0]",
                 depResolution.getOrderedPackageIdsToRemove().toString());
-        assertEquals(
-                new Version("1.1.0"),
-                depResolution.getLocalPackagesToRemove().get(
-                        "nuxeo-content-browser"));
+        assertEquals(new Version("1.1.0"), depResolution.getLocalPackagesToRemove().get("nuxeo-content-browser"));
         // SNAPSHOT forbidden
-        depResolution = pm.resolveDependencies(null, uninstalls, null, null,
-                false);
+        depResolution = pm.resolveDependencies(null, uninstalls, null, null, false);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(3, depResolution.getRemovePackageIds().size());
         assertEquals(
                 "[nuxeo-social-collaboration-5.6.0-SNAPSHOT, nuxeo-dm-5.6.0-SNAPSHOT, nuxeo-content-browser-1.1.0]",
                 depResolution.getOrderedPackageIdsToRemove().toString());
-        assertEquals(
-                new Version("1.1.0"),
-                depResolution.getLocalPackagesToRemove().get(
-                        "nuxeo-content-browser"));
+        assertEquals(new Version("1.1.0"), depResolution.getLocalPackagesToRemove().get("nuxeo-content-browser"));
     }
 
 }

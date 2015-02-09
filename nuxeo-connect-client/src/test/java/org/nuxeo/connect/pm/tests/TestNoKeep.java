@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2014-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -52,7 +52,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
     // {"name":"B","version":"1.0.0","dependencies":["A:1.0.0:1.0.0"],"state":5,"type":"addon"}
     // {"name":"D","version":"1.0.0","dependencies":[],"state":0,"type":"addon"}
     // After: [A-1.0.0, B-1.0.0, D-1.0.0]
-    // After:  [A-1.0.0, B-1.0.0, C-1.0.0, D-1.0.0]
+    // After: [A-1.0.0, B-1.0.0, C-1.0.0, D-1.0.0]
     public void testInstallBD() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep2.json");
         List<DownloadablePackage> remote = getDownloads("remoteNoKeep2.json");

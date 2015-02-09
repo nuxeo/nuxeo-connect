@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -94,13 +94,11 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
         dumpPkgList("update", updates);
         assertEquals(0, updates.size());
 
-        List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages(null,
-                null);
+        List<DownloadablePackage> remoteOnly = pm.listOnlyRemotePackages(null, null);
         dumpPkgList("remoteOnly", remoteOnly);
         assertEquals(1, remoteOnly.size());
 
-        List<DownloadablePackage> remoteOrLocal = pm.listRemoteOrLocalPackages(
-                null, null);
+        List<DownloadablePackage> remoteOrLocal = pm.listRemoteOrLocalPackages(null, null);
         dumpPkgList("remoteOrLocal", remoteOrLocal);
         assertEquals(3, remoteOrLocal.size());
         downloading = remoteOrLocal.get(1);

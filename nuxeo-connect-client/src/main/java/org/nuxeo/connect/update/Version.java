@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -22,10 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Those versions are used in the Marketplace packages. They are in the form
- * major.minor.patch-classifier with some "special" classifiers which are "rc",
- * "alpha", "beta" (upper or lower case), a letter followed by a date in the
- * form AAAAMMDD (for instance "I20131022") and the SNAPSHOT classifier.<br>
+ * Those versions are used in the Marketplace packages. They are in the form major.minor.patch-classifier with some
+ * "special" classifiers which are "rc", "alpha", "beta" (upper or lower case), a letter followed by a date in the form
+ * AAAAMMDD (for instance "I20131022") and the SNAPSHOT classifier.<br>
  * Order is the following:<br>
  * <code>
  * x.y.z-beta<br>
@@ -34,12 +33,10 @@ import org.apache.commons.logging.LogFactory;
  * x.y.z<br>
  * x.y.z-anyclassifier<br>
  * </code><br>
- *
  * Classifiers are alphabetically ordered between themselves.<br>
  * Special classifiers are before the SNAPSHOT.<br>
  * SNAPSHOT is always just before the release (without classifier).<br>
  * Non-special classifiers are after the release.<br>
- *
  * See <a href=
  * "https://github.com/nuxeo/nuxeo-connect/blob/master/nuxeo-connect-client/src/test/java/org/nuxeo/connect/pm/tests/TestVersions.java"
  * >TestVersions</a>.
@@ -66,8 +63,7 @@ public class Version implements Comparable<Version> {
     protected boolean specialClassifier = false;
 
     /**
-     * Special classifiers are considered as earlier than versions without
-     * classifier or with a non-special classifier
+     * Special classifiers are considered as earlier than versions without classifier or with a non-special classifier
      *
      * @since 1.4.4
      */
@@ -203,8 +199,7 @@ public class Version implements Comparable<Version> {
                 }
             }
         } else {
-            if (specialClassifier && o.isSpecialClassifier()
-                    || !specialClassifier && !o.isSpecialClassifier()) {
+            if (specialClassifier && o.isSpecialClassifier() || !specialClassifier && !o.isSpecialClassifier()) {
                 log.trace(" case 4 => compare classifiers");
                 return mClassifier.compareTo(oClassifier);
             } else if (specialClassifier) {
@@ -219,8 +214,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public boolean equals(Object o) {
-        return (this == o || o != null && (o instanceof Version)
-                && compareTo((Version) o) == 0);
+        return (this == o || o != null && (o instanceof Version) && compareTo((Version) o) == 0);
     }
 
     @Override

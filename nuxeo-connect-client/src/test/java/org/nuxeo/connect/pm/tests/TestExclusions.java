@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -47,24 +47,19 @@ public class TestExclusions extends AbstractPackageManagerTestCase {
     }
 
     /**
-     * Need to override since nuxeo-content-browser-cmf is considered as an
-     * upgrade of nuxeo-content-browser in Legacy resolver whereas it's a
-     * replacement with P2CUDF
+     * Need to override since nuxeo-content-browser-cmf is considered as an upgrade of nuxeo-content-browser in Legacy
+     * resolver whereas it's a replacement with P2CUDF
      */
     public void testResolutionOrder() throws Exception {
         // verify that CMF installation triggers DM uninstall
-        DependencyResolution depResolution = pm.resolveDependencies(
-                "nuxeo-cmf-5.5.0", null);
+        DependencyResolution depResolution = pm.resolveDependencies("nuxeo-cmf-5.5.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToRemove().size());
-        assertTrue(depResolution.getLocalPackagesToRemove().containsKey(
-                "nuxeo-dm"));
-        assertTrue(depResolution.getLocalPackagesToRemove().containsKey(
-                "nuxeo-content-browser"));
+        assertTrue(depResolution.getLocalPackagesToRemove().containsKey("nuxeo-dm"));
+        assertTrue(depResolution.getLocalPackagesToRemove().containsKey("nuxeo-content-browser"));
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertTrue(depResolution.getLocalPackagesToUpgrade().containsKey(
-                "nuxeo-content-browser"));
+        assertTrue(depResolution.getLocalPackagesToUpgrade().containsKey("nuxeo-content-browser"));
 
         // Fake installation
         List<DownloadablePackage> local2 = getDownloads("localExclusion2.json");
@@ -75,13 +70,10 @@ public class TestExclusions extends AbstractPackageManagerTestCase {
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToRemove().size());
-        assertTrue(depResolution.getLocalPackagesToRemove().containsKey(
-                "nuxeo-cmf"));
-        assertTrue(depResolution.getLocalPackagesToRemove().containsKey(
-                "nuxeo-content-browser"));
+        assertTrue(depResolution.getLocalPackagesToRemove().containsKey("nuxeo-cmf"));
+        assertTrue(depResolution.getLocalPackagesToRemove().containsKey("nuxeo-content-browser"));
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertTrue(depResolution.getLocalPackagesToUpgrade().containsKey(
-                "nuxeo-content-browser"));
+        assertTrue(depResolution.getLocalPackagesToUpgrade().containsKey("nuxeo-content-browser"));
     }
 
 }
