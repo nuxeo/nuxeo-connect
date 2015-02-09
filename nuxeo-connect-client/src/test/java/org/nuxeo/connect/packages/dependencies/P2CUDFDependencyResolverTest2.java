@@ -42,9 +42,8 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
         super.setUp();
         List<DownloadablePackage> local = getDownloads("local6.json");
         List<DownloadablePackage> remote = getDownloads("remote4.json");
-        DummyPackageSource source = new DummyPackageSource(local, true);
-        pm.registerSource(source, true);
-        pm.registerSource(new DummyPackageSource(remote, false), false);
+        pm.registerSource(new DummyPackageSource(local, "dummyLocal"), true);
+        pm.registerSource(new DummyPackageSource(remote, "dummyRemote"), false);
     }
 
     @Test

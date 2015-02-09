@@ -45,6 +45,7 @@ import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
+import org.nuxeo.connect.packages.PackageListCache;
 import org.nuxeo.connect.update.PackageType;
 
 /**
@@ -53,6 +54,10 @@ import org.nuxeo.connect.update.PackageType;
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public abstract class AbstractConnectConnector implements ConnectConnector {
+    /**
+     * @since 1.4.19
+     */
+    public static final String STUDIO_REGISTERED_CACHE_SUFFIX = "studio_registered";
 
     public static final String GET_DOWNLOADS_SUFFIX = "getDownloads";
 
@@ -64,7 +69,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     public static final String CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY = "org.nuxeo.connect.connector.cache.duration";
 
-    public static final long DEFAULT_CACHE_TIME_MS = 3600 * 1000;
+    /**
+     * @since 1.4.19
+     */
+    public static final String DEFAULT_CACHE_TIME_MINUTES = "60";
 
     /**
      * @since 1.4
@@ -85,7 +93,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     /**
      * @since 1.4
      */
-    protected File getCacheFileFor(PackageType type) {
+    protected File getCacheFileFor(String suffix) {
         String connectUrlString = ConnectUrlConfig.getBaseUrl();
         String cacheDir = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
         try {
@@ -101,10 +109,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                 cachePrefix = cachePrefix + Integer.toString(port) + "_";
             }
             cachePrefix = cachePrefix + connectUrl.getPath().replaceAll("/", "#");
-            String cacheFileName = cachePrefix + "_" + type + ".json";
+            String cacheFileName = cachePrefix + "_" + suffix + ".json";
             return new File(cacheDir, cacheFileName);
         } catch (MalformedURLException e) {
-            String fallbackFileName = connectUrlString + "_" + type + ".json";
+            String fallbackFileName = connectUrlString + "_" + suffix + ".json";
             return new File(cacheDir, fallbackFileName);
         }
     }
@@ -112,7 +120,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     @Override
     public void flushCache() {
         for (PackageType type : PackageType.values()) {
-            File cacheFile = getCacheFileFor(type);
+            File cacheFile = getCacheFileFor(type.getValue());
             FileUtils.deleteQuietly(cacheFile);
         }
         FileUtils.deleteQuietly(getCacheFileFor(null));
@@ -184,67 +192,96 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
+        return getDownloads(type.getValue(), type.getValue());
+    }
+
+    @Override
+    public List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError {
+        return getDownloads(STUDIO_REGISTERED_CACHE_SUFFIX, PackageType.STUDIO + "?registered=true");
+    }
+
+    protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
         if (!isConnectServerReachable()) {
             return new ArrayList<>();
         }
-        List<DownloadablePackage> result = new ArrayList<>();
-        String json = null;
-        String cacheTimeString = NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, null);
-        long cacheMaxAge;
-        if (cacheTimeString == null) {
-            cacheMaxAge = DEFAULT_CACHE_TIME_MS;
-        } else {
-            cacheMaxAge = Long.parseLong(cacheTimeString) * 60 * 1000;
-        }
-        if (type == null || type == PackageType.STUDIO) {
-            cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
-        }
-        File cacheFile = getCacheFileFor(type);
 
         // Try reading from the cache first
-        Date now = new Date();
-        if (cacheFile.exists() && ((now.getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
-            try {
-                json = FileUtils.readFileToString(cacheFile);
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject ob = (JSONObject) array.get(i);
-                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
-                }
-            } catch (IOException e) {
-                // Issue reading the file (json is null)
-            } catch (JSONException e) {
-                // Issue parsing the file
-                json = null;
-                result = new ArrayList<>();
-            }
+        List<DownloadablePackage> result = readCacheFile(fileSuffix);
+        if (result != null) {
+            return result;
         }
 
-        if (json == null) { // Fallback on the real source
-            String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + type;
-            ConnectServerResponse response = execCall(url);
-            json = response.getString();
-            response.release();
-            try {
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject ob = (JSONObject) array.get(i);
-                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
-                }
-            } catch (JSONException e) {
-                throw new ConnectServerError("Unable to parse response", e);
+        // Fallback on the real source
+        String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + urlSuffix;
+        ConnectServerResponse response = execCall(url);
+        String json = response.getString();
+        response.release();
+        try {
+            result = new ArrayList<>();
+            JSONArray array = new JSONArray(json);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject ob = (JSONObject) array.get(i);
+                result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
             }
-            // Parsing went OK, we cache the result
-            try {
-                FileUtils.writeStringToFile(cacheFile, json);
-            } catch (IOException e) {
-                // Can't cache - ignore
-            }
+        } catch (JSONException e) {
+            throw new ConnectServerError("Unable to parse response", e);
         }
+
+        writeCacheFile(fileSuffix, json);
         return result;
+    }
+
+    /**
+     * @param suffix Usually {@link PackageType#toString()}
+     * @param json String JSON representation of list of {@link DownloadablePackage}
+     * @since 1.4.19
+     * @see PackageDescriptor
+     */
+    public void writeCacheFile(String type, String json) {
+        try {
+            FileUtils.writeStringToFile(getCacheFileFor(type), json);
+        } catch (IOException e) { // Can't cache: log but don't fail
+            log.error("Could not store packages list in cache", e);
+        }
+    }
+
+    /**
+     * @param suffix Usually {@link PackageType#toString()}
+     * @return Packages list from file cache
+     * @since 1.4.19
+     * @see PackageListCache In-memory cache PackageListCache
+     */
+    public List<DownloadablePackage> readCacheFile(String suffix) {
+        long cacheMaxAge = Long.parseLong(NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY,
+                DEFAULT_CACHE_TIME_MINUTES)) * 60 * 1000;
+        if (suffix == null || PackageType.getByValue(suffix) == PackageType.STUDIO) {
+            cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
+        }
+        File cacheFile = getCacheFileFor(suffix);
+        if (!cacheFile.exists() || ((new Date().getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
+            return null;
+        }
+        try {
+            String json = FileUtils.readFileToString(cacheFile);
+            JSONArray array = new JSONArray(json);
+            List<DownloadablePackage> result = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject ob = (JSONObject) array.get(i);
+                result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
+            }
+            return result;
+        } catch (IOException e) {
+            // Issue reading the file
+            log.debug(e.getMessage(), e);
+        } catch (JSONException e) {
+            // Issue parsing the file
+            log.debug(e.getMessage(), e);
+        }
+        return null;
     }
 
     protected boolean isConnectServerReachable() {
         return Boolean.parseBoolean(NuxeoConnectClient.getProperty(CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
+
 }

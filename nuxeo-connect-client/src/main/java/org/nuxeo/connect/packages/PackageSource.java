@@ -52,4 +52,10 @@ public interface PackageSource {
      */
     Collection<? extends DownloadablePackage> listPackagesByName(String packageName);
 
+    /**
+     * @return Studio packages associated with the current registration.
+     * @since 1.4.19
+     */
+    List<DownloadablePackage> listStudioPackages();
+
 }

@@ -37,24 +37,16 @@ import org.nuxeo.connect.update.PackageType;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class RemotePackageSource implements PackageSource {
+public class RemotePackageSource extends AbstractPackageSource implements PackageSource {
 
     protected static final Log log = LogFactory.getLog(RemotePackageSource.class);
 
     protected PackageListCache cache;
 
-    @Override
-    public String getName() {
-        return "Connect Server";
-    }
-
-    @Override
-    public String getId() {
-        return "remote";
-    }
-
     public RemotePackageSource() {
         cache = new PackageListCache();
+        id = "remote";
+        name = "Connect Server";
     }
 
     @Override
@@ -67,25 +59,46 @@ public class RemotePackageSource implements PackageSource {
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
-        List<DownloadablePackage> result = new ArrayList<>();
+    public List<DownloadablePackage> listStudioPackages() {
+        if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistred()) {
+            log.info("Server is not registered");
+            return new ArrayList<>();
+        }
+        List<DownloadablePackage> result = cache.getFromCache(PackageListCache.STUDIO_REGISTERED_KEY);
+        if (result != null) {
+            return result;
+        }
         try {
-            List<DownloadablePackage> pkgs = cache.getFromCache(type.toString());
-            if (pkgs == null) {
-                ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-                pkgs = crs.getConnector().getDownloads(type);
-                cache.add(pkgs, type.toString());
-            }
-            for (DownloadablePackage pkg : pkgs) {
-                result.add(pkg);
-            }
+            ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+            result = crs.getConnector().getRegisteredStudio();
+            cache.add(result, PackageListCache.STUDIO_REGISTERED_KEY);
         } catch (ConnectServerError e) {
             log.debug(e, e);
             log.warn("Unable to fetch remote packages list: " + e.getMessage());
-            // store an empty list to avoid calling back the server
-            // since anyway we probably have no connection...
-            cache.add(new ArrayList<DownloadablePackage>(), type.toString());
+            // do not store an empty list to force retries
         }
+        return result;
+    }
+
+    @Override
+    public List<DownloadablePackage> listPackages(PackageType type) {
+        if (type == null) {
+            return listPackages();
+        }
+        List<DownloadablePackage> result = cache.getFromCache(type.toString());
+        if (result != null) {
+            return result;
+        }
+        try {
+            ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+            result = crs.getConnector().getDownloads(type);
+        } catch (ConnectServerError e) {
+            log.debug(e, e);
+            log.warn("Unable to fetch remote packages list: " + e.getMessage());
+            // store an empty list to avoid calling back the server since anyway we probably have no connection...
+            result = new ArrayList<>();
+        }
+        cache.add(result, type.toString());
         return result;
     }
 

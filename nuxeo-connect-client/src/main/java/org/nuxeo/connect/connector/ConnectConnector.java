@@ -46,4 +46,9 @@ public interface ConnectConnector {
      */
     void flushCache();
 
+    /**
+     * @since 1.4.19
+     */
+    List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
+
 }

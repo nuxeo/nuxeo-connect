@@ -121,26 +121,24 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> allPackages = getAllPackages(sources, type, targetPlatform);
         Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<>();
         for (DownloadablePackage pkg : allPackages) {
-            if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
-                        : pkg.getTargetPlatforms();
-                if (targetPlatforms == null) { // if the package doesn't specify any target platform
-                    targetPlatforms = new String[] { null };
+            String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
+                    : pkg.getTargetPlatforms();
+            if (targetPlatforms == null) { // if the package doesn't specify any target platform
+                targetPlatforms = new String[] { null };
+            }
+            for (String tp : targetPlatforms) {
+                Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
+                if (packagesById == null) {
+                    packagesById = new HashMap<>();
+                    packagesByIdAndTargetPlatform.put(tp, packagesById);
                 }
-                for (String tp : targetPlatforms) {
-                    Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
-                    if (packagesById == null) {
-                        packagesById = new HashMap<>();
-                        packagesByIdAndTargetPlatform.put(tp, packagesById);
-                    }
-                    String key = pkg.getId();
-                    if (packagesById.containsKey(key)) {
-                        if (pkg.getVersion().greaterThan(packagesById.get(key).getVersion())) {
-                            packagesById.put(key, pkg);
-                        }
-                    } else {
+                String key = pkg.getId();
+                if (packagesById.containsKey(key)) {
+                    if (pkg.getVersion().greaterThan(packagesById.get(key).getVersion())) {
                         packagesById.put(key, pkg);
                     }
+                } else {
+                    packagesById.put(key, pkg);
                 }
             }
         }
@@ -152,6 +150,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
+        Collections.sort(result, new PackageComparator());
         return result;
     }
 
@@ -403,6 +402,8 @@ public class PackageManagerImpl implements PackageManager {
             } else {
                 remoteSources.add(source);
             }
+        } else {
+            log.warn("Already registered a package source named " + name);
         }
     }
 
@@ -432,9 +433,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listRemotePackages(PackageType pkgType, String targetPlatform) {
-        List<DownloadablePackage> result = doMergePackages(remoteSources, pkgType, targetPlatform);
-        Collections.sort(result, new PackageComparator());
-        return result;
+        return doMergePackages(remoteSources, pkgType, targetPlatform);
     }
 
     @Override
@@ -447,12 +446,7 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> result = new ArrayList<>();
         List<String> pkgIds = new ArrayList<>();
         for (PackageSource source : localSources) {
-            List<DownloadablePackage> pkgs = null;
-            if (type == null) {
-                pkgs = source.listPackages();
-            } else {
-                pkgs = source.listPackages(type);
-            }
+            List<DownloadablePackage> pkgs = source.listPackages(type);
             for (DownloadablePackage pkg : pkgs) {
                 if (!pkgIds.contains(pkg.getId())) {
                     pkgIds.add(pkg.getId());
@@ -494,10 +488,8 @@ public class PackageManagerImpl implements PackageManager {
                 continue;
             }
             for (DownloadablePackage availablePackage : availablePackages) {
-                if (availablePackage.getName().equals(pkg.getName()) && availablePackage.getVersion() != null) {
-                    if (availablePackage.getVersion().greaterThan(pkg.getVersion())
-                            || availablePackage.getVersion().isSnapshot()
-                            && availablePackage.getVersion().equalsTo(pkg.getVersion())) {
+                if (availablePackage.getName().equals(pkg.getName())) {
+                    if (availablePackage.getVersion().isUpgradeFor(pkg.getVersion())) {
                         toUpdate.add(availablePackage);
                         toUpdateIds.add(availablePackage.getId());
                     }
@@ -675,22 +667,19 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
-        List<DownloadablePackage> remote = listAllStudioRemotePackages();
+        List<DownloadablePackage> remote = listRemoteAssociatedStudioPackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
         List<DownloadablePackage> result = new ArrayList<>();
         result.addAll(local);
-        for (DownloadablePackage rpkg : remote) {
-            boolean foundLocal = false;
+        REMOTE: for (DownloadablePackage rpkg : remote) {
             for (DownloadablePackage lpkg : local) {
                 if (lpkg.getId().equals(rpkg.getId())) {
-                    foundLocal = true;
-                    break;
+                    continue REMOTE;
                 }
             }
-            if (!foundLocal) {
-                result.add(rpkg);
-            }
+            result.add(rpkg);
         }
+        Collections.sort(result, new PackageComparator());
         return result;
     }
 
@@ -728,10 +717,21 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listAllStudioRemotePackages() {
+        return listRemotePackages(PackageType.STUDIO);
+    }
+
+    @Override
+    public List<DownloadablePackage> listRemoteAssociatedStudioPackages() {
         List<DownloadablePackage> result = new ArrayList<>();
+        List<String> pkgIds = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            List<DownloadablePackage> packages = source.listPackages(PackageType.STUDIO);
-            result.addAll(packages);
+            List<DownloadablePackage> pkgs = source.listStudioPackages();
+            for (DownloadablePackage pkg : pkgs) {
+                if (!pkgIds.contains(pkg.getId())) {
+                    pkgIds.add(pkg.getId());
+                    result.add(pkg);
+                }
+            }
         }
         return result;
     }

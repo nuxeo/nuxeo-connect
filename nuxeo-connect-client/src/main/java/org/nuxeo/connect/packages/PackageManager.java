@@ -186,14 +186,26 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, String targetPlatform);
 
     /**
-     * Lists all versions of the studio packages associated to user account.
+     * Lists all versions of the studio packages the user has access to. This was used to return only the Studio
+     * package(s) associated with the server registration. Now that includes the Studio packages the user is contributor
+     * on. Thus the deprecation to encourage explicit use of {@link #listRemotePackages(PackageType)} or
+     * {@link #listRemoteAssociatedStudioPackages()}.
+     *
+     * @deprecated Since 1.4.19. Use instead {@link #listRemotePackages(PackageType)} with {@link PackageType#STUDIO} or
+     *             {@link #listRemoteAssociatedStudioPackages()}
      */
     @Deprecated
     List<DownloadablePackage> listAllStudioRemotePackages();
 
     /**
-     * Lists all versions of the studio packages associated to user account in
-     * remote and potentially overridden by a local package.
+     * @return All remote versions of the Studio package associated with the server registration.
+     * @since 1.4.19
+     */
+    List<DownloadablePackage> listRemoteAssociatedStudioPackages();
+
+    /**
+     * Lists all versions of the studio packages associated to user account in remote and potentially overridden by a
+     * local package.
      */
     List<DownloadablePackage> listAllStudioRemoteOrLocalPackages();
 

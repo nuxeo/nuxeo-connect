@@ -254,4 +254,21 @@ public class Version implements Comparable<Version> {
         this.classifier = classifier;
     }
 
+    /**
+     * @return true if the current version is an upgrade comparing to the given version
+     * @since 1.4.19
+     */
+    public boolean isUpgradeFor(Version version) {
+        return isUpgradeFor(version, true);
+    }
+
+    /**
+     * @param snapshotUpgrade whether to upgrade when both versions are SNAPSHOT and equal to each other
+     * @return true if the current version is an upgrade comparing to the given version
+     * @since 1.4.19
+     */
+    public boolean isUpgradeFor(Version version, boolean snapshotUpgrade) {
+        return greaterThan(version) || snapshotUpgrade && isSnapshot() && equalsTo(version);
+    }
+
 }

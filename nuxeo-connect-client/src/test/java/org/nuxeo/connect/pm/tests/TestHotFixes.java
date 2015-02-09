@@ -20,6 +20,8 @@ package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -33,14 +35,10 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("localhf2.json");
         List<DownloadablePackage> remote = getDownloads("remotehf2.json");
-
-        assertNotNull(local);
-        assertTrue(local.size() > 0);
-        assertNotNull(remote);
-        assertTrue(remote.size() > 0);
-
-        pm.registerSource(new DummyPackageSource(local, true), true);
-        pm.registerSource(new DummyPackageSource(remote, false), false);
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        assertTrue(CollectionUtils.isNotEmpty(remote));
+        pm.registerSource(new DummyPackageSource(local, "localhf2"), true);
+        pm.registerSource(new DummyPackageSource(remote, "remotehf2"), false);
     }
 
     public void testResolutionOrder() throws Exception {

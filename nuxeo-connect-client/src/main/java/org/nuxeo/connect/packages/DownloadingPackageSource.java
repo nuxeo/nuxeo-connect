@@ -19,7 +19,6 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -29,25 +28,19 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
-import org.nuxeo.connect.update.PackageType;
 
 /**
  * {@link PackageSource} implementation for listing packages being downloaded.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class DownloadingPackageSource implements PackageSource {
+public class DownloadingPackageSource extends AbstractPackageSource implements PackageSource {
 
     protected static final Log log = LogFactory.getLog(DownloadingPackageSource.class);
 
-    @Override
-    public String getName() {
-        return "Downloading";
-    }
-
-    @Override
-    public String getId() {
-        return "downloading";
+    public DownloadingPackageSource() {
+        id = "downloading";
+        name = "Downloading";
     }
 
     @Override
@@ -59,37 +52,10 @@ public class DownloadingPackageSource implements PackageSource {
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : listPackages()) {
-            if (pkg.getType().equals(type)) {
-                result.add(pkg);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void flushCache() {
-        // NOP
-    }
-
-    @Override
     public DownloadablePackage getPackageById(String packageId) {
         ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
         DownloadingPackage pkg = cdm.getDownloadingPackage(packageId);
         return pkg;
-    }
-
-    @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : listPackages()) {
-            if (packageName.equals(pkg.getName())) {
-                result.add(pkg);
-            }
-        }
-        return result;
     }
 
 }

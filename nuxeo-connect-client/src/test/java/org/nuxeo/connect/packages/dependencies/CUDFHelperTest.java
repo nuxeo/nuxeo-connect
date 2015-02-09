@@ -100,9 +100,8 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("local3.json");
         List<DownloadablePackage> remote = getDownloads("remote3.json");
-        DummyPackageSource source = new DummyPackageSource(local, true);
-        pm.registerSource(source, true);
-        pm.registerSource(new DummyPackageSource(remote, false), false);
+        pm.registerSource(new DummyPackageSource(local, "local3"), true);
+        pm.registerSource(new DummyPackageSource(remote, "remote3"), false);
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setAllowSNAPSHOT(true);
         pcr = new Parser().parse(new AddSpaceInputStream(this.getClass().getClassLoader().getResourceAsStream(

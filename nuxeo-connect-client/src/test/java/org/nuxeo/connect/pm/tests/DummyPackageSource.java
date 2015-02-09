@@ -17,46 +17,47 @@
 
 package org.nuxeo.connect.pm.tests;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.packages.AbstractPackageSource;
 import org.nuxeo.connect.packages.PackageSource;
-import org.nuxeo.connect.update.PackageType;
 
-public class DummyPackageSource implements PackageSource {
+public class DummyPackageSource extends AbstractPackageSource implements PackageSource {
 
     protected List<DownloadablePackage> pkgs;
 
-    protected boolean local;
-
-    private String id = "dummy";
-
-    private String name = null;
-
+    /**
+     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List)}
+     */
+    @Deprecated
     public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local) {
-        this.pkgs = pkgs;
-        this.local = local;
+        this(pkgs, "dummy");
     }
 
     /**
      * @since 1.4.13
+     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List, String)}
      */
+    @Deprecated
     public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local, String id) {
+        this(pkgs, id);
+    }
+
+    /**
+     * @since 1.4.19
+     */
+    public DummyPackageSource(List<DownloadablePackage> pkgs) {
+        this(pkgs, "dummy");
+    }
+
+    /**
+     * @since 1.4.19
+     */
+    public DummyPackageSource(List<DownloadablePackage> pkgs, String id) {
         this.pkgs = pkgs;
-        this.local = local;
         this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getId() {
-        return id;
+        name = id;
     }
 
     @Override
@@ -65,28 +66,8 @@ public class DummyPackageSource implements PackageSource {
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : pkgs) {
-            if (type.equals(pkg.getType())) {
-                result.add(pkg);
-            }
-        }
-        return result;
-    }
-
-    @Override
     public String toString() {
-        if (local) {
-            return "local : " + pkgs.size() + " packages";
-        } else {
-            return "remote : " + pkgs.size() + " packages";
-        }
-    }
-
-    @Override
-    public void flushCache() {
-        // NOP
+        return name + " : " + pkgs.size() + " packages";
     }
 
     public void reset(List<DownloadablePackage> packages) {
@@ -101,16 +82,5 @@ public class DummyPackageSource implements PackageSource {
             }
         }
         return null;
-    }
-
-    @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : pkgs) {
-            if (packageName.equals(pkg.getName())) {
-                result.add(pkg);
-            }
-        }
-        return result;
     }
 }

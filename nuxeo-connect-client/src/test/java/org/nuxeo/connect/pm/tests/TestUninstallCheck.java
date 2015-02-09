@@ -20,6 +20,8 @@ package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageState;
 
@@ -32,9 +34,8 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
     public void setUp() throws Exception {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("localuninstall.json");
-        assertNotNull(local);
-        assertTrue(local.size() > 0);
-        pm.registerSource(new DummyPackageSource(local, false), true);
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        pm.registerSource(new DummyPackageSource(local, "localuninstall"), true);
     }
 
     public void testUninstallDependencies() throws Exception {

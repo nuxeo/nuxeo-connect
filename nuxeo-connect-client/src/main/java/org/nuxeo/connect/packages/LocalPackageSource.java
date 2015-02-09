@@ -19,7 +19,6 @@
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +28,6 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.LocalPackage;
 import org.nuxeo.connect.update.PackageException;
-import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
 
 /**
@@ -37,18 +35,13 @@ import org.nuxeo.connect.update.PackageUpdateService;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class LocalPackageSource implements PackageSource {
+public class LocalPackageSource extends AbstractPackageSource implements PackageSource {
 
     protected static final Log log = LogFactory.getLog(LocalPackageSource.class);
 
-    @Override
-    public String getName() {
-        return "Local";
-    }
-
-    @Override
-    public String getId() {
-        return "local";
+    public LocalPackageSource() {
+        id = "local";
+        name = "Local";
     }
 
     @Override
@@ -67,26 +60,6 @@ public class LocalPackageSource implements PackageSource {
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
-        List<DownloadablePackage> all = listPackages();
-        if (type == null) {
-            return all;
-        }
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : all) {
-            if (pkg.getType() != null && pkg.getType().equals(type)) {
-                result.add(pkg);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void flushCache() {
-        // NOP
-    }
-
-    @Override
     public LocalPackageAsDownloadablePackage getPackageById(String packageId) {
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         LocalPackageAsDownloadablePackage pkg = null;
@@ -99,17 +72,6 @@ public class LocalPackageSource implements PackageSource {
             log.error("Error when getting local package " + packageId, e);
         }
         return pkg;
-    }
-
-    @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
-        List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : listPackages()) {
-            if (packageName.equals(pkg.getName())) {
-                result.add(pkg);
-            }
-        }
-        return result;
     }
 
 }

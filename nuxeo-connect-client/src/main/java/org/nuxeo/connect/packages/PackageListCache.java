@@ -28,6 +28,11 @@ import org.nuxeo.connect.update.PackageType;
 
 public class PackageListCache {
     /**
+     * @since 1.4.19
+     */
+    public static final String STUDIO_REGISTERED_KEY = "StudioRegistered";
+
+    /**
      * @since 1.4.18
      */
     public static final String CONNECT_CLIENT_CACHE_MINUTES_PROPERTY = "org.nuxeo.ecm.connect.client.cache";
@@ -59,6 +64,9 @@ public class PackageListCache {
         // Reset cache timestamp?
     }
 
+    /**
+     * @return null if no entry in cache or if entry is expired
+     */
     public List<DownloadablePackage> getFromCache(String type) {
         PackageListCacheEntry entry = cache.get(type);
         if (entry == null || isExpired(entry)) {

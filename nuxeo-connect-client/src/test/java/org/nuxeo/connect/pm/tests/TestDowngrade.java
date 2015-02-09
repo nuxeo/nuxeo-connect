@@ -21,6 +21,8 @@ package org.nuxeo.connect.pm.tests;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -33,10 +35,8 @@ public class TestDowngrade extends AbstractPackageManagerTestCase {
     public void setUp() throws Exception {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("local5.json");
-
-        assertNotNull(local);
-        assertTrue(local.size() > 0);
-        pm.registerSource(new DummyPackageSource(local, true), true);
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        pm.registerSource(new DummyPackageSource(local, "local5"), true);
     }
 
     public void testResolutionOrder() throws Exception {

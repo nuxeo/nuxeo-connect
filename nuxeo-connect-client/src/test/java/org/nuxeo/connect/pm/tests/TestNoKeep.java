@@ -35,7 +35,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
     // After: [A-1.0.0, B-1.0.0]
     public void testInstallB() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep1.json");
-        pm.registerSource(new DummyPackageSource(local, true), true);
+        pm.registerSource(new DummyPackageSource(local, "localNoKeep1"), true);
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
@@ -56,8 +56,8 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
     public void testInstallBD() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep2.json");
         List<DownloadablePackage> remote = getDownloads("remoteNoKeep2.json");
-        pm.registerSource(new DummyPackageSource(local, true), true);
-        pm.registerSource(new DummyPackageSource(remote, false), true);
+        pm.registerSource(new DummyPackageSource(local, "localNoKeep2"), true);
+        pm.registerSource(new DummyPackageSource(remote, "remoteNoKeep2"), true);
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         pkgToSet.add("D");
@@ -76,7 +76,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
     // After: [A-2.0.0, B-2.0.0]
     public void testInstallAB() throws Exception {
         List<DownloadablePackage> local = getDownloads("localNoKeep3.json");
-        pm.registerSource(new DummyPackageSource(local, true), true);
+        pm.registerSource(new DummyPackageSource(local, "localNoKeep3"), true);
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);

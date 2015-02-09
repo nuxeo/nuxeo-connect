@@ -20,6 +20,8 @@ package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -35,15 +37,11 @@ public class TestExclusions extends AbstractPackageManagerTestCase {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("localExclusion.json");
         List<DownloadablePackage> remote = getDownloads("remoteExclusion.json");
-
-        assertNotNull(local);
-        assertTrue(local.size() > 0);
-        assertNotNull(remote);
-        assertTrue(remote.size() > 0);
-
-        source = new DummyPackageSource(local, true);
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        assertTrue(CollectionUtils.isNotEmpty(remote));
+        source = new DummyPackageSource(local, "localExclusion");
         pm.registerSource(source, true);
-        pm.registerSource(new DummyPackageSource(remote, false), false);
+        pm.registerSource(new DummyPackageSource(remote, "remoteExclusion"), false);
     }
 
     /**

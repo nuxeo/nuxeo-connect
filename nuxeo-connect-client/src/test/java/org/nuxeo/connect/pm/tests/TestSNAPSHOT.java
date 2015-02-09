@@ -40,14 +40,10 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         super.setUp();
         List<DownloadablePackage> local = getDownloads("localsnapshot.json");
         List<DownloadablePackage> remote = getDownloads("remotesnapshot.json");
-
-        assertNotNull(local);
-        assertTrue(local.size() > 0);
-        assertNotNull(remote);
-        assertTrue(remote.size() > 0);
-
-        pm.registerSource(new DummyPackageSource(local, true), true);
-        pm.registerSource(new DummyPackageSource(remote, false), false);
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        assertTrue(CollectionUtils.isNotEmpty(remote));
+        pm.registerSource(new DummyPackageSource(local, "localsnapshot"), true);
+        pm.registerSource(new DummyPackageSource(remote, "remotesnapshot"), false);
     }
 
     public void testAWithoutSNAPSHOT() throws Exception {
