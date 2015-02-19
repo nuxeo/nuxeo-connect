@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -87,10 +87,6 @@ class NuxeoCUDFPackage {
     }
 
     public Version getNuxeoVersion() {
-        // No more remove classifier from version
-        // Version version = new Version(pkg.getVersion().toString());
-        // version.setSnapshot(version.isSnapshot());
-        // version.setClassifier(null);
         return pkg.getVersion();
     }
 
