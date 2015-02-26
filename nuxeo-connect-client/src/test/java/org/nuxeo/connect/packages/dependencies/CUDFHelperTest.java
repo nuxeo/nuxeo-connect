@@ -26,6 +26,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import org.eclipse.equinox.p2.cudf.Parser;
 import org.eclipse.equinox.p2.cudf.metadata.IProvidedCapability;
@@ -141,23 +143,22 @@ public class CUDFHelperTest extends AbstractPackageManagerTestCase {
     @Test
     public void testGetCUDFFile() throws Exception {
         cudfHelper.initMapping();
-        BufferedReader gen = new BufferedReader(new StringReader(cudfHelper.getCUDFFile()));
-        BufferedReader ref = new BufferedReader(new InputStreamReader(
-                CUDFHelperTest.class.getClassLoader().getResourceAsStream(
-                        AbstractPackageManagerTestCase.TEST_DATA + "universe.cudf")));
-        try {
-            int i = 1;
-            while (gen.ready() && ref.ready()) {
-                String generatedLine = gen.readLine().trim();
-                assertEquals("Generated CUDF universe different than reference at line " + i, ref.readLine().trim(),
-                        generatedLine);
-                i++;
-            }
-            assertFalse(gen.ready() && ref.ready());
-        } finally {
-            gen.close();
-            ref.close();
+        String cudfFile = cudfHelper.getCUDFFile();
+        log.debug(cudfFile);
+
+        Map<String, NuxeoCUDFPackageDescription> genMap;
+        try (BufferedReader gen = new BufferedReader(new StringReader(cudfFile))) {
+            genMap = cudfHelper.parseCUDFFile(gen);
         }
+        Map<String, NuxeoCUDFPackageDescription> refMap;
+        try (BufferedReader ref = new BufferedReader(new InputStreamReader(
+                CUDFHelperTest.class.getClassLoader().getResourceAsStream(
+                        AbstractPackageManagerTestCase.TEST_DATA + "universe.cudf")))) {
+            refMap = cudfHelper.parseCUDFFile(ref);
+        }
+        assertEquals("Generated CUDF universe different than the reference", refMap.keySet(), genMap.keySet());
+        assertEquals("Generated CUDF universe different than the reference", new TreeSet<>(refMap.values()),
+                new TreeSet<>(genMap.values()));
     }
 
     private InstallableUnit getIU(String id) {

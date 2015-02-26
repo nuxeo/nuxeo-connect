@@ -24,52 +24,36 @@ import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 
-class NuxeoCUDFPackage {
+class NuxeoCUDFPackage implements CUDFPackage {
 
-    public static final String CUDF_PACKAGE = "package: ";
+    public final String newLine = System.getProperty("line.separator");
 
-    public static final String CUDF_VERSION = "version: ";
+    protected DownloadablePackage pkg;
 
-    public static final String CUDF_INSTALLED = "installed: ";
+    protected int cudfVersion;
 
-    public static final String CUDF_DEPENDS = "depends: ";
+    protected String cudfName;
 
-    public static final String CUDF_CONFLICTS = "conflicts: ";
-
-    public static final String CUDF_PROVIDES = "provides: ";
-
-    public static final String CUDF_REQUEST = "request: ";
-
-    public static final String CUDF_INSTALL = "install: ";
-
-    public static final String CUDF_REMOVE = "remove: ";
-
-    public static final String CUDF_UPGRADE = "upgrade: ";
-
-    private final String newLine = System.getProperty("line.separator");
-
-    private DownloadablePackage pkg;
-
-    private int cudfVersion;
-
-    private String cudfName;
-
-    private boolean installed;
+    protected boolean installed;
 
     public NuxeoCUDFPackage(DownloadablePackage pkg) {
         this.pkg = pkg;
         cudfName = pkg.getName();
         // NXP-9268: Workaround for nuxeo-content-browser
-        if ("nuxeo-content-browser".equals(cudfName)
-                && "cmf".equalsIgnoreCase(pkg.getVersion().classifier())) {
+        if ("nuxeo-content-browser".equals(cudfName) && "cmf".equalsIgnoreCase(pkg.getVersion().classifier())) {
             cudfName += "*" + pkg.getVersion().classifier();
         }
         setInstalled(pkg.getPackageState().isInstalled());
     }
 
     /**
+     * @since 1.4.20
+     */
+    protected NuxeoCUDFPackage() {
+    }
+
+    /**
      * @param remotePackage
-     *
      * @since 1.4.11
      */
     public void setPkg(DownloadablePackage pkg) {
@@ -78,6 +62,7 @@ class NuxeoCUDFPackage {
         setInstalled(pkg.getPackageState().isInstalled());
     }
 
+    @Override
     public String getCUDFName() {
         return cudfName;
     }
@@ -97,54 +82,41 @@ class NuxeoCUDFPackage {
         cudfVersion = posInt;
     }
 
+    @Override
     public int getCUDFVersion() {
         return cudfVersion;
     }
 
     @Override
     public String toString() {
-        return getCUDFName() + " CUDF {" + cudfVersion + "}" + " Nuxeo {"
-                + pkg.getVersion() + "} " + pkg.getClass();
+        return getCUDFName() + " CUDF {" + cudfVersion + "}" + " Nuxeo {" + pkg.getVersion() + "} " + pkg.getClass();
     }
 
-    /**
-     * @return CUDF stanza for that package; see
-     *         {@link "http://www.mancoosi.org/cudf/"}
-     */
+    @Override
     public String getCUDFStanza() {
         StringBuffer sb = new StringBuffer();
-        sb.append(CUDF_PACKAGE + cudfName + newLine);
-        sb.append(CUDF_VERSION + cudfVersion + newLine);
-        sb.append(CUDF_INSTALLED + installed + newLine);
+        sb.append(TAG_PACKAGE + cudfName + newLine);
+        sb.append(TAG_VERSION + cudfVersion + newLine);
+        sb.append(TAG_INSTALLED + installed + newLine);
         return sb.toString();
     }
 
+    @Override
     public void setInstalled(boolean installed) {
         this.installed = installed;
     }
 
+    @Override
     public boolean isInstalled() {
         return installed;
     }
 
+    @Override
     public PackageDependency[] getDependencies() {
-        // NXP-9268: Workaround for nuxeo-content-browser
-        // PackageDependency[] dependencies = pkg.getDependencies();
-        // for (PackageDependency packageDependency : dependencies) {
-        // if
-        // ("nuxeo-content-browser*cmf".equals(getCUDFName(packageDependency)))
-        // {
-        //
-        // }
-        // }
-        // return renameDependency(dependencies, "nuxeo-content-browser");
-        // } else if ("nuxeo-content-browser".equals(cudfName)) {
-        // return addToConflicts(conflicts, "nuxeo-content-browser*cmf");
-        // } else {
         return pkg.getDependencies();
-        // }
     }
 
+    @Override
     public PackageDependency[] getConflicts() {
         // NXP-9268: Workaround for nuxeo-content-browser
         PackageDependency[] conflicts = pkg.getConflicts();
@@ -157,19 +129,18 @@ class NuxeoCUDFPackage {
         }
     }
 
-    private PackageDependency[] addToConflicts(PackageDependency[] conflicts,
-            String dep) {
+    private PackageDependency[] addToConflicts(PackageDependency[] conflicts, String dep) {
         PackageDependency[] withContentBrowser;
         if (conflicts != null && conflicts.length > 0) {
             withContentBrowser = Arrays.copyOf(conflicts, conflicts.length + 1);
         } else {
             withContentBrowser = new PackageDependency[1];
         }
-        withContentBrowser[withContentBrowser.length - 1] = new PackageDependency(
-                dep);
+        withContentBrowser[withContentBrowser.length - 1] = new PackageDependency(dep);
         return withContentBrowser;
     }
 
+    @Override
     public PackageDependency[] getProvides() {
         return pkg.getProvides();
     }

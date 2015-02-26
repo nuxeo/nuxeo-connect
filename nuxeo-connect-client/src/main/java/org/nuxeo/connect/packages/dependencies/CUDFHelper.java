@@ -18,6 +18,8 @@
 
 package org.nuxeo.connect.packages.dependencies;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -306,7 +310,7 @@ public class CUDFHelper {
         }
     }
 
-    private List<String> getInstalledSNAPSHOTPackages() {
+    protected List<String> getInstalledSNAPSHOTPackages() {
         List<String> installedSNAPSHOTPackages = new ArrayList<>();
         for (DownloadablePackage pkg : pm.listInstalledPackages()) {
             if (pkg.getVersion().isSnapshot()) {
@@ -359,21 +363,30 @@ public class CUDFHelper {
     public String getCUDFFile() throws DependencyException {
         StringBuilder sb = new StringBuilder();
         for (String cudfKey : CUDF2NuxeoMap.keySet()) {
-            NuxeoCUDFPackage cudfPackage = CUDF2NuxeoMap.get(cudfKey);
-            sb.append(cudfPackage.getCUDFStanza());
-            sb.append(NuxeoCUDFPackage.CUDF_DEPENDS + formatCUDF(cudfPackage.getDependencies(), false, true) + newLine);
-            // Add conflicts to other versions of the same package
-            String conflictsFormatted = formatCUDF(cudfPackage.getConflicts(), false, false);
-            conflictsFormatted += (conflictsFormatted.trim().length() > 0 ? ", " : "") + cudfPackage.getCUDFName()
-                    + " != " + cudfPackage.getCUDFVersion();
-            sb.append(NuxeoCUDFPackage.CUDF_CONFLICTS + conflictsFormatted + newLine);
-            sb.append(NuxeoCUDFPackage.CUDF_PROVIDES + formatCUDF(cudfPackage.getProvides(), false, false) + newLine);
-            sb.append(System.getProperty("line.separator"));
+            sb.append(formatCUDF(CUDF2NuxeoMap.get(cudfKey)));
+            sb.append(newLine);
         }
         return sb.toString();
     }
 
-    private String formatCUDF(PackageDependency[] dependencies, boolean failOnError, boolean warnOnError)
+    /**
+     * @return A string representation of a {@link NuxeoCUDFPackage}
+     * @since 1.4.20
+     */
+    public String formatCUDF(NuxeoCUDFPackage cudfPackage) throws DependencyException {
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append(cudfPackage.getCUDFStanza());
+        sb2.append(CUDFPackage.TAG_DEPENDS + formatCUDFDeps(cudfPackage.getDependencies(), false, true) + newLine);
+        // Add conflicts to other versions of the same package
+        String conflictsFormatted = formatCUDFDeps(cudfPackage.getConflicts(), false, false);
+        conflictsFormatted += (conflictsFormatted.trim().length() > 0 ? ", " : "") + cudfPackage.getCUDFName() + " != "
+                + cudfPackage.getCUDFVersion();
+        sb2.append(CUDFPackage.TAG_CONFLICTS + conflictsFormatted + newLine);
+        sb2.append(CUDFPackage.TAG_PROVIDES + formatCUDFDeps(cudfPackage.getProvides(), false, false) + newLine);
+        return sb2.toString();
+    }
+
+    protected String formatCUDFDeps(PackageDependency[] dependencies, boolean failOnError, boolean warnOnError)
             throws DependencyException {
         if (dependencies == null) {
             return "";
@@ -398,13 +411,13 @@ public class CUDFHelper {
             if (versionRange.getMinVersion() == null) {
                 cudfMinVersion = -1;
             } else {
-                NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
+                CUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
                 cudfMinVersion = (cudfPackage == null) ? -1 : cudfPackage.getCUDFVersion();
             }
             if (versionRange.getMaxVersion() == null) {
                 cudfMaxVersion = -1;
             } else {
-                NuxeoCUDFPackage cudfPackage = versionsMap.get(versionRange.getMaxVersion());
+                CUDFPackage cudfPackage = versionsMap.get(versionRange.getMaxVersion());
                 cudfMaxVersion = (cudfPackage == null) ? -1 : cudfPackage.getCUDFVersion();
             }
             if (cudfMinVersion == cudfMaxVersion) {
@@ -430,6 +443,162 @@ public class CUDFHelper {
     }
 
     /**
+     * Parse a CUDF universe string
+     *
+     * @param reader
+     * @return The CUDF universe as a map of {@link NuxeoCUDFPackageDescription} per CUDF unique ID
+     *         (pkgName-pkgCUDFVersion). The map uses the natural ordering of its keys.
+     * @throws IOException
+     * @throws DependencyException
+     * @since 1.4.20
+     * @see #getCUDFFile()
+     * @see #formatCUDF(NuxeoCUDFPackage)
+     */
+    public Map<String, NuxeoCUDFPackageDescription> parseCUDFFile(BufferedReader reader) throws IOException,
+            DependencyException {
+        Map<String, NuxeoCUDFPackageDescription> map = new TreeMap<>();
+        NuxeoCUDFPackageDescription nuxeoCUDFPkgDesc = null;
+        Pattern linePattern = Pattern.compile(CUDFPackage.LINE_PATTERN);
+
+        while (reader.ready()) {
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+            line = line.trim();
+            log.debug("Parsing line >> " + line);
+            if (line.trim().isEmpty()) {
+                if (nuxeoCUDFPkgDesc == null) {
+                    throw new DependencyException("Invalid CUDF file starting with an empty line");
+                }
+                map.put(nuxeoCUDFPkgDesc.getCUDFName() + "-" + nuxeoCUDFPkgDesc.getCUDFVersion(), nuxeoCUDFPkgDesc);
+                nuxeoCUDFPkgDesc = null;
+            } else {
+                Matcher m = linePattern.matcher(line);
+                if (!m.matches()) {
+                    throw new DependencyException("Invalid CUDF line: " + line);
+                }
+                String tag = m.group(1);
+                if (tag.endsWith(":")) {
+                    tag += " ";
+                }
+                String value = m.group(2);
+                if (nuxeoCUDFPkgDesc == null) {
+                    if (!CUDFPackage.TAG_PACKAGE.equals(tag)) {
+                        throw new DependencyException("Invalid CUDF file not starting with " + CUDFPackage.TAG_PACKAGE);
+                    }
+                    nuxeoCUDFPkgDesc = new NuxeoCUDFPackageDescription();
+                    nuxeoCUDFPkgDesc.setCUDFName(value);
+                    continue;
+                }
+                switch (tag) {
+                case CUDFPackage.TAG_VERSION:
+                    nuxeoCUDFPkgDesc.setCUDFVersion(Integer.parseInt(value));
+                    break;
+                case CUDFPackage.TAG_INSTALLED:
+                    nuxeoCUDFPkgDesc.setInstalled(Boolean.parseBoolean(value));
+                    break;
+                case CUDFPackage.TAG_DEPENDS:
+                    nuxeoCUDFPkgDesc.setDependencies(parseCUDFDeps(value));
+                    break;
+                case CUDFPackage.TAG_CONFLICTS:
+                    nuxeoCUDFPkgDesc.setConflicts(parseCUDFDeps(value));
+                    break;
+                case CUDFPackage.TAG_PROVIDES:
+                    nuxeoCUDFPkgDesc.setProvides(parseCUDFDeps(value));
+                    break;
+                case CUDFPackage.TAG_REQUEST:
+                case CUDFPackage.TAG_INSTALL:
+                case CUDFPackage.TAG_REMOVE:
+                case CUDFPackage.TAG_UPGRADE:
+                    log.debug("Ignore request stanza " + line);
+                    break;
+                case CUDFPackage.TAG_PACKAGE:
+                default:
+                    throw new DependencyException("Invalid CUDF line: " + line);
+                }
+            }
+        }
+        if (nuxeoCUDFPkgDesc != null) { // CUDF file without newline at end of file
+            map.put(nuxeoCUDFPkgDesc.getCUDFName() + "-" + nuxeoCUDFPkgDesc.getCUDFVersion(), nuxeoCUDFPkgDesc);
+        }
+        return map;
+    }
+
+    /**
+     * @param value CUDF dependencies
+     * @return An array of {@link PackageDependency}
+     * @throws DependencyException In case of parsing issue
+     * @since 1.4.20
+     * @see CUDFPackage#TAG_DEPENDS
+     * @see CUDFPackage#TAG_CONFLICTS
+     * @see CUDFPackage#TAG_PROVIDES
+     * @see #formatCUDFDeps(PackageDependency[], boolean, boolean)
+     */
+    protected List<PackageDependency> parseCUDFDeps(String value) throws DependencyException {
+        // Map<Version, NuxeoCUDFPackage> versionsMap = nuxeo2CUDFMap.get(cudfName);
+        // CUDF2NuxeoMap.
+        Map<String, PackageDependency> deps = new HashMap<>();
+        if (value.trim().length() == 0) {
+            return new ArrayList<>(deps.values());
+        }
+        for (String pkgDep : value.split(",")) {
+            String[] split = pkgDep.trim().split("\\s");
+            if (split.length == 1) {
+                deps.put(pkgDep.trim(), new PackageDependency(pkgDep.trim()));
+                continue;
+            }
+            if (split.length != 3) {
+                throw new DependencyException("Invalid dependency value: " + value);
+            }
+            String name = split[0].trim();
+            String rel = split[1].trim();
+            Version version = new Version(split[2].trim());
+            PackageDependency previous = deps.get(name);
+            switch (rel) {
+            case "=":
+                if (previous != null) {
+                    throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
+                }
+                deps.put(name, new PackageDependency(name, version, version));
+                break;
+            case "<": // Not managed, let's consider it's "<="
+            case "<=":
+                if (previous == null) {
+                    deps.put(name, new PackageDependency(name, Version.ZERO, version));
+                } else {
+                    VersionRange versionRange = previous.getVersionRange();
+                    if (versionRange.getMaxVersion() != null) {
+                        throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
+                    }
+                    versionRange.setMaxVersion(version);
+                }
+                break;
+            case ">": // Not managed, let's consider it's ">="
+            case ">=":
+                if (previous == null) {
+                    deps.put(name, new PackageDependency(name, version));
+                } else {
+                    VersionRange versionRange = previous.getVersionRange();
+                    if (versionRange.getMinVersion() != null) {
+                        throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
+                    }
+                    versionRange.setMinVersion(version);
+                }
+                break;
+
+            case "!=": // Not managed, ignore
+                break;
+
+            default:
+                throw new DependencyException("Invalid dependency value: " + value);
+            }
+
+        }
+        return new ArrayList<>(deps.values());
+    }
+
+    /**
      * @param pkgInstall
      * @param pkgRemove
      * @param pkgUpgrade
@@ -440,10 +609,10 @@ public class CUDFHelper {
             PackageDependency[] pkgUpgrade) throws DependencyException {
         initMapping(pkgInstall, pkgRemove, pkgUpgrade);
         StringBuilder sb = new StringBuilder(getCUDFFile());
-        sb.append(NuxeoCUDFPackage.CUDF_REQUEST + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_INSTALL + formatCUDF(pkgInstall, true, true) + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_REMOVE + formatCUDF(pkgRemove, true, true) + newLine);
-        sb.append(NuxeoCUDFPackage.CUDF_UPGRADE + formatCUDF(pkgUpgrade, true, true) + newLine);
+        sb.append(CUDFPackage.TAG_REQUEST + newLine);
+        sb.append(CUDFPackage.TAG_INSTALL + formatCUDFDeps(pkgInstall, true, true) + newLine);
+        sb.append(CUDFPackage.TAG_REMOVE + formatCUDFDeps(pkgRemove, true, true) + newLine);
+        sb.append(CUDFPackage.TAG_UPGRADE + formatCUDFDeps(pkgUpgrade, true, true) + newLine);
         return sb.toString();
     }
 
@@ -482,7 +651,7 @@ public class CUDFHelper {
      * @param details
      * @param solution
      */
-    private void completeResolution(DependencyResolution res, Map<Criteria, List<String>> details,
+    protected void completeResolution(DependencyResolution res, Map<Criteria, List<String>> details,
             Collection<InstallableUnit> solution) {
         // Complete with removals
         for (String pkgName : details.get(Criteria.REMOVED)) {

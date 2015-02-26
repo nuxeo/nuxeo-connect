@@ -69,9 +69,9 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
                 + resolution.getDownloadPackageIds() + "\n");
         assertEquals("There must be five packages to download and install", 5,
                 resolution.getDownloadPackageIds().size());
-        assertEquals(
+        assertTrue(resolution.getDownloadPackageIds().containsAll(
                 Arrays.asList(new String[] { "DM-5.4.0.1-HF02-1.0.7", "DM-5.4.0.1-HF04-1.0.0", "DM-5.4.0.1-HF06-1.0.0",
-                        "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", }), resolution.getDownloadPackageIds());
+                        "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", })));
         log.info("Dependencies that are already installed on your instance and won't be changed: resolution.getUnchangedPackageIds()\n"
                 + resolution.getUnchangedPackageIds() + "\n");
         assertEquals("There must be one unchanged package", 1, resolution.getUnchangedPackageIds().size());

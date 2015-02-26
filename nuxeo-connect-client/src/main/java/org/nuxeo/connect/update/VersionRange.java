@@ -49,13 +49,26 @@ public class VersionRange {
     }
 
     public VersionRange(Version minVersion, Version maxVersion) {
-        this.minVersion = minVersion == null && maxVersion != null ? Version.ZERO
-                : minVersion;
+        this.minVersion = minVersion == null && maxVersion != null ? Version.ZERO : minVersion;
         this.maxVersion = maxVersion;
+    }
+
+    /**
+     * @since 1.4.20
+     */
+    public void setMinVersion(Version minVersion) {
+        this.minVersion = minVersion;
     }
 
     public Version getMinVersion() {
         return minVersion;
+    }
+
+    /**
+     * @since 1.4.20
+     */
+    public void setMaxVersion(Version maxVersion) {
+        this.maxVersion = maxVersion;
     }
 
     public Version getMaxVersion() {
@@ -68,8 +81,7 @@ public class VersionRange {
         }
         if (minVersion != null) {
             if (maxVersion != null) { // check range
-                return version.greaterOrEqualThan(minVersion)
-                        && version.lessOrEqualsThan(maxVersion);
+                return version.greaterOrEqualThan(minVersion) && version.lessOrEqualsThan(maxVersion);
             } else { // max version is null
                 return version.greaterOrEqualThan(minVersion);
             }

@@ -27,6 +27,10 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
@@ -81,6 +85,7 @@
                   <exclude>commons-io:commons-io</exclude>
                   <exclude>commons-codec:commons-codec</exclude>
                   <exclude>commons-logging:commons-logging</exclude>
+                  <exclude>commons-lang:commons-lang</exclude>
                   <exclude>logkit:logkit</exclude>
                   <exclude>avalon-framework:avalon-framework</exclude>
                   <exclude>log4j:log4j</exclude>
