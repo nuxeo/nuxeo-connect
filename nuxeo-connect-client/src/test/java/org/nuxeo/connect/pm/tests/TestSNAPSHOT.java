@@ -118,11 +118,11 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         depResolution = pm.resolveDependencies(null, uninstalls, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
         assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getLocalPackagesToRemove().size());
-        assertEquals(0, depResolution.getNewPackagesToDownload().size());
+        assertEquals(1, depResolution.getNewPackagesToDownload().size());
     }
 
     public void testCWithoutSNAPSHOT() throws Exception {
