@@ -124,6 +124,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             FileUtils.deleteQuietly(cacheFile);
         }
         FileUtils.deleteQuietly(getCacheFileFor(null));
+        FileUtils.deleteQuietly(getCacheFileFor(STUDIO_REGISTERED_CACHE_SUFFIX));
     }
 
     protected ConnectServerResponse execCall(String url) throws ConnectServerError {
