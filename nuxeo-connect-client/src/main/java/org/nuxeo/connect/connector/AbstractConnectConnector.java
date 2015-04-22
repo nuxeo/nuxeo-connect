@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -64,6 +63,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     public static final String GET_DOWNLOAD_SUFFIX = "getDownload";
 
     public static final String GET_STATUS_SUFFIX = "status";
+
+    public static final String GET_CURRENT_PACKAGE = "getCurrentStudioPackage";
 
     public static final String NUXEO_TMP_DIR_PROPERTY = "nuxeo.tmp.dir";
 
@@ -287,4 +288,24 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         return Boolean.parseBoolean(NuxeoConnectClient.getProperty(CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
 
+    public DownloadablePackage getCurrentStudioPackage() throws ConnectServerError {
+        if (!isConnectServerReachable()) {
+            return null;
+        }
+
+        String url = getBaseUrl() + GET_CURRENT_PACKAGE;
+        ConnectServerResponse response = execCall(url);
+        String json = response.getString();
+        response.release();
+        DownloadablePackage result = null;
+
+        try {
+            JSONObject ob = new JSONObject(json);
+            result = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob);
+        } catch (JSONException e) {
+            throw new ConnectServerError("Unable to parse response", e);
+        }
+
+        return result;
+    }
 }

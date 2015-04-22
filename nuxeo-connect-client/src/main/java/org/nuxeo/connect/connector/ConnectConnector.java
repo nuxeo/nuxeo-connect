@@ -51,4 +51,11 @@ public interface ConnectConnector {
      */
     List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
 
+    /**
+     * The current Studio package for the registered user.
+     *
+     * @since 1.4.21
+     */
+    DownloadablePackage getCurrentStudioPackage() throws ConnectServerError;
+
 }

@@ -517,4 +517,11 @@ public interface PackageManager extends BasePackageManager {
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep);
 
+    /**
+     * Get the current studio package for the registered user.
+     *
+     * @since 1.4.21
+     */
+    DownloadablePackage getCurrentUserStudioPackage();
+
 }

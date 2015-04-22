@@ -1011,4 +1011,20 @@ public class PackageManagerImpl implements PackageManager {
         return false;
     }
 
+    @Override
+    public DownloadablePackage getCurrentUserStudioPackage() {
+        // Check all remote sources and return the first package with the given id
+        DownloadablePackage currentStudioPackage = null;
+
+        for (PackageSource remoteSource : remoteSources) {
+            DownloadablePackage pkg = ((RemotePackageSource) remoteSource).getCurrentStudioPackage();
+            if (pkg != null) {
+                currentStudioPackage = pkg;
+                break;
+            }
+        }
+
+        return currentStudioPackage;
+    }
+
 }

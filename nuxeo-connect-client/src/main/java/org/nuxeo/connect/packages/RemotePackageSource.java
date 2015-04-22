@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -139,6 +138,26 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
                 }
             }
         }
+        return result;
+    }
+
+    /**
+     * Use the ConnectGateway in order to get the DownloadablePackage object corresponding to the current studio package
+     * of the registered Connect user.
+     *
+     * @since 1.4.21
+     */
+    public DownloadablePackage getCurrentStudioPackage() {
+        DownloadablePackage result = null;
+
+        try {
+            ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+            result = crs.getConnector().getCurrentStudioPackage();
+        } catch (ConnectServerError e) {
+            log.debug(e, e);
+            log.warn("Unable to fetch current Studio package: " + e.getMessage());
+        }
+
         return result;
     }
 
