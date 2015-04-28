@@ -16,6 +16,7 @@
  */
 package org.nuxeo.connect.update;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -55,6 +56,8 @@ public class Version implements Comparable<Version> {
 
     public final static Version ZERO = new Version(0);
 
+    public final static Pattern VERSION_PATTERN = Pattern.compile("([0-9]+)(\\.[0-9]+)?(\\.[0-9]+)?");
+
     /**
      * @since 1.4.4
      */
@@ -86,29 +89,34 @@ public class Version implements Comparable<Version> {
     protected boolean snapshot = false;
 
     public Version(String version) {
-        int i = version.indexOf(SNAPSHOT);
-        if (i > 0) {
-            version = version.substring(0, i);
-            snapshot = true;
-        }
-        int p = version.lastIndexOf('-');
-        if (p > 0) { // classifier found
-            classifier = version.substring(p + 1);
-            version = version.substring(0, p);
-            specialClassifier = SPECIAL_CLASSIFIER.matcher(classifier).matches();
-        }
-        p = version.indexOf('.', 0);
-        if (p > -1) {
-            major = Integer.parseInt(version.substring(0, p));
-            int q = version.indexOf('.', p + 1);
-            if (q > -1) {
-                minor = Integer.parseInt(version.substring(p + 1, q));
-                patch = Integer.parseInt(version.substring(q + 1));
-            } else {
-                minor = Integer.parseInt(version.substring(p + 1));
+        // Get the versionNumber
+        Matcher versionMatcher = VERSION_PATTERN.matcher(version);
+        if (versionMatcher.find()) {
+            String versionNumber = versionMatcher.group();
+            // Get the details of the version number
+            Pattern digitVersion = Pattern.compile("[0-9]+");
+            versionMatcher = digitVersion.matcher(versionNumber);
+            if (versionMatcher.find()) {
+                major = Integer.parseInt(versionMatcher.group());
+                if (versionMatcher.find()) {
+                    minor = Integer.parseInt(versionMatcher.group());
+                    if (versionMatcher.find()) {
+                        patch = Integer.parseInt(versionMatcher.group());
+                    }
+                }
             }
-        } else {
-            major = Integer.parseInt(version);
+
+            // Get the classifier, if any
+            String versionClassifier = version.substring(versionNumber.length());
+            // Determine if it's a SNAPSHOT version
+            if (versionClassifier.contains(SNAPSHOT)) {
+                snapshot = true;
+                versionClassifier = versionClassifier.replaceFirst(SNAPSHOT, "");
+            }
+            if (versionClassifier != null && !versionClassifier.isEmpty()) { // classifier found
+                classifier = versionClassifier.substring(1);
+                specialClassifier = SPECIAL_CLASSIFIER.matcher(classifier).matches();
+            }
         }
     }
 
@@ -230,15 +238,16 @@ public class Version implements Comparable<Version> {
 
     @Override
     public String toString() {
-        String v;
-        if (classifier == null) {
-            v = major + "." + minor + "." + patch;
-        } else {
-            v = major + "." + minor + "." + patch + "-" + classifier;
+        String v = major + "." + minor + "." + patch;
+
+        if (classifier != null) {
+            v = v + "-" + classifier;
         }
+
         if (isSnapshot()) {
             v = v + SNAPSHOT;
         }
+
         return v;
     }
 
