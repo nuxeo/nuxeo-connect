@@ -27,9 +27,7 @@ import org.nuxeo.connect.update.Version;
 public class TestVersions extends TestCase {
 
     public void testVersions() {
-        assertEquals(-1,
-                new Version("5.2.1-RC1").compareTo(new Version("5.2.1")));
-
+        assertEquals(-1, new Version("5.2.1-RC1").compareTo(new Version("5.2.1")));
         List<Version> versions = new ArrayList<Version>();
         versions.add(new Version("5"));
         versions.add(new Version("5.0"));
@@ -70,5 +68,29 @@ public class TestVersions extends TestCase {
         expectedOrder.add(new Version("5.2.1-SNAPSHOT"));
         expectedOrder.add(new Version("5.2.1"));
         assertEquals(expectedOrder, versions);
+    }
+
+    public void testParsingVersions() {
+        // Reference version for the test
+        Version versionRef = new Version(7, 3, 12, "BETA");
+        versionRef.setSnapshot(true);
+
+        // Test with the "-SNAPSHOT" at the end
+        Version version1 = new Version("7.3.12-BETA-SNAPSHOT");
+        assertEquals(versionRef, version1);
+        assertEquals(7, version1.major());
+        assertEquals(3, version1.minor());
+        assertEquals(12, version1.patch());
+        assertEquals("BETA", version1.classifier());
+        assertTrue(version1.isSnapshot());
+        assertTrue(version1.isSpecialClassifier());
+
+        // Test with the "-SNAPSHOT" after the version
+        Version version2 = new Version("7.3.12-SNAPSHOT-BETA");
+        assertEquals(versionRef, version1);
+        assertEquals(version1, version2);
+        assertEquals("BETA", version2.classifier());
+        assertTrue(version2.isSnapshot());
+        assertTrue(version2.isSpecialClassifier());
     }
 }
