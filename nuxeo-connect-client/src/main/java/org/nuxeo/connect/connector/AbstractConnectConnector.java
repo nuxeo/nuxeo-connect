@@ -210,9 +210,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         // Try reading from the cache first
         List<DownloadablePackage> result = readCacheFile(fileSuffix);
         if (result != null) {
+            log.debug("Using cache for " + fileSuffix);
             return result;
         }
-
+        log.debug("Cache empty or expired for " + fileSuffix + ". Sending request to " + getBaseUrl());
         // Fallback on the real source
         String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + urlSuffix;
         ConnectServerResponse response = execCall(url);
@@ -260,7 +261,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }
         File cacheFile = getCacheFileFor(suffix);
-        if (!cacheFile.exists() || ((new Date().getTime() - cacheFile.lastModified()) < cacheMaxAge)) {
+        if (!cacheFile.exists() || ((new Date().getTime() - cacheFile.lastModified()) > cacheMaxAge)) {
             return null;
         }
         try {

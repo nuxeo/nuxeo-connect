@@ -3,7 +3,7 @@
 
   <groupId>org.nuxeo.connect</groupId>
   <artifactId>nuxeo-connect-client-parent</artifactId>
-  <version>1.4.20</version>
+  <version>1.4.20-NXBT-918</version>
   <packaging>pom</packaging>
   <name>Nuxeo Connect Client Parent</name>
   <description>Nuxeo Connect Client Parent</description>
