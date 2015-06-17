@@ -60,12 +60,13 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
 
     @Override
     public List<DownloadablePackage> listStudioPackages() {
+        List<DownloadablePackage> result = new ArrayList<>();
         if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistred()) {
             log.info("Server is not registered");
-            return new ArrayList<>();
+            return result;
         }
-        List<DownloadablePackage> result = cache.getFromCache(PackageListCache.STUDIO_REGISTERED_KEY);
-        if (result != null) {
+        result = cache.getFromCache(PackageListCache.STUDIO_REGISTERED_KEY);
+        if (!result.isEmpty()) {
             return result;
         }
         try {
@@ -86,7 +87,7 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
             return listPackages();
         }
         List<DownloadablePackage> result = cache.getFromCache(type.toString());
-        if (result != null) {
+        if (!result.isEmpty()) {
             return result;
         }
         try {

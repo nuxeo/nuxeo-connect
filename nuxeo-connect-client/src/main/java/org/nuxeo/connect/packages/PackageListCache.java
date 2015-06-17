@@ -57,7 +57,7 @@ public class PackageListCache {
     public void add(DownloadablePackage pkg) {
         PackageListCacheEntry packageListCacheEntry = cache.get(pkg.getType().toString());
         if (packageListCacheEntry == null) {
-            packageListCacheEntry = new PackageListCacheEntry(new ArrayList<DownloadablePackage>());
+            packageListCacheEntry = new PackageListCacheEntry();
             cache.put(pkg.getType().toString(), packageListCacheEntry);
         }
         packageListCacheEntry.getPackages().add(pkg);
@@ -65,12 +65,12 @@ public class PackageListCache {
     }
 
     /**
-     * @return null if no entry in cache or if entry is expired
+     * @return an empty list if no entry in cache or if entry is expired
      */
     public List<DownloadablePackage> getFromCache(String type) {
         PackageListCacheEntry entry = cache.get(type);
         if (entry == null || isExpired(entry)) {
-            return null;
+            return new ArrayList<>();
         }
         return entry.getPackages();
     }

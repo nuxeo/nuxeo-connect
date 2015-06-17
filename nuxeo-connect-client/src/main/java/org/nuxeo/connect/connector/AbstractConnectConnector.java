@@ -203,13 +203,14 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     }
 
     protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
+        List<DownloadablePackage> result = new ArrayList<>();
         if (!isConnectServerReachable()) {
-            return new ArrayList<>();
+            return result;
         }
 
         // Try reading from the cache first
-        List<DownloadablePackage> result = readCacheFile(fileSuffix);
-        if (result != null) {
+        result = readCacheFile(fileSuffix);
+        if (!result.isEmpty()) {
             log.debug("Using cache for " + fileSuffix);
             return result;
         }
@@ -220,7 +221,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         String json = response.getString();
         response.release();
         try {
-            result = new ArrayList<>();
             JSONArray array = new JSONArray(json);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject ob = (JSONObject) array.get(i);
@@ -235,7 +235,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     }
 
     /**
-     * @param suffix Usually {@link PackageType#toString()}
+     * @param type Usually {@link PackageType#toString()}
      * @param json String JSON representation of list of {@link DownloadablePackage}
      * @since 1.4.19
      * @see PackageDescriptor
@@ -255,6 +255,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      * @see PackageListCache In-memory cache PackageListCache
      */
     public List<DownloadablePackage> readCacheFile(String suffix) {
+        List<DownloadablePackage> result = new ArrayList<>();
         long cacheMaxAge = Long.parseLong(NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY,
                 DEFAULT_CACHE_TIME_MINUTES)) * 60 * 1000;
         if (suffix == null || PackageType.getByValue(suffix) == PackageType.STUDIO) {
@@ -262,17 +263,15 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
         File cacheFile = getCacheFileFor(suffix);
         if (!cacheFile.exists() || ((new Date().getTime() - cacheFile.lastModified()) > cacheMaxAge)) {
-            return null;
+            return result;
         }
         try {
             String json = FileUtils.readFileToString(cacheFile);
             JSONArray array = new JSONArray(json);
-            List<DownloadablePackage> result = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
                 JSONObject ob = (JSONObject) array.get(i);
                 result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
             }
-            return result;
         } catch (IOException e) {
             // Issue reading the file
             log.debug(e.getMessage(), e);
@@ -280,7 +279,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             // Issue parsing the file
             log.debug(e.getMessage(), e);
         }
-        return null;
+        return result;
     }
 
     protected boolean isConnectServerReachable() {

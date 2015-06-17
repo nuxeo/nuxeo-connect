@@ -48,6 +48,7 @@ public interface PackageSource {
     DownloadablePackage getPackageById(String packageId);
 
     /**
+     * @param packageName Must not be null
      * @since 1.4.18
      */
     Collection<? extends DownloadablePackage> listPackagesByName(String packageName);

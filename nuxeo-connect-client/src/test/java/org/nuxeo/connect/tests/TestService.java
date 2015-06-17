@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,6 +31,7 @@ import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.packages.PackageSource;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.MockPackageUpdateService;
 
@@ -93,6 +94,11 @@ public class TestService extends TestCase {
     public void testPackageManagerSimple() throws Exception {
         PackageManager pm = NuxeoConnectClient.getPackageManager();
         assertNotNull(pm);
+        for (PackageSource packageSource : pm.getAllSources()) {
+            assertNotNull(packageSource.listPackages());
+            assertNotNull(packageSource.listPackages(null));
+            assertNotNull(packageSource.listStudioPackages());
+        }
 
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
         crs.localRegisterInstance("toto--titi", "my test server");

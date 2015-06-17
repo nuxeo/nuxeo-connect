@@ -517,4 +517,9 @@ public interface PackageManager extends BasePackageManager {
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep);
 
+    /**
+     * @since public since 1.4.21, was protected before that
+     */
+    List<PackageSource> getAllSources();
+
 }

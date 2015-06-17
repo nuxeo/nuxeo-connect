@@ -17,6 +17,7 @@
 
 package org.nuxeo.connect.pm.tests;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -25,7 +26,7 @@ import org.nuxeo.connect.packages.PackageSource;
 
 public class DummyPackageSource extends AbstractPackageSource implements PackageSource {
 
-    protected List<DownloadablePackage> pkgs;
+    protected List<DownloadablePackage> pkgs = new ArrayList<>();
 
     /**
      * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List)}

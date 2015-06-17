@@ -74,7 +74,8 @@ public class PackageManagerImpl implements PackageManager {
 
     protected DependencyResolver resolver;
 
-    protected List<PackageSource> getAllSources() {
+    @Override
+    public List<PackageSource> getAllSources() {
         List<PackageSource> allSources = new ArrayList<>();
         allSources.addAll(remoteSources);
         allSources.addAll(localSources);
