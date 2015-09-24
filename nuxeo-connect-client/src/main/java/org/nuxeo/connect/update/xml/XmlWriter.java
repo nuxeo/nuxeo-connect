@@ -16,6 +16,8 @@
  */
 package org.nuxeo.connect.update.xml;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
@@ -100,7 +102,7 @@ public class XmlWriter {
 
     public final void attr(String name, String value) {
         if (value != null) {
-            sb.append(" ").append(name).append("=\"").append(value).append("\"");
+            sb.append(" ").append(name).append("=\"").append(StringEscapeUtils.escapeXml(value)).append("\"");
         }
     }
 
@@ -110,8 +112,14 @@ public class XmlWriter {
 
     public void element(String name, String value) {
         if (value != null) {
-            sb.append(indent).append('<').append(name).append('>').append(value).append(
-                    "</").append(name).append(">\n");
+            sb.append(indent)
+              .append('<')
+              .append(name)
+              .append('>')
+              .append(StringEscapeUtils.escapeXml(value))
+              .append("</")
+              .append(name)
+              .append(">\n");
         }
     }
 
