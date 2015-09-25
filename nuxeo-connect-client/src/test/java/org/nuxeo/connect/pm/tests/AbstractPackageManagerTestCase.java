@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
+import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
@@ -80,25 +81,25 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
     }
 
-    protected static List<DownloadablePackage> getDownloads(String filename)
-            throws IOException, JSONException {
+    protected static List<DownloadablePackage> getDownloads(String filename) throws IOException, JSONException {
         return getDownloads(filename, false);
     }
 
     /**
+     * @param filename
+     * @param isLocal
      * @throws IOException
      * @throws JSONException
      * @since 1.4.13
      */
-    protected static List<DownloadablePackage> getDownloads(String filename,
-            boolean isLocal) throws IOException, JSONException {
+    protected static List<DownloadablePackage> getDownloads(String filename, boolean isLocal) throws IOException,
+            JSONException {
         List<DownloadablePackage> result = new ArrayList<>();
-        InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(
-                TEST_DATA + filename);
+        InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(TEST_DATA + filename);
         List<String> lines = readLines(is);
         for (String data : lines) {
-            PackageDescriptor pkg = PackageDescriptor.loadFromJSON(
-                    PackageDescriptor.class, new JSONObject(data));
+            PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, new JSONObject(
+                    data));
             if (isLocal) {
                 pkg.setLocal(true);
             }

@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.data;
@@ -32,7 +31,7 @@ import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 /**
  * Base class for Data Transfer Object used for the communication between Nuxeo Connect Client and Server.
  * <p>
- * => mainly helpers for JSON marshaling / unmarshaling
+ * Mainly helpers for JSON marshaling / unmarshaling
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -67,18 +66,18 @@ public abstract class AbstractJSONSerializableData {
 
     protected static Object doLoadFromJSON(JSONObject data, Class<?> klass, Object instance) throws JSONException {
 
-        if (klass.getSuperclass()!=null) {
+        if (klass.getSuperclass() != null) {
             instance = doLoadFromJSON(data, klass.getSuperclass(), instance);
         }
 
-        List<String> fieldNames = new ArrayList<String>();
+        List<String> fieldNames = new ArrayList<>();
         for (Method method : instance.getClass().getDeclaredMethods()) {
-            if (method.getAnnotation(JSONImportMethod.class)!=null) {
+            if (method.getAnnotation(JSONImportMethod.class) != null) {
                 try {
                     String name = method.getAnnotation(JSONImportMethod.class).name();
                     fieldNames.add(name);
                     Object value = data.get(name);
-                    method.invoke(instance, new Object[]{value});
+                    method.invoke(instance, new Object[] { value });
                 } catch (Exception e) {
                     // NOP
                 }
@@ -86,7 +85,7 @@ public abstract class AbstractJSONSerializableData {
         }
 
         for (Field field : instance.getClass().getDeclaredFields()) {
-            if (field.getAnnotation(JSONExportableField.class)!=null && (!fieldNames.contains(field.getName()))) {
+            if (field.getAnnotation(JSONExportableField.class) != null && (!fieldNames.contains(field.getName()))) {
                 try {
                     field.set(instance, data.get(field.getName()));
                 } catch (Exception e) {
@@ -101,7 +100,7 @@ public abstract class AbstractJSONSerializableData {
         try {
             return targetClass.cast(doLoadFromJSON(data, targetClass, targetClass.newInstance()));
         } catch (Exception e) {
-          throw new JSONException(e);
+            throw new JSONException(e);
         }
     }
 

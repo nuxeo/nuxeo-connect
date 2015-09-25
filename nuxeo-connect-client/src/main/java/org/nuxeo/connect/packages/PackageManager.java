@@ -372,7 +372,7 @@ public interface PackageManager extends BasePackageManager {
      * <ul>
      * <li>already installed version (means no upgrade and no download)</li>
      * <li>already downloaded version (means no download)</li>
-     * <li>remote versions sorted by version number (higher => last)</li>
+     * <li>remote versions sorted by version number (higher comes last)</li>
      * </ul>
      *
      * @param pkgName
@@ -415,7 +415,9 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all {@link Package} versions for a given name and {@link VersionRange}
      *
-     * @param packageName
+     * @param pkgName
+     * @param range
+     * @param targetPlatform
      * @since 1.4
      */
     List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform);

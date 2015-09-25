@@ -53,7 +53,7 @@ class NuxeoCUDFPackage implements CUDFPackage {
     }
 
     /**
-     * @param remotePackage
+     * @param pkg
      * @since 1.4.11
      */
     public void setPkg(DownloadablePackage pkg) {
@@ -150,7 +150,7 @@ class NuxeoCUDFPackage implements CUDFPackage {
     }
 
     /**
-     * @param packageDependency
+     * @param dependency
      */
     public static String getCUDFName(PackageDependency dependency) {
         // NXP-9268: Workaround for nuxeo-content-browser

@@ -27,13 +27,13 @@ import org.nuxeo.connect.update.PackageDependency;
  * In every such scenario there exists a package universe (i.e. a set of packages) known to a package manager
  * application, a package status (i.e. the currently installed packages), and a user request (i.e. a wish to change the
  * set of installed packages) that need to be fulfilled.
+ * </p>
  * <ul>
  * <li>CUDF permits to describe an upgrade scenario in a way that is both distribution-independent and
  * package-manager-independent</li>
  * <li>CUDF offers a rigorous semantics of dependency solving that enables to independently check the correctness of
  * upgrade solutions proposed by package managers.</li>
  * </ul>
- * </p>
  * See <a href="http://www.mancoosi.org/cudf/">http://www.mancoosi.org/cudf/</a>
  *
  * @since 1.4.20

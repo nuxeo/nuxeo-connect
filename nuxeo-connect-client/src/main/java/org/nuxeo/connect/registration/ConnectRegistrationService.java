@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *
- * $Id$
  */
 
 package org.nuxeo.connect.registration;
@@ -30,7 +29,6 @@ import org.nuxeo.connect.identity.LogicalInstanceIdentifier.InvalidCLID;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 
 /**
- *
  * Interface for Nuxeo Connect Registration
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
@@ -39,50 +37,37 @@ public interface ConnectRegistrationService {
 
     /**
      * get the Technical Identifier for the current Nuxeo Instance
-     *
      */
     TechnicalInstanceIdentifier getCTID();
 
     /**
      * get the Logical Instance identifier
-     *
      */
     LogicalInstanceIdentifier getCLID();
 
     /**
-     * Register locally an instance provided a CLID
-     *
-     * (Means user has registered it's instance against Connect Web site and has
-     * already obtained a CLID)
-     *
-     * => can be used if local instance has no access to Internet
+     * Register locally an instance provided a CLID (means user has registered his instance against NOS Web site and has
+     * already obtained a CLID): can be used if local instance has no access to Internet
      *
      * @param strCLID
      * @param description
      * @throws InvalidCLID
      * @throws IOException
      */
-    void localRegisterInstance(String strCLID, String description)
-            throws InvalidCLID, IOException;
+    void localRegisterInstance(String strCLID, String description) throws InvalidCLID, IOException;
 
     /**
-     *
-     * Ask Connect server for projects where current user is a contact
-     * Returns projects that can be used to register instance
-     *
+     * Ask Connect server for projects where current user is a contact Returns projects that can be used to register
+     * instance
      *
      * @param login
      * @param password
-     *
      * @throws Exception
      */
-    List<ConnectProject> getAvailableProjectsForRegistration(String login,
-            String password) throws Exception;
+    List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) throws Exception;
 
     /**
-     * Let Nuxeo client do all the registration process
-     *
-     * (Requires the local instance to have Internet access)
+     * Let Nuxeo client do all the registration process (Requires the local instance to have Internet access)
      *
      * @param login
      * @param password
@@ -91,18 +76,16 @@ public interface ConnectRegistrationService {
      * @param description
      * @throws Exception
      */
-    void remoteRegisterInstance(String login, String password, String prjId,
-            NuxeoClientInstanceType type, String description) throws Exception;
+    void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
+            String description) throws Exception;
 
     /**
      * Gives instance registration status
-     *
      */
     boolean isInstanceRegistred();
 
     /**
      * return the connector to access connect remote services
-     *
      */
     ConnectConnector getConnector();
 }

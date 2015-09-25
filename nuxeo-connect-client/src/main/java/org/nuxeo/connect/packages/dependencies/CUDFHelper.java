@@ -62,7 +62,8 @@ public class CUDFHelper {
      * methods.
      *
      * @since 1.4.13
-     * @see #initMapping(boolean)
+     * @see #initMapping(PackageDependency[], PackageDependency[], PackageDependency[])
+     * @see #setAllowSNAPSHOT(boolean)
      */
     public static boolean defaultAllowSNAPSHOT = false;
 
@@ -100,8 +101,6 @@ public class CUDFHelper {
 
     /**
      * Map "name, version-classifier" to "name-classifier, version" (with -SNAPSHOT being a specific case)
-     *
-     * @param packagesInRequest
      */
     public void initMapping() {
         initMapping(null, null, null);
@@ -645,7 +644,7 @@ public class CUDFHelper {
     }
 
     /**
-     * TODO NXP-9268 should use results from {@value Criteria#NOTUPTODATE} and {@link Criteria#RECOMMENDED}
+     * TODO NXP-9268 should use results from {@link Criteria#NOTUPTODATE} and {@link Criteria#RECOMMENDED}
      *
      * @param res
      * @param details
