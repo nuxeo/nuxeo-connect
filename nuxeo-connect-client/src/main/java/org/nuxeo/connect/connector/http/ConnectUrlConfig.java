@@ -90,6 +90,10 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_UNREGISTERED_ROOT_PATH = "unregistered/";
 
+    public static final String STUDIO_BASEURL = "studio/ide";
+
+    public static final String STUDIO_PROJECT_PARAMETER = "project";
+
     public static String getBaseUrl() {
         if (NuxeoConnectClient.isTestModeSet()) {
             return "http://127.0.0.1:8082/";
@@ -97,6 +101,20 @@ public class ConnectUrlConfig {
             return NuxeoConnectClient.getProperty(CONNECT_URL_PROPERTY,
                     CONNECT_DEFAULT_BASEURL);
         }
+    }
+
+    /**
+     * @since 1.4.24
+     */
+    public static String getStudioUrl() {
+        return getBaseUrl() + STUDIO_BASEURL;
+    }
+
+    /**
+     * @since 1.4.24
+     */
+    public static String getStudioUrl(String projectId) {
+        return getStudioUrl() + String.format("?%s=%s", STUDIO_PROJECT_PARAMETER, projectId);
     }
 
     public static String getDownloadBaseUrl() {
