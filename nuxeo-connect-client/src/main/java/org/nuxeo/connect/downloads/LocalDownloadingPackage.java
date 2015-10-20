@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,11 +55,27 @@ import org.nuxeo.connect.update.PackageUpdateService;
  */
 public class LocalDownloadingPackage extends PackageDescriptor implements DownloadingPackage, Runnable {
 
+    /**
+     * Timeout until a connection is established
+     *
+     * @since 1.4.24
+     */
+    public static final int CONNECTION_TIMEOUT_MS = 30000; // 10s
+
+    /**
+     * Timeout for waiting for data
+     *
+     * @since 1.4.24
+     */
+    public static final int SO_TIMEOUT_MS = 120000; // 120s
+
     protected static final Log log = LogFactory.getLog(LocalDownloadingPackage.class);
 
     protected File file = null;
 
     private boolean completed = false;
+
+    private boolean serverError = false;
 
     public LocalDownloadingPackage(PackageDescriptor descriptor) {
         super(descriptor);
@@ -110,7 +127,9 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
     public void run() {
         setPackageState(PackageState.REMOTE);
         HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
+        HttpConnectionManagerParams httpParams = httpClient.getHttpConnectionManager().getParams();
+        httpParams.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
+        httpParams.setSoTimeout(SO_TIMEOUT_MS);
         ProxyHelper.configureProxyIfNeeded(httpClient, sourceUrl);
         HttpMethod method = new GetMethod(sourceUrl);
         method.setFollowRedirects(true);
@@ -145,9 +164,15 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
             case HttpStatus.SC_UNAUTHORIZED:
                 throw new ConnectServerError(String.format("Registration required (%s).", rc));
             default:
+                serverError = true;
                 throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
             }
-        } catch (ConnectServerError | IOException e) {
+        } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException
+            serverError = true;
+            setPackageState(PackageState.REMOTE);
+            log.debug(e, e);
+            errorMessage = e.getMessage();
+        } catch (ConnectServerError e) {
             setPackageState(PackageState.REMOTE);
             log.debug(e, e);
             errorMessage = e.getMessage();
@@ -174,6 +199,11 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
     @Override
     public boolean isCompleted() {
         return completed;
+    }
+
+    @Override
+    public boolean isServerError() {
+        return serverError;
     }
 
 }

@@ -121,7 +121,7 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
                 pkg = crs.getConnector().getDownload(packageId);
             } catch (ConnectServerError e) {
                 log.debug(e, e);
-                log.warn("Unable to fetch remote package '" + packageId + "': " + e.getMessage());
+                log.warn("Unable to fetch remote package with ID '" + packageId + "': " + e.getMessage());
             }
             if (pkg != null) {
                 cache.add(pkg);
