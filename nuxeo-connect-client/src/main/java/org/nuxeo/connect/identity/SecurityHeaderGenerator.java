@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,8 +28,7 @@ import org.nuxeo.connect.connector.ConnectSecurityError;
 import org.nuxeo.connect.connector.ProtocolConst;
 
 /**
- * Helper to generate Security Header when communication with Nuxeo Connect
- * Server.
+ * Helper to generate Security Header when communication with Nuxeo Connect Server.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -56,9 +55,7 @@ public class SecurityHeaderGenerator {
      * @since 1.4.24
      */
     public static Map<String, String> getRegisteredHeaders(LogicalInstanceIdentifier logicalIdentifier,
-                                                           TechnicalInstanceIdentifier technicalIdentifier)
-            throws ConnectSecurityError {
-
+            TechnicalInstanceIdentifier technicalIdentifier) throws ConnectSecurityError {
         String CLID1;
         String CLID2;
         String CTID;
@@ -106,7 +103,7 @@ public class SecurityHeaderGenerator {
      * @since 1.4
      */
     public static Map<String, String> getAnonymousHeaders() {
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(ProtocolConst.VERSION_HEADER, NuxeoConnectClient.getVersion());
         return headers;
     }
