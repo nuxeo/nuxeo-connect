@@ -39,12 +39,7 @@ public class SecurityHeaderGenerator {
     public static Map<String, String> getHeaders() throws ConnectSecurityError {
         Map<String, String> headers;
         if (LogicalInstanceIdentifier.isRegistered()) {
-            try {
-                headers = getRegisteredHeaders(LogicalInstanceIdentifier.instance(),
-                        TechnicalInstanceIdentifier.instance());
-            } catch (LogicalInstanceIdentifier.NoCLID e) {
-                throw new ConnectSecurityError("Unable to construct Security Headers", e);
-            }
+            headers = getRegisteredHeaders();
         } else {
             headers = getAnonymousHeaders();
         }
@@ -81,15 +76,10 @@ public class SecurityHeaderGenerator {
     }
 
     /**
-     * Preferably use {@link #getHeaders()} or {@link #getRegisteredHeaders(LogicalInstanceIdentifier logicalIdentifier,
-     *      TechnicalInstanceIdentifier technicalIdentifier)}
-     *
      * @since 1.4
-     * @deprecated
+     * @see #getRegisteredHeaders(LogicalInstanceIdentifier, TechnicalInstanceIdentifier)
      */
-    public static Map<String, String> getRegisteredHeaders()
-            throws ConnectSecurityError {
-
+    protected static Map<String, String> getRegisteredHeaders() throws ConnectSecurityError {
         try {
             return getRegisteredHeaders(LogicalInstanceIdentifier.instance(), TechnicalInstanceIdentifier.instance());
         } catch (LogicalInstanceIdentifier.NoCLID e) {
