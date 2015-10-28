@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -23,21 +23,25 @@ import org.apache.commons.io.IOCase;
 import org.nuxeo.connect.update.Package;
 
 /**
- *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
- *
  */
 public class TargetPlatformFilterHelper {
 
-    public static boolean isCompatibleWithTargetPlatform(Package pkg,
-            String targetPlatform) {
-        if (targetPlatform == null || pkg.getTargetPlatforms() == null
-                || pkg.getTargetPlatforms().length == 0) {
+    public static boolean isCompatibleWithTargetPlatform(Package pkg, String targetPlatform) {
+        return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+    }
+
+    /**
+     * @param targetPlatforms The target platforms on which to check compliance.
+     * @param targetPlatform The target platform to match with.
+     * @since 1.4.24
+     */
+    public static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
+        if (targetPlatform == null || targetPlatforms == null || targetPlatforms.length == 0) {
             return true;
         }
-        for (String target : pkg.getTargetPlatforms()) {
-            if (FilenameUtils.wildcardMatch(targetPlatform, target,
-                    IOCase.INSENSITIVE)) {
+        for (String target : targetPlatforms) {
+            if (FilenameUtils.wildcardMatch(targetPlatform, target, IOCase.INSENSITIVE)) {
                 return true;
             }
         }
