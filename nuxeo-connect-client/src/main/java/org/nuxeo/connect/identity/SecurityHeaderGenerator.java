@@ -19,6 +19,7 @@
 package org.nuxeo.connect.identity;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,12 @@ public class SecurityHeaderGenerator {
     public static Map<String, String> getHeaders() throws ConnectSecurityError {
         Map<String, String> headers;
         if (LogicalInstanceIdentifier.isRegistered()) {
-            headers = getRegisteredHeaders();
+            try {
+                headers = getRegisteredHeaders(LogicalInstanceIdentifier.instance(),
+                        TechnicalInstanceIdentifier.instance());
+            } catch (LogicalInstanceIdentifier.NoCLID e) {
+                throw new ConnectSecurityError("Unable to construct Security Headers", e);
+            }
         } else {
             headers = getAnonymousHeaders();
         }
@@ -47,12 +53,12 @@ public class SecurityHeaderGenerator {
     }
 
     /**
-     * Preferably use {@link #getHeaders()}
-     *
-     * @since 1.4
+     * @since 1.4.24
      */
-    protected static Map<String, String> getRegisteredHeaders()
+    public static Map<String, String> getRegisteredHeaders(LogicalInstanceIdentifier logicalIdentifier,
+                                                           TechnicalInstanceIdentifier technicalIdentifier)
             throws ConnectSecurityError {
+
         String CLID1;
         String CLID2;
         String CTID;
@@ -60,16 +66,14 @@ public class SecurityHeaderGenerator {
         String digest;
         Map<String, String> headers = getAnonymousHeaders();
         try {
-            CLID1 = LogicalInstanceIdentifier.instance().getCLID1();
-            CLID2 = LogicalInstanceIdentifier.instance().getCLID2();
-            CTID = TechnicalInstanceIdentifier.instance().getCTID();
+            CLID1 = logicalIdentifier.getCLID1();
+            CLID2 = logicalIdentifier.getCLID2();
+            CTID = technicalIdentifier.getCTID();
             TS = "" + System.currentTimeMillis();
             String toDigest = CLID2 + CTID + TS;
-            digest = Base64.encodeBytes(MessageDigest.getInstance(HASH_METHOD).digest(
-                    toDigest.getBytes()));
-        } catch (Exception e) {
-            throw new ConnectSecurityError(
-                    "Unable to construct Security Headers", e);
+            digest = Base64.encodeBytes(MessageDigest.getInstance(HASH_METHOD).digest(toDigest.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new ConnectSecurityError("Unable to construct Security Headers", e);
         }
         headers.put(ProtocolConst.CLID_HEADER, CLID1);
         headers.put(ProtocolConst.CTID_HEADER, CTID);
@@ -80,14 +84,30 @@ public class SecurityHeaderGenerator {
     }
 
     /**
+     * Preferably use {@link #getHeaders()} or {@link #getRegisteredHeaders(LogicalInstanceIdentifier logicalIdentifier,
+     *      TechnicalInstanceIdentifier technicalIdentifier)}
+     *
+     * @since 1.4
+     * @deprecated
+     */
+    public static Map<String, String> getRegisteredHeaders()
+            throws ConnectSecurityError {
+
+        try {
+            return getRegisteredHeaders(LogicalInstanceIdentifier.instance(), TechnicalInstanceIdentifier.instance());
+        } catch (LogicalInstanceIdentifier.NoCLID e) {
+            throw new ConnectSecurityError("Unable to construct Security Headers", e);
+        }
+    }
+
+    /**
      * Preferably use {@link #getHeaders()}
      *
      * @since 1.4
      */
-    protected static Map<String, String> getAnonymousHeaders() {
+    public static Map<String, String> getAnonymousHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put(ProtocolConst.VERSION_HEADER,
-                NuxeoConnectClient.getVersion());
+        headers.put(ProtocolConst.VERSION_HEADER, NuxeoConnectClient.getVersion());
         return headers;
     }
 
