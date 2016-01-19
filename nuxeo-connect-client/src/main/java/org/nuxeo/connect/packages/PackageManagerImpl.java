@@ -70,6 +70,10 @@ public class PackageManagerImpl implements PackageManager {
 
     protected List<String> sourcesNames = new ArrayList<>();
 
+    /**
+     * @deprecated Since 1.4.25. Unused.
+     */
+    @Deprecated
     protected Map<String, DownloadablePackage> cachedPackageList = null;
 
     protected DependencyResolver resolver;
@@ -585,10 +589,18 @@ public class PackageManagerImpl implements PackageManager {
         }
     }
 
+    /**
+     * @deprecated Since 1.4.25. Unused.
+     */
+    @Deprecated
     protected void invalidateCache() {
         cachedPackageList = null;
     }
 
+    /**
+     * @deprecated Since 1.4.25. Unused.
+     */
+    @Deprecated
     protected Map<String, DownloadablePackage> getCachedPackageList() {
         if (cachedPackageList == null) {
             cachedPackageList = new HashMap<>();
