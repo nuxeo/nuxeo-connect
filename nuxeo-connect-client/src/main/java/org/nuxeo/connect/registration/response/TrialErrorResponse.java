@@ -25,7 +25,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.omg.CORBA.UNKNOWN;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
