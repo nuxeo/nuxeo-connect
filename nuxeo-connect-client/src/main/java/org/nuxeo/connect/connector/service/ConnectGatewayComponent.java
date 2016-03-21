@@ -20,6 +20,7 @@ package org.nuxeo.connect.connector.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
@@ -33,7 +34,11 @@ import org.nuxeo.connect.identity.LogicalInstanceIdentifier.InvalidCLID;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier.NoCLID;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
+import org.nuxeo.connect.registration.RegistrationException;
 import org.nuxeo.connect.registration.RegistrationHelper;
+import org.nuxeo.connect.registration.response.TrialErrorResponse;
+import org.nuxeo.connect.registration.response.TrialRegistrationResponse;
+import org.nuxeo.connect.registration.response.TrialSuccessResponse;
 
 /**
  * Implementation of the {@link ConnectRegistrationService} Also provides access to {@link ConnectConnector} and
@@ -117,6 +122,23 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         if (strCLID != null) {
             localRegisterInstance(strCLID, description);
         }
+    }
+
+    @Override
+    public void remoteTrialInstanceRegistration(Map<String, String> parameters) throws RegistrationException,
+            IOException, InvalidCLID {
+        // If no login; replace it with email
+        if (!parameters.containsKey("login")) {
+            parameters.put("login", parameters.get("email"));
+        }
+
+        TrialRegistrationResponse res = RegistrationHelper.remoteTrialInstanceRegistration(parameters);
+        if (res.isError()) {
+            throw new RegistrationException((TrialErrorResponse) res);
+        }
+
+        TrialSuccessResponse ss = (TrialSuccessResponse) res;
+        localRegisterInstance(ss.getToken().get("CLID"), "");
     }
 
 }

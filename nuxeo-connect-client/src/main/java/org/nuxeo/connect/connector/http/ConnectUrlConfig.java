@@ -86,6 +86,8 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_ROOT_PATH = "connect-gateway/";
 
+    public static final String CONNECT_TRIAL_PATH = "connect/ioTrial/";
+
     public static final String CONNECT_REGISTERED_ROOT_PATH = "registred/";
 
     public static final String CONNECT_UNREGISTERED_ROOT_PATH = "unregistered/";
@@ -123,6 +125,13 @@ public class ConnectUrlConfig {
 
     public static String getRegistrationBaseUrl() {
         return getBaseUrl() + CONNECT_ROOT_PATH;
+    }
+
+    /**
+     * @since 1.4.25
+     */
+    public static String getTrialRegistrationBaseUrl() {
+        return getBaseUrl() + CONNECT_TRIAL_PATH;
     }
 
     /**

@@ -17,9 +17,13 @@
  */
 package org.nuxeo.connect.registration;
 
+import static org.nuxeo.connect.connector.http.ConnectUrlConfig.getTrialRegistrationBaseUrl;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -41,6 +45,8 @@ import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
+import org.nuxeo.connect.registration.response.TrialErrorResponse;
+import org.nuxeo.connect.registration.response.TrialRegistrationResponse;
 
 /**
  * Helper to manage Registration to Nuxeo Connect.
@@ -59,24 +65,34 @@ public class RegistrationHelper {
         return ConnectUrlConfig.getRegistrationBaseUrl();
     }
 
+    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "password",
+            "password_verif", "email", "login", "connectreg:projectName");
+
     protected static void configureHttpClient(HttpClient httpClient,
             String url, String login, String password) {
         // Configure BA to access Connect for registration
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
                 10000);
-        httpClient.getParams().setAuthenticationPreemptive(true);
-        Credentials ba = new UsernamePasswordCredentials(login, password);
-        httpClient.getState().setCredentials(
-                new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+        if (login != null) {
+            httpClient.getParams().setAuthenticationPreemptive(true);
+            Credentials ba = new UsernamePasswordCredentials(login, password);
+            httpClient.getState().setCredentials(
+                    new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+        }
         // Configure the http proxy if needed
         ProxyHelper.configureProxyIfNeeded(httpClient, url);
+    }
+
+    protected static HttpClient newHttpClient(String url, String login, String password) {
+        HttpClient httpClient = new HttpClient();
+        configureHttpClient(httpClient, url, login, password);
+        return httpClient;
     }
 
     public static List<ConnectProject> getAvailableProjectsForRegistration(
             String login, String password) {
         String url = getBaseUrl() + GET_PROJECTS_SUFFIX;
-        HttpClient httpClient = new HttpClient();
-        configureHttpClient(httpClient, url, login, password);
+        HttpClient httpClient = newHttpClient(url, login, password);
         HttpMethod method = new GetMethod(url);
         List<ConnectProject> result = new ArrayList<>();
         try {
@@ -102,8 +118,7 @@ public class RegistrationHelper {
             String prjId, NuxeoClientInstanceType type, String description)
             throws Exception {
         String url = getBaseUrl() + POST_REGISTER_SUFFIX;
-        HttpClient httpClient = new HttpClient();
-        configureHttpClient(httpClient, url, login, password);
+        HttpClient httpClient = newHttpClient(url, login, password);
         PostMethod method = new PostMethod(url);
         NameValuePair project = new NameValuePair("projectId", prjId);
         NameValuePair desc = new NameValuePair("description", description);
@@ -123,5 +138,43 @@ public class RegistrationHelper {
             method.releaseConnection();
         }
         return null;
+    }
+
+    /**
+     * @since 1.4.25
+     */
+    public static TrialRegistrationResponse remoteTrialInstanceRegistration(Map<String, String> parameters) {
+        String url = getTrialRegistrationBaseUrl() + "submit?embedded=true";
+        PostMethod method = new PostMethod(url);
+        List<NameValuePair> nvp = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            if (!ALLOWED_TRIAL_FIELDS.contains(entry.getKey())) {
+                log.debug("Skipped field: " + entry.getKey() + " (" + entry.getValue() + ")");
+                continue;
+            }
+            nvp.add(new NameValuePair(entry.getKey(), entry.getValue()));
+        }
+
+        method.setRequestBody(nvp.toArray(new NameValuePair[nvp.size()]));
+        HttpClient httpClient = newHttpClient(url, null, null);
+        try {
+            int rc = httpClient.executeMethod(method);
+            log.debug("Registration response code: " + rc);
+
+            String body = method.getResponseBodyAsString();
+            if (rc == HttpStatus.SC_OK) {
+                return TrialRegistrationResponse.read(body);
+            } else if (rc == HttpStatus.SC_BAD_REQUEST) {
+                return TrialRegistrationResponse.read(body);
+            } else {
+                log.error("Unhandled response code: " + rc);
+            }
+        } catch (IOException e) {
+            log.debug(e, e);
+        } finally {
+            method.releaseConnection();
+        }
+        return TrialErrorResponse.UNKNOWN();
     }
 }

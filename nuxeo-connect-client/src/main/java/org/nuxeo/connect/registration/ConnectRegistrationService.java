@@ -20,6 +20,7 @@ package org.nuxeo.connect.registration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
@@ -83,6 +84,16 @@ public interface ConnectRegistrationService {
      * Gives instance registration status
      */
     boolean isInstanceRegistred();
+
+    /**
+     * Call Connect to register a new instance with a new trial user. The CLID is pregenerated from Connect.
+     *
+     * @param properties needed properties: termsAndConditions, company, password, password_verif, email, login and
+     *            connectreg:projectName
+     * @throws RegistrationException In case something went wrong, a RegistrationException is thrown with information
+     *             returned from the server
+     */
+    void remoteTrialInstanceRegistration(Map<String, String> properties) throws RegistrationException, IOException, InvalidCLID;
 
     /**
      * return the connector to access connect remote services
