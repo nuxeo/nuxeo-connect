@@ -92,6 +92,7 @@ public interface ConnectRegistrationService {
      *            connectreg:projectName
      * @throws RegistrationException In case something went wrong, a RegistrationException is thrown with information
      *             returned from the server
+     * @since 1.4.25
      */
     void remoteTrialInstanceRegistration(Map<String, String> properties) throws RegistrationException, IOException, InvalidCLID;
 
