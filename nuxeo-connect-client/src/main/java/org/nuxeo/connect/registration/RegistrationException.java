@@ -36,6 +36,16 @@ public class RegistrationException extends Exception {
         this.error = error;
     }
 
+    public RegistrationException(String message) {
+        super(message);
+        this.error = TrialErrorResponse.UNKNOWN();
+    }
+
+    public RegistrationException(Throwable e) {
+        super(e);
+        this.error = TrialErrorResponse.UNKNOWN();
+    }
+
     public List<TrialErrorResponse.Error> getErrors() {
         return error.getErrors();
     }

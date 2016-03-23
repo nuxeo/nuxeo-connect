@@ -126,7 +126,7 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
 
     @Override
     public void remoteTrialInstanceRegistration(Map<String, String> parameters) throws RegistrationException,
-            IOException, InvalidCLID {
+            IOException {
         // If no login; replace it with email
         if (!parameters.containsKey("login")) {
             parameters.put("login", parameters.get("email"));
@@ -138,7 +138,11 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         }
 
         TrialSuccessResponse ss = (TrialSuccessResponse) res;
-        localRegisterInstance(ss.getToken().get("CLID"), "");
+        try {
+            localRegisterInstance(ss.getToken().get("CLID"), "");
+        } catch (InvalidCLID e) {
+            throw new RegistrationException(e);
+        }
     }
 
 }
