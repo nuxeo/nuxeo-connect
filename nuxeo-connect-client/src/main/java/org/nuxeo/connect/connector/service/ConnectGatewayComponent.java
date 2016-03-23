@@ -111,13 +111,13 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
     }
 
     @Override
-    public List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) throws Exception {
+    public List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) {
         return RegistrationHelper.getAvailableProjectsForRegistration(login, password);
     }
 
     @Override
     public void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
-            String description) throws Exception {
+            String description) throws IOException, InvalidCLID {
         String strCLID = RegistrationHelper.remoteRegisterInstance(login, password, prjId, type, description);
         if (strCLID != null) {
             localRegisterInstance(strCLID, description);

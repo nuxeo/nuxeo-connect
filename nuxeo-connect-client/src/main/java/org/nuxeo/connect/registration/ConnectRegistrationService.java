@@ -63,9 +63,8 @@ public interface ConnectRegistrationService {
      *
      * @param login
      * @param password
-     * @throws Exception
      */
-    List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) throws Exception;
+    List<ConnectProject> getAvailableProjectsForRegistration(String login, String password);
 
     /**
      * Let Nuxeo client do all the registration process (Requires the local instance to have Internet access)
@@ -75,10 +74,9 @@ public interface ConnectRegistrationService {
      * @param prjId
      * @param type
      * @param description
-     * @throws Exception
      */
     void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
-            String description) throws Exception;
+            String description) throws IOException, InvalidCLID;
 
     /**
      * Gives instance registration status

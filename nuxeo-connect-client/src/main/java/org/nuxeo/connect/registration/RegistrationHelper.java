@@ -115,8 +115,7 @@ public class RegistrationHelper {
     }
 
     public static String remoteRegisterInstance(String login, String password,
-            String prjId, NuxeoClientInstanceType type, String description)
-            throws Exception {
+            String prjId, NuxeoClientInstanceType type, String description) {
         String url = getBaseUrl() + POST_REGISTER_SUFFIX;
         HttpClient httpClient = newHttpClient(url, login, password);
         PostMethod method = new PostMethod(url);
