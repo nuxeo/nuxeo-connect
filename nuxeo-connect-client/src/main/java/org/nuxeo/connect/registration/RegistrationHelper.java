@@ -66,7 +66,7 @@ public class RegistrationHelper {
     }
 
     protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "password",
-            "password_verif", "email", "login", "connectreg:projectName");
+            "password_verif", "email", "login", "connectreg:projectName", "description");
 
     protected static void configureHttpClient(HttpClient httpClient,
             String url, String login, String password) {

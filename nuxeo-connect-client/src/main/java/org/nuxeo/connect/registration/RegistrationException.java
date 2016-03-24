@@ -29,6 +29,9 @@ import org.nuxeo.connect.registration.response.TrialErrorResponse;
  * @since 1.4.25
  */
 public class RegistrationException extends Exception {
+
+    private static final long serialVersionUID = -8586515796778400401L;
+
     private TrialErrorResponse error;
 
     public RegistrationException(TrialErrorResponse error) {

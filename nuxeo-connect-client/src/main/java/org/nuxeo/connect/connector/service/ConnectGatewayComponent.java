@@ -139,7 +139,7 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
 
         TrialSuccessResponse ss = (TrialSuccessResponse) res;
         try {
-            localRegisterInstance(ss.getToken().get("CLID"), "");
+            localRegisterInstance(ss.getToken().get("CLID"), parameters.get("description"));
         } catch (InvalidCLID e) {
             throw new RegistrationException(e);
         }
