@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  *
  */
 
@@ -37,21 +38,18 @@ import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
- * DTO implementation of the {@link DownloadablePackage} interface. Used to
- * transfer {@link Package} description between server and client.
+ * DTO implementation of the {@link DownloadablePackage} interface. Used to transfer {@link Package} description between
+ * server and client.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class PackageDescriptor extends AbstractJSONSerializableData implements
-        DownloadablePackage {
+public class PackageDescriptor extends AbstractJSONSerializableData implements DownloadablePackage {
 
     /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)}
-     *             instead.
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
      */
     @Deprecated
-    public static PackageDescriptor loadFromJSON(JSONObject json)
-            throws JSONException {
+    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
         return loadFromJSON(PackageDescriptor.class, json);
     }
 
@@ -59,8 +57,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
      */
     @Deprecated
-    public static PackageDescriptor loadFromJSON(String json)
-            throws JSONException {
+    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
         return loadFromJSON(new JSONObject(json));
     }
 
@@ -142,6 +139,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @JSONExportableField
     protected PackageVisibility visibility;
 
+    @JSONExportableField
+    protected boolean deprecated;
+
     private boolean local = false;
 
     public PackageDescriptor() {
@@ -153,26 +153,26 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      */
     public PackageDescriptor(Package descriptor) {
         super();
-        this.classifier = descriptor.getClassifier();
-        this.dependencies = descriptor.getDependencies();
-        this.conflicts = descriptor.getConflicts();
-        this.description = descriptor.getDescription();
-        this.homePage = descriptor.getHomePage();
-        this.license = descriptor.getLicenseType();
-        this.licenseUrl = descriptor.getLicenseUrl();
-        this.name = descriptor.getName();
-        this.productionState = descriptor.getProductionState();
-        this.provides = descriptor.getProvides();
-        this.packageState = descriptor.getPackageState();
-        this.targetPlatforms = descriptor.getTargetPlatforms();
-        this.title = descriptor.getTitle();
-        this.type = descriptor.getType();
-        this.vendor = descriptor.getVendor();
-        this.version = descriptor.getVersion();
-        this.visibility = descriptor.getVisibility();
-        this.nuxeoValidationState = descriptor.getValidationState();
-        this.supported = descriptor.isSupported();
-        this.supportsHotReload = descriptor.supportsHotReload();
+        classifier = descriptor.getClassifier();
+        dependencies = descriptor.getDependencies();
+        conflicts = descriptor.getConflicts();
+        description = descriptor.getDescription();
+        homePage = descriptor.getHomePage();
+        license = descriptor.getLicenseType();
+        licenseUrl = descriptor.getLicenseUrl();
+        name = descriptor.getName();
+        productionState = descriptor.getProductionState();
+        provides = descriptor.getProvides();
+        packageState = descriptor.getPackageState();
+        targetPlatforms = descriptor.getTargetPlatforms();
+        title = descriptor.getTitle();
+        type = descriptor.getType();
+        vendor = descriptor.getVendor();
+        version = descriptor.getVersion();
+        visibility = descriptor.getVisibility();
+        nuxeoValidationState = descriptor.getValidationState();
+        supported = descriptor.isSupported();
+        supportsHotReload = descriptor.supportsHotReload();
     }
 
     @Override
@@ -409,6 +409,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         return supported;
     }
 
+    @Override
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
     public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
@@ -471,8 +476,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         this.name = name;
     }
 
-    public void setNuxeoValidationState(
-            NuxeoValidationState nuxeoValidationState) {
+    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
         this.nuxeoValidationState = nuxeoValidationState;
     }
 
@@ -485,7 +489,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      * @since 1.4.17
      */
     public void setPackageState(PackageState state) {
-        this.packageState = state;
+        packageState = state;
     }
 
     /**
@@ -493,7 +497,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      */
     @JSONImportMethod(name = "state")
     public void setPackageState(int state) {
-        this.packageState = PackageState.getByValue(state);
+        packageState = PackageState.getByValue(state);
     }
 
     /**
@@ -547,12 +551,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     }
 
     /**
-     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)}
-     *             instead.
+     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
      */
     @Deprecated
     public void setState(int state) {
-        this.packageState = PackageState.getByValue(state);
+        packageState = PackageState.getByValue(state);
     }
 
     public void setSupported(boolean supported) {
@@ -624,6 +627,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
     @Override
     public String toString() {
         return getId();
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
 }

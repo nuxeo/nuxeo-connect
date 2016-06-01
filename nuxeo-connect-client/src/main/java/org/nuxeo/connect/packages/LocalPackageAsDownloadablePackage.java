@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2013 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages;
@@ -34,8 +35,7 @@ import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.model.Form;
 import org.nuxeo.connect.update.task.Task;
 
-public class LocalPackageAsDownloadablePackage implements LocalPackage,
-        DownloadablePackage {
+public class LocalPackageAsDownloadablePackage implements LocalPackage, DownloadablePackage {
 
     protected LocalPackage localPackage;
 
@@ -268,6 +268,11 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
     @Override
     public PackageVisibility getVisibility() {
         return localPackage.getVisibility();
+    }
+
+    @Override
+    public boolean isDeprecated() {
+        return localPackage.isDeprecated();
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  *
  */
 
@@ -55,8 +56,7 @@ public class TestSerialization extends TestCase {
         assertNotNull(json);
         log.info(json);
 
-        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(
-                SubscriptionStatus.class, json);
+        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
         assertNotNull(s2);
 
         assertEquals(status.getContractStatus(), s2.getContractStatus());
@@ -79,8 +79,7 @@ public class TestSerialization extends TestCase {
         p.setTitle("My Title");
         p.setType(PackageType.STUDIO);
         p.setVersion(new Version(1, 0, 2));
-        PackageDependency[] deps = {
-                new PackageDependency("my-package:1.1:1.2"),
+        PackageDependency[] deps = { new PackageDependency("my-package:1.1:1.2"),
                 new PackageDependency("my-package:2.0:2.2") };
         p.setDependencies(deps);
         p.setCommentsNumber(8);
@@ -92,13 +91,13 @@ public class TestSerialization extends TestCase {
         p.setProductionState(ProductionState.PRODUCTION_READY);
         p.setSupported(true);
         p.setSupportsHotReload(true);
+        p.setDeprecated(true);
 
         String json = p.serializeAsJSON();
         assertNotNull(json);
         log.info(json);
 
-        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(
-                PackageDescriptor.class, json);
+        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
         assertNotNull(p2);
         assertEquals(p.getHomePage(), p2.getHomePage());
         assertEquals(p.getDescription(), p2.getDescription());
@@ -118,10 +117,10 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getCommentsNumber(), p2.getCommentsNumber());
         assertEquals(PackageState.INSTALLED, p2.getPackageState());
         assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
-        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED,
-                p2.getValidationState());
+        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED, p2.getValidationState());
         assertEquals(true, p2.isSupported());
         assertEquals(true, p2.supportsHotReload());
+        assertEquals(true, p2.isDeprecated());
 
     }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Julien Carsique
+ *     Yannis JULIENNE
  *
  */
 
@@ -70,6 +71,8 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     public NuxeoValidationState validationState;
 
     public PackageVisibility visibility;
+
+    public boolean depreacted;
 
     public FakeDownloadablePackage(String name, Version version) {
         this.name = name;
@@ -234,6 +237,11 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     @Override
     public PackageVisibility getVisibility() {
         return visibility;
+    }
+
+    @Override
+    public boolean isDeprecated() {
+        return depreacted;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     bstefanescu, jcarsique
+ *     Yannis JULIENNE
  */
 package org.nuxeo.connect.update.model;
 
@@ -30,7 +31,6 @@ import org.nuxeo.connect.update.task.Task;
  * Describe a package.
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public interface PackageDefinition extends Package {
 
@@ -135,8 +135,7 @@ public interface PackageDefinition extends Package {
      *
      * @param platforms
      * @see #getPlatforms()
-     * @deprecated Since 1.4.5. Duplicates {@link #setTargetPlatforms(String[])}
-     *             .
+     * @deprecated Since 1.4.5. Duplicates {@link #setTargetPlatforms(String[])} .
      */
     @Deprecated
     void setPlatforms(String[] platforms);
@@ -174,9 +173,7 @@ public interface PackageDefinition extends Package {
     void setProvides(PackageDependency[] deps);
 
     /**
-     * Get the package installer definition.
-     *
-     * The installer is a class implementing {@link Task}. if not specified the
+     * Get the package installer definition. The installer is a class implementing {@link Task}. if not specified the
      * default implementation will be used
      *
      * @return the package installer. If not set null is returned.
@@ -192,10 +189,8 @@ public interface PackageDefinition extends Package {
     void setInstaller(TaskDefinition installer);
 
     /**
-     * Get the package uninstaller.
-     *
-     * The uninstaller is a class implementing {@link Task}. if not specified
-     * the default implementation will be used
+     * Get the package uninstaller. The uninstaller is a class implementing {@link Task}. if not specified the default
+     * implementation will be used
      *
      * @return the package uninstaller. If not set null is returned.
      */
@@ -210,11 +205,8 @@ public interface PackageDefinition extends Package {
     void setUninstaller(TaskDefinition uninstaller);
 
     /**
-     * Get the package validator. Validators can be used to test that an
-     * installation succeeded.
-     *
-     * The validator is a class implementing {@link Validator}. If not specified
-     * not post install validation will be done
+     * Get the package validator. Validators can be used to test that an installation succeeded. The validator is a
+     * class implementing {@link Validator}. If not specified not post install validation will be done
      *
      * @return the validator class name or null if none.
      */
@@ -230,13 +222,11 @@ public interface PackageDefinition extends Package {
 
     /**
      * Get an XML representation of this package definition.
-     *
      */
     public String toXML();
 
     /**
      * Test if terms and conditions should be accepted by user
-     *
      */
     public boolean requireTermsAndConditionsAcceptance();
 
@@ -263,12 +253,15 @@ public interface PackageDefinition extends Package {
     /**
      * @since 1.4
      */
-    void setRequireTermsAndConditionsAcceptance(
-            boolean requireTermsAndConditionsAcceptance);
+    void setRequireTermsAndConditionsAcceptance(boolean requireTermsAndConditionsAcceptance);
 
     /**
      * @since 1.4
      */
     void setVisibility(PackageVisibility visibility);
 
+    /**
+     * @since 1.4.25
+     */
+    void setDeprecated(boolean deprecated);
 }
