@@ -18,8 +18,13 @@
 
 package org.nuxeo.connect.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.mutable.MutableObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +49,12 @@ import org.nuxeo.connect.update.Version;
  */
 public class PackageDescriptor extends AbstractJSONSerializableData implements
         DownloadablePackage {
+
+    private static final String CAP_PREFIX = "cap-";
+
+    private static final String SERVER_PREFIX = "server-";
+
+    private static final String NUXEO_JSF_UI = "nuxeo-jsf-ui";
 
     /**
      * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)}
@@ -430,8 +441,27 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setConflicts(deps);
     }
 
+    /**
+     * Merges two arrays of package dependencies.
+     *
+     * @since 8.3
+     */
+    public static PackageDependency[] addPackageDependencies(PackageDependency[] dep1, PackageDependency[] dep2) {
+        if (dep1 == null) {
+            return dep2;
+        }
+        if (dep2 == null) {
+            return dep1;
+        }
+        // merge without duplicates
+        Set<PackageDependency> set = new LinkedHashSet<>();
+        set.addAll(Arrays.asList(dep1));
+        set.addAll(Arrays.asList(dep2));
+        return set.toArray(new PackageDependency[0]);
+    }
+
     public void setDependencies(PackageDependency[] dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies = addPackageDependencies(this.dependencies, dependencies);
     }
 
     @JSONImportMethod(name = "dependencies")
@@ -467,8 +497,30 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         local = isLocal;
     }
 
+    @JSONImportMethod(name = "name")
     public void setName(String name) {
         this.name = name;
+        dependencies = fixDependencies(name, dependencies);
+    }
+
+    /**
+     * If additional dependencies have already been set, check that we don't have ourselves in them.
+     *
+     * @since 8.3
+     */
+    public static PackageDependency[] fixDependencies(String name, PackageDependency[] dependencies) {
+        if (dependencies == null) {
+            return null;
+        }
+        for (PackageDependency dep : dependencies) {
+            if (dep.getName().equals(name)) {
+                // we have a dependency for ourselves. remove it.
+                List<PackageDependency> list = new ArrayList<>(Arrays.asList(dependencies));
+                list.remove(dep);
+                return list.toArray(new PackageDependency[0]);
+            }
+        }
+        return dependencies;
     }
 
     public void setNuxeoValidationState(
@@ -578,7 +630,49 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         for (int i = 0; i < array.length(); i++) {
             targets[i] = array.getString(i);
         }
-        targetPlatforms = targets;
+        MutableObject packageDependencies = new MutableObject();
+        targetPlatforms = fixTargetPlatforms(name, targets, packageDependencies);
+        setDependencies((PackageDependency[]) packageDependencies.getValue());
+    }
+
+    /**
+     * Returns a fixed list of target platforms and dependencies, to deal with backward compatibility.
+     *
+     * @param packageDependencies a PackageDependency[] return value
+     * @since 8.3
+     */
+    public static String[] fixTargetPlatforms(String name, String[] targets, MutableObject packageDependencies) {
+        List<String> serverTargets = new ArrayList<>();
+        List<String> newServerTargets = new ArrayList<>();
+        for (String target : targets) {
+            if (target.startsWith(SERVER_PREFIX)) {
+                serverTargets.add(target);
+            } else if (target.startsWith(CAP_PREFIX)) {
+                String newServerTarget = SERVER_PREFIX + target.substring(CAP_PREFIX.length());
+                newServerTargets.add(newServerTarget);
+            }
+        }
+        newServerTargets.removeAll(serverTargets);
+        if (!newServerTargets.isEmpty()) {
+            // BBB: if we have "cap" declared as a target platform,
+            // then also declare "server" with an added dependency on "nuxeo-jsf-ui"
+            List<String> list = new ArrayList<>(targets.length + newServerTargets.size());
+            list.addAll(Arrays.asList(targets));
+            if (!NUXEO_JSF_UI.equals(name)) {
+                // don't do if it's for nuxeo-jsf-ui itself, otherwise the cap compatibility version
+                // would be a candidate even on a server
+                list.addAll(newServerTargets);
+            }
+            targets = list.toArray(new String[0]);
+            // set additional dependency if it's not ourselves
+            // name may be null (not yet set), in which case the setter for name will clean up dependencies
+            if (NUXEO_JSF_UI.equals(name)) {
+                packageDependencies.setValue(null);
+            } else {
+                packageDependencies.setValue(new PackageDependency[] { new PackageDependency(NUXEO_JSF_UI) });
+            }
+        }
+        return targets;
     }
 
     public void setTitle(String title) {

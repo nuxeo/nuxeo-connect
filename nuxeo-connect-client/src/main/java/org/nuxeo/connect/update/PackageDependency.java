@@ -99,4 +99,21 @@ public class PackageDependency {
             return name + ':' + vr;
         }
     }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof PackageDependency)) {
+            return false;
+        }
+        return toString().equals(((PackageDependency) other).toString());
+    }
+
 }

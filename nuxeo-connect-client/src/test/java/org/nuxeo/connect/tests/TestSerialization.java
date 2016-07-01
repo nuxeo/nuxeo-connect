@@ -18,16 +18,21 @@
 
 package org.nuxeo.connect.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
-
+import org.junit.Test;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.PackageDescriptor;
@@ -39,10 +44,11 @@ import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
-public class TestSerialization extends TestCase {
+public class TestSerialization {
 
     private static final Log log = LogFactory.getLog(TestSerialization.class);
 
+    @Test
     public void testSerializeSubscriptionStatus() throws JSONException {
         SubscriptionStatus status = new SubscriptionStatus();
         status.setEndDate("25/11/2011");
@@ -66,7 +72,7 @@ public class TestSerialization extends TestCase {
         assertEquals(status.getInstanceType(), s2.getInstanceType());
     }
 
-    public void testSerializePackage() throws Exception {
+    protected void doTestSerializePackage(boolean cap) throws Exception {
         PackageDescriptor p = new PackageDescriptor();
         p.setClassifier("MyClassifier");
         p.setDescription("MyDescription");
@@ -75,6 +81,9 @@ public class TestSerialization extends TestCase {
         List<String> targets = new ArrayList<>();
         targets.add("5.3.0");
         targets.add("5.3.1");
+        if (cap) {
+            targets.add("cap-8.3");
+        }
         p.setTargetPlatforms(targets);
         p.setTitle("My Title");
         p.setType(PackageType.STUDIO);
@@ -107,11 +116,8 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getName(), p2.getName());
         assertEquals(p.getPackageState(), p2.getPackageState());
         assertEquals(p.getTitle(), p2.getTitle());
-        assertEquals(Arrays.asList(p.getTargetPlatforms()).toString(),
-                Arrays.asList(p2.getTargetPlatforms()).toString());
         assertEquals(p.getType(), p2.getType());
         assertEquals(p.getVersion(), p2.getVersion());
-        assertEquals(p.getDependenciesAsString(), p2.getDependenciesAsString());
         assertEquals(p.getDownloadsCount(), p2.getDownloadsCount());
         assertEquals(p.getRating(), p2.getRating());
         assertEquals(p.getPictureUrl(), p2.getPictureUrl());
@@ -122,6 +128,31 @@ public class TestSerialization extends TestCase {
                 p2.getValidationState());
         assertEquals(true, p2.isSupported());
         assertEquals(true, p2.supportsHotReload());
+        Set<String> expectedTargetPlatforms = new HashSet<>(Arrays.asList("5.3.0", "5.3.1"));
+        if (cap) {
+            expectedTargetPlatforms.add("cap-8.3");
+            expectedTargetPlatforms.add("server-8.3");
+        }
+        assertEquals(expectedTargetPlatforms, new HashSet<>(Arrays.asList(p2.getTargetPlatforms())));
+        Set<String> dependencies = new HashSet<>();
+        for (PackageDependency pd : p2.getDependencies()) {
+            dependencies.add(pd.toString());
+        }
+        Set<String> expectedDependencies = new HashSet<>(
+                Arrays.asList("my-package:1.1.0:1.2.0", "my-package:2.0.0:2.2.0"));
+        if (cap) {
+            expectedDependencies.add("nuxeo-jsf-ui");
+        }
+        assertEquals(expectedDependencies, dependencies);
+    }
 
+    @Test
+    public void testSerializePackage() throws Exception {
+        doTestSerializePackage(false);
+    }
+
+    @Test
+    public void testSerializePackageWithCap() throws Exception {
+        doTestSerializePackage(true);
     }
 }

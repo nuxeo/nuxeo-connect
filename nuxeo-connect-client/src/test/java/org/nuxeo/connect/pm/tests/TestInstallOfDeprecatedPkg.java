@@ -50,9 +50,10 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
                 null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(2, depResolution.getOrderedPackageIdsToInstall().size());
-        assertEquals("nuxeo-dm-5.6.0", depResolution.getOrderedPackageIdsToInstall().get(0));
-        assertEquals("nuxeo-poll-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(1));
+        assertEquals(3, depResolution.getOrderedPackageIdsToInstall().size());
+        assertEquals("nuxeo-jsf-ui-5.6.0-cap", depResolution.getOrderedPackageIdsToInstall().get(0));
+        assertEquals("nuxeo-dm-5.6.0", depResolution.getOrderedPackageIdsToInstall().get(1));
+        assertEquals("nuxeo-poll-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(2));
     }
 
     public void testTargetPlatforms() throws PackageException {
