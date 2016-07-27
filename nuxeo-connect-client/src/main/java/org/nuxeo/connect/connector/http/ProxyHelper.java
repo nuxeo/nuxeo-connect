@@ -23,8 +23,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.nuxeo.connect.connector.http.proxy.NashornProxyPacResolver;
 import org.nuxeo.connect.connector.http.proxy.ProxyPacResolver;
-import org.nuxeo.connect.connector.http.proxy.RhinoProxyPacResolver;
 
 /**
  * Helper class to handle the HTTP Configuration
@@ -36,7 +36,8 @@ public class ProxyHelper {
 
     protected static boolean useNTLM = false;
 
-    protected static ProxyPacResolver pacResolver = new RhinoProxyPacResolver();
+    // public for tests
+    public static ProxyPacResolver pacResolver = new NashornProxyPacResolver();
 
     protected static String PROXY_PAC_DIRECT = "DIRECT";
 

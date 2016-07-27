@@ -18,14 +18,15 @@
 
 package org.nuxeo.connect.connector.http.proxy;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.nuxeo.connect.connector.http.proxy.ProxyPacResolver.parseProxyInfos;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.nuxeo.connect.connector.http.ProxyHelper;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
@@ -35,7 +36,7 @@ public class TestProxyPacResolver {
 
     static final String PAC_FILE_KEY = "nuxeo.test.pac.fake.remote.file";
 
-    RhinoProxyPacResolver solver;
+    ProxyPacResolver solver;
 
     @BeforeClass
     public static void beforeClass() {
@@ -45,7 +46,7 @@ public class TestProxyPacResolver {
     @Before
     public void before() {
         System.clearProperty(PAC_FILE_KEY);
-        solver = new RhinoProxyPacResolver();
+        solver = ProxyHelper.pacResolver;
     }
 
     @Test

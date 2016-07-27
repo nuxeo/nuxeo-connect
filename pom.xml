@@ -83,11 +83,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>rhino</groupId>
-        <artifactId>js</artifactId>
-        <version>1.7R1</version>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.equinox</groupId>
         <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
         <version>1.17-NX</version>
@@ -291,7 +286,7 @@
                 <version>[3.1.1,)</version>
               </requireMavenVersion>
               <requireJavaVersion>
-                <version>[1.7,)</version>
+                <version>[1.8,)</version>
               </requireJavaVersion>
             </rules>
           </configuration>
@@ -339,8 +334,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -482,7 +477,7 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.5</version>
         <configuration>
-          <targetJdk>1.7</targetJdk>
+          <targetJdk>1.8</targetJdk>
         </configuration>
       </plugin>
       <!-- MCHECKSTYLE-287 -->
