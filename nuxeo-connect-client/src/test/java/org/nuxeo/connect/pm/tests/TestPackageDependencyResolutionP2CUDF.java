@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,7 @@
  *
  * Contributors:
  *     Julien Carsique
- *
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.pm.tests;
@@ -57,59 +57,67 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
         CUDFHelper.defaultAllowSNAPSHOT = false;
     }
 
+    // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0]
+    // {"version":"1.0.0","name":"C","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["D:1.0.0:2.0.0","B:1.0.0:1.1.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
+    // {"version":"1.0.0","name":"B","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":2,"type":"addon"}
+    // {"version":"1.1.0","name":"B","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":0,"type":"addon"}
+    // {"version":"1.1.0","name":"D","targetPlatforms":["5.3.0","5.3.1"],"dependencies":[],"state":0,"type":"addon"}
+    // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, C-1.0.0, D-1.1.0, EE-1.0.0, NXBT-654.1-1.0.0,
+    // NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testSimpleDeps() throws Exception {
         depResolution = pm.resolveDependencies("C-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(9, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(5, depResolution.getNewPackagesToDownload().size());
     }
 
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0]
     // {"version":"1.0.0","name":"E","dependencies":["EE:1.1.0:2.0.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0}
-    // After: [AA-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.1.0, E-1.0.0, EE-1.1.0, NXBT-654.1-1.0.1-SNAPSHOT,
-    // NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, Z1-2.0.0, Z2-2.0.0]
+    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, E-1.0.0, EE-1.1.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testSimpleUpgrade() throws Exception {
         depResolution = pm.resolveDependencies("E-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(7, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(7, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
     }
 
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0]
     // {"version":"1.0.0","name":"F","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["EE:1.1.0:2.0.0","C:1.0.0:1.1.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
-    // After: [AA-1.1.0, B-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.1.0, C-1.0.0, D-1.1.0, EE-1.1.0, F-1.0.0,
-    // NXBT-654.1-1.0.1-SNAPSHOT, NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, Z1-2.0.0, Z2-2.0.0]
+    // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, C-1.0.0, D-1.1.0, EE-1.1.0, F-1.0.0,
+    // NXBT-654.1-1.0.0, NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testDoubleDownload() throws Exception {
         depResolution = pm.resolveDependencies("F-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(10, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(7, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(7, depResolution.getNewPackagesToDownload().size());
     }
 
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0]
     // {"version":"1.0.0","name":"O","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["P:1.0.0:1.1.0","Q:1.0.0:1.1.1","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
-    // After: [AA-1.1.0, B-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.1.0, EE-1.1.0, NXBT-654.1-1.0.1-SNAPSHOT,
-    // NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, O-1.0.0, P-1.0.0, Q-1.0.0, R-1.2.0, Z1-2.0.0, Z2-2.0.0]
+    // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0, O-1.0.0, P-1.0.0, Q-1.0.0, R-1.2.0, Z1-2.0.0, Z2-2.0.0]
     public void test3LevelsDeps() throws Exception {
         depResolution = pm.resolveDependencies("O-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(11, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(7, depResolution.getNewPackagesToDownload().size());
     }
 
     /**
@@ -118,84 +126,103 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0]
     // {"version":"1.0","name":"NXBT-872","targetPlatforms":["6.0"],"dependencies":["NXBT-872-S1","NXBT-872-S2:2.0"],"state":2,"type":"addon"}
-    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.1-SNAPSHOT,
-    // NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, NXBT-872-1.0.0, NXBT-872-S1-1.2.0-SNAPSHOT,
-    // NXBT-872-S2-2.0.0]
+    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0, NXBT-872-1.0.0, NXBT-872-S1-1.2.0-SNAPSHOT, NXBT-872-S2-2.0.0]
     public void testStudioDeps() throws Exception {
         depResolution = pm.resolveDependencies("NXBT-872", "6.0");
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(4, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(3, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(5, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
         assertEquals(2, depResolution.getNewPackagesToDownload().size());
     }
 
     // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0]
     // {"version":"1.0.0","name":"CC","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["AA:1.1.0:1.2.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
-    // After: [AA-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.1.0, CC-1.0.0, EE-1.1.0, NXBT-654.1-1.0.1-SNAPSHOT,
-    // NXBT-654.2-1.0.1-SNAPSHOT, NXBT-654.3-1.0.2-SNAPSHOT, Z1-2.0.0, Z2-2.0.0]
+    // After: [AA-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.0.0, CC-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0,
+    // NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testDoubleUpgrade() throws Exception {
         depResolution = pm.resolveDependencies("CC-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(7, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(6, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(5, depResolution.getNewPackagesToDownload().size());
     }
 
+    // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0]
+    // {"version":"1.0.0","name":"X1","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["Y1:1.0.0:1.1.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
+    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0, X1-1.0.0, Y1-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testForceRemove() throws Exception {
         depResolution = pm.resolveDependencies("X1-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(8, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
+    // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0]
+    // {"version":"1.0.0","name":"X2","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["Y2:1.0.0:1.1.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
+    // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0, X2-1.0.0, Y2-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testForceUpgradeOverRemove() throws Exception {
         depResolution = pm.resolveDependencies("X2-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(8, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
+    // Before: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+    // NXBT-654.3-1.0.0]
+    // {"version":"1.0.0","name":"PF1","targetPlatforms":["5.3.0","5.3.1"],"dependencies":["PF2:1.0.0:2.0.0","NXBT-654.1","NXBT-654.2","NXBT-654.3"],"state":0,"type":"addon"}
     public void testPlatformFiltering() throws Exception {
         // test that Platform Filtering changes the resolution result
+        // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+        // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-2.0.0, Z1-2.0.0, Z2-2.0.0]
         depResolution = pm.resolveDependencies("PF1-1.0.0", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(8, depResolution.getNewPackagesToDownload().size());
-        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
-
-        depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.1");
-        log.info(depResolution.toString());
-        assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(8, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(new Version("2.0.0"), depResolution.getNewPackagesToDownload().get("PF2"));
 
+        // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+        // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-2.0.0, Z1-2.0.0, Z2-2.0.0]
+        depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.1");
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
+        assertEquals(new Version("2.0.0"), depResolution.getNewPackagesToDownload().get("PF2"));
+
+        // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
+        // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-1.0.0, Z1-2.0.0, Z2-2.0.0]
         depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.0");
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(3, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(7, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(8, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(8, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(4, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(new Version("1.0.0"), depResolution.getNewPackagesToDownload().get("PF2"));
 

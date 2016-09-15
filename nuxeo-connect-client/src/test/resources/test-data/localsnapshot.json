@@ -4,8 +4,8 @@
 {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
 {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
 {"version":"1.0.0","name":"B2","state":2,"type":"addon"}
-{"version":"1.0.1-SNAPSHOT","name":"B2","state":2,"type":"addon"}
-{"version":"1.0.2-SNAPSHOT","name":"B2","state":5,"type":"addon"}
+{"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
+{"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
 {"version":"1.0.0","name":"C","state":2,"type":"addon"}
 {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
 {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -57,4 +57,29 @@ public interface DependencyResolver {
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep)
                     throws DependencyException;
 
+    /**
+     * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
+     * for the specified target platform. <b>Note</b> : prefer to use {@link #resolve(List, List, List, String)} if you
+     * are not sure of what to give as a solverCriteria
+     *
+     * @param solverCriteria specify the criteria string to be used by the solver
+     * @since TODO
+     */
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, String solverCriteria) throws DependencyException;
+
+    /**
+     * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
+     * for the specified target platform. <b>Note</b> : prefer to use
+     * {@link #resolve(List, List, List, String, boolean, boolean)} if you are not sure of what to give as a
+     * solverCriteria
+     *
+     * @param allowSNAPSHOT true to allow SNAPSHOT packages to be part of the computed solution
+     * @param doKeep false to uninstall all packages that do not need to be part of the computed solution
+     * @param solverCriteria specify the criteria string to be used by the solver
+     * @since TODO
+     */
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria)
+            throws DependencyException;
 }
