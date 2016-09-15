@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -147,6 +147,19 @@ public class LegacyDependencyResolver implements DependencyResolver {
             throws DependencyException {
         throw new UnsupportedOperationException(
                 "Legacy resolver does not support advanced resolution method");
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, String solverCriteria) throws DependencyException {
+        throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria)
+            throws DependencyException {
+        throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 
 }

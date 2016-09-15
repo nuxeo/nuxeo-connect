@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2013-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2013-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,7 @@
  *
  * Contributors:
  *     Julien Carsique
- *
+ *     Yannis JULIENNE
  */
 package org.nuxeo.connect.pm.tests;
 
@@ -47,27 +47,42 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
     }
 
     public void testAWithoutSNAPSHOT() throws Exception {
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"A","state":5,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"A","state":2,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"A","state":0,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         DependencyResolution depResolution = pm.resolveDependencies("A", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        // requireChanges is true because of automatic upgrade
-        // assertFalse(depResolution.requireChanges());
+        assertFalse(depResolution.requireChanges());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"A","state":5,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"A","state":2,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"A","state":0,"type":"addon"}
+        // After: [A-1.0.1-SNAPSHOT, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("A-1.0.1-SNAPSHOT");
         depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(2, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
         assertEquals(new Version("1.0.1-SNAPSHOT"), depResolution.getLocalPackagesToInstall().get("A"));
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
     public void testBWithoutSNAPSHOT() throws Exception {
-        DependencyResolution depResolution = pm.resolveDependencies("B", null);
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.1-SNAPSHOT]
+        // {"version":"1.0.0","name":"B","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.2-SNAPSHOT, B2-1.0.1-SNAPSHOT]
+        DependencyResolution depResolution = pm.resolveDependencies("B-1.0.2-SNAPSHOT", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -78,6 +93,12 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"B","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("B-1.0.1");
         depResolution = pm.resolveDependencies(installs, null, null, null);
@@ -92,7 +113,13 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
     }
 
     public void testB2WithoutSNAPSHOT() throws Exception {
-        DependencyResolution depResolution = pm.resolveDependencies("B2", null);
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.1-SNAPSHOT]
+        // {"version":"1.0.0","name":"B2","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
+        // After:  [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        DependencyResolution depResolution = pm.resolveDependencies("B2-1.0.2-SNAPSHOT", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -101,98 +128,154 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.1-SNAPSHOT]
+        // {"version":"1.0.0","name":"B2","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
+        // After:  [A-1.0.0, B-1.0.1-SNAPSHOT]
         List<String> uninstalls = new ArrayList<>();
         uninstalls.add("B2");
         depResolution = pm.resolveDependencies(null, uninstalls, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getLocalPackagesToRemove().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.1-SNAPSHOT]
+        // {"version":"1.0.0","name":"B2","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
+        // After:  [A-1.0.0]
         uninstalls = new ArrayList<>();
         uninstalls.add("B");
-        uninstalls.add("B2-1.0.2-SNAPSHOT");
+        // this is a downgrade
+        uninstalls.add("B2-1.0.1-SNAPSHOT");
         depResolution = pm.resolveDependencies(null, uninstalls, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
         assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getLocalPackagesToRemove().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(2, depResolution.getLocalPackagesToRemove().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
     }
 
     public void testCWithoutSNAPSHOT() throws Exception {
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
         DependencyResolution depResolution = pm.resolveDependencies("C", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
-        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
-
-        depResolution = pm.resolveDependencies("C-1.0.1", null);
-        log.info(depResolution.toString());
-        assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
         assertEquals(new Version("1.0.1"), depResolution.getNewPackagesToDownload().get("C"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
+        depResolution = pm.resolveDependencies("C-1.0.1", null);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(new Version("1.0.1"), depResolution.getNewPackagesToDownload().get("C"));
+        assertEquals(0, depResolution.getLocalPackagesToRemove().size());
+
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1-SNAPSHOT]
         depResolution = pm.resolveDependencies("C-1.0.1-SNAPSHOT", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(2, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
         assertEquals(new Version("1.0.1-SNAPSHOT"), depResolution.getLocalPackagesToInstall().get("C"));
-        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
         assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
     public void testAWithSNAPSHOT() throws Exception {
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"A","state":5,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"A","state":2,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"A","state":0,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("A");
         DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertFalse(depResolution.requireChanges());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"A","state":5,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"A","state":2,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"A","state":0,"type":"addon"}
+        // After: [A-1.0.2-SNAPSHOT, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("A-1.0.2-SNAPSHOT");
         depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
         assertEquals(1, depResolution.getNewPackagesToDownload().size());
         assertEquals(new Version("1.0.2-SNAPSHOT"), depResolution.getNewPackagesToDownload().get("A"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
     public void testBWithSNAPSHOT() throws Exception {
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"B","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("B");
         DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertFalse(depResolution.requireChanges());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"B","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.2-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("B-1.0.2-SNAPSHOT");
         depResolution = pm.resolveDependencies(installs, null, null, null, true);
@@ -200,45 +283,63 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
         assertEquals(new Version("1.0.2-SNAPSHOT"), depResolution.getLocalPackagesToInstall().get("B"));
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"B","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"B","state":5,"type":"addon"}
+        // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("B-1.0.1");
         depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(2, depResolution.getNewPackagesToDownload().size());
+        assertEquals(1, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(2, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getNewPackagesToDownload().size());
         assertEquals(new Version("1.0.1"), depResolution.getNewPackagesToDownload().get("B"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
 
     public void testCWithSNAPSHOT() throws Exception {
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("C");
         DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(2, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(1, depResolution.getNewPackagesToDownload().size());
+        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(0, depResolution.getNewPackagesToDownload().size());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
 
+        // Before: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // {"version":"1.0.0","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
+        // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
         installs = new ArrayList<>();
         installs.add("C-1.0.1");
         depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(1, depResolution.getLocalPackagesToInstall().size());
-        assertEquals(2, depResolution.getLocalPackagesToUpgrade().size());
-        assertEquals(1, depResolution.getLocalUnchangedPackages().size());
-        assertEquals(2, depResolution.getNewPackagesToDownload().size());
+        assertEquals(0, depResolution.getLocalPackagesToInstall().size());
+        assertEquals(0, depResolution.getLocalPackagesToUpgrade().size());
+        assertEquals(3, depResolution.getLocalUnchangedPackages().size());
+        assertEquals(1, depResolution.getNewPackagesToDownload().size());
         assertEquals(new Version("1.0.1"), depResolution.getNewPackagesToDownload().get("C"));
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
     }
