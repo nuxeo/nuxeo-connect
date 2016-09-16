@@ -51,7 +51,7 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getOrderedPackageIdsToInstall().size());
-        assertEquals("nuxeo-dm-5.6.0", depResolution.getOrderedPackageIdsToInstall().get(0));
+        assertEquals("nuxeo-dam-5.6.0", depResolution.getOrderedPackageIdsToInstall().get(0));
         assertEquals("nuxeo-poll-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(1));
     }
 
