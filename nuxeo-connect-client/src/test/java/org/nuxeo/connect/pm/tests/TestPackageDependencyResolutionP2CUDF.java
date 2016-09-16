@@ -18,6 +18,7 @@
 
 package org.nuxeo.connect.pm.tests;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -66,7 +67,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, C-1.0.0, D-1.1.0, EE-1.0.0, NXBT-654.1-1.0.0,
     // NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testSimpleDeps() throws Exception {
-        depResolution = pm.resolveDependencies("C-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("C-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -81,7 +82,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, E-1.0.0, EE-1.1.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testSimpleUpgrade() throws Exception {
-        depResolution = pm.resolveDependencies("E-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("E-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -96,7 +97,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, C-1.0.0, D-1.1.0, EE-1.1.0, F-1.0.0,
     // NXBT-654.1-1.0.0, NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testDoubleDownload() throws Exception {
-        depResolution = pm.resolveDependencies("F-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("F-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -111,7 +112,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, B-1.1.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0, O-1.0.0, P-1.0.0, Q-1.0.0, R-1.2.0, Z1-2.0.0, Z2-2.0.0]
     public void test3LevelsDeps() throws Exception {
-        depResolution = pm.resolveDependencies("O-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("O-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -129,7 +130,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0, NXBT-872-1.0.0, NXBT-872-S1-1.2.0-SNAPSHOT, NXBT-872-S2-2.0.0]
     public void testStudioDeps() throws Exception {
-        depResolution = pm.resolveDependencies("NXBT-872", "6.0");
+        depResolution = pm.resolveDependencies(Arrays.asList("NXBT-872"), null, null, "6.0");
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -144,7 +145,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.1.0, BB-1.1.0, Blocker-1.0.0, Blocker2-1.0.0, CC-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0,
     // NXBT-654.2-1.0.0, NXBT-654.3-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testDoubleUpgrade() throws Exception {
-        depResolution = pm.resolveDependencies("CC-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("CC-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -159,7 +160,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0, X1-1.0.0, Y1-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testForceRemove() throws Exception {
-        depResolution = pm.resolveDependencies("X1-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("X1-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -175,7 +176,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
     // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
     // NXBT-654.3-1.0.0, X2-1.0.0, Y2-1.0.0, Z1-2.0.0, Z2-2.0.0]
     public void testForceUpgradeOverRemove() throws Exception {
-        depResolution = pm.resolveDependencies("X2-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("X2-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -192,7 +193,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
         // test that Platform Filtering changes the resolution result
         // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
         // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-2.0.0, Z1-2.0.0, Z2-2.0.0]
-        depResolution = pm.resolveDependencies("PF1-1.0.0", null);
+        depResolution = pm.resolveDependencies(Arrays.asList("PF1-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -204,7 +205,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
 
         // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
         // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-2.0.0, Z1-2.0.0, Z2-2.0.0]
-        depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.1");
+        depResolution = pm.resolveDependencies(Arrays.asList("PF1-1.0.0"), null, null, "5.3.1");
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -216,7 +217,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
 
         // After: [AA-1.0.0, BB-1.0.0, Blocker-1.0.0, Blocker2-1.0.0, EE-1.0.0, NXBT-654.1-1.0.0, NXBT-654.2-1.0.0,
         // NXBT-654.3-1.0.0, PF1-1.0.0, PF2-1.0.0, Z1-2.0.0, Z2-2.0.0]
-        depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.0");
+        depResolution = pm.resolveDependencies(Arrays.asList("PF1-1.0.0"), null, null, "5.3.0");
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -226,7 +227,7 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(new Version("1.0.0"), depResolution.getNewPackagesToDownload().get("PF2"));
 
-        depResolution = pm.resolveDependencies("PF1-1.0.0", "5.3.2");
+        depResolution = pm.resolveDependencies(Arrays.asList("PF1-1.0.0"), null, null, "5.3.2");
         log.info(depResolution.toString());
         assertTrue(depResolution.isFailed());
     }

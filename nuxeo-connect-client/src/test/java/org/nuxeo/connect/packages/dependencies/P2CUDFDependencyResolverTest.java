@@ -50,7 +50,7 @@ public class P2CUDFDependencyResolverTest extends AbstractPackageManagerTestCase
 
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = pm.resolveDependencies("nuxeo-dm-5.5.0", "5.5.0");
+        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("nuxeo-dm-5.5.0"), null, null, "5.5.0");
         assertFalse(resolution.toString(), resolution.isFailed());
         assertEquals(2, resolution.getRemovePackageIds().size());
         assertEquals(Arrays.asList(new String[] { "nuxeo-cmf-5.5.0", "nuxeo-content-browser-1.1.0-cmf" }),

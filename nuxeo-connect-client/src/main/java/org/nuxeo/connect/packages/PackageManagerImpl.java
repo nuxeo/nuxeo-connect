@@ -757,6 +757,7 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
+    @Deprecated
     public DependencyResolution resolveDependencies(String pkgId, String targetPlatform) {
         try {
             DependencyResolution resolution = resolver.resolve(pkgId, targetPlatform);
