@@ -47,8 +47,8 @@ public class TestPackageDependencyResolutionP2CUDF extends AbstractPackageManage
         assertNotNull(remote);
         assertTrue(remote.size() > 0);
 
-        pm.registerSource(new DummyPackageSource(local, true, "localDummy"), true);
-        pm.registerSource(new DummyPackageSource(remote, false, "remoteDummy"), false);
+        pm.registerSource(new DummyPackageSource(local, "localDummy"), true);
+        pm.registerSource(new DummyPackageSource(remote, "remoteDummy"), false);
         CUDFHelper.defaultAllowSNAPSHOT = true;
     }
 
