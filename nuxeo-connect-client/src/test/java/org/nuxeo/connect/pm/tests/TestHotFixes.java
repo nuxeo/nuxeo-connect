@@ -18,10 +18,10 @@
 
 package org.nuxeo.connect.pm.tests;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -42,7 +42,7 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
     }
 
     public void testResolutionOrder() throws Exception {
-        DependencyResolution depResolution = pm.resolveDependencies("hf11-1.0.0", null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("hf11-1.0.0"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         String expectedOrder = "hf00-1.0.0/hf01-1.0.0/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.0.0/hf10-1.0.0/hf11-1.0.0";
