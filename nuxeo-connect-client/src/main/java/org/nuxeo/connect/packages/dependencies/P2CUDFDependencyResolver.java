@@ -39,26 +39,45 @@ import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 
 /**
- * This implementation uses the p2cudf resolver to solve complex dependencies
+ * This implementation uses the p2cudf resolver to solve complex dependencies. <br>
+ * Predefined CUDF criteria to match different behaviours :
+ * <ul>
+ * <li>mp-install -> {@link #SOLVER_CRITERIA_LESS_CHANGES}</li>
+ * <li>mp-remove/uninstall -> {@link #SOLVER_CRITERIA_LESS_VERSION_CHANGES}</li>
+ * <li>mp-upgrade -> {@link #SOLVER_CRITERIA_LESS_OUTDATED}</li>
+ * <li>mp-set -> {@link #SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE}</li>
+ * </ul>
  *
  * @since 1.4
  */
 public class P2CUDFDependencyResolver implements DependencyResolver {
 
     /**
-     * Predefined CUDF criteria to match different behaviours :
-     * - mp-install -> SOLVER_CRITERIA_LESS_CHANGES
-     * - mp-remove  -> SOLVER_CRITERIA_LESS_VERSION_CHANGES
-     * - mp-upgrade -> SOLVER_CRITERIA_LESS_OUTDATED
-     * - mp-set     -> SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE
+     * Solver criteria requesting the less changes. Used for mp-install.
+     *
      * @since TODO
      */
     public static final String SOLVER_CRITERIA_LESS_CHANGES = "-removed,-changed,-notuptodate,-new,-versionchanged";
 
+    /**
+     * Solver criteria requesting the less version changes. Used for mp-remove and mp-uninstall.
+     *
+     * @since TODO
+     */
     public static final String SOLVER_CRITERIA_LESS_VERSION_CHANGES = "-versionchanged,-removed,-changed,-notuptodate,-new";
 
+    /**
+     * Solver criteria requesting the less outdated packages. Used for mp-upgrade.
+     *
+     * @since TODO
+     */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED = "-removed,-notuptodate,-changed,-new,-versionchanged";
 
+    /**
+     * Solver criteria requesting the more removed and the less outdated packages. Used for mp-set.
+     *
+     * @since TODO
+     */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE = "+removed,-notuptodate,-changed,-new,-versionchanged";
 
     protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
@@ -75,20 +94,15 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     }
 
     @Override
-    public DependencyResolution resolve(List<String> pkgInstall,
-            List<String> pkgRemove, List<String> pkgUpgrade,
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                CUDFHelper.defaultAllowSNAPSHOT);
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
     }
 
     @Override
-    public DependencyResolution resolve(List<String> pkgInstall,
-            List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT)
-            throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                allowSNAPSHOT, true);
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true);
     }
 
     @Override
@@ -107,7 +121,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             solverCriteria = SOLVER_CRITERIA_LESS_OUTDATED;
         } else if (CollectionUtils.isNotEmpty(pkgRemove)) {
             // For a remove request, criteria prioritizes the solution with the less version changed packages
-            // otherwise, it will upgrade/downgrade a package instead of removing it when trying to remove a specific
+            // otherwise, it would upgrade/downgrade a package instead of removing it when trying to remove a specific
             // version
             solverCriteria = SOLVER_CRITERIA_LESS_VERSION_CHANGES;
         }
@@ -115,16 +129,14 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     }
 
     @Override
-    public DependencyResolution resolve(List<String> pkgInstall,
-            List<String> pkgRemove, List<String> pkgUpgrade,
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, String solverCriteria) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                CUDFHelper.defaultAllowSNAPSHOT, true, solverCriteria);
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT, true,
+                solverCriteria);
     }
 
     @Override
-    public DependencyResolution resolve(List<String> pkgInstall,
-            List<String> pkgRemove, List<String> pkgUpgrade,
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria)
             throws DependencyException {
         cudfHelper = new CUDFHelper(pm);
@@ -132,8 +144,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         cudfHelper.setAllowSNAPSHOT(allowSNAPSHOT);
         cudfHelper.setKeep(doKeep);
         // generate CUDF package universe and request stanza
-        String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall),
-                str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
+        String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall), str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
         log.debug("CUDF request:\n" + cudf);
 
         // pass to p2cudf for solving
@@ -160,8 +171,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         if (!planner.isSolutionOptimal()) {
             log.warn("The solution found might not be optimal");
         }
-        DependencyResolution resolution = cudfHelper.buildResolution(solution,
-                planner.getSolutionDetails());
+        DependencyResolution resolution = cudfHelper.buildResolution(solution, planner.getSolutionDetails());
         if (!doKeep) {
             // Make sub-resolution to remove all packages that are not part of
             // our target list
@@ -182,8 +192,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
                     subRemove.add(pkgId);
                 }
             }
-            resolution = resolve(subInstall, subRemove, null, targetPlatform,
-                    allowSNAPSHOT, true);
+            resolution = resolve(subInstall, subRemove, null, targetPlatform, allowSNAPSHOT, true);
         }
         return resolution;
     }
@@ -197,8 +206,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         for (String pkgStr : pkgList) {
             if (packagesByID.containsKey(pkgStr)) {
                 DownloadablePackage pkg = packagesByID.get(pkgStr);
-                list.add(new PackageDependency(pkg.getName(), pkg.getVersion(),
-                        pkg.getVersion()));
+                list.add(new PackageDependency(pkg.getName(), pkg.getVersion(), pkg.getVersion()));
             } else {
                 list.add(new PackageDependency(pkgStr));
             }
@@ -206,13 +214,6 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         return list.toArray(new PackageDependency[list.size()]);
     }
 
-    /**
-     * This a backward-compatibility method used only from tests. There is no more possibility to upgrade a single
-     * package without knowing the target version so when calling this method on a already installed package, it will
-     * return a no-change solution
-     *
-     * @deprecated since 1.4.26 Use {@link #resolve(List, List, List, String)} instead
-     */
     @Override
     @Deprecated
     public DependencyResolution resolve(String pkgIdOrName, String targetPlatform) throws DependencyException {

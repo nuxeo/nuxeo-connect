@@ -118,7 +118,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
         // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
-        // After:  [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         DependencyResolution depResolution = pm.resolveDependencies("B2-1.0.2-SNAPSHOT", null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
@@ -133,7 +133,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
         // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
-        // After:  [A-1.0.0, B-1.0.1-SNAPSHOT]
+        // After: [A-1.0.0, B-1.0.1-SNAPSHOT]
         List<String> uninstalls = new ArrayList<>();
         uninstalls.add("B2");
         depResolution = pm.resolveDependencies(null, uninstalls, null, null);
@@ -150,7 +150,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1-SNAPSHOT","name":"B2","state":5,"type":"addon"}
         // {"version":"1.0.1","name":"B2","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
-        // After:  [A-1.0.0]
+        // After: [A-1.0.0]
         uninstalls = new ArrayList<>();
         uninstalls.add("B");
         // this is a downgrade
