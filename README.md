@@ -9,7 +9,7 @@ Nuxeo Connect
 
 ## QA results
 
-[![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=nuxeo-connect-master)](https://qa.nuxeo.org/jenkins/job/nuxeo-connect-master/)
+[![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=master/nuxeo-connect-master)](https://qa.nuxeo.org/jenkins/job/master/job/nuxeo-connect-master/)
 
 # About Nuxeo
 
