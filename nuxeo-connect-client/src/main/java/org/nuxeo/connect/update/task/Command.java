@@ -19,6 +19,7 @@ package org.nuxeo.connect.update.task;
 import java.util.Map;
 
 import org.nuxeo.connect.update.PackageException;
+import org.nuxeo.connect.update.PackageUpdateService;
 import org.nuxeo.connect.update.ValidationStatus;
 import org.nuxeo.connect.update.xml.XmlWriter;
 import org.w3c.dom.Element;
@@ -33,6 +34,14 @@ import org.w3c.dom.Element;
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public interface Command {
+
+    /**
+     * Sets the package update service.
+     *
+     * @since 8.4
+     */
+    default void setPackageUpdateService(PackageUpdateService packageUpdateService) {
+    }
 
     /**
      * Test if the command must be run at the end in an installation process. This is useful for flush like commands
