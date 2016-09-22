@@ -64,7 +64,7 @@ public interface DependencyResolver {
      * are not sure of what to give as a solverCriteria
      *
      * @param solverCriteria specify the criteria string to be used by the solver
-     * @since TODO
+     * @since 1.4.26
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, String solverCriteria) throws DependencyException;
@@ -78,7 +78,7 @@ public interface DependencyResolver {
      * @param allowSNAPSHOT true to allow SNAPSHOT packages to be part of the computed solution
      * @param doKeep false to uninstall all packages that do not need to be part of the computed solution
      * @param solverCriteria specify the criteria string to be used by the solver
-     * @since TODO
+     * @since 1.4.26
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria)

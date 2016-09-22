@@ -55,28 +55,28 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     /**
      * Solver criteria requesting the less changes. Used for mp-install.
      *
-     * @since TODO
+     * @since 1.4.26
      */
     public static final String SOLVER_CRITERIA_LESS_CHANGES = "-removed,-changed,-notuptodate,-new,-versionchanged";
 
     /**
      * Solver criteria requesting the less version changes. Used for mp-remove and mp-uninstall.
      *
-     * @since TODO
+     * @since 1.4.26
      */
     public static final String SOLVER_CRITERIA_LESS_VERSION_CHANGES = "-versionchanged,-removed,-changed,-notuptodate,-new";
 
     /**
      * Solver criteria requesting the less outdated packages. Used for mp-upgrade.
      *
-     * @since TODO
+     * @since 1.4.26
      */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED = "-removed,-notuptodate,-changed,-new,-versionchanged";
 
     /**
      * Solver criteria requesting the more removed and the less outdated packages. Used for mp-set.
      *
-     * @since TODO
+     * @since 1.4.26
      */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE = "+removed,-notuptodate,-changed,-new,-versionchanged";
 
