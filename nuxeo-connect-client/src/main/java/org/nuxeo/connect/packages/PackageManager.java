@@ -313,7 +313,9 @@ public interface PackageManager extends BasePackageManager {
      *
      * @param pkgId
      * @param targetPlatform (String representing the target platform or null
+     * @deprecated since 1.4.26 use {@link #resolveDependencies(List, List, List, String)} instead
      */
+    @Deprecated
     DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
 
     /**
@@ -367,8 +369,8 @@ public interface PackageManager extends BasePackageManager {
     Map<String, List<DownloadablePackage>> getAllPackagesByName();
 
     /**
-     * Return the available {@link Version} for a given {@link Package} name. Versions are sorted in the
-     * "preferred order":
+     * Return the available {@link Version} for a given {@link Package} name. Versions are sorted in the "preferred
+     * order":
      * <ul>
      * <li>already installed version (means no upgrade and no download)</li>
      * <li>already downloaded version (means no download)</li>

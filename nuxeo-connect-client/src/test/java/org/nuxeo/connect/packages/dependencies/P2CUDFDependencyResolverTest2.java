@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,7 @@
  *
  * Contributors:
  *     Julien Carsique
- *
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -46,9 +46,12 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
         pm.registerSource(new DummyPackageSource(remote, "dummyRemote"), false);
     }
 
+    // Before: [DM-5.4.0.1-HF02-1.0.0, DM-5.4.0.1-HF03-1.0.0]
+    // After: [DM-5.4.0.1-HF01-1.0.0, DM-5.4.0.1-HF02-1.0.0, DM-5.4.0.1-HF03-1.0.0, DM-5.4.0.1-HF04-1.0.0,
+    // DM-5.4.0.1-HF05-1.0.0, DM-5.4.0.1-HF06-1.0.0, DM-5.4.0.1-HF07-1.1.0]
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = pm.resolveDependencies("DM-5.4.0.1-HF07", null);
+        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("DM-5.4.0.1-HF07"), null, null, null);
         assertFalse(resolution.toString(), resolution.isFailed());
 
         log.info(resolution.toString());
@@ -57,9 +60,8 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
         assertEquals("There must be no package to remove", 0, resolution.getRemovePackageIds().size());
         log.info("Already installed packages that need to be upgraded: resolution.getUpgradePackageIds()\n"
                 + resolution.getUpgradePackageIds() + "\n");
-        assertEquals("There must be one already installed package to upgrade", 1,
+        assertEquals("There must be no already installed package to upgrade", 0,
                 resolution.getUpgradePackageIds().size());
-        assertEquals("DM-5.4.0.1-HF02-1.0.0", resolution.getUpgradePackageIds().get(0));
         log.info("Already downloaded packages that need to be installed: resolution.getLocalToInstallIds()\n"
                 + resolution.getLocalToInstallIds() + "\n");
         assertEquals("There must be one already downloaded package to install", 1,
@@ -67,14 +69,15 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
         assertEquals("DM-5.4.0.1-HF01-1.0.0", resolution.getLocalToInstallIds().get(0));
         log.info("New packages that need to be downloaded and installed: resolution.getDownloadPackageIds()\n"
                 + resolution.getDownloadPackageIds() + "\n");
-        assertEquals("There must be five packages to download and install", 5,
+        assertEquals("There must be five packages to download and install", 4,
                 resolution.getDownloadPackageIds().size());
-        assertTrue(resolution.getDownloadPackageIds().containsAll(
-                Arrays.asList(new String[] { "DM-5.4.0.1-HF02-1.0.7", "DM-5.4.0.1-HF04-1.0.0", "DM-5.4.0.1-HF06-1.0.0",
-                        "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", })));
-        log.info("Dependencies that are already installed on your instance and won't be changed: resolution.getUnchangedPackageIds()\n"
-                + resolution.getUnchangedPackageIds() + "\n");
-        assertEquals("There must be one unchanged package", 1, resolution.getUnchangedPackageIds().size());
-        assertEquals("DM-5.4.0.1-HF03-1.0.0", resolution.getUnchangedPackageIds().get(0));
+        assertTrue(resolution.getDownloadPackageIds().containsAll(Arrays.asList(new String[] { "DM-5.4.0.1-HF04-1.0.0",
+                "DM-5.4.0.1-HF06-1.0.0", "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", })));
+        log.info(
+                "Dependencies that are already installed on your instance and won't be changed: resolution.getUnchangedPackageIds()\n"
+                        + resolution.getUnchangedPackageIds() + "\n");
+        assertEquals("There must be two unchanged package", 2, resolution.getUnchangedPackageIds().size());
+        assertTrue(resolution.getUnchangedPackageIds().containsAll(
+                Arrays.asList(new String[] { "DM-5.4.0.1-HF02-1.0.0", "DM-5.4.0.1-HF03-1.0.0" })));
     }
 }

@@ -1,3 +1,4 @@
 {"id":"hf03-1.0.0","name":"hf03", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":2, "dependencies":["hf02:1.0.0:1.0.0"]}
 {"id":"hf06-1.0.0","name":"hf06", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":2, "dependencies":["hf05:1.0.0:1.0.0"]}
 {"id":"hf07-1.0.0","name":"hf07", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":2, "dependencies":["hf06:1.0.0:1.0.0"]}
+{"id":"A-1.0.0","name":"A", "version":"1.0.0","title":"Package A","description":"description of A", "type":"addon", "state":4}
