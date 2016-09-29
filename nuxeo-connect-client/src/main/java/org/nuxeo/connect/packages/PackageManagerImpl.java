@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -427,6 +426,30 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
+    public List<String> listInstalledPackagesNames(PackageType pkgType) {
+        List<DownloadablePackage> upgrades = listInstalledPackages();
+        List<String> upgradeNames = new ArrayList<>();
+        for (DownloadablePackage upgrade : upgrades) {
+            if (pkgType == null || upgrade.getType() == pkgType) {
+                upgradeNames.add(upgrade.getName());
+            }
+        }
+        return upgradeNames;
+    }
+
+    @Override
+    public List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT) {
+        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
+        List<String> hotFixNames = new ArrayList<>();
+        hotFixes.forEach(pkg -> {
+            if(!hotFixNames.contains(pkg.getName()) && (!pkg.getVersion().isSnapshot() || allowSNAPSHOT)){
+                hotFixNames.add(pkg.getName());
+            }
+        });
+        return hotFixNames;
+    }
+
+    @Override
     public List<DownloadablePackage> listRemotePackages() {
         return listRemotePackages(null, null);
     }
@@ -480,58 +503,19 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform) {
-        List<DownloadablePackage> localPackages = getAllPackages(localSources, type);
-        List<DownloadablePackage> availablePackages = doMergePackages(getAllSources(), type, targetPlatform);
+        List<String> installedPackagesNames = listInstalledPackagesNames(type);
+        List<String> hotfixesNames = null;
+        if(type == null || type == PackageType.HOT_FIX){
+            // list last version of available hot-fixes too
+            hotfixesNames = listHotfixesNames(targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+            hotfixesNames.removeAll(installedPackagesNames);
+        }
+        DependencyResolution resolution = resolveDependencies(hotfixesNames, null, installedPackagesNames, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+
+        List<String> toUpdateIds = resolution.getOrderedPackageIdsToInstall();
         List<DownloadablePackage> toUpdate = new ArrayList<>();
-        List<String> toUpdateIds = new ArrayList<>();
+        toUpdateIds.forEach(pkgId -> toUpdate.add(getPackage(pkgId)));
 
-        // take all the available packages that correspond to an upgrade of an
-        // active local package and match the target platform
-        for (DownloadablePackage pkg : localPackages) {
-            // Ignore upgrade check for unused packages
-            if (!pkg.getPackageState().isInstalled()) {
-                continue;
-            }
-            for (DownloadablePackage availablePackage : availablePackages) {
-                if (availablePackage.getName().equals(pkg.getName())) {
-                    if (availablePackage.getVersion().isUpgradeFor(pkg.getVersion())) {
-                        toUpdate.add(availablePackage);
-                        toUpdateIds.add(availablePackage.getId());
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (type == null || type == PackageType.HOT_FIX) {
-            // force addition of hot-fixes
-            List<DownloadablePackage> hotFixes = doMergePackages(getAllSources(), PackageType.HOT_FIX, targetPlatform);
-            for (DownloadablePackage pkg : hotFixes) {
-                // check it is not already in update list
-                if (!toUpdateIds.contains(pkg.getId())) {
-                    // check if package is not already in local
-                    boolean alreadyInLocal = false;
-                    for (DownloadablePackage lpkg : localPackages) {
-                        if (lpkg.getName().equals(pkg.getName())) {
-                            if (lpkg.getVersion().greaterOrEqualThan(pkg.getVersion())) {
-                                if (lpkg.getPackageState().isInstalled()) {
-                                    alreadyInLocal = true;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    if (!alreadyInLocal) {
-                        toUpdate.add(0, pkg);
-                    }
-                }
-            }
-        }
-
-        // Remove duplicates
-        Set<DownloadablePackage> updateSet = new LinkedHashSet<>(toUpdate);
-        toUpdate = new ArrayList<>(updateSet);
-        Collections.sort(toUpdate, new PackageComparator());
         return toUpdate;
     }
 
