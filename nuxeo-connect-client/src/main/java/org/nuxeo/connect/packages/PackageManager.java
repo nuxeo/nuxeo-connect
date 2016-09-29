@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  *
  */
 
@@ -132,19 +133,22 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
-     * available on connect server for a given {@link PackageType}.
+     * available on connect server for a given {@link PackageType}. Also list all available hotfixes for the current
+     * targetPlatform if {@link PackageType} is null or is explicitly {@value PackageType#HOT_FIX}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type);
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
-     * available on connect server for a given {@link PackageType} and target platform.
+     * available on connect server for a given target platform. Also list all available hotfixes for the given
+     * targetPlatform.
      */
     List<DownloadablePackage> listUpdatePackages(String targetPlatform);
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
-     * available on connect server for a given target platform.
+     * available on connect server for a given {@link PackageType} and target platform. Also list all available hotfixes
+     * for the given targetPlatform if {@link PackageType} is null or is explicitly {@value PackageType#HOT_FIX}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform);
 
@@ -257,6 +261,21 @@ public interface PackageManager extends BasePackageManager {
      * @see #listPrivatePackages(PackageType, String)
      */
     List<DownloadablePackage> listPrivatePackages(String targetPlatform);
+
+    /**
+     * List all installed packages names (without version), filtered on package type if {@code pkgType} is not null.
+     *
+     * @since 1.4.26
+     */
+    List<String> listInstalledPackagesNames(PackageType pkgType);
+
+    /**
+     * List available hotfixes names (without version), already installed or not, for the given targetPlatform.
+     *
+     * @param allowSNAPSHOT whether to return hotfixes names with only a snapshot version available.
+     * @since 1.4.26
+     */
+    List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT);
 
     /**
      * Register a new {@link PackageSource}
