@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -222,7 +223,8 @@ public class PackageManagerImpl implements PackageManager {
      * @since 1.4
      * @return a Map of all packages from given sources filtered on type if not null
      */
-    protected Map<String, List<DownloadablePackage>> getAllPackagesByName(List<PackageSource> sources, PackageType type) {
+    protected Map<String, List<DownloadablePackage>> getAllPackagesByName(List<PackageSource> sources,
+            PackageType type) {
         Map<String, List<DownloadablePackage>> packagesByName = new HashMap<>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
@@ -427,26 +429,23 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<String> listInstalledPackagesNames(PackageType pkgType) {
-        List<DownloadablePackage> upgrades = listInstalledPackages();
-        List<String> upgradeNames = new ArrayList<>();
-        for (DownloadablePackage upgrade : upgrades) {
-            if (pkgType == null || upgrade.getType() == pkgType) {
-                upgradeNames.add(upgrade.getName());
-            }
-        }
-        return upgradeNames;
+        List<DownloadablePackage> installedPackages = listInstalledPackages();
+        // filter on type and collect names
+        List<String> installedPackagesNames = installedPackages.stream().filter(
+                pkg -> (pkgType == null || pkg.getType() == pkgType)).map(DownloadablePackage::getName).collect(
+                        Collectors.toList());
+
+        return installedPackagesNames;
     }
 
     @Override
     public List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT) {
         List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
-        List<String> hotFixNames = new ArrayList<>();
-        hotFixes.forEach(pkg -> {
-            if(!hotFixNames.contains(pkg.getName()) && (!pkg.getVersion().isSnapshot() || allowSNAPSHOT)){
-                hotFixNames.add(pkg.getName());
-            }
-        });
-        return hotFixNames;
+        // filter on snapshots and collect unique names
+        List<String> hotFixesNames = hotFixes.stream().filter(
+                pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot())).map(
+                        DownloadablePackage::getName).distinct().collect(Collectors.toList());
+        return hotFixesNames;
     }
 
     @Override
@@ -505,16 +504,16 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform) {
         List<String> installedPackagesNames = listInstalledPackagesNames(type);
         List<String> hotfixesNames = null;
-        if(type == null || type == PackageType.HOT_FIX){
+        if (type == null || type == PackageType.HOT_FIX) {
             // list last version of available hot-fixes too
             hotfixesNames = listHotfixesNames(targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
             hotfixesNames.removeAll(installedPackagesNames);
         }
-        DependencyResolution resolution = resolveDependencies(hotfixesNames, null, installedPackagesNames, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+        DependencyResolution resolution = resolveDependencies(hotfixesNames, null, installedPackagesNames,
+                targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
 
         List<String> toUpdateIds = resolution.getOrderedPackageIdsToInstall();
-        List<DownloadablePackage> toUpdate = new ArrayList<>();
-        toUpdateIds.forEach(pkgId -> toUpdate.add(getPackage(pkgId)));
+        List<DownloadablePackage> toUpdate = toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
 
         return toUpdate;
     }
