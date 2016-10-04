@@ -176,7 +176,7 @@ public class CUDFHelper {
             }
 
             // ignore incompatible packages when a targetPlatform is set
-            if (targetPlatform != null && !pkg.isLocal()
+            if (!pkg.getPackageState().isInstalled()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                 log.debug("Ignore " + pkg + " (incompatible target platform)");
                 continue;
