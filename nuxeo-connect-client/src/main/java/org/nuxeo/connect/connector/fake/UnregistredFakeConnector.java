@@ -27,6 +27,7 @@ import org.nuxeo.connect.update.PackageType;
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  * @deprecated since 1.4
  */
+@Deprecated
 public class UnregistredFakeConnector extends AbstractFakeConnector {
 
     @Override
@@ -47,6 +48,11 @@ public class UnregistredFakeConnector extends AbstractFakeConnector {
     @Override
     protected String getJSONDataForStatus() {
         return "{ contractStatus : 'unregistered', endDate : ''}";
+    }
+
+    @Override
+    protected String getJSONDataForDownload(String pkgId) {
+        throw new UnsupportedOperationException();
     }
 
 }

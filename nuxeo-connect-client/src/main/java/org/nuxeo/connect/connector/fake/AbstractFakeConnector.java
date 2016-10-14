@@ -37,9 +37,10 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
 
     protected abstract String getJSONDataForDownloads(String type);
 
+    protected abstract String getJSONDataForDownload(String pkgId);
+
     @Override
-    protected ConnectServerResponse execServerCall(String url,
-            Map<String, String> headers) throws ConnectServerError {
+    protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
 
         String data = null;
 
@@ -48,6 +49,9 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
         } else if (url.contains("/" + GET_DOWNLOADS_SUFFIX + "/")) {
             String type = url.split(GET_DOWNLOADS_SUFFIX + "\\/")[1];
             data = getJSONDataForDownloads(type);
+        } else if (url.contains("/" + GET_DOWNLOAD_SUFFIX + "/")) {
+            String pkgId = url.split(GET_DOWNLOAD_SUFFIX + "\\/")[1];
+            data = getJSONDataForDownload(pkgId);
         }
 
         return new ConnectFakeResponse(data);
