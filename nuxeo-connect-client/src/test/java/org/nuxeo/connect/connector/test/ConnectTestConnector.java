@@ -24,10 +24,12 @@ import org.nuxeo.connect.update.PackageType;
 
 public class ConnectTestConnector extends AbstractFakeConnector {
 
+    @Override
     protected String getJSONDataForStatus() {
         return "{ contractStatus : 'active', endDate : '10/12/2010'}";
     }
 
+    @Override
     protected String getJSONDataForDownloads(String type) {
         String data = null;
         if (PackageType.HOT_FIX.getValue().equals(type)) {
@@ -47,6 +49,11 @@ public class ConnectTestConnector extends AbstractFakeConnector {
             data = "[]";
         }
         return data;
+    }
+
+    @Override
+    protected String getJSONDataForDownload(String pkgId) {
+        throw new UnsupportedOperationException();
     }
 
 }

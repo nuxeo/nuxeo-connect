@@ -95,7 +95,7 @@ public class DependencyResolution {
      */
     public void markAsFailed(String message) {
         resolution = false;
-        this.failedMessage = message;
+        failedMessage = message;
         log.warn(failedMessage);
     }
 
@@ -301,6 +301,9 @@ public class DependencyResolution {
             append(sb, newPackagesToDownload, "Packages to download");
             append(sb, localPackagesToInstall, "Local packages to install");
             append(sb, localPackagesToRemove, "Local packages to remove");
+        } else {
+            sb.append("\nDependency resolution:\n");
+            append(sb, localUnchangedPackages, "Unchanged packages");
         }
         return sb.toString();
     }
