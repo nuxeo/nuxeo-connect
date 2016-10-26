@@ -135,7 +135,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
         method.setFollowRedirects(true);
         try {
             setPackageState(PackageState.DOWNLOADING);
-            if (!sourceUrl.contains("127.0.0.1:8082/test")) { // for testing
+            if (!sourceUrl.contains(ConnectUrlConfig.CONNECT_TEST_MODE_BASEURL + "test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
                 for (String headerName : headers.keySet()) {
                     method.addRequestHeader(headerName, headers.get(headerName));

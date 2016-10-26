@@ -20,7 +20,6 @@ package org.nuxeo.connect.connector.http;
 import org.nuxeo.connect.NuxeoConnectClient;
 
 /**
- *
  * Helper to manage URL configuration when accessing Nuxceo Connect Services
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
@@ -28,6 +27,10 @@ import org.nuxeo.connect.NuxeoConnectClient;
 public class ConnectUrlConfig {
 
     public static final String CONNECT_DEFAULT_BASEURL = "https://connect.nuxeo.com/nuxeo/site/";
+
+    public static final int CONNECT_TEST_MODE_PORT = 8082;
+
+    public static final String CONNECT_TEST_MODE_BASEURL = "http://127.0.0.1:" + CONNECT_TEST_MODE_PORT + "/";
 
     public static final String CONNECT_URL_PROPERTY = "org.nuxeo.connect.url";
 
@@ -98,10 +101,9 @@ public class ConnectUrlConfig {
 
     public static String getBaseUrl() {
         if (NuxeoConnectClient.isTestModeSet()) {
-            return "http://127.0.0.1:8082/";
+            return NuxeoConnectClient.getProperty(CONNECT_URL_PROPERTY, CONNECT_TEST_MODE_BASEURL);
         } else {
-            return NuxeoConnectClient.getProperty(CONNECT_URL_PROPERTY,
-                    CONNECT_DEFAULT_BASEURL);
+            return NuxeoConnectClient.getProperty(CONNECT_URL_PROPERTY, CONNECT_DEFAULT_BASEURL);
         }
     }
 
@@ -200,11 +202,9 @@ public class ConnectUrlConfig {
     }
 
     public static int getProxyPort() {
-        String portAsString = NuxeoConnectClient.getProperty(
-                CONNECT_PROXY_PORT_PROPERTY,
+        String portAsString = NuxeoConnectClient.getProperty(CONNECT_PROXY_PORT_PROPERTY,
                 NuxeoConnectClient.getProperty(NUXEO_PROXY_PORT_PROPERTY, null));
-        if (portAsString == null || portAsString.isEmpty()
-                || portAsString.startsWith("$")) {
+        if (portAsString == null || portAsString.isEmpty() || portAsString.startsWith("$")) {
             return 80;
         }
         try {
@@ -215,15 +215,13 @@ public class ConnectUrlConfig {
     }
 
     public static String getProxyLogin() {
-        return NuxeoConnectClient.getProperty(
-                CONNECT_PROXY_LOGIN_PROPERTY,
+        return NuxeoConnectClient.getProperty(CONNECT_PROXY_LOGIN_PROPERTY,
                 NuxeoConnectClient.getProperty(NUXEO_PROXY_LOGIN_PROPERTY, null));
     }
 
     public static String getProxyPassword() {
         return NuxeoConnectClient.getProperty(CONNECT_PROXY_PASSWORD_PROPERTY,
-                NuxeoConnectClient.getProperty(NUXEO_PROXY_PASSWORD_PROPERTY,
-                        null));
+                NuxeoConnectClient.getProperty(NUXEO_PROXY_PASSWORD_PROPERTY, null));
     }
 
     public static String getProxyNTLMHost() {
