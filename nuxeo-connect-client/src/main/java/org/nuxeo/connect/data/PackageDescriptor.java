@@ -165,6 +165,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         super();
         classifier = descriptor.getClassifier();
         dependencies = descriptor.getDependencies();
+        optionalDependencies = descriptor.getOptionalDependencies();
         conflicts = descriptor.getConflicts();
         description = descriptor.getDescription();
         homePage = descriptor.getHomePage();
@@ -232,14 +233,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         return dependencies;
     }
 
-    @Override
-    public PackageDependency[] getOptionalDependencies() {
-        if (optionalDependencies == null) {
-            optionalDependencies = new PackageDependency[0];
-        }
-        return optionalDependencies;
-    }
-
     @JSONExportMethod(name = "dependencies")
     protected JSONArray getDependenciesAsJSON() {
         JSONArray deps = new JSONArray();
@@ -255,6 +248,41 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
             return "";
         }
         for (PackageDependency dep : getDependencies()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public PackageDependency[] getOptionalDependencies() {
+        if (optionalDependencies == null) {
+            optionalDependencies = new PackageDependency[0];
+        }
+        return optionalDependencies;
+    }
+
+    /**
+     * @since 1.5.3
+     */
+    @JSONExportMethod(name = "optionalDependencies")
+    protected JSONArray getOptionalDependenciesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getOptionalDependencies()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    /**
+     * @since 1.5.3
+     */
+    public String getOptionalDependenciesAsString() {
+        StringBuilder sb = new StringBuilder();
+        if (optionalDependencies == null || optionalDependencies.length == 0) {
+            return "";
+        }
+        for (PackageDependency dep : getOptionalDependencies()) {
             sb.append(dep.toString());
             sb.append(",");
         }
