@@ -83,6 +83,10 @@ public class TestSerialization extends TestCase {
                 new PackageDependency("my-package:1.1:1.2"),
                 new PackageDependency("my-package:2.0:2.2") };
         p.setDependencies(deps);
+        PackageDependency[] optDeps = {
+                new PackageDependency("my-opt-package:1.1:1.2"),
+                new PackageDependency("my-opt-package:2.0:2.2") };
+        p.setOptionalDependencies(optDeps);
         p.setCommentsNumber(8);
         p.setRating(4);
         p.setDownloadsCount(1000);
@@ -112,6 +116,7 @@ public class TestSerialization extends TestCase {
         assertEquals(p.getType(), p2.getType());
         assertEquals(p.getVersion(), p2.getVersion());
         assertEquals(p.getDependenciesAsString(), p2.getDependenciesAsString());
+        assertEquals(p.getOptionalDependenciesAsString(), p2.getOptionalDependenciesAsString());
         assertEquals(p.getDownloadsCount(), p2.getDownloadsCount());
         assertEquals(p.getRating(), p2.getRating());
         assertEquals(p.getPictureUrl(), p2.getPictureUrl());

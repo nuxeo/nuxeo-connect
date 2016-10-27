@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,7 +12,9 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu, jcarsique
+ *     bstefanescu
+ *     jcarsique
+ *     Yannis JULIENNE
  */
 package org.nuxeo.connect.update.model;
 
@@ -156,6 +158,15 @@ public interface PackageDefinition extends Package {
      * @see #getDependencies()
      */
     void setDependencies(PackageDependency[] deps);
+
+    /**
+     * Set the package optional dependencies.
+     *
+     * @param deps
+     * @see #getOptionalDependencies()
+     * @since 1.4.24.1
+     */
+    void setOptionalDependencies(PackageDependency[] deps);
 
     /**
      * Set the package conflicts.

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2013 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages;
@@ -122,6 +123,11 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage,
     @Override
     public PackageDependency[] getDependencies() {
         return localPackage.getDependencies();
+    }
+
+    @Override
+    public PackageDependency[] getOptionalDependencies() {
+        return localPackage.getOptionalDependencies();
     }
 
     @Override
