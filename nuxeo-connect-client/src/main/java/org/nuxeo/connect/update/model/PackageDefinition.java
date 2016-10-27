@@ -158,6 +158,14 @@ public interface PackageDefinition extends Package {
     void setDependencies(PackageDependency[] deps);
 
     /**
+     * Set the package optional dependencies.
+     *
+     * @param deps
+     * @see #geOptionalDependencies()
+     */
+    void setOptionalDependencies(PackageDependency[] deps);
+
+    /**
      * Set the package conflicts.
      *
      * @param deps

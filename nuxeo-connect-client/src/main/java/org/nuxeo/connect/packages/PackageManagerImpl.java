@@ -1,24 +1,28 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  *
  */
 
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.connect.NuxeoConnectClient;
@@ -891,40 +896,63 @@ public class PackageManagerImpl implements PackageManager {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
         boolean hasChanged = true;
         Set<String> missingDeps = new HashSet<>();
+        Set<String> optionalMissingDeps = new HashSet<>();
         while (!orderedList.isEmpty() && hasChanged) {
             hasChanged = false;
             for (String id : orderedList) {
                 DownloadablePackage pkg = allPackagesByID.get(id);
-                if (pkg.getDependencies().length == 0) {
-                    // Add pkg to orderedMap if it has no dependencies
+                if (pkg.getDependencies().length == 0 && pkg.getOptionalDependencies().length == 0) {
+                    // Add pkg to orderedMap if it has no dependencies nor optional dependencies
                     orderedMap.put(id, pkg);
                     hasChanged = true;
                 } else {
-                    // Add to orderedMap if all its dependencies are satisfied
+                    // Add to orderedMap if all its dependencies and optional dependencies are satisfied
                     boolean allSatisfied = true;
-                    for (PackageDependency pkgDep : pkg.getDependencies()) {
+                    List<PackageDependency> allDependencies = new ArrayList<>();
+                    CollectionUtils.addAll(allDependencies, pkg.getDependencies());
+                    List<PackageDependency> optionalDependencies = Arrays.asList(pkg.getOptionalDependencies());
+                    allDependencies.addAll(optionalDependencies);
+                    for (PackageDependency pkgDep : allDependencies) {
+                        // is pkDep optional?
+                        boolean isOptionalPkgDep = optionalDependencies.contains(pkgDep);
                         // is pkgDep satisfied in orderedMap?
                         boolean satisfied = false;
                         for (Package orderedPkg : orderedMap.values()) {
                             if (matchDependency(pkgDep, orderedPkg)) {
                                 satisfied = true;
-                                missingDeps.remove(pkgDep);
+                                if (isOptionalPkgDep) {
+                                    optionalMissingDeps.remove(pkgDep);
+                                } else {
+                                    missingDeps.remove(pkgDep);
+                                }
                                 break;
                             }
                         }
-                        // else, is pkgDep satisfied in already installed pkgs?
+                        // else, is pkgDep satisfied in already installed pkgs ?
+                        boolean isOptionalPkgDepAlreadyInstalled = false;
                         if (!satisfied) {
                             for (Version version : findLocalPackageInstalledVersions(pkgDep.getName())) {
                                 if (pkgDep.getVersionRange().matchVersion(version)) {
-                                    satisfied = true;
-                                    missingDeps.remove(pkgDep);
+                                    if (isOptionalPkgDep) {
+                                        // keep optional pkgDep unsatisfied as it can also be in orderedList
+                                        isOptionalPkgDepAlreadyInstalled = true;
+                                    } else {
+                                        satisfied = true;
+                                        missingDeps.remove(pkgDep);
+                                    }
                                     break;
                                 }
                             }
                         }
                         if (!satisfied) { // couldn't satisfy pkgDep
                             allSatisfied = false;
-                            missingDeps.add(pkgDep.toString());
+                            if (isOptionalPkgDep) {
+                                if (!isOptionalPkgDepAlreadyInstalled) {
+                                    optionalMissingDeps.add(pkgDep.toString());
+                                }
+                            } else {
+                                missingDeps.add(pkgDep.toString());
+                            }
                             break;
                         }
                     }
@@ -937,7 +965,19 @@ public class PackageManagerImpl implements PackageManager {
             orderedList.removeAll(orderedMap.keySet());
         }
         if (!orderedList.isEmpty()) {
-            throw new DependencyException(String.format("Couldn't order %s missing %s.", orderedList, missingDeps));
+            if (missingDeps.isEmpty()) {
+                if (!optionalMissingDeps.isEmpty()) {
+                    log.info(String.format("Optional dependencies %s will be ignored for %s.", optionalMissingDeps,
+                            orderedList));
+                }
+                for (String id : orderedList) {
+                    DownloadablePackage pkg = allPackagesByID.get(id);
+                    orderedMap.put(id, pkg);
+                }
+                orderedList.clear();
+            } else {
+                throw new DependencyException(String.format("Couldn't order %s missing %s.", orderedList, missingDeps));
+            }
         }
         orderedList.addAll(orderedMap.keySet());
     }

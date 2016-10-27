@@ -1,0 +1,5 @@
+{"id":"zz-nuxeo-jsf-ui-1.0.0","name":"zz-nuxeo-jsf-ui", "version":"1.0.0", "optionalDependencies":["zz-nuxeo-web-ui:1.0.0"],"title":"Nuxeo JSF UI","description":"Nuxeo JSF UI", "type":"addon", "state":2}
+{"id":"zz-nuxeo-web-ui-1.0.0","name":"zz-nuxeo-web-ui", "version":"1.0.0","title":"Nuxeo WEB UI","description":"Nuxeo WEB UI", "type":"addon", "state":5}
+{"id":"zz-nuxeo-web-ui-1.0.2","name":"zz-nuxeo-web-ui", "version":"1.0.2","title":"Nuxeo WEB UI","description":"Nuxeo WEB UI", "type":"addon", "state":2}
+{"id":"test-opt-dep1-1.0.0","name":"test-opt-dep1", "version":"1.0.0", "optionalDependencies":["zz-nuxeo-jsf-ui:1.0.0:1.0.0"], "title":"Test Optional Dep","description":"Test Optional Dep", "type":"addon", "state":2}
+{"id":"test-opt-dep2-1.0.0","name":"test-opt-dep2", "version":"1.0.0", "optionalDependencies":["zz-nuxeo-jsf-ui:1.0.0:1.0.0"], "title":"Test Optional Dep2","description":"Test Optional Dep2", "type":"addon", "state":2}
