@@ -178,11 +178,11 @@ public class DependencyResolution {
             String id = pkgName + "-" + allPackages.get(pkgName).toString();
             DownloadablePackage pkg = pm.findPackageById(id);
             List<Version> installedVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
-            if (pkg.getPackageState().isInstalled()) {
+            if (pkg.getPackageState().isInstalled() && !orderedRemovablePackages.contains(id)) {
                 // Already installed in the wanted version, nothing to do
                 localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
             } else {
-                if (installedVersions.size() > 0) {
+                if (installedVersions.size() > 0 && !installedVersions.contains(pkg.getVersion())) {
                     // Upgrade case: already installed in other version(s)
                     localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
                 }
@@ -252,6 +252,17 @@ public class DependencyResolution {
         return res;
     }
 
+    /**
+     * @since 1.4.26
+     */
+    public List<String> getInstallPackageNames() {
+        List<String> res = new ArrayList<>();
+        res.addAll(getLocalPackagesToInstall().keySet());
+        res.addAll(getNewPackagesToDownload().keySet());
+        Collections.sort(res);
+        return res;
+    }
+
     public List<String> getDownloadPackageIds() {
         return allPackagesToDownload;
     }
@@ -261,6 +272,16 @@ public class DependencyResolution {
         for (Entry<String, Version> entry : getLocalPackagesToRemove().entrySet()) {
             res.add(entry.getKey() + "-" + entry.getValue().toString());
         }
+        Collections.sort(res);
+        return res;
+    }
+
+    /**
+     * @since 1.4.26
+     */
+    public List<String> getRemovePackageNames() {
+        List<String> res = new ArrayList<>();
+        res.addAll(getLocalPackagesToRemove().keySet());
         Collections.sort(res);
         return res;
     }
