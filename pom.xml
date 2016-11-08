@@ -433,7 +433,7 @@
         <inherited>false</inherited>
         <configuration>
           <show>protected</show>
-          <additionalparam>-Xdoclint:none</additionalparam>
+          <additionalparam>${javadoc.opts}</additionalparam>
           <!-- <includeDependencySources>true</includeDependencySources> -->
           <!-- <includeTransitiveDependencySources>true</includeTransitiveDependencySources> -->
           <linksource>true</linksource>
@@ -662,6 +662,15 @@
           <uniqueVersion>true</uniqueVersion>
         </snapshotRepository>
       </distributionManagement>
+    </profile>
+    <profile>
+      <id>doclint-java8-disable</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <properties>
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
+      </properties>
     </profile>
   </profiles>
 
