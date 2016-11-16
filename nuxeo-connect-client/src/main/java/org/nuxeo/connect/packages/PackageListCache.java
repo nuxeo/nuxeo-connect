@@ -1,18 +1,21 @@
 /*
- * (C) Copyright 2010-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
+ *     Nuxeo
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.packages;
@@ -26,6 +29,9 @@ import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.PackageType;
 
+/**
+ * @since 1.0
+ */
 public class PackageListCache {
     /**
      * @since 1.4.19
@@ -60,8 +66,7 @@ public class PackageListCache {
             packageListCacheEntry = new PackageListCacheEntry();
             cache.put(pkg.getType().toString(), packageListCacheEntry);
         }
-        packageListCacheEntry.getPackages().add(pkg);
-        // Reset cache timestamp?
+        packageListCacheEntry.getPackageCacheEntries().add(new PackageCacheEntry(pkg));
     }
 
     /**
@@ -69,7 +74,7 @@ public class PackageListCache {
      */
     public List<DownloadablePackage> getFromCache(String type) {
         PackageListCacheEntry entry = cache.get(type);
-        if (entry == null || isExpired(entry)) {
+        if (entry == null || entry.isExpired(cache_duration)) {
             return new ArrayList<>();
         }
         return entry.getPackages();
@@ -80,26 +85,16 @@ public class PackageListCache {
      */
     public DownloadablePackage getPackageByID(String packageId) {
         for (PackageListCacheEntry entry : cache.values()) {
-            if (isExpired(entry)) {
-                continue;
-            }
-            for (DownloadablePackage pkg : entry.getPackages()) {
-                if (packageId.equals(pkg.getId())) {
-                    return pkg;
+            for (PackageCacheEntry pkgEntry : entry.getPackageCacheEntries()) {
+                if (packageId.equals(pkgEntry.getPackage().getId())) {
+                    if (pkgEntry.isExpired(cache_duration)) {
+                        return null;
+                    }
+                    return pkgEntry.getPackage();
                 }
             }
         }
         return null;
-    }
-
-    /**
-     * Is the given cache expired
-     *
-     * @see #CONNECT_CLIENT_CACHE_MINUTES_PROPERTY
-     * @since 1.4.18
-     */
-    public boolean isExpired(PackageListCacheEntry entry) {
-        return (System.currentTimeMillis() - entry.getTimeStamp() > cache_duration * 60 * 1000);
     }
 
     /**
@@ -109,7 +104,8 @@ public class PackageListCache {
      * @since 1.4.18
      */
     public boolean isExpired(PackageType type) {
-        return isExpired(cache.get(type.toString()));
+        PackageListCacheEntry packageListCacheForType = cache.get(type.toString());
+        return packageListCacheForType == null || packageListCacheForType.isExpired(cache_duration);
     }
 
 }
