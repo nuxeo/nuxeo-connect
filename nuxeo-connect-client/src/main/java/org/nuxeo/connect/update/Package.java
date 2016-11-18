@@ -86,7 +86,9 @@ public interface Package {
      * @see #getProvides()
      * @since 1.4.26
      */
-    PackageDependency[] getOptionalDependencies();
+    default PackageDependency[] getOptionalDependencies() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Gets the list of conflicts of this package. If no conflict
