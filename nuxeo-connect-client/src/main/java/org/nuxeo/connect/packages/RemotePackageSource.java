@@ -117,18 +117,17 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     @Override
     public DownloadablePackage getPackageById(String packageId) {
         DownloadablePackage pkg = cache.getPackageByID(packageId);
-        if (pkg != null) {
-            return pkg;
-        }
-        ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        try {
-            pkg = crs.getConnector().getDownload(packageId);
-        } catch (ConnectServerError e) {
-            log.debug(e, e);
-            log.warn("Unable to fetch remote package with ID '" + packageId + "': " + e.getMessage());
-        }
-        if (pkg != null) {
-            cache.add(pkg);
+        if (pkg == null) {
+            ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
+            try {
+                pkg = crs.getConnector().getDownload(packageId);
+            } catch (ConnectServerError e) {
+                log.debug(e, e);
+                log.warn("Unable to fetch remote package with ID '" + packageId + "': " + e.getMessage());
+            }
+            if (pkg != null) {
+                cache.add(pkg);
+            }
         }
         return pkg;
     }
