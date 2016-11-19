@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2014 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,6 @@
  *
  * Contributors:
  *     Julien Carsique
- *     Yannis JULIENNE
  *
  */
 
@@ -43,8 +42,6 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     private String classifier;
 
     private List<PackageDependency> dependencies = new ArrayList<>();
-
-    private List<PackageDependency> optionalDependencies = new ArrayList<>();
 
     private List<PackageDependency> conflicts = new ArrayList<>();
 
@@ -77,7 +74,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     public FakeDownloadablePackage(String name, Version version) {
         this.name = name;
         this.version = version;
-        classifier = version.classifier();
+        this.classifier = version.classifier();
     }
 
     @Override
@@ -123,11 +120,6 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     @Override
     public PackageDependency[] getDependencies() {
         return dependencies.toArray(new PackageDependency[dependencies.size()]);
-    }
-
-    @Override
-    public PackageDependency[] getOptionalDependencies() {
-        return optionalDependencies.toArray(new PackageDependency[optionalDependencies.size()]);
     }
 
     @Override

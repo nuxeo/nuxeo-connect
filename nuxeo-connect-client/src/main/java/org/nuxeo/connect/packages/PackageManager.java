@@ -545,13 +545,4 @@ public interface PackageManager extends BasePackageManager {
      */
     List<PackageSource> getAllSources();
 
-    /**
-     * Scan all installed packages unresolved optional dependencies and if some of them are being installed in the given
-     * {@link DependencyResolution}, mark them for reinstallation.
-     *
-     * @param res DependencyResolution listing packages to be installed
-     * @since 1.4.26
-     */
-    void checkOptionalDependenciesOnInstalledPackages(DependencyResolution res);
-
 }

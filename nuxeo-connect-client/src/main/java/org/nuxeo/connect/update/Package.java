@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,6 @@
  *
  * Contributors:
  *     bstefanescu
- *     Yannis JULIENNE
  */
 package org.nuxeo.connect.update;
 
@@ -75,18 +74,6 @@ public interface Package {
      * @see #getProvides()
      */
     PackageDependency[] getDependencies();
-
-    /**
-     * Gets the list of package optional dependencies for this package. If no optional dependency exists, either null or
-     * an empty array is returned.
-     *
-     * @see PackageDependency
-     * @see #getDependencies()
-     * @see #getConflicts()
-     * @see #getProvides()
-     * @since 1.4.26
-     */
-    PackageDependency[] getOptionalDependencies();
 
     /**
      * Gets the list of conflicts of this package. If no conflict

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,6 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *     Yannis JULIENNE
  *
  */
 
@@ -105,8 +104,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
 
     protected PackageDependency[] dependencies;
 
-    protected PackageDependency[] optionalDependencies;
-
     protected PackageDependency[] conflicts;
 
     protected PackageDependency[] provides;
@@ -167,26 +164,26 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      */
     public PackageDescriptor(Package descriptor) {
         super();
-        classifier = descriptor.getClassifier();
-        dependencies = descriptor.getDependencies();
-        conflicts = descriptor.getConflicts();
-        description = descriptor.getDescription();
-        homePage = descriptor.getHomePage();
-        license = descriptor.getLicenseType();
-        licenseUrl = descriptor.getLicenseUrl();
-        name = descriptor.getName();
-        productionState = descriptor.getProductionState();
-        provides = descriptor.getProvides();
-        packageState = descriptor.getPackageState();
-        targetPlatforms = descriptor.getTargetPlatforms();
-        title = descriptor.getTitle();
-        type = descriptor.getType();
-        vendor = descriptor.getVendor();
-        version = descriptor.getVersion();
-        visibility = descriptor.getVisibility();
-        nuxeoValidationState = descriptor.getValidationState();
-        supported = descriptor.isSupported();
-        supportsHotReload = descriptor.supportsHotReload();
+        this.classifier = descriptor.getClassifier();
+        this.dependencies = descriptor.getDependencies();
+        this.conflicts = descriptor.getConflicts();
+        this.description = descriptor.getDescription();
+        this.homePage = descriptor.getHomePage();
+        this.license = descriptor.getLicenseType();
+        this.licenseUrl = descriptor.getLicenseUrl();
+        this.name = descriptor.getName();
+        this.productionState = descriptor.getProductionState();
+        this.provides = descriptor.getProvides();
+        this.packageState = descriptor.getPackageState();
+        this.targetPlatforms = descriptor.getTargetPlatforms();
+        this.title = descriptor.getTitle();
+        this.type = descriptor.getType();
+        this.vendor = descriptor.getVendor();
+        this.version = descriptor.getVersion();
+        this.visibility = descriptor.getVisibility();
+        this.nuxeoValidationState = descriptor.getValidationState();
+        this.supported = descriptor.isSupported();
+        this.supportsHotReload = descriptor.supportsHotReload();
     }
 
     @Override
@@ -234,14 +231,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
             dependencies = new PackageDependency[0];
         }
         return dependencies;
-    }
-
-    @Override
-    public PackageDependency[] getOptionalDependencies() {
-        if (optionalDependencies == null) {
-            optionalDependencies = new PackageDependency[0];
-        }
-        return optionalDependencies;
     }
 
     @JSONExportMethod(name = "dependencies")
@@ -484,19 +473,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
         setDependencies(deps);
     }
 
-    public void setOptionalDependencies(PackageDependency[] optionalDependencies) {
-        this.optionalDependencies = addPackageDependencies(this.optionalDependencies, optionalDependencies);
-    }
-
-    @JSONImportMethod(name = "optionalDependencies")
-    protected void setOptionalDependenciesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
-        }
-        setOptionalDependencies(deps);
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -561,7 +537,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      * @since 1.4.17
      */
     public void setPackageState(PackageState state) {
-        packageState = state;
+        this.packageState = state;
     }
 
     /**
@@ -569,7 +545,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      */
     @JSONImportMethod(name = "state")
     public void setPackageState(int state) {
-        packageState = PackageState.getByValue(state);
+        this.packageState = PackageState.getByValue(state);
     }
 
     /**
@@ -628,7 +604,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements
      */
     @Deprecated
     public void setState(int state) {
-        packageState = PackageState.getByValue(state);
+        this.packageState = PackageState.getByValue(state);
     }
 
     public void setSupported(boolean supported) {

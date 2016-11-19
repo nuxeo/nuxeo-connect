@@ -639,7 +639,6 @@ public class CUDFHelper {
             throw new DependencyException(res.failedMessage);
         }
         res.markAsSuccess();
-        pm.checkOptionalDependenciesOnInstalledPackages(res);
         pm.order(res);
         return res;
     }
