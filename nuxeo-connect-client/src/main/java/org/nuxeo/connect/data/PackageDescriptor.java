@@ -43,12 +43,13 @@ import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
- * DTO implementation of the {@link DownloadablePackage} interface. Used to transfer {@link Package} description between
- * server and client.
+ * DTO implementation of the {@link DownloadablePackage} interface. Used to
+ * transfer {@link Package} description between server and client.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-public class PackageDescriptor extends AbstractJSONSerializableData implements DownloadablePackage {
+public class PackageDescriptor extends AbstractJSONSerializableData implements
+        DownloadablePackage {
 
     private static final String CAP_PREFIX = "cap-";
 
@@ -57,10 +58,12 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     private static final String NUXEO_JSF_UI = "nuxeo-jsf-ui";
 
     /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)}
+     *             instead.
      */
     @Deprecated
-    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
+    public static PackageDescriptor loadFromJSON(JSONObject json)
+            throws JSONException {
         return loadFromJSON(PackageDescriptor.class, json);
     }
 
@@ -68,7 +71,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
      * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
      */
     @Deprecated
-    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
+    public static PackageDescriptor loadFromJSON(String json)
+            throws JSONException {
         return loadFromJSON(new JSONObject(json));
     }
 
@@ -480,16 +484,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         setDependencies(deps);
     }
 
-    /**
-     * @since 1.4.26
-     */
     public void setOptionalDependencies(PackageDependency[] optionalDependencies) {
         this.optionalDependencies = addPackageDependencies(this.optionalDependencies, optionalDependencies);
     }
 
-    /**
-     * @since 1.4.26
-     */
     @JSONImportMethod(name = "optionalDependencies")
     protected void setOptionalDependenciesAsJSON(JSONArray array) throws JSONException {
         PackageDependency[] deps = new PackageDependency[array.length()];
@@ -549,7 +547,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         return dependencies;
     }
 
-    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
+    public void setNuxeoValidationState(
+            NuxeoValidationState nuxeoValidationState) {
         this.nuxeoValidationState = nuxeoValidationState;
     }
 
@@ -624,7 +623,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     /**
-     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
+     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)}
+     *             instead.
      */
     @Deprecated
     public void setState(int state) {

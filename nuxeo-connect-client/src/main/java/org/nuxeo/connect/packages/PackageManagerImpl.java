@@ -888,18 +888,6 @@ public class PackageManagerImpl implements PackageManager {
         }
     }
 
-    /**
-     * Sort the given orderedList list of package ids by dependencies and optional dependencies. If a package A has a
-     * dependency on a package B, B will be ordered before A. If B is missing, a {@link DependencyException} will be
-     * thrown. If a package C has an optional dependency on a package D, D will be ordered before C. If D is missing, a
-     * message will be logged to inform that D will be ignored.
-     *
-     * @param allPackagesByID all available packages sorted by id
-     * @param orderedList the package ids list to sort
-     * @param namesList the package names corresponding to the package ids in orederedList
-     * @param isRemoveList if true, no message will be logged for missing optional dependencies
-     * @throws DependencyException if one ore more dependency (non optional) is missing
-     */
     private void orderByDependencies(Map<String, DownloadablePackage> allPackagesByID, List<String> orderedList,
             List<String> namesList, boolean isRemoveList) throws DependencyException {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());

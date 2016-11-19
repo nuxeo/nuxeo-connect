@@ -179,7 +179,7 @@ public class DependencyResolution {
             DownloadablePackage pkg = pm.findPackageById(id);
             List<Version> installedVersions = pm.findLocalPackageInstalledVersions(pkg.getName());
             if (pkg.getPackageState().isInstalled() && !orderedRemovablePackages.contains(id)) {
-                // Already installed in the wanted version and not to be removed, nothing to do
+                // Already installed in the wanted version, nothing to do
                 localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
             } else {
                 if (installedVersions.size() > 0 && !installedVersions.contains(pkg.getVersion())) {
@@ -187,11 +187,9 @@ public class DependencyResolution {
                     localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
                 }
                 if (pkg.getPackageState() == PackageState.REMOTE) {
-                    // Needs to be download
                     newPackagesToDownload.put(pkg.getName(), pkg.getVersion());
                     allPackagesToDownload.add(id);
                 } else {
-                    // Already in local cache
                     localPackagesToInstall.put(pkg.getName(), pkg.getVersion());
                 }
             }
@@ -255,8 +253,6 @@ public class DependencyResolution {
     }
 
     /**
-     * Return names of all packages to be installed (local and remote)
-     * 
      * @since 1.4.26
      */
     public List<String> getInstallPackageNames() {
