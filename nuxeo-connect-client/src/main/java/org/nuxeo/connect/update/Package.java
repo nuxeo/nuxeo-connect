@@ -17,6 +17,8 @@
  */
 package org.nuxeo.connect.update;
 
+import org.apache.commons.lang.NotImplementedException;
+
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
@@ -87,7 +89,7 @@ public interface Package {
      * @since 1.4.26
      */
     default PackageDependency[] getOptionalDependencies() {
-        throw new UnsupportedOperationException();
+        throw new NotImplementedException();
     }
 
     /**
