@@ -126,4 +126,16 @@ public class TestOptionalDependencies extends AbstractPackageManagerTestCase {
 
     }
 
+    public void testNoReinstallForUpgradingOptionalDependency() throws Exception {
+        // zz-nuxeo-web-ui-1.0.0 has an optional dependency on test-opt-dep5
+        // it should not be reinstalled when upgrading test-opt-dep5
+        DependencyResolution depResolution = pm.resolveDependencies(
+                Arrays.asList(new String[] { "test-opt-dep5-1.0.1" }), null, null, null);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(1, depResolution.getOrderedPackageIdsToInstall().size());
+        assertEquals("test-opt-dep5-1.0.1", depResolution.getOrderedPackageIdsToInstall().get(0));
+        assertEquals(0, depResolution.getOrderedPackageIdsToRemove().size());
+    }
+
 }

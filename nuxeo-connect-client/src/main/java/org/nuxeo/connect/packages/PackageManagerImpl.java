@@ -792,9 +792,16 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
             List<String> pkgUpgrade, String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep, false);
+    }
+
+    @Override
+    public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
+            List<String> pkgUpgrade, String targetPlatform, boolean allowSNAPSHOT, boolean doKeep,
+            boolean isSubResolution) {
         try {
             DependencyResolution resolution = resolver.resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                    allowSNAPSHOT, doKeep);
+                    allowSNAPSHOT, doKeep, isSubResolution);
 
             log.debug(beforeAfterResolutionToString(resolution));
             return resolution;
@@ -1096,24 +1103,44 @@ public class PackageManagerImpl implements PackageManager {
             for (DownloadablePackage installedPkg : installedPackages) {
                 PackageDependency[] optionalDependencies = installedPkg.getOptionalDependencies();
                 for (PackageDependency pkgOptDep : optionalDependencies) {
-                    if (findLocalPackageInstalledVersions(pkgOptDep.getName()).isEmpty()) {
+                    // is pkgOptDep already installed ?
+                    List<Version> installedVersions = findLocalPackageInstalledVersions(pkgOptDep.getName());
+                    boolean hasAnInstalledMatch = false;
+                    for (Version version : installedVersions) {
+                        if (pkgOptDep.getVersionRange().matchVersion(version)) {
+                            hasAnInstalledMatch = true;
+                            break;
+                        }
+                    }
+                    if (!hasAnInstalledMatch) {// if not, is pkgOptDep going to be installed ?
                         for (String pkgId : res.getOrderedPackageIdsToInstall()) {
                             DownloadablePackage pkgToInstall = getPackage(pkgId);
                             if (matchDependency(pkgOptDep, pkgToInstall)) {
-                                log.info(String.format(
-                                        "As package '%s' has an optional dependency on package '%s' currently being installed, it will be reinstalled.",
-                                        installedPkg, pkgToInstall));
+                                // if yes, mark installedPkg for reinstall
+                                res.addReinstallForNewlyInstalledOptional(installedPkg.getId(), pkgToInstall.getId());
                                 packagesToReinstall.add(installedPkg);
+                                break;
                             }
                         }
-                    } else {
-                        for (String pkgId : res.getOrderedPackageIdsToRemove()) {
-                            DownloadablePackage pkgToRemove = getPackage(pkgId);
-                            if (matchDependency(pkgOptDep, pkgToRemove)) {
-                                log.info(String.format(
-                                        "As package '%s' has an optional dependency on package '%s' currently being uninstalled, it will be reinstalled.",
-                                        installedPkg, pkgToRemove));
-                                packagesToReinstall.add(installedPkg);
+                    } else { // if yes, is pkgOptDep going to be upgraded ?
+                        boolean hasAnUpgradingMatch = false;
+                        for (String pkgId : res.getOrderedPackageIdsToInstall()) {
+                            DownloadablePackage pkgToInstall = getPackage(pkgId);
+                            if (pkgToInstall.getName().equals(pkgOptDep.getName())
+                                    && pkgOptDep.getVersionRange().matchVersion(pkgToInstall.getVersion())) {
+                                hasAnUpgradingMatch = true;
+                                break;
+                            }
+                        }
+                        if (!hasAnUpgradingMatch) { // if not, is pkgOptDep going to be removed ?
+                            for (String pkgId : res.getOrderedPackageIdsToRemove()) {
+                                DownloadablePackage pkgToRemove = getPackage(pkgId);
+                                if (matchDependency(pkgOptDep, pkgToRemove)) {
+                                    // if yes, mark installedPkg for reinstall
+                                    res.addReinstallForNewlyRemovedOptional(installedPkg.getId(), pkgToRemove.getId());
+                                    packagesToReinstall.add(installedPkg);
+                                    break;
+                                }
                             }
                         }
                     }
