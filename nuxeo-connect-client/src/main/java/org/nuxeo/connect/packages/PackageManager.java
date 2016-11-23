@@ -1,20 +1,22 @@
 /*
  * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
+ *     
  */
 
 package org.nuxeo.connect.packages;
@@ -541,13 +543,26 @@ public interface PackageManager extends BasePackageManager {
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep);
 
     /**
+     * @param allowSNAPSHOT Whether to allow SNAPSHOT versions or not. Even if not allowed, SNAPSHOT versions of a given
+     *            package will be included if a SNAPSHOT version of that package is already installed. There may be
+     *            other acceptance cases.
+     * @param doKeep Whether to keep the installed versions in the resolution.
+     * @param isSubResolution if true, do not check for optional dependencies on installed packages
+     * @since 1.4.27
+     */
+    DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution);
+
+    /**
      * @since public since 1.4.21, was protected before that
      */
     List<PackageSource> getAllSources();
 
     /**
      * Scan all installed packages unresolved optional dependencies and if some of them are being installed in the given
-     * {@link DependencyResolution}, mark them for reinstallation.
+     * {@link DependencyResolution}, mark them for reinstallation. Also scan all installed packages resolved optional
+     * dependencies and if some of them are being uninstalled in the given {@link DependencyResolution}, mark them for
+     * reinstallation.
      *
      * @param res DependencyResolution listing packages to be installed
      * @since 1.4.26

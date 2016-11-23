@@ -26,8 +26,10 @@ package org.nuxeo.connect.packages.dependencies;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
@@ -72,6 +74,16 @@ public class DependencyResolution {
     protected List<String> orderedRemovablePackages = new ArrayList<>();
 
     protected List<String> allPackagesToDownload = new ArrayList<>();
+
+    /**
+     * Packages to be reinstalled because at least one of their optional dependencies is going to be installed
+     */
+    protected Map<String, Set<String>> reinstallForNewlyInstalledOptionals = new HashMap<>();
+
+    /**
+     * Packages to be reinstalled because at least one of their optional dependencies is going to be removed
+     */
+    protected Map<String, Set<String>> reinstallForNewlyRemovedOptionals = new HashMap<>();
 
     public DependencyResolution() {
 
@@ -256,7 +268,7 @@ public class DependencyResolution {
 
     /**
      * Return names of all packages to be installed (local and remote)
-     * 
+     *
      * @since 1.4.26
      */
     public List<String> getInstallPackageNames() {
@@ -306,6 +318,16 @@ public class DependencyResolution {
     @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
+        for (Entry<String, Set<String>> entry : reinstallForNewlyInstalledOptionals.entrySet()) {
+            sb.append(String.format(
+                    "\nAs package '%s' has an optional dependency on package(s) %s currently being installed, it will be reinstalled.",
+                    entry.getKey(), entry.getValue()));
+        }
+        for (Entry<String, Set<String>> entry : reinstallForNewlyRemovedOptionals.entrySet()) {
+            sb.append(String.format(
+                    "\nAs package '%s' has an optional dependency on package(s) %s currently being uninstalled, it will be reinstalled.",
+                    entry.getKey(), entry.getValue()));
+        }
         if (isFailed()) {
             sb.append("\nFailed to resolve dependencies: ");
             sb.append(failedMessage);
@@ -405,6 +427,26 @@ public class DependencyResolution {
      */
     public boolean isSorted() {
         return sorted;
+    }
+
+    /**
+     * Add information about a package to be reinstalled because at least one of their optional dependencies is going to
+     * be installed
+     *
+     * @since 1.4.27
+     */
+    public void addReinstallForNewlyInstalledOptional(String installedPkgId, String optDepToInsallId) {
+        reinstallForNewlyInstalledOptionals.computeIfAbsent(installedPkgId, k -> new HashSet<>()).add(optDepToInsallId);
+    }
+
+    /**
+     * Add information about a package to be reinstalled because at least one of their optional dependencies is going to
+     * be installed
+     *
+     * @since 1.4.27
+     */
+    public void addReinstallForNewlyRemovedOptional(String installedPkgId, String optDepToRemoveId) {
+        reinstallForNewlyRemovedOptionals.computeIfAbsent(installedPkgId, k -> new HashSet<>()).add(optDepToRemoveId);
     }
 
 }

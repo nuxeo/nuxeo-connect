@@ -1,19 +1,22 @@
 /*
  * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
+ *     
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -108,6 +111,13 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep, false);
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
+            throws DependencyException {
         // By default, criteria are made for install, prioritizing the solution with the less changes
         String solverCriteria = SOLVER_CRITERIA_LESS_CHANGES;
         if (!doKeep) {
@@ -125,20 +135,21 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             // version
             solverCriteria = SOLVER_CRITERIA_LESS_VERSION_CHANGES;
         }
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true, solverCriteria);
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true, solverCriteria,
+                isSubResolution);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, String solverCriteria) throws DependencyException {
         return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT, true,
-                solverCriteria);
+                solverCriteria, false);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria)
-            throws DependencyException {
+            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria,
+            boolean isSubResolution) throws DependencyException {
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setTargetPlatform(targetPlatform);
         cudfHelper.setAllowSNAPSHOT(allowSNAPSHOT);
@@ -171,7 +182,8 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         if (!planner.isSolutionOptimal()) {
             log.warn("The solution found might not be optimal");
         }
-        DependencyResolution resolution = cudfHelper.buildResolution(solution, planner.getSolutionDetails());
+        DependencyResolution resolution = cudfHelper.buildResolution(solution, planner.getSolutionDetails(),
+                isSubResolution);
         if (!doKeep) {
             // Make sub-resolution to remove all packages that are not part of
             // our target list

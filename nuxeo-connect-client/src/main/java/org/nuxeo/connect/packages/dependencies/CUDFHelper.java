@@ -1,18 +1,22 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *      Mathieu Guillaume, Julien Carsique
+ *     Mathieu Guillaume
+ *     Julien Carsique
+ *     Yannis JULIENNE
  *
  */
 
@@ -294,8 +298,8 @@ public class CUDFHelper {
                     continue;
                 }
                 for (DownloadablePackage downloadablePkgDep : downloadablePkgDeps) {
-                    computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages,
-                            downloadablePkgDep, allPackagesMap);
+                    computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, downloadablePkgDep,
+                            allPackagesMap);
                 }
             }
         }
@@ -453,8 +457,8 @@ public class CUDFHelper {
      * @see #getCUDFFile()
      * @see #formatCUDF(NuxeoCUDFPackage)
      */
-    public Map<String, NuxeoCUDFPackageDescription> parseCUDFFile(BufferedReader reader) throws IOException,
-            DependencyException {
+    public Map<String, NuxeoCUDFPackageDescription> parseCUDFFile(BufferedReader reader)
+            throws IOException, DependencyException {
         Map<String, NuxeoCUDFPackageDescription> map = new TreeMap<>();
         NuxeoCUDFPackageDescription nuxeoCUDFPkgDesc = null;
         Pattern linePattern = Pattern.compile(CUDFPackage.LINE_PATTERN);
@@ -618,11 +622,12 @@ public class CUDFHelper {
     /**
      * @param solution CUDF solution
      * @param details
+     * @param isSubResolution if true, do not check for optional dependencies on installed packages
      * @return a DependencyResolution built from the given CUDF solution
      * @throws DependencyException
      */
     public DependencyResolution buildResolution(Collection<InstallableUnit> solution,
-            Map<Criteria, List<String>> details) throws DependencyException {
+            Map<Criteria, List<String>> details, boolean isSubResolution) throws DependencyException {
         if (solution == null) {
             throw new DependencyException("No solution found.");
         }
@@ -639,7 +644,9 @@ public class CUDFHelper {
             throw new DependencyException(res.failedMessage);
         }
         res.markAsSuccess();
-        pm.checkOptionalDependenciesOnInstalledPackages(res);
+        if (!isSubResolution) {
+            pm.checkOptionalDependenciesOnInstalledPackages(res);
+        }
         pm.order(res);
         return res;
     }
