@@ -1092,7 +1092,7 @@ public class PackageManagerImpl implements PackageManager {
     public void checkOptionalDependenciesOnInstalledPackages(DependencyResolution res) {
         List<DownloadablePackage> installedPackages = listInstalledPackages();
         synchronized (res) {
-            List<DownloadablePackage> packagesToReinstall = new ArrayList<>();
+            Set<DownloadablePackage> packagesToReinstall = new HashSet<>();
             for (DownloadablePackage installedPkg : installedPackages) {
                 PackageDependency[] optionalDependencies = installedPkg.getOptionalDependencies();
                 for (PackageDependency pkgOptDep : optionalDependencies) {
@@ -1103,6 +1103,16 @@ public class PackageManagerImpl implements PackageManager {
                                 log.info(String.format(
                                         "As package '%s' has an optional dependency on package '%s' currently being installed, it will be reinstalled.",
                                         installedPkg, pkgToInstall));
+                                packagesToReinstall.add(installedPkg);
+                            }
+                        }
+                    } else {
+                        for (String pkgId : res.getOrderedPackageIdsToRemove()) {
+                            DownloadablePackage pkgToRemove = getPackage(pkgId);
+                            if (matchDependency(pkgOptDep, pkgToRemove)) {
+                                log.info(String.format(
+                                        "As package '%s' has an optional dependency on package '%s' currently being uninstalled, it will be reinstalled.",
+                                        installedPkg, pkgToRemove));
                                 packagesToReinstall.add(installedPkg);
                             }
                         }
