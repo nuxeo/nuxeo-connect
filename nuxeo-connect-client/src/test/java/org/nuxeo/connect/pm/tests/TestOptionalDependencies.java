@@ -99,14 +99,16 @@ public class TestOptionalDependencies extends AbstractPackageManagerTestCase {
 
     public void testReinstallForLatelyResolvedOptionalDependency() throws Exception {
         // zz-nuxeo-web-ui-1.0.0 has an optional dependency on test-opt-dep3
-        // it should be reinstalled when installing test-opt-dep3
+        // test-opt-dep6 has a required dependency on zz-nuxeo-web-ui-1.0.0 and test-opt-dep3
+        // zz-nuxeo-web-ui-1.0.0 should be reinstalled before test-opt-dep6 when installing test-opt-dep6
         DependencyResolution depResolution = pm.resolveDependencies(
-                Arrays.asList(new String[] { "test-opt-dep3-1.0.0" }), null, null, null);
+                Arrays.asList(new String[] { "test-opt-dep6-1.0.0" }), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        assertEquals(2, depResolution.getOrderedPackageIdsToInstall().size());
+        assertEquals(3, depResolution.getOrderedPackageIdsToInstall().size());
         assertEquals("test-opt-dep3-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(0));
         assertEquals("zz-nuxeo-web-ui-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(1));
+        assertEquals("test-opt-dep6-1.0.0", depResolution.getOrderedPackageIdsToInstall().get(2));
         assertEquals(1, depResolution.getOrderedPackageIdsToRemove().size());
         assertEquals("zz-nuxeo-web-ui-1.0.0", depResolution.getOrderedPackageIdsToRemove().get(0));
     }
