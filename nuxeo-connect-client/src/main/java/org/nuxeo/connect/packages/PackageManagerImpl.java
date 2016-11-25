@@ -888,9 +888,9 @@ public class PackageManagerImpl implements PackageManager {
                 res.sort(this);
             }
             List<String> installOrder = res.getOrderedPackageIdsToInstall();
-            orderByDependencies(allPackagesByID, installOrder, res.getInstallPackageNames(), false);
             List<String> removeOrder = res.getOrderedPackageIdsToRemove();
-            orderByDependencies(allPackagesByID, removeOrder, res.getRemovePackageNames(), true);
+            orderByDependencies(allPackagesByID, installOrder, removeOrder, false);
+            orderByDependencies(allPackagesByID, removeOrder, removeOrder, true);
             Collections.reverse(removeOrder);
         }
     }
@@ -902,20 +902,20 @@ public class PackageManagerImpl implements PackageManager {
      * message will be logged to inform that D will be ignored.
      *
      * @param allPackagesByID all available packages sorted by id
-     * @param orderedList the package ids list to sort
-     * @param namesList the package names corresponding to the package ids in orederedList
+     * @param listToOrder the package ids list to order
+     * @param orderedRemoveList the package ids list which are going to be removed
      * @param isRemoveList if true, no message will be logged for missing optional dependencies
      * @throws DependencyException if one ore more dependency (non optional) is missing
      */
-    private void orderByDependencies(Map<String, DownloadablePackage> allPackagesByID, List<String> orderedList,
-            List<String> namesList, boolean isRemoveList) throws DependencyException {
+    private void orderByDependencies(Map<String, DownloadablePackage> allPackagesByID, List<String> listToOrder,
+            List<String> orderedRemoveList, boolean isRemoveList) throws DependencyException {
         Map<String, Package> orderedMap = Collections.synchronizedMap(new LinkedHashMap<String, Package>());
         boolean hasChanged = true;
         Set<String> missingDeps = new HashSet<>();
         Map<String, Set<String>> optionalMissingDeps = new HashMap<>();
-        while (!orderedList.isEmpty() && hasChanged) {
+        while (!listToOrder.isEmpty() && hasChanged) {
             hasChanged = false;
-            for (String id : orderedList) {
+            for (String id : listToOrder) {
                 DownloadablePackage pkg = allPackagesByID.get(id);
                 if (pkg.getDependencies().length == 0 && pkg.getOptionalDependencies().length == 0) {
                     // Add pkg to orderedMap if it has no dependencies nor optional dependencies
@@ -946,48 +946,39 @@ public class PackageManagerImpl implements PackageManager {
                                 break;
                             }
                         }
-                        // else, is pkgDep satisfied in already installed pkgs ?
-                        boolean isOptionalPkgDepAlreadyInstalled = false;
-                        if (!satisfied) {
+                        // else, is pkgDep satisfied in already installed pkgs and is not going to be removed or
+                        // upgraded ?
+                        if (!satisfied && !hasMatchInIdList(pkgDep, listToOrder)) {
                             for (Version version : findLocalPackageInstalledVersions(pkgDep.getName())) {
-                                if (pkgDep.getVersionRange().matchVersion(version)) {
+                                if ((isRemoveList || !hasMatchInIdList(pkgDep.getName(), version, orderedRemoveList))
+                                        && pkgDep.getVersionRange().matchVersion(version)) {
+                                    satisfied = true;
                                     if (isOptionalPkgDep) {
-                                        if (namesList.contains(pkgDep.getName())) {
-                                            // keep optional pkgDep unsatisfied as it is also in orderedList
-                                            isOptionalPkgDepAlreadyInstalled = true;
-                                        } else {
-                                            satisfied = true;
-                                            if (optionalMissingDeps.get(id) != null) {
-                                                optionalMissingDeps.get(id).remove(pkgDep.toString());
-                                            }
+                                        if (optionalMissingDeps.get(id) != null) {
+                                            optionalMissingDeps.get(id).remove(pkgDep.toString());
                                         }
                                     } else {
-                                        satisfied = true;
                                         missingDeps.remove(pkgDep.toString());
                                     }
                                     break;
                                 }
                             }
-                        }
-                        // else if it's an optional dependency that will not be installed
-                        if (!satisfied && isOptionalPkgDep && !isOptionalPkgDepAlreadyInstalled
-                                && !namesList.contains(pkgDep.getName())) {
-                            // consider the pkDep as satisfied, but add it in optional missing dependencies for logging
-                            satisfied = true;
-                            if (optionalMissingDeps.get(id) == null) {
-                                optionalMissingDeps.put(id, new HashSet<>());
+                            // if it's an optional dependency that will not be installed
+                            if (!satisfied && isOptionalPkgDep) {
+                                // consider the pkDep as satisfied, but add it in optional missing dependencies for
+                                // logging if it is not going to be removed
+                                satisfied = true;
+                                if (!hasMatchInIdList(pkgDep, orderedRemoveList)) {
+                                    optionalMissingDeps.computeIfAbsent(id, k -> new HashSet<>()).add(
+                                            pkgDep.toString());
+                                }
                             }
-                            optionalMissingDeps.get(id).add(pkgDep.toString());
                         }
+
                         if (!satisfied) { // couldn't satisfy pkgDep
                             allSatisfied = false;
                             if (isOptionalPkgDep) {
-                                if (!isOptionalPkgDepAlreadyInstalled) {
-                                    if (optionalMissingDeps.get(id) == null) {
-                                        optionalMissingDeps.put(id, new HashSet<>());
-                                    }
-                                    optionalMissingDeps.get(id).add(pkgDep.toString());
-                                }
+                                optionalMissingDeps.computeIfAbsent(id, k -> new HashSet<>()).add(pkgDep.toString());
                             } else {
                                 missingDeps.add(pkgDep.toString());
                             }
@@ -996,12 +987,12 @@ public class PackageManagerImpl implements PackageManager {
                     }
                     if (allSatisfied) {
                         orderedMap.put(id, pkg);
-                        namesList.remove(pkg.getName());
+                        orderedRemoveList.remove(pkg.getName());
                         hasChanged = true;
                     }
                 }
             }
-            orderedList.removeAll(orderedMap.keySet());
+            listToOrder.removeAll(orderedMap.keySet());
         }
         if (!optionalMissingDeps.isEmpty() && !isRemoveList) {
             for (Entry<String, Set<String>> entry : optionalMissingDeps.entrySet()) {
@@ -1011,18 +1002,33 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        if (!orderedList.isEmpty()) {
+        if (!listToOrder.isEmpty()) {
             if (missingDeps.isEmpty()) {
-                for (String id : orderedList) {
+                for (String id : listToOrder) {
                     DownloadablePackage pkg = allPackagesByID.get(id);
                     orderedMap.put(id, pkg);
                 }
-                orderedList.clear();
+                listToOrder.clear();
             } else {
-                throw new DependencyException(String.format("Couldn't order %s missing %s.", orderedList, missingDeps));
+                throw new DependencyException(String.format("Couldn't order %s missing %s.", listToOrder, missingDeps));
             }
         }
-        orderedList.addAll(orderedMap.keySet());
+        listToOrder.addAll(orderedMap.keySet());
+    }
+
+    private boolean hasMatchInIdList(String pkgName, Version pkgVersion, List<String> pkgIdList) {
+        String pkgId = pkgName + "-" + pkgVersion;
+        return pkgIdList.contains(pkgId);
+    }
+
+    private boolean hasMatchInIdList(PackageDependency pkgDep, List<String> pkgIdList) {
+        for (String pkgId : pkgIdList) {
+            Package pkg = getPackage(pkgId);
+            if (matchDependency(pkgDep, pkg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean matchDependency(PackageDependency pkgDep, Package pkg) {
@@ -1123,15 +1129,7 @@ public class PackageManagerImpl implements PackageManager {
                             }
                         }
                     } else { // if yes, is pkgOptDep going to be upgraded ?
-                        boolean hasAnUpgradingMatch = false;
-                        for (String pkgId : res.getOrderedPackageIdsToInstall()) {
-                            DownloadablePackage pkgToInstall = getPackage(pkgId);
-                            if (pkgToInstall.getName().equals(pkgOptDep.getName())
-                                    && pkgOptDep.getVersionRange().matchVersion(pkgToInstall.getVersion())) {
-                                hasAnUpgradingMatch = true;
-                                break;
-                            }
-                        }
+                        boolean hasAnUpgradingMatch = hasMatchInIdList(pkgOptDep, res.getOrderedPackageIdsToInstall());
                         if (!hasAnUpgradingMatch) { // if not, is pkgOptDep going to be removed ?
                             for (String pkgId : res.getOrderedPackageIdsToRemove()) {
                                 DownloadablePackage pkgToRemove = getPackage(pkgId);
