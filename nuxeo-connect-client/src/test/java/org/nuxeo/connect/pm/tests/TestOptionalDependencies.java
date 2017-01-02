@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,6 +126,19 @@ public class TestOptionalDependencies extends AbstractPackageManagerTestCase {
         assertEquals("zz-nuxeo-web-ui-1.0.0", depResolution.getOrderedPackageIdsToRemove().get(0));
         assertEquals("test-opt-dep5-1.0.0", depResolution.getOrderedPackageIdsToRemove().get(1));
 
+    }
+
+    public void testNoReinstallForPackageBeingRemoved() throws Exception {
+        // zz-nuxeo-web-ui-1.0.0 has an optional dependency on test-opt-dep5
+        // it should not be reinstalled when uninstalling test-opt-dep5 and zz-nuxeo-web-ui-1.0.0
+        DependencyResolution depResolution = pm.resolveDependencies(null,
+                Arrays.asList(new String[] { "test-opt-dep5-1.0.0", "zz-nuxeo-web-ui-1.0.0" }), null, null);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        assertEquals(0, depResolution.getOrderedPackageIdsToInstall().size());
+        assertEquals(2, depResolution.getOrderedPackageIdsToRemove().size());
+        assertEquals("zz-nuxeo-web-ui-1.0.0", depResolution.getOrderedPackageIdsToRemove().get(0));
+        assertEquals("test-opt-dep5-1.0.0", depResolution.getOrderedPackageIdsToRemove().get(1));
     }
 
     public void testNoReinstallForUpgradingOptionalDependency() throws Exception {

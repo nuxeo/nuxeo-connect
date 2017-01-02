@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1107,6 +1107,10 @@ public class PackageManagerImpl implements PackageManager {
         synchronized (res) {
             Set<DownloadablePackage> packagesToReinstall = new HashSet<>();
             for (DownloadablePackage installedPkg : installedPackages) {
+                if (res.getOrderedPackageIdsToRemove().contains(installedPkg.getId())) {
+                    // no check to do on packages being removed
+                    continue;
+                }
                 PackageDependency[] optionalDependencies = installedPkg.getOptionalDependencies();
                 for (PackageDependency pkgOptDep : optionalDependencies) {
                     // is pkgOptDep already installed ?
