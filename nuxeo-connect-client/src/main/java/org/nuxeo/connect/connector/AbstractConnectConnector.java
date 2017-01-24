@@ -1,18 +1,24 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     bstefanescu, tdelprat, mguillaume, jcarsique
+ *     bstefanescu
+ *     tdelprat
+ *     mguillaume
+ *     jcarsique
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.connector;
@@ -169,10 +175,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             log.error(e);
         }
         String url = getBaseUrl() + GET_DOWNLOAD_SUFFIX + "/" + id;
-        ConnectServerResponse response = null;
         PackageDescriptor pkg = null;
+        ConnectServerResponse response = execCall(url);
         try {
-            response = execCall(url);
             String json = response.getString();
             if (json == null) { // Not found
                 return null;
@@ -181,9 +186,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
-            if (response != null) {
-                response.release();
-            }
+            response.release();
         }
         if (pkg == null || pkg.getId() == null) {
             throw new ConnectSecurityError("Unable to parse server response: package has no id");
@@ -218,19 +221,22 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         // Fallback on the real source
         String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + urlSuffix;
         ConnectServerResponse response = execCall(url);
-        String json = response.getString();
-        response.release();
         try {
-            JSONArray array = new JSONArray(json);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject ob = (JSONObject) array.get(i);
-                result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
+            String json = response.getString();
+            if (json != null) {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject ob = (JSONObject) array.get(i);
+                    result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
+                }
+                writeCacheFile(fileSuffix, json);
             }
         } catch (JSONException e) {
             throw new ConnectServerError("Unable to parse response", e);
+        } finally {
+            response.release();
         }
 
-        writeCacheFile(fileSuffix, json);
         return result;
     }
 
@@ -256,8 +262,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      */
     public List<DownloadablePackage> readCacheFile(String suffix) {
         List<DownloadablePackage> result = new ArrayList<>();
-        long cacheMaxAge = Long.parseLong(NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY,
-                DEFAULT_CACHE_TIME_MINUTES)) * 60 * 1000;
+        long cacheMaxAge = Long.parseLong(
+                NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, DEFAULT_CACHE_TIME_MINUTES))
+                * 60 * 1000;
         if (suffix == null || PackageType.getByValue(suffix) == PackageType.STUDIO) {
             cacheMaxAge = Math.min(cacheMaxAge, DEFAULT_CACHE_TIME_MS_STUDIO);
         }

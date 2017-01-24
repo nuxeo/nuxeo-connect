@@ -1,32 +1,39 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Yannis JULIENNE
  *
  */
 
 package org.nuxeo.connect.connector.http;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.CanNotReachConnectServer;
@@ -69,32 +76,44 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
 
     @Override
     protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(connectHttpTimeout);
-        ProxyHelper.configureProxyIfNeeded(httpClient, url);
-        HttpMethod method = new GetMethod(url);
-        method.setFollowRedirects(true);
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        ProxyHelper.configureProxyIfNeeded(httpClientBuilder, url);
+        httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
+        HttpGet method = new HttpGet(url);
 
         for (String name : headers.keySet()) {
-            method.addRequestHeader(name, headers.get(name));
+            method.addHeader(name, headers.get(name));
         }
 
-        int rc = 0;
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse httpResponse = null;
         try {
-            rc = httpClient.executeMethod(method);
+            // We do not use autoclose on the httpClient nor on the httpResponse since we may return them yet
+            // not consumed in the ConnectHttpResponse
+            httpClient = httpClientBuilder.build();
+            httpResponse = httpClient.execute(method);
+            int rc = httpResponse.getStatusLine().getStatusCode();
             switch (rc) {
             case HttpStatus.SC_OK:
             case HttpStatus.SC_NO_CONTENT:
             case HttpStatus.SC_NOT_FOUND:
-                return new ConnectHttpResponse(httpClient, method);
+                return new ConnectHttpResponse(httpClient, httpResponse);
             case HttpStatus.SC_UNAUTHORIZED:
+                httpResponse.close();
+                httpClient.close();
                 throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
+            case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED:
+                httpResponse.close();
+                httpClient.close();
+                throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
             case HttpStatus.SC_GATEWAY_TIMEOUT:
             case HttpStatus.SC_REQUEST_TIMEOUT:
+                httpResponse.close();
+                httpClient.close();
                 throw new ConnectServerError("Timeout " + rc);
             default:
                 try {
-                    String body = method.getResponseBodyAsString();
+                    String body = EntityUtils.toString(httpResponse.getEntity());
                     JSONObject obj = new JSONObject(body);
                     String message = obj.getString("message");
                     String errorClass = obj.getString("errorClass");
@@ -110,20 +129,17 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                 } catch (JSONException e) {
                     log.debug("Can't parse server error " + rc, e);
                     throw new ConnectServerError("Server returned a code " + rc);
+                } finally {
+                    httpResponse.close();
+                    httpClient.close();
                 }
             }
         } catch (ConnectServerError cse) {
-            method.releaseConnection();
             throw cse;
-        } catch (Throwable t) {
-            String exName = t.getClass().getName();
-            if (exName.startsWith("java.net") || exName.startsWith("org.apache.commons.httpclient")) {
-                log.warn("Connect Server is not reachable");
-                method.releaseConnection();
-                throw new CanNotReachConnectServer(t.getMessage(), t);
-            }
-            method.releaseConnection();
-            throw new ConnectServerError("Error during communication with the Nuxeo Connect Server", t);
+        } catch (IOException e) {
+            IOUtils.closeQuietly(httpResponse);
+            IOUtils.closeQuietly(httpClient);
+            throw new ConnectServerError("Error during communication with the Nuxeo Connect Server", e);
         }
     }
 
