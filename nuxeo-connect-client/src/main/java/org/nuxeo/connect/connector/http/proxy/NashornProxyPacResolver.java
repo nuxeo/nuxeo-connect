@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * Contributors:
  *     Arnaud Kervern
  *     Florent Guillaume
+ *     Yannis JULIENNE
  */
 package org.nuxeo.connect.connector.http.proxy;
 
@@ -35,11 +36,15 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 
@@ -97,13 +102,15 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
         }
 
         if (fileCache.getValue() == null) {
-            HttpClient client = new HttpClient();
-            GetMethod method = new GetMethod(ConnectUrlConfig.getProxyPacUrl());
-            int status = client.executeMethod(method);
-            if (status == HttpStatus.SC_OK) {
-                fileCache.saveValue(method.getResponseBodyAsString());
-            } else {
-                throw new IOException("Unable to get pac file");
+            try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                    CloseableHttpResponse httpResponse = httpClient.execute(
+                            new HttpGet(ConnectUrlConfig.getProxyPacUrl()))) {
+                StatusLine statusLine = httpResponse.getStatusLine();
+                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                    fileCache.saveValue(EntityUtils.toString(httpResponse.getEntity()));
+                } else {
+                    throw new IOException("Unable to get pac file: "+ statusLine);
+                }
             }
         }
         return new StringReader(fileCache.getValue());

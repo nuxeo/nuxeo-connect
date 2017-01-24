@@ -1,20 +1,21 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
- *
- * $Id$
+ *     Nuxeo
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.connector.http;
@@ -22,10 +23,12 @@ package org.nuxeo.connect.connector.http;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
 
@@ -37,33 +40,42 @@ import org.nuxeo.connect.connector.ConnectServerResponse;
 public class ConnectHttpResponse implements ConnectServerResponse {
     protected static final Log log = LogFactory.getLog(ConnectHttpResponse.class);
 
-    protected HttpClient httpClient;
-    protected HttpMethod method;
+    protected CloseableHttpClient httpClient;
 
-    public ConnectHttpResponse (HttpClient httpClient, HttpMethod method ) {
-        this.httpClient=httpClient;
-        this.method = method;
+    protected CloseableHttpResponse httpResponse;
+
+    public ConnectHttpResponse(CloseableHttpClient httpClient, CloseableHttpResponse httpResponse) {
+        this.httpClient = httpClient;
+        this.httpResponse = httpResponse;
     }
 
+    @Override
     public InputStream getInputStream() throws ConnectServerError {
         try {
-            return method.getResponseBodyAsStream();
+            return httpResponse.getEntity().getContent();
         } catch (IOException e) {
             throw new ConnectServerError("Unable to get Stream", e);
         }
     }
 
-    public String getString()  throws ConnectServerError  {
+    @Override
+    public String getString() throws ConnectServerError {
         try {
-            return method.getResponseBodyAsString();
-        }
-        catch (IOException e) {
+            HttpEntity entity = httpResponse.getEntity();
+            return entity == null ? null : EntityUtils.toString(entity);
+        } catch (IOException e) {
             throw new ConnectServerError("Unable to ready body", e);
         }
     }
 
-    public void release() {
-        method.releaseConnection();
+    @Override
+    public void release() throws ConnectServerError {
+        try {
+            httpResponse.close();
+            httpClient.close();
+        } catch (IOException e) {
+            throw new ConnectServerError("Unable to close connection resources", e);
+        }
     }
 
 }

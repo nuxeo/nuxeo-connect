@@ -1,19 +1,21 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
- *
+ *     Nuxeo
+ *     Yannis JULIENNE
  */
 
 package org.nuxeo.connect.downloads;
@@ -25,16 +27,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.http.Header;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
@@ -126,46 +129,49 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
     @Override
     public void run() {
         setPackageState(PackageState.REMOTE);
-        HttpClient httpClient = new HttpClient();
-        HttpConnectionManagerParams httpParams = httpClient.getHttpConnectionManager().getParams();
-        httpParams.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
-        httpParams.setSoTimeout(SO_TIMEOUT_MS);
-        ProxyHelper.configureProxyIfNeeded(httpClient, sourceUrl);
-        HttpMethod method = new GetMethod(sourceUrl);
-        method.setFollowRedirects(true);
-        try {
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom().setSocketTimeout(
+                SO_TIMEOUT_MS).setConnectTimeout(CONNECTION_TIMEOUT_MS);
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, sourceUrl);
+        httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
+        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+
+        try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
             setPackageState(PackageState.DOWNLOADING);
+            HttpGet method = new HttpGet(sourceUrl);
             if (!sourceUrl.contains(ConnectUrlConfig.CONNECT_TEST_MODE_BASEURL + "test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
                 for (String headerName : headers.keySet()) {
-                    method.addRequestHeader(headerName, headers.get(headerName));
+                    method.addHeader(headerName, headers.get(headerName));
                 }
             }
-            int rc = 0;
-            rc = httpClient.executeMethod(method);
-            switch (rc) {
-            case HttpStatus.SC_OK:
-                if (sourceSize == 0) {
-                    Header clheader = method.getResponseHeader("content-length");
-                    if (clheader != null) {
-                        sourceSize = Long.parseLong(clheader.getValue());
+            try (CloseableHttpResponse httpResponse = httpClient.execute(method)) {
+                int rc = httpResponse.getStatusLine().getStatusCode();
+                switch (rc) {
+                case HttpStatus.SC_OK:
+                    if (sourceSize == 0) {
+                        Header clheader = httpResponse.getFirstHeader("content-length");
+                        if (clheader != null) {
+                            sourceSize = Long.parseLong(clheader.getValue());
+                        }
                     }
-                }
-                InputStream in = method.getResponseBodyAsStream();
-                saveStreamAsFile(in);
-                registerDownloadedPackage();
-                setPackageState(PackageState.DOWNLOADED);
-                break;
+                    InputStream in = httpResponse.getEntity().getContent();
+                    saveStreamAsFile(in);
+                    registerDownloadedPackage();
+                    setPackageState(PackageState.DOWNLOADED);
+                    break;
 
-            case HttpStatus.SC_NOT_FOUND:
-                throw new ConnectServerError(String.format("Package not found (%s).", rc));
-            case HttpStatus.SC_FORBIDDEN:
-                throw new ConnectServerError(String.format("Access refused (%s).", rc));
-            case HttpStatus.SC_UNAUTHORIZED:
-                throw new ConnectServerError(String.format("Registration required (%s).", rc));
-            default:
-                serverError = true;
-                throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new ConnectServerError(String.format("Package not found (%s).", rc));
+                case HttpStatus.SC_FORBIDDEN:
+                    throw new ConnectServerError(String.format("Access refused (%s).", rc));
+                case HttpStatus.SC_UNAUTHORIZED:
+                    throw new ConnectServerError(String.format("Registration required (%s).", rc));
+                default:
+                    serverError = true;
+                    throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
+                }
             }
         } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException
             serverError = true;
@@ -179,7 +185,6 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
         } finally {
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
             cdm.removeDownloadingPackage(getId());
-            method.releaseConnection();
             completed = true;
         }
     }

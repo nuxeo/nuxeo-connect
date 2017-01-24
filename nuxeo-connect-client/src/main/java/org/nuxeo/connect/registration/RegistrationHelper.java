@@ -1,41 +1,59 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     Nuxeo - initial API and implementation
- *
+ *     Nuxeo
+ *     Yannis JULIENNE
  */
 package org.nuxeo.connect.registration;
 
 import static org.nuxeo.connect.connector.http.ConnectUrlConfig.getTrialRegistrationBaseUrl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,73 +86,90 @@ public class RegistrationHelper {
     protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "password",
             "password_verif", "email", "login", "connectreg:projectName", "description");
 
-    protected static void configureHttpClient(HttpClient httpClient,
-            String url, String login, String password) {
-        // Configure BA to access Connect for registration
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
-                10000);
+    protected static HttpClientContext getHttpClientContext(String url, String login, String password) {
+        HttpClientContext context = HttpClientContext.create();
+
+        // Set credentials provider
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         if (login != null) {
-            httpClient.getParams().setAuthenticationPreemptive(true);
             Credentials ba = new UsernamePasswordCredentials(login, password);
-            httpClient.getState().setCredentials(
-                    new AuthScope(null, -1, AuthScope.ANY_REALM), ba);
+            credentialsProvider.setCredentials(AuthScope.ANY, ba);
         }
-        // Configure the http proxy if needed
-        ProxyHelper.configureProxyIfNeeded(httpClient, url);
-    }
+        context.setCredentialsProvider(credentialsProvider);
 
-    protected static HttpClient newHttpClient(String url, String login, String password) {
-        HttpClient httpClient = new HttpClient();
-        configureHttpClient(httpClient, url, login, password);
-        return httpClient;
-    }
-
-    public static List<ConnectProject> getAvailableProjectsForRegistration(
-            String login, String password) {
-        String url = getBaseUrl() + GET_PROJECTS_SUFFIX;
-        HttpClient httpClient = newHttpClient(url, login, password);
-        HttpMethod method = new GetMethod(url);
-        List<ConnectProject> result = new ArrayList<>();
+        // Create AuthCache instance for preemptive authentication
+        AuthCache authCache = new BasicAuthCache();
+        // Generate BASIC scheme object and add it to the local auth cache
+        BasicScheme basicAuth = new BasicScheme();
         try {
-            int rc = httpClient.executeMethod(method);
+            authCache.put(URIUtils.extractHost(new URI(url)), basicAuth);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        context.setAuthCache(authCache);
+
+        // Create request configuration
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom().setConnectTimeout(10000);
+
+        // Configure the http proxy if needed
+        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
+
+        context.setRequestConfig(requestConfigBuilder.build());
+        return context;
+    }
+
+    public static List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) {
+        String url = getBaseUrl() + GET_PROJECTS_SUFFIX;
+        List<ConnectProject> result = new ArrayList<>();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url),
+                        getHttpClientContext(url, login, password))) {
+            int rc = httpResponse.getStatusLine().getStatusCode();
             if (rc == HttpStatus.SC_OK) {
-                String json = method.getResponseBodyAsString();
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject ob = (JSONObject) array.get(i);
-                    result.add(AbstractJSONSerializableData.loadFromJSON(
-                            ConnectProject.class, ob));
+                HttpEntity responseEntity = httpResponse.getEntity();
+                if (responseEntity != null) {
+                    String json = EntityUtils.toString(responseEntity);
+                    JSONArray array = new JSONArray(json);
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject ob = (JSONObject) array.get(i);
+                        result.add(AbstractJSONSerializableData.loadFromJSON(ConnectProject.class, ob));
+                    }
                 }
+            } else {
+                log.error("Unhandled response code: " + rc);
             }
         } catch (IOException | JSONException e) {
-            log.debug(e, e);
-        } finally {
-            method.releaseConnection();
+            throw new RuntimeException(e);
         }
         return result;
     }
 
-    public static String remoteRegisterInstance(String login, String password,
-            String prjId, NuxeoClientInstanceType type, String description) {
+    public static String remoteRegisterInstance(String login, String password, String prjId,
+            NuxeoClientInstanceType type, String description) {
         String url = getBaseUrl() + POST_REGISTER_SUFFIX;
-        HttpClient httpClient = newHttpClient(url, login, password);
-        PostMethod method = new PostMethod(url);
-        NameValuePair project = new NameValuePair("projectId", prjId);
-        NameValuePair desc = new NameValuePair("description", description);
-        NameValuePair strType = new NameValuePair("type", type.getValue());
-        NameValuePair ctid = new NameValuePair("CTID",
-                TechnicalInstanceIdentifier.instance().getCTID());
-        method.setRequestBody(new NameValuePair[] { project, desc, strType,
-                ctid });
+        List<NameValuePair> nvps = new ArrayList<>();
+        nvps.add(new BasicNameValuePair("projectId", prjId));
+        nvps.add(new BasicNameValuePair("description", description));
+        nvps.add(new BasicNameValuePair("type", type.getValue()));
+        nvps.add(new BasicNameValuePair("CTID", TechnicalInstanceIdentifier.instance().getCTID()));
+        HttpPost method = new HttpPost(url);
         try {
-            int rc = httpClient.executeMethod(method);
+            method.setEntity(new UrlEncodedFormEntity(nvps));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                CloseableHttpResponse httpResponse = httpClient.execute(method,
+                        getHttpClientContext(url, login, password))) {
+            int rc = httpResponse.getStatusLine().getStatusCode();
             if (rc == HttpStatus.SC_OK) {
-                return method.getResponseBodyAsString();
+                HttpEntity responseEntity = httpResponse.getEntity();
+                return responseEntity == null ? null : EntityUtils.toString(responseEntity);
+            } else {
+                log.error("Unhandled response code: " + rc);
             }
         } catch (IOException e) {
-            log.debug(e, e);
-        } finally {
-            method.releaseConnection();
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -144,35 +179,38 @@ public class RegistrationHelper {
      */
     public static TrialRegistrationResponse remoteTrialInstanceRegistration(Map<String, String> parameters) {
         String url = getTrialRegistrationBaseUrl() + "submit?embedded=true";
-        PostMethod method = new PostMethod(url);
-        List<NameValuePair> nvp = new ArrayList<>();
-
+        List<NameValuePair> nvps = new ArrayList<>();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             if (!ALLOWED_TRIAL_FIELDS.contains(entry.getKey())) {
                 log.debug("Skipped field: " + entry.getKey() + " (" + entry.getValue() + ")");
                 continue;
             }
-            nvp.add(new NameValuePair(entry.getKey(), entry.getValue()));
+            nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
-
-        method.setRequestBody(nvp.toArray(new NameValuePair[nvp.size()]));
-        HttpClient httpClient = newHttpClient(url, null, null);
+        HttpPost method = new HttpPost(url);
         try {
-            int rc = httpClient.executeMethod(method);
+            method.setEntity(new UrlEncodedFormEntity(nvps));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                CloseableHttpResponse httpResponse = httpClient.execute(method,
+                        getHttpClientContext(url, null, null))) {
+            int rc = httpResponse.getStatusLine().getStatusCode();
             log.debug("Registration response code: " + rc);
-
-            String body = method.getResponseBodyAsString();
-            if (rc == HttpStatus.SC_OK) {
-                return TrialRegistrationResponse.read(body);
-            } else if (rc == HttpStatus.SC_BAD_REQUEST) {
-                return TrialRegistrationResponse.read(body);
-            } else {
-                log.error("Unhandled response code: " + rc);
+            HttpEntity responseEntity = httpResponse.getEntity();
+            if (responseEntity != null) {
+                String body = EntityUtils.toString(responseEntity);
+                if (rc == HttpStatus.SC_OK) {
+                    return TrialRegistrationResponse.read(body);
+                } else if (rc == HttpStatus.SC_BAD_REQUEST) {
+                    return TrialRegistrationResponse.read(body);
+                } else {
+                    log.error("Unhandled response code: " + rc);
+                }
             }
         } catch (IOException e) {
-            log.debug(e, e);
-        } finally {
-            method.releaseConnection();
+            throw new RuntimeException(e);
         }
         return TrialErrorResponse.UNKNOWN();
     }
