@@ -21,6 +21,9 @@
     </layout>
   </appender>
 
+  <logger name="org.nuxeo.connect.connector.http.proxy.NashornProxyPacResolver">
+    <level value="ERROR" />
+  </logger>
   <!-- <logger name="org.nuxeo.connect"> -->
   <!-- <level value="DEBUG" /> -->
   <!-- </logger> -->
