@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -81,7 +81,7 @@ public interface ConnectRegistrationService {
     /**
      * Gives instance registration status
      */
-    boolean isInstanceRegistred();
+    boolean isInstanceRegistered();
 
     /**
      * Call Connect to register a new instance with a new trial user. The CLID is pregenerated from Connect.

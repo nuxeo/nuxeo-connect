@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     @Override
     public List<DownloadablePackage> listStudioPackages() {
         List<DownloadablePackage> result = new ArrayList<>();
-        if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistred()) {
+        if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistered()) {
             log.info("Server is not registered");
             return result;
         }

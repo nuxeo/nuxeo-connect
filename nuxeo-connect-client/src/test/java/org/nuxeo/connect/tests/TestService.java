@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -58,7 +58,7 @@ public class TestService extends TestCase {
 
     public void testServiceAsUnregistered() {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        assertFalse(crs.isInstanceRegistred());
+        assertFalse(crs.isInstanceRegistered());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
         assertTrue(connector instanceof ConnectHttpConnector);
@@ -66,10 +66,10 @@ public class TestService extends TestCase {
 
     public void testServiceAsRegistered() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        assertFalse(crs.isInstanceRegistred());
+        assertFalse(crs.isInstanceRegistered());
 
         crs.localRegisterInstance("toto--titi", "my test server");
-        assertTrue(crs.isInstanceRegistred());
+        assertTrue(crs.isInstanceRegistered());
 
         ConnectConnector connector = NuxeoConnectClient.getConnectConnector();
         assertTrue(connector instanceof ConnectHttpConnector);
@@ -77,7 +77,7 @@ public class TestService extends TestCase {
 
     public void testServiceAsTest() throws Exception {
         ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-        assertFalse(crs.isInstanceRegistred());
+        assertFalse(crs.isInstanceRegistered());
 
         ConnectConnector oldTestConnector = NuxeoConnectClient.getConnectGatewayComponent().getTestConnector();
         NuxeoConnectClient.getConnectGatewayComponent().setTestConnector(new ConnectTestConnector());

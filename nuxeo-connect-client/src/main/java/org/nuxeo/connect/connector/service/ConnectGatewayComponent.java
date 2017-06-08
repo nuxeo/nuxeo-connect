@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -86,7 +86,7 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
     }
 
     @Override
-    public boolean isInstanceRegistred() {
+    public boolean isInstanceRegistered() {
         return LogicalInstanceIdentifier.isRegistered();
     }
 
