@@ -86,7 +86,7 @@ public interface ConnectRegistrationService {
     /**
      * Call Connect to register a new instance with a new trial user. The CLID is pregenerated from Connect.
      *
-     * @param properties needed properties: termsAndConditions, company, password, password_verif, email, login and
+     * @param properties needed properties: termsAndConditions, company, firstName, lastName, email, login and
      *            connectreg:projectName
      * @throws RegistrationException In case something went wrong, a RegistrationException is thrown with information
      *             returned from the server
