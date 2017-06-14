@@ -83,8 +83,8 @@ public class RegistrationHelper {
         return ConnectUrlConfig.getRegistrationBaseUrl();
     }
 
-    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "password",
-            "password_verif", "email", "login", "connectreg:projectName", "description");
+    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "email",
+            "login", "connectreg:projectName", "firstName", "lastName");
 
     protected static HttpClientContext getHttpClientContext(String url, String login, String password) {
         HttpClientContext context = HttpClientContext.create();
