@@ -78,8 +78,17 @@ public interface ConnectRegistrationService {
     void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
             String description) throws IOException, InvalidCLID;
 
+
     /**
-     * Gives instance registration status
+     * @see #isInstanceRegistered()
+     * @deprecated since 1.5.1
+     */
+    boolean isInstanceRegistred();
+
+    /**
+     * Gives instance registration status.
+     *
+     * @since 1.5.1
      */
     boolean isInstanceRegistered();
 

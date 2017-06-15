@@ -86,6 +86,11 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
     }
 
     @Override
+    public boolean isInstanceRegistred() {
+        return isInstanceRegistered();
+    }
+
+    @Override
     public boolean isInstanceRegistered() {
         return LogicalInstanceIdentifier.isRegistered();
     }
