@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *     
+ *     Ronan DANIELLOU <rdaniellou@nuxeo.com>
+ *
  */
 
 package org.nuxeo.connect.packages;
@@ -105,6 +106,16 @@ public interface PackageManager extends BasePackageManager {
      * packages are not merged/filtered on latest versions
      */
     List<DownloadablePackage> listLocalPackages(PackageType type);
+
+    /**
+     * Lists most recent version of {@link DownloadablePackage} locally present for a given {@link PackageType} and/or
+     * target platform. Local packages are not merged/filtered on latest versions
+     *
+     * @param pkgType
+     * @param targetPlatform
+     * @since TODO
+     */
+    List<DownloadablePackage> listLocalPackages(PackageType type, String targetPlatform);
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available on connect server.
@@ -210,10 +221,23 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listRemoteAssociatedStudioPackages();
 
     /**
+     * @return All remote versions of the Studio package associated with the server registration.
+     * @since TODO
+     */
+    List<DownloadablePackage> listRemoteAssociatedStudioPackages(String targetPlatform);
+
+    /**
      * Lists all versions of the studio packages associated to user account in remote and potentially overridden by a
      * local package.
      */
     List<DownloadablePackage> listAllStudioRemoteOrLocalPackages();
+
+    /**
+     * Lists all versions of the studio packages associated to user account in remote and potentially overridden by a
+     * local package.
+     * @since TODO
+     */
+    List<DownloadablePackage> listAllStudioRemoteOrLocalPackages(String targetPlatform);
 
     /**
      * Lists packages available in remote and potentially overridden by a local package.
@@ -373,6 +397,12 @@ public interface PackageManager extends BasePackageManager {
     List<DownloadablePackage> listAllPackages();
 
     /**
+     * @return all the packages, in all versions, properly managing classifiers
+     * @since TODO
+     */
+    List<DownloadablePackage> listAllPackages(String targetPlatform);
+
+    /**
      * @since 1.4
      */
     boolean isInstalled(Package pkg);
@@ -384,10 +414,22 @@ public interface PackageManager extends BasePackageManager {
     Map<String, DownloadablePackage> getAllPackagesByID();
 
     /**
+     * @since TODO
+     * @return a Map of all packages by ID
+     */
+    Map<String, DownloadablePackage> getAllPackagesByID(String targetPlatform);
+
+    /**
      * @since 1.4
      * @return a Map of all packages by Name
      */
     Map<String, List<DownloadablePackage>> getAllPackagesByName();
+
+    /**
+     * @since TODO
+     * @return a Map of all packages by Name
+     */
+    Map<String, List<DownloadablePackage>> getAllPackagesByName(String targetPlatform);
 
     /**
      * Return the available {@link Version} for a given {@link Package} name. Versions are sorted in the "preferred
@@ -410,6 +452,14 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4
      */
     List<DownloadablePackage> findRemotePackages(String packageName);
+
+    /**
+     * Returns all remote {@link Package} versions for a given name
+     *
+     * @param packageName
+     * @since TODO
+     */
+    List<DownloadablePackage> findRemotePackages(String packageName, String targetPlatform);
 
     /**
      * Find a {@link Package} by it's id (will find masked versions on the contrary of {@link PackageManager} getPackage

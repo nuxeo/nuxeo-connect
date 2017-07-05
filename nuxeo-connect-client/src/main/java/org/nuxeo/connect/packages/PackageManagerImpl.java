@@ -16,6 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
+ *     Ronan DANIELLOU <rdaniellou@nuxeo.com>
  *
  */
 
@@ -201,15 +202,13 @@ public class PackageManagerImpl implements PackageManager {
         Map<String, DownloadablePackage> packagesById = new HashMap<>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
-            if (type == null) {
+            if (type == null && targetPlatform == null) {
                 packages = source.listPackages();
             } else {
-                packages = source.listPackages(type);
+                packages = source.listPackages(type, targetPlatform);
             }
             for (DownloadablePackage pkg : packages) {
-                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                    packagesById.put(pkg.getId(), pkg);
-                }
+                packagesById.put(pkg.getId(), pkg);
             }
         }
         return packagesById;
@@ -217,12 +216,22 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public Map<String, DownloadablePackage> getAllPackagesByID() {
-        return getAllPackagesByID(getAllSources(), null);
+        return getAllPackagesByID(null);
+    }
+
+    @Override
+    public Map<String, DownloadablePackage> getAllPackagesByID(String targetPlatform) {
+        return getAllPackagesByID(getAllSources(), null, targetPlatform);
     }
 
     @Override
     public Map<String, List<DownloadablePackage>> getAllPackagesByName() {
-        return getAllPackagesByName(getAllSources(), null);
+        return getAllPackagesByName(null);
+    }
+
+    @Override
+    public Map<String, List<DownloadablePackage>> getAllPackagesByName(String targetPlatform) {
+        return getAllPackagesByName(getAllSources(), null, targetPlatform);
     }
 
     /**
@@ -231,13 +240,22 @@ public class PackageManagerImpl implements PackageManager {
      */
     protected Map<String, List<DownloadablePackage>> getAllPackagesByName(List<PackageSource> sources,
             PackageType type) {
+        return getAllPackagesByName(sources, type, null);
+    }
+
+    /**
+     * @param targetPlatform
+     * @since TODO
+     */
+    protected Map<String, List<DownloadablePackage>> getAllPackagesByName(List<PackageSource> sources, PackageType type,
+            String targetPlatform) {
         Map<String, List<DownloadablePackage>> packagesByName = new HashMap<>();
         for (PackageSource source : sources) {
             List<DownloadablePackage> packages = null;
-            if (type == null) {
+            if (type == null && targetPlatform == null) {
                 packages = source.listPackages();
             } else {
-                packages = source.listPackages(type);
+                packages = source.listPackages(type, targetPlatform);
             }
             for (DownloadablePackage pkg : packages) {
                 List<DownloadablePackage> pkgsForName;
@@ -255,9 +273,14 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> findRemotePackages(String packageName) {
+        return findRemotePackages(packageName, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> findRemotePackages(String packageName, String targetPlatform) {
         List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            pkgs.addAll(source.listPackagesByName(packageName));
+            pkgs.addAll(source.listPackagesByName(packageName, targetPlatform));
         }
         return pkgs;
     }
@@ -368,9 +391,8 @@ public class PackageManagerImpl implements PackageManager {
     public List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform) {
         List<Version> versions = new ArrayList<>();
         for (PackageSource source : getAllSources()) {
-            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
-                if (range.matchVersion(pkg.getVersion())
-                        && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, targetPlatform)) {
+                if (range.matchVersion(pkg.getVersion())) {
                     if (!versions.contains(pkg.getVersion())) {
                         versions.add(pkg.getVersion());
                     }
@@ -437,9 +459,11 @@ public class PackageManagerImpl implements PackageManager {
     public List<String> listInstalledPackagesNames(PackageType pkgType) {
         List<DownloadablePackage> installedPackages = listInstalledPackages();
         // filter on type and collect names
-        List<String> installedPackagesNames = installedPackages.stream().filter(
-                pkg -> (pkgType == null || pkg.getType() == pkgType)).map(DownloadablePackage::getName).collect(
-                        Collectors.toList());
+        List<String> installedPackagesNames = installedPackages.stream()
+                                                               .filter(pkg -> (pkgType == null
+                                                                       || pkg.getType() == pkgType))
+                                                               .map(DownloadablePackage::getName)
+                                                               .collect(Collectors.toList());
 
         return installedPackagesNames;
     }
@@ -448,9 +472,11 @@ public class PackageManagerImpl implements PackageManager {
     public List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT) {
         List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
         // filter on snapshots and collect unique names
-        List<String> hotFixesNames = hotFixes.stream().filter(
-                pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot())).map(
-                        DownloadablePackage::getName).distinct().collect(Collectors.toList());
+        List<String> hotFixesNames = hotFixes.stream()
+                                             .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
+                                             .map(DownloadablePackage::getName)
+                                             .distinct()
+                                             .collect(Collectors.toList());
         return hotFixesNames;
     }
 
@@ -476,10 +502,15 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listLocalPackages(PackageType type) {
+        return listLocalPackages(type, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listLocalPackages(PackageType type, String targetPlatform) {
         List<DownloadablePackage> result = new ArrayList<>();
         List<String> pkgIds = new ArrayList<>();
         for (PackageSource source : localSources) {
-            List<DownloadablePackage> pkgs = source.listPackages(type);
+            List<DownloadablePackage> pkgs = source.listPackages(type, targetPlatform);
             for (DownloadablePackage pkg : pkgs) {
                 if (!pkgIds.contains(pkg.getId())) {
                     pkgIds.add(pkg.getId());
@@ -669,8 +700,13 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
-        List<DownloadablePackage> remote = listRemoteAssociatedStudioPackages();
-        List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
+        return listAllStudioRemoteOrLocalPackages(null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages(String targetPlatform) {
+        List<DownloadablePackage> remote = listRemoteAssociatedStudioPackages(targetPlatform);
+        List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO, targetPlatform);
         List<DownloadablePackage> result = new ArrayList<>();
         result.addAll(local);
         REMOTE: for (DownloadablePackage rpkg : remote) {
@@ -724,10 +760,15 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listRemoteAssociatedStudioPackages() {
+        return listRemoteAssociatedStudioPackages(null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listRemoteAssociatedStudioPackages(String targetPlatform) {
         List<DownloadablePackage> result = new ArrayList<>();
         List<String> pkgIds = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            List<DownloadablePackage> pkgs = source.listStudioPackages();
+            List<DownloadablePackage> pkgs = source.listStudioPackages(targetPlatform);
             for (DownloadablePackage pkg : pkgs) {
                 if (!pkgIds.contains(pkg.getId())) {
                     pkgIds.add(pkg.getId());
@@ -866,7 +907,12 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listAllPackages() {
-        return getAllPackages(getAllSources(), null);
+        return getAllPackages(getAllSources(), null, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> listAllPackages(String targetPlatform) {
+        return getAllPackages(getAllSources(), null, targetPlatform);
     }
 
     @Override
@@ -969,8 +1015,8 @@ public class PackageManagerImpl implements PackageManager {
                                 // logging if it is not going to be removed
                                 satisfied = true;
                                 if (!hasMatchInIdList(pkgDep, orderedRemoveList)) {
-                                    optionalMissingDeps.computeIfAbsent(id, k -> new HashSet<>()).add(
-                                            pkgDep.toString());
+                                    optionalMissingDeps.computeIfAbsent(id, k -> new HashSet<>())
+                                                       .add(pkgDep.toString());
                                 }
                             }
                         }
@@ -1081,21 +1127,46 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public boolean matchesPlatform(String requestPkgStr, String targetPlatform) throws PackageException {
-        Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
-        // Try ID match first
-        if (allPackagesByID.containsKey(requestPkgStr)) {
-            return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(allPackagesByID.get(requestPkgStr),
-                    targetPlatform);
-        }
-        // Fallback on name match
-        List<DownloadablePackage> allPackagesForName = getAllPackagesByName().get(requestPkgStr);
-        if (allPackagesForName == null) {
-            throw new PackageException("Package not found: " + requestPkgStr);
-        }
-        for (DownloadablePackage pkg : allPackagesForName) {
-            if (requestPkgStr.equals(pkg.getName())
-                    && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                return true;
+
+        boolean isFilteredOnTargetPlatform = targetPlatform == null ? false : true;
+
+        for (int i = 0; i < 2; i++) {
+            String inTargetPlatform = isFilteredOnTargetPlatform ? targetPlatform : null;
+            Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID(inTargetPlatform);
+            // Try ID match first
+
+            if (allPackagesByID.containsKey(requestPkgStr)) {
+                // on regular use, you will have updated your package list, by filtering on your target platform. Thus
+                // everything you ask to install/update/remove, should be compatible with your targer platform
+                if (isFilteredOnTargetPlatform) {
+                    return true;
+                } else {
+                    return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(allPackagesByID.get(requestPkgStr),
+                            targetPlatform);
+                }
+            }
+            // Fallback on name match
+            List<DownloadablePackage> allPackagesForName = getAllPackagesByName(inTargetPlatform).get(requestPkgStr);
+            if (allPackagesForName == null) {
+                // packages list filtered on given target platform not found for given name, but it may exist for other
+                // target platform
+                if (isFilteredOnTargetPlatform) {
+                    // search without filter
+                    isFilteredOnTargetPlatform = false;
+                    continue;
+                } else {
+                    throw new PackageException("Package not found: " + requestPkgStr);
+                }
+            } else {
+                if (isFilteredOnTargetPlatform) {
+                    return !allPackagesForName.isEmpty();
+                } else {
+                    for (DownloadablePackage pkg : allPackagesForName) {
+                        if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;

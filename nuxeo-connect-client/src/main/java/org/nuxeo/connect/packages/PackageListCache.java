@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -73,11 +74,38 @@ public class PackageListCache {
      * @return an empty list if no entry in cache or if entry is expired
      */
     public List<DownloadablePackage> getFromCache(String type) {
+        return getFromCache(type, null);
+    }
+
+    /**
+     * @param type
+     * @param targetPlatform If not <code>null</code>, used to filter results. You may use shell wildcards '*' and '?'.
+     * @since TODO
+     */
+    public List<DownloadablePackage> getFromCache(String type, String targetPlatform) {
         PackageListCacheEntry entry = cache.get(type);
         if (entry == null || entry.isExpired(cache_duration)) {
             return new ArrayList<>();
         }
-        return entry.getPackages();
+        List<DownloadablePackage> packages = entry.getPackages();
+        if (targetPlatform != null) {
+            packages.removeIf(new Predicate<DownloadablePackage>() {
+
+                @Override
+                public boolean test(DownloadablePackage t) {
+                    // maps shell wildcards "*" and "?" to Java regex
+                    String regex = targetPlatform.replaceAll("\\*", ".*").replaceAll("\\?", "\\.");
+                    for (String tp : t.getTargetPlatforms()) {
+                        if (tp.matches(regex)) {
+                            // we keep it
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
+        return packages;
     }
 
     /**

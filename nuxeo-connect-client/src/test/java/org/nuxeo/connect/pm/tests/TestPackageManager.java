@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -17,7 +17,12 @@
 
 package org.nuxeo.connect.pm.tests;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -124,4 +129,84 @@ public class TestPackageManager extends AbstractPackageManagerTestCase {
                     || (update.getPackageState() == PackageState.STARTED));
         }
     }
+
+    public void testTargetPlatformFiltering() throws Exception {
+        String testFileRemoteId = "remote3";
+        // taken from the above file:
+        final int pkgRemote56SnapshotCount = 2;
+        final int pkgRemote56Count = 2;
+        final int pkgRemote7WildcardCount = 2;
+        final int pkgRemote7WildcardStudioCount = 1;
+        String testFileLocalId = "local3";
+        // taken from the above file:
+        final int pkgLocal550Count = 2;
+        final int pkgLocal7WildcardCount = 1;
+        List<DownloadablePackage> local = getDownloads(testFileLocalId + ".json");
+        List<DownloadablePackage> remote = getDownloads(testFileRemoteId + ".json");
+        assertTrue(CollectionUtils.isNotEmpty(local));
+        assertTrue(CollectionUtils.isNotEmpty(remote));
+        pm.registerSource(new DummyPackageSource(local, testFileLocalId), true);
+        pm.registerSource(new DummyPackageSource(remote, testFileRemoteId), false);
+
+        // == remotes
+
+        // === no filter
+
+        List<DownloadablePackage> remotes = pm.listRemotePackages(null, null);
+        assertThat(remotes).hasSameSizeAs(remote);
+        assertThat(pm.listRemotePackages()).hasSameSizeAs(remote);
+        assertThat(pm.listRemotePackages(null)).hasSameSizeAs(remote);
+
+        // === filtered
+
+        Map<String, Integer> testParamToExpectedCount = new HashMap<>();
+        testParamToExpectedCount.put("5.6-SNAPSHOT", pkgRemote56SnapshotCount);
+        testParamToExpectedCount.put("5.6", pkgRemote56Count);
+        testParamToExpectedCount.put("5.6*", pkgRemote56Count + pkgRemote56SnapshotCount);
+        testParamToExpectedCount.put("?.6", pkgRemote56Count);
+        testParamToExpectedCount.put("?.6*", pkgRemote56Count + pkgRemote56SnapshotCount);
+        testParamToExpectedCount.put("?.6*", pkgRemote56Count + pkgRemote56SnapshotCount);
+        testParamToExpectedCount.put("5*", pkgRemote56Count + pkgRemote56SnapshotCount + pkgLocal550Count);
+        testParamToExpectedCount.put("7.4-HF12", pkgRemote7WildcardCount);
+
+        for (Entry<String, Integer> entry : testParamToExpectedCount.entrySet()) {
+            remotes = pm.listRemotePackages(null, entry.getKey());
+            assertThat(remotes).as("for: " + entry.toString()).hasSize(entry.getValue());
+        }
+
+        // == local
+
+        // === no filter
+
+        List<DownloadablePackage> locals = pm.listLocalPackages(null, null);
+        assertThat(locals).hasSameSizeAs(local);
+        assertThat(pm.listLocalPackages()).hasSameSizeAs(local);
+        assertThat(pm.listLocalPackages(null)).hasSameSizeAs(local);
+
+        // === filtered
+
+        testParamToExpectedCount.clear();
+        testParamToExpectedCount.put("5.?.0", pkgLocal550Count);
+        testParamToExpectedCount.put("5.*", pkgLocal550Count);
+        testParamToExpectedCount.put("?.5*", pkgLocal550Count);
+        testParamToExpectedCount.put("7.4-HF12", pkgLocal7WildcardCount);
+
+        for (Entry<String, Integer> entry : testParamToExpectedCount.entrySet()) {
+            locals = pm.listLocalPackages(null, entry.getKey());
+            assertThat(locals).as("for: " + entry.toString()).hasSize(entry.getValue());
+        }
+
+        // == "all" packages
+
+        List<DownloadablePackage> allFiltered = pm.listPackages("7.4-HF12");
+        assertThat(allFiltered.size()).isNotEqualTo(pm.listPackages().size());
+        assertThat(allFiltered).hasSize(pkgLocal7WildcardCount + pkgRemote7WildcardCount);
+
+        // == studio packages
+
+        List<DownloadablePackage> studioOnlyFiltered = pm.listRemoteAssociatedStudioPackages("7.4-HF12");
+        assertThat(studioOnlyFiltered.size()).isNotEqualTo(pm.listRemoteAssociatedStudioPackages().size());
+        assertThat(studioOnlyFiltered).hasSize(pkgRemote7WildcardStudioCount);
+    }
+
 }

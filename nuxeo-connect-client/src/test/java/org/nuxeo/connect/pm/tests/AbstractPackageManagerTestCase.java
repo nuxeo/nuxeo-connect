@@ -133,6 +133,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         }
         sb.append("}");
         log.info(sb.toString());
+        System.out.println(sb.toString());
     }
 
 }

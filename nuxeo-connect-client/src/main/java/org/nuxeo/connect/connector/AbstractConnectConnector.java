@@ -206,8 +206,17 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
+        return getDownloads(type, null);
+    }
+
+    public List<DownloadablePackage> getDownloads(PackageType type, String targetPlatform) throws ConnectServerError {
         String typeStr = String.valueOf(type);
-        return getDownloads(typeStr, typeStr);
+        String urlSuffix = typeStr;
+        if (targetPlatform != null) {
+            urlSuffix += "?targetPlatform=" + targetPlatform;
+        }
+        return getDownloads(typeStr, urlSuffix);
+
     }
 
     @Override

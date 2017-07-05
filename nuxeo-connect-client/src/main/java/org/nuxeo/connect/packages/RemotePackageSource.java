@@ -53,13 +53,16 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
 
     @Override
     public List<DownloadablePackage> listPackages() {
+        return listPackages((String) null);
+    }
+
+    protected List<DownloadablePackage> listPackages(String targetPlatform) {
         List<DownloadablePackage> all = new ArrayList<>();
         for (PackageType type : PackageType.values()) {
-            all.addAll(listPackages(type));
+            all.addAll(listPackages(type, targetPlatform));
         }
         return all;
     }
-
     @Override
     public List<DownloadablePackage> listStudioPackages() {
         List<DownloadablePackage> result = new ArrayList<>();
@@ -84,17 +87,24 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
+    public List<DownloadablePackage> listPackages(PackageType type, String targetPlatform) {
         if (type == null) {
-            return listPackages();
+            return listPackages(targetPlatform);
         }
-        List<DownloadablePackage> result = cache.getFromCache(type.toString());
-        if (!result.isEmpty()) {
-            return result;
+
+        List<DownloadablePackage> result;
+        if (targetPlatformUsedtoFillTheCache == null // either it has not been filed, or filled without filter
+                || targetPlatformUsedtoFillTheCache.equals(targetPlatform)) {
+            result = cache.getFromCache(type.toString(), targetPlatform);
+            if (!result.isEmpty()) {
+                return result;
+            }
         }
+
         try {
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-            result = crs.getConnector().getDownloads(type);
+            result = crs.getConnector().getDownloads(type, targetPlatform);
+            targetPlatformUsedtoFillTheCache = targetPlatform;
         } catch (ConnectServerError e) {
             log.debug(e, e);
             log.warn("Unable to fetch remote packages list: " + e.getMessage());

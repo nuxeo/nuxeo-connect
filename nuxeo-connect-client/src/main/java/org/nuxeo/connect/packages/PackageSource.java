@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,6 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
+ *     Ronan DANIELLOU <rdaniellou@nuxeo.com>
  *
  */
 
@@ -40,6 +41,8 @@ public interface PackageSource {
 
     List<DownloadablePackage> listPackages(PackageType type);
 
+    List<DownloadablePackage> listPackages(PackageType type, String targetPlatform);
+
     void flushCache();
 
     /**
@@ -54,9 +57,21 @@ public interface PackageSource {
     Collection<? extends DownloadablePackage> listPackagesByName(String packageName);
 
     /**
+     * @param packageName Must not be null
+     * @since TODO
+     */
+    Collection<? extends DownloadablePackage> listPackagesByName(String packageName, String targetPlatform);
+
+    /**
      * @return Studio packages associated with the current registration.
      * @since 1.4.19
      */
     List<DownloadablePackage> listStudioPackages();
+
+    /**
+     * @return Studio packages associated with the current registration.
+     * @since TODO
+     */
+    List<DownloadablePackage> listStudioPackages(String targetPlatform);
 
 }

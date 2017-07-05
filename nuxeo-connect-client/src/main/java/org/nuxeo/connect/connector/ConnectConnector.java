@@ -36,6 +36,14 @@ public interface ConnectConnector {
      * @throws ConnectServerError
      */
     List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
+    /**
+     *
+     * @param type
+     * @param targetPlatform TODO
+     *
+     * @since TODO
+     */
+    List<DownloadablePackage> getDownloads(PackageType type, String targetPlatform) throws ConnectServerError;
 
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 
