@@ -59,4 +59,9 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
         return new ConnectFakeResponse(data);
     }
 
+    @Override
+    protected ConnectServerResponse execServerPost(String url, Map<String, String> headers) throws ConnectServerError {
+        throw new UnsupportedOperationException();
+    }
+
 }

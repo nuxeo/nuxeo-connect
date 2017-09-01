@@ -52,4 +52,12 @@ public interface ConnectConnector {
      */
     List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
 
+    /**
+     * Renews the current registration with the Connect server.
+     *
+     * @return the new clid in one-line form
+     * @since 1.4.24.2
+     */
+    String remoteRenewRegistration() throws ConnectServerError;
+
 }
