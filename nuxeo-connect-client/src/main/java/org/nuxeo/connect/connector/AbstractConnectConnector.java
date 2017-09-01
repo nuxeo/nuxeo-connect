@@ -65,6 +65,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      */
     public static final String STUDIO_REGISTERED_CACHE_SUFFIX = "studio_registered";
 
+    /** @since 1.4.24.2 */
+    public static final String RENEW_REGISTRATION_SUFFIX = "remoteRenewRegistration";
+
     public static final String GET_DOWNLOADS_SUFFIX = "getDownloads";
 
     public static final String GET_DOWNLOAD_SUFFIX = "getDownload";
@@ -137,7 +140,14 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         return execServerCall(url, SecurityHeaderGenerator.getHeaders());
     }
 
+    protected ConnectServerResponse execPost(String url) throws ConnectServerError {
+        return execServerPost(url, SecurityHeaderGenerator.getHeaders());
+    }
+
     protected abstract ConnectServerResponse execServerCall(String url, Map<String, String> headers)
+            throws ConnectServerError;
+
+    protected abstract ConnectServerResponse execServerPost(String url, Map<String, String> headers)
             throws ConnectServerError;
 
     @Override
@@ -291,6 +301,22 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     protected boolean isConnectServerReachable() {
         return Boolean.parseBoolean(NuxeoConnectClient.getProperty(CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
+    }
+
+    @Override
+    public String remoteRenewRegistration() throws ConnectServerError {
+        String url = getBaseUrl() + RENEW_REGISTRATION_SUFFIX;
+        String clid;
+        ConnectServerResponse response = execPost(url);
+        try {
+            clid = response.getString();
+        } finally {
+            response.release();
+        }
+        if (clid == null) {
+            throw new ConnectServerError("null response from server");
+        }
+        return clid;
     }
 
 }
