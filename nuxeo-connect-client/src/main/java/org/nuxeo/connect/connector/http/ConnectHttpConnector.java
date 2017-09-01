@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,13 +68,26 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         return super.getBaseUrl();
     }
 
+
     @Override
     protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
+        return execServer(true, url, headers);
+    }
+
+    @Override
+    protected ConnectServerResponse execServerPost(String url, Map<String, String> headers) throws ConnectServerError {
+        return execServer(false, url, headers);
+    }
+
+    protected ConnectServerResponse execServer(boolean get, String url, Map<String, String> headers)
+            throws ConnectServerError {
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(connectHttpTimeout);
         ProxyHelper.configureProxyIfNeeded(httpClient, url);
-        HttpMethod method = new GetMethod(url);
-        method.setFollowRedirects(true);
+        HttpMethod method = get ? new GetMethod(url) : new PostMethod(url);
+        if (get) {
+            method.setFollowRedirects(true);
+        }
 
         for (String name : headers.keySet()) {
             method.addRequestHeader(name, headers.get(name));

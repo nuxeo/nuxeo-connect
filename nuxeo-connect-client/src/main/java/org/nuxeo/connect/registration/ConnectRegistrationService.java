@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.nuxeo.connect.connector.ConnectConnector;
+import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
@@ -78,6 +79,14 @@ public interface ConnectRegistrationService {
      */
     void remoteRegisterInstance(String login, String password, String prjId, NuxeoClientInstanceType type,
             String description) throws Exception;
+
+    /**
+     * Renews the current LogicalInstanceIdentifier registration with the Connect server and updates the local one
+     * accordingly.
+     *
+     * @since 1.4.24.2
+     */
+    void remoteRenewRegistration() throws Exception;
 
     /**
      * Gives instance registration status

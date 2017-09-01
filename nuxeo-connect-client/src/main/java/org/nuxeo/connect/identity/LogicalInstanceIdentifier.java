@@ -91,8 +91,11 @@ public class LogicalInstanceIdentifier {
         CLID2 = parts[1];
     }
 
+    public static String makeCLID(String clid1, String clid2) {
+        return clid1 + ID_SEP + clid2;
+    }
     public String getCLID() {
-        return CLID1 + ID_SEP + CLID2;
+        return makeCLID(CLID1, CLID2);
     }
 
     public String getInstanceDescription() {
@@ -200,7 +203,7 @@ public class LogicalInstanceIdentifier {
             throw new InvalidCLID(String.format("CLID file (%s) is invalid", path));
         }
 
-        String id = lines.get(0) + ID_SEP + lines.get(1);
+        String id = makeCLID(lines.get(0), lines.get(1));
         String description = lines.size() > 2 ? lines.get(2) : "";
         instance = new LogicalInstanceIdentifier(id, description);
         return instance;
