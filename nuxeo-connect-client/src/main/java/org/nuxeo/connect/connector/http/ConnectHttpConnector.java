@@ -29,6 +29,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -76,10 +78,20 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
 
     @Override
     protected ConnectServerResponse execServerCall(String url, Map<String, String> headers) throws ConnectServerError {
+        return execServer(true, url, headers);
+    }
+
+    @Override
+    protected ConnectServerResponse execServerPost(String url, Map<String, String> headers) throws ConnectServerError {
+        return execServer(false, url, headers);
+    }
+
+    protected ConnectServerResponse execServer(boolean get, String url, Map<String, String> headers)
+            throws ConnectServerError {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         ProxyHelper.configureProxyIfNeeded(httpClientBuilder, url);
         httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
-        HttpGet method = new HttpGet(url);
+        HttpUriRequest method = get ? new HttpGet(url) : new HttpPost(url);
 
         for (String name : headers.keySet()) {
             method.addHeader(name, headers.get(name));
