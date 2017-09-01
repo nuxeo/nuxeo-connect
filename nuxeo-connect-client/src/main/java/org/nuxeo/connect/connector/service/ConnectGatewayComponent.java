@@ -145,4 +145,14 @@ public class ConnectGatewayComponent implements ConnectRegistrationService {
         }
     }
 
+    @Override
+    public void remoteRenewRegistration() throws Exception {
+        String newCLID = getConnector().remoteRenewRegistration();
+        if (newCLID != null) {
+            LogicalInstanceIdentifier oldCLID = getCLID();
+            String description = oldCLID == null ? "" : oldCLID.getInstanceDescription();
+            localRegisterInstance(newCLID, description);
+        }
+    }
+
 }
