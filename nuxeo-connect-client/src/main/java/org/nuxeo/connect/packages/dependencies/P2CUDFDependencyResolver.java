@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *     
+ *
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -45,7 +45,7 @@ import org.nuxeo.connect.update.Version;
  * This implementation uses the p2cudf resolver to solve complex dependencies. <br>
  * Predefined CUDF criteria to match different behaviours :
  * <ul>
- * <li>mp-install -> {@link #SOLVER_CRITERIA_LESS_CHANGES}</li>
+ * <li>mp-install -> {@link #SOLVER_CRITERIA_BASIC_INSTALL}</li>
  * <li>mp-remove/uninstall -> {@link #SOLVER_CRITERIA_LESS_VERSION_CHANGES}</li>
  * <li>mp-upgrade -> {@link #SOLVER_CRITERIA_LESS_OUTDATED}</li>
  * <li>mp-set -> {@link #SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE}</li>
@@ -56,11 +56,11 @@ import org.nuxeo.connect.update.Version;
 public class P2CUDFDependencyResolver implements DependencyResolver {
 
     /**
-     * Solver criteria requesting the less changes. Used for mp-install.
+     * Solver criteria requesting the less removed and less version changes. Used for mp-install.
      *
-     * @since 1.4.26
+     * @since 1.4.24.2
      */
-    public static final String SOLVER_CRITERIA_LESS_CHANGES = "-removed,-changed,-notuptodate,-new,-versionchanged";
+    public static final String SOLVER_CRITERIA_BASIC_INSTALL = "-removed,-versionchanged,-notuptodate,-new";
 
     /**
      * Solver criteria requesting the less version changes. Used for mp-remove and mp-uninstall.
@@ -119,7 +119,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
             throws DependencyException {
         // By default, criteria are made for install, prioritizing the solution with the less changes
-        String solverCriteria = SOLVER_CRITERIA_LESS_CHANGES;
+        String solverCriteria = SOLVER_CRITERIA_BASIC_INSTALL;
         if (!doKeep) {
             // When setting a new batch of packages (doKeep=false), criteria prioritizes the
             // solution with the less outdated packages but prefering remove over unchanged
