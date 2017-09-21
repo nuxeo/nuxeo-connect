@@ -1,19 +1,22 @@
 /*
- * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2017 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
+ *
  */
 
 package org.nuxeo.connect.packages.dependencies;
@@ -39,26 +42,45 @@ import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.Version;
 
 /**
- * This implementation uses the p2cudf resolver to solve complex dependencies
+ * This implementation uses the p2cudf resolver to solve complex dependencies. <br>
+ * Predefined CUDF criteria to match different behaviours :
+ * <ul>
+ * <li>mp-install -> {@link #SOLVER_CRITERIA_BASIC_INSTALL}</li>
+ * <li>mp-remove/uninstall -> {@link #SOLVER_CRITERIA_LESS_VERSION_CHANGES}</li>
+ * <li>mp-upgrade -> {@link #SOLVER_CRITERIA_LESS_OUTDATED}</li>
+ * <li>mp-set -> {@link #SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE}</li>
+ * </ul>
  *
  * @since 1.4
  */
 public class P2CUDFDependencyResolver implements DependencyResolver {
 
     /**
-     * Predefined CUDF criteria to match different behaviours :
-     * - mp-install -> SOLVER_CRITERIA_LESS_CHANGES
-     * - mp-remove  -> SOLVER_CRITERIA_LESS_VERSION_CHANGES
-     * - mp-upgrade -> SOLVER_CRITERIA_LESS_OUTDATED
-     * - mp-set     -> SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE
-     * @since TODO
+     * Solver criteria requesting the less removed and less version changes. Used for mp-install.
+     *
+     * @since 1.4.24.3
      */
-    public static final String SOLVER_CRITERIA_LESS_CHANGES = "-removed,-changed,-notuptodate,-new,-versionchanged";
+    public static final String SOLVER_CRITERIA_BASIC_INSTALL = "-removed,-versionchanged,-notuptodate,-new";
 
+    /**
+     * Solver criteria requesting the less version changes. Used for mp-remove and mp-uninstall.
+     *
+     * @since 1.4.24.3
+     */
     public static final String SOLVER_CRITERIA_LESS_VERSION_CHANGES = "-versionchanged,-removed,-changed,-notuptodate,-new";
 
+    /**
+     * Solver criteria requesting the less outdated packages. Used for mp-upgrade.
+     *
+     * @since 1.4.24.3
+     */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED = "-removed,-notuptodate,-changed,-new,-versionchanged";
 
+    /**
+     * Solver criteria requesting the more removed and the less outdated packages. Used for mp-set.
+     *
+     * @since 1.4.24.3
+     */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE = "+removed,-notuptodate,-changed,-new,-versionchanged";
 
     protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
@@ -95,7 +117,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) throws DependencyException {
         // By default, criteria are made for install, prioritizing the solution with the less changes
-        String solverCriteria = SOLVER_CRITERIA_LESS_CHANGES;
+        String solverCriteria = SOLVER_CRITERIA_BASIC_INSTALL;
         if (!doKeep) {
             // When setting a new batch of packages (doKeep=false), criteria prioritizes the
             // solution with the less outdated packages but prefering remove over unchanged
@@ -107,7 +129,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             solverCriteria = SOLVER_CRITERIA_LESS_OUTDATED;
         } else if (CollectionUtils.isNotEmpty(pkgRemove)) {
             // For a remove request, criteria prioritizes the solution with the less version changed packages
-            // otherwise, it will upgrade/downgrade a package instead of removing it when trying to remove a specific
+            // otherwise, it would upgrade/downgrade a package instead of removing it when trying to remove a specific
             // version
             solverCriteria = SOLVER_CRITERIA_LESS_VERSION_CHANGES;
         }
