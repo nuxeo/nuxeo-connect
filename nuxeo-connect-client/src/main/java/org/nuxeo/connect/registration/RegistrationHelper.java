@@ -138,8 +138,10 @@ public class RegistrationHelper {
             } else {
                 log.error("Unhandled response code: " + rc);
             }
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (JSONException e) {
+            log.debug(e, e);
         }
         return result;
     }
