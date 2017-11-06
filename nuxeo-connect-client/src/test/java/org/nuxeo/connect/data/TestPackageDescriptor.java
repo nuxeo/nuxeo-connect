@@ -24,10 +24,37 @@ import static org.junit.Assert.assertNull;
 import java.util.Arrays;
 
 import org.apache.commons.lang.mutable.MutableObject;
+import org.junit.After;
 import org.junit.Test;
 import org.nuxeo.connect.update.PackageDependency;
 
 public class TestPackageDescriptor {
+
+    @After
+    public void clearSystemProperty() {
+        System.clearProperty(PackageDescriptor.NUXEO_CAP_TARGET_PLATFORM_COMPAT);
+    }
+
+    @Test
+    public void testSystemProperty() {
+        String[] targets;
+        MutableObject pd = new MutableObject();
+        PackageDependency[] packageDependencies;
+
+        targets = PackageDescriptor.fixTargetPlatforms("foo", new String[] { "cap-123" }, pd);
+        assertEquals(Arrays.asList("cap-123", "server-123"), Arrays.asList(targets));
+        packageDependencies = (PackageDependency[]) pd.getValue();
+        assertEquals(1, packageDependencies.length);
+        assertEquals("nuxeo-jsf-ui", packageDependencies[0].toString());
+
+        System.setProperty(PackageDescriptor.NUXEO_CAP_TARGET_PLATFORM_COMPAT, "false");
+
+        pd = new MutableObject();
+        targets = PackageDescriptor.fixTargetPlatforms("foo", new String[] { "cap-123" }, pd);
+        assertEquals(Arrays.asList("cap-123"), Arrays.asList(targets));
+        packageDependencies = (PackageDependency[]) pd.getValue();
+        assertNull(packageDependencies);
+    }
 
     @Test
     public void testFixTargetPlatforms() {
