@@ -56,7 +56,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
 
     private static final String NUXEO_JSF_UI = "nuxeo-jsf-ui";
 
-    private static final String NUXEO_CAP_TARGET_PLATFORM_COMPAT = "nuxeo.cap.target.platform.compat";
+    public static final String NUXEO_CAP_TARGET_PLATFORM_COMPAT = "nuxeo.cap.target.platform.compat";
 
     /**
      * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
