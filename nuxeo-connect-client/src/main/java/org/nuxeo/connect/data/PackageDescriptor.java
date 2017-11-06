@@ -56,6 +56,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
 
     private static final String NUXEO_JSF_UI = "nuxeo-jsf-ui";
 
+    private static final String NUXEO_CAP_TARGET_PLATFORM_COMPAT = "nuxeo.cap.target.platform.compat";
+
     /**
      * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
      */
@@ -688,40 +690,43 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     /**
-     * Returns a fixed list of target platforms and dependencies, to deal with backward compatibility.
+     * Returns a fixed list of target platforms and dependencies, to deal with backward compatibility. Can be turned off
+     * by setting the nuxeo.cap.target.platform.compat system property to false (useful for Connect/Studio).
      *
      * @param packageDependencies a PackageDependency[] return value
      * @since 8.3
      */
     public static String[] fixTargetPlatforms(String name, String[] targets, MutableObject packageDependencies) {
-        List<String> serverTargets = new ArrayList<>();
-        List<String> newServerTargets = new ArrayList<>();
-        for (String target : targets) {
-            if (target.startsWith(SERVER_PREFIX)) {
-                serverTargets.add(target);
-            } else if (target.startsWith(CAP_PREFIX)) {
-                String newServerTarget = SERVER_PREFIX + target.substring(CAP_PREFIX.length());
-                newServerTargets.add(newServerTarget);
+        if (Boolean.parseBoolean(System.getProperty(NUXEO_CAP_TARGET_PLATFORM_COMPAT, "true"))) {
+            List<String> serverTargets = new ArrayList<>();
+            List<String> newServerTargets = new ArrayList<>();
+            for (String target : targets) {
+                if (target.startsWith(SERVER_PREFIX)) {
+                    serverTargets.add(target);
+                } else if (target.startsWith(CAP_PREFIX)) {
+                    String newServerTarget = SERVER_PREFIX + target.substring(CAP_PREFIX.length());
+                    newServerTargets.add(newServerTarget);
+                }
             }
-        }
-        newServerTargets.removeAll(serverTargets);
-        if (!newServerTargets.isEmpty()) {
-            // BBB: if we have "cap" declared as a target platform,
-            // then also declare "server" with an added dependency on "nuxeo-jsf-ui"
-            List<String> list = new ArrayList<>(targets.length + newServerTargets.size());
-            list.addAll(Arrays.asList(targets));
-            if (!NUXEO_JSF_UI.equals(name)) {
-                // don't do if it's for nuxeo-jsf-ui itself, otherwise the cap compatibility version
-                // would be a candidate even on a server
-                list.addAll(newServerTargets);
-            }
-            targets = list.toArray(new String[0]);
-            // set additional dependency if it's not ourselves
-            // name may be null (not yet set), in which case the setter for name will clean up dependencies
-            if (NUXEO_JSF_UI.equals(name)) {
-                packageDependencies.setValue(null);
-            } else {
-                packageDependencies.setValue(new PackageDependency[] { new PackageDependency(NUXEO_JSF_UI) });
+            newServerTargets.removeAll(serverTargets);
+            if (!newServerTargets.isEmpty()) {
+                // BBB: if we have "cap" declared as a target platform,
+                // then also declare "server" with an added dependency on "nuxeo-jsf-ui"
+                List<String> list = new ArrayList<>(targets.length + newServerTargets.size());
+                list.addAll(Arrays.asList(targets));
+                if (!NUXEO_JSF_UI.equals(name)) {
+                    // don't do if it's for nuxeo-jsf-ui itself, otherwise the cap compatibility version
+                    // would be a candidate even on a server
+                    list.addAll(newServerTargets);
+                }
+                targets = list.toArray(new String[0]);
+                // set additional dependency if it's not ourselves
+                // name may be null (not yet set), in which case the setter for name will clean up dependencies
+                if (NUXEO_JSF_UI.equals(name)) {
+                    packageDependencies.setValue(null);
+                } else {
+                    packageDependencies.setValue(new PackageDependency[] { new PackageDependency(NUXEO_JSF_UI) });
+                }
             }
         }
         return targets;
