@@ -16,7 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *     
+ *
  */
 
 package org.nuxeo.connect.packages;
@@ -278,6 +278,15 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4.26
      */
     List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT);
+
+    /**
+     * List last version of available hotfixes, already installed or not, for the given targetPlatform.
+     *
+     * @param allowSNAPSHOT whether to return hotfixes with only a snapshot version available.
+     * @return the id of the filtered hotfixes.
+     * @since 1.5.7
+     */
+    List<String> listLastHotfixes(String targetPlatform, boolean allowSNAPSHOT);
 
     /**
      * Register a new {@link PackageSource}
