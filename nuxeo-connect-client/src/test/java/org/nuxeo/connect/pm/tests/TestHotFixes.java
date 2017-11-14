@@ -41,11 +41,39 @@ public class TestHotFixes extends AbstractPackageManagerTestCase {
         pm.registerSource(new DummyPackageSource(remote, "remotehf2"), false);
     }
 
+    public void testListLastHotfixes() {
+        // Without SNAPSHOT
+        List<String> expectedLastHotfixes = Arrays.asList("hf00-1.0.0", "hf01-1.0.1", "hf01PATCH-1.0.0", "hf02-1.0.0",
+                "hf03-1.0.0", "hf04-1.0.0", "hf05-1.0.0", "hf06-1.0.0", "hf07-1.0.0", "hf08-1.0.0", "hf09-1.11.0",
+                "hf10-1.0.0", "hf11-1.0.0");
+        List<String> lastHotfixes = pm.listLastHotfixes(null, false);
+        assertEquals(expectedLastHotfixes.size(), lastHotfixes.size());
+        lastHotfixes.forEach(
+                hfName -> assertTrue(hfName + " should not be listed", expectedLastHotfixes.contains(hfName)));
+
+        // With SNAPSHOT allowed
+        List<String> expectedLastSnapshotHotfixes = Arrays.asList("hf00-1.0.0", "hf01-1.0.2-SNAPSHOT",
+                "hf01PATCH-1.0.0", "hf02-1.0.0", "hf03-1.0.0", "hf04-1.0.2-SNAPSHOT", "hf05-1.0.0", "hf06-1.0.0",
+                "hf07-1.0.0", "hf08-1.0.0", "hf09-1.11.0", "hf10-1.0.0", "hf11-1.0.0");
+        lastHotfixes = pm.listLastHotfixes(null, true);
+        assertEquals(expectedLastSnapshotHotfixes.size(), lastHotfixes.size());
+        lastHotfixes.forEach(
+                hfName -> assertTrue(hfName + " should not be listed", expectedLastSnapshotHotfixes.contains(hfName)));
+    }
+
     public void testResolutionOrder() throws Exception {
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("hf11-1.0.0"), null, null, null);
+        // Without SNAPSHOT
+        DependencyResolution depResolution = pm.resolveDependencies(pm.listLastHotfixes(null, false), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
-        String expectedOrder = "hf00-1.0.0/hf01-1.0.0/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.0.0/hf10-1.0.0/hf11-1.0.0";
+        String expectedOrder = "hf01-1.0.1/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.0/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.11.0/hf10-1.0.0/hf11-1.0.0";
+        assertEquals("Bad dependencies order", expectedOrder, depResolution.getInstallationOrderAsString());
+
+        // With SNAPSHOT allowed
+        depResolution = pm.resolveDependencies(pm.listLastHotfixes(null, true), null, null, null);
+        log.info(depResolution.toString());
+        assertTrue(depResolution.isValidated());
+        expectedOrder = "hf01-1.0.2-SNAPSHOT/hf01PATCH-1.0.0/hf02-1.0.0/hf03-1.0.0/hf04-1.0.2-SNAPSHOT/hf05-1.0.0/hf06-1.0.0/hf07-1.0.0/hf08-1.0.0/hf09-1.11.0/hf10-1.0.0/hf11-1.0.0";
         assertEquals("Bad dependencies order", expectedOrder, depResolution.getInstallationOrderAsString());
     }
 

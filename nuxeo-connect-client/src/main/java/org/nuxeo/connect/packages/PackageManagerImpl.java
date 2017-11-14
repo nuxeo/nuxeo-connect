@@ -24,6 +24,7 @@ package org.nuxeo.connect.packages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -452,6 +453,20 @@ public class PackageManagerImpl implements PackageManager {
                 pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot())).map(
                         DownloadablePackage::getName).distinct().collect(Collectors.toList());
         return hotFixesNames;
+    }
+
+    @Override
+    public List<String> listLastHotfixes(String targetPlatform, boolean allowSNAPSHOT) {
+        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
+        // filter on snapshots and collect last versions
+        Map<String, List<DownloadablePackage>> hotfixesByName = hotFixes.stream().filter(
+                pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot())) //
+                .collect(Collectors.groupingBy(DownloadablePackage::getName));
+        List<String> lastHotFixes = hotfixesByName.values().stream() //
+                .map(list -> Collections.max(list, Comparator.comparing(DownloadablePackage::getVersion))) //
+                .map(DownloadablePackage::getId) //
+                .collect(Collectors.toList());
+        return lastHotFixes;
     }
 
     @Override
