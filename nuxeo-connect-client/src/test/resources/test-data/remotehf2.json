@@ -1,14 +1,20 @@
 {"id":"hf00-1.0.0","name":"hf00", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0}
 {"id":"hf01-1.0.0","name":"hf01", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf00:1.0.0:1.0.0"]}
+{"id":"hf01-1.0.1","name":"hf01", "version":"1.0.1","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf00:1.0.0:1.0.0"]}
+{"id":"hf01-1.0.2-SNAPSHOT","name":"hf01", "version":"1.0.2-SNAPSHOT","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf00:1.0.0:1.0.0"]}
 {"id":"hf02-1.0.0","name":"hf02", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf01PATCH:1.0.0:1.0.0"] }
 {"id":"hf03-1.0.0","name":"hf03", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf02:1.0.0:1.0.0"]}
 {"id":"hf04-1.0.0","name":"hf04", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf03:1.0.0:1.0.0"]}
-{"id":"hf05-1.0.0","name":"hf05", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf04:1.0.0:1.0.0"]}
+{"id":"hf04-1.0.2-SNAPSHOT","name":"hf04", "version":"1.0.2-SNAPSHOT","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf03:1.0.0:1.0.0"]}
+{"id":"hf05-1.0.0","name":"hf05", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf04:1.0.0"]}
 {"id":"hf06-1.0.0","name":"hf06", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf05:1.0.0:1.0.0"]}
 {"id":"hf07-1.0.0","name":"hf07", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf06:1.0.0:1.0.0"]}
 {"id":"hf08-1.0.0","name":"hf08", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf07:1.0.0:1.0.0"]}
 {"id":"hf09-1.0.0","name":"hf09", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf08:1.0.0:1.0.0"]}
-{"id":"hf10-1.0.0","name":"hf10", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf09:1.0.0:1.0.0"]}
+{"id":"hf09-1.0.1","name":"hf09", "version":"1.0.1","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf08:1.0.0:1.0.0"]}
+{"id":"hf09-1.2.0","name":"hf09", "version":"1.2.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf08:1.0.0:1.0.0"]}
+{"id":"hf09-1.11.0","name":"hf09", "version":"1.11.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf08:1.0.0:1.0.0"]}
+{"id":"hf10-1.0.0","name":"hf10", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf09:1.0.0"]}
 {"id":"hf11-1.0.0","name":"hf11", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf10:1.0.0:1.0.0"]}
-{"id":"hf01PATCH-1.0.0","name":"hf01PATCH", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf01:1.0.0:1.0.0"]}
+{"id":"hf01PATCH-1.0.0","name":"hf01PATCH", "version":"1.0.0","title":"Hot fix NXP","description":"Hot Fix for NXP", "type":"hotfix", "state":0, "dependencies":["hf01"]}
 {"id":"A-1.2.0","name":"A", "version":"1.2.0","title":"Package A","description":"description of A", "type":"addon", "state":4}
