@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2018 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 
-import org.apache.commons.lang.mutable.MutableObject;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.After;
 import org.junit.Test;
 import org.nuxeo.connect.update.PackageDependency;
@@ -63,7 +64,7 @@ public class TestPackageDescriptor {
         PackageDependency[] packageDependencies;
 
         targets = PackageDescriptor.fixTargetPlatforms("foo", new String[] { "bar-888" }, pd);
-        assertEquals(Arrays.asList("bar-888"), Arrays.asList(targets));
+        assertEquals(Collections.singletonList("bar-888"), Arrays.asList(targets));
         packageDependencies = (PackageDependency[]) pd.getValue();
         assertNull(packageDependencies);
 

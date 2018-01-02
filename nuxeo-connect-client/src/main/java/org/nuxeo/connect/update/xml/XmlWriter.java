@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2018 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -16,7 +16,7 @@
  */
 package org.nuxeo.connect.update.xml;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
@@ -102,7 +102,7 @@ public class XmlWriter {
 
     public final void attr(String name, String value) {
         if (value != null) {
-            sb.append(" ").append(name).append("=\"").append(StringEscapeUtils.escapeXml(value)).append("\"");
+            sb.append(" ").append(name).append("=\"").append(StringEscapeUtils.escapeXml10(value)).append("\"");
         }
     }
 
@@ -116,7 +116,7 @@ public class XmlWriter {
               .append('<')
               .append(name)
               .append('>')
-              .append(StringEscapeUtils.escapeXml(value))
+              .append(StringEscapeUtils.escapeXml10(value))
               .append("</")
               .append(name)
               .append(">\n");
