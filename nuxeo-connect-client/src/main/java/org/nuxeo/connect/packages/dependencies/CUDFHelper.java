@@ -91,6 +91,27 @@ public class CUDFHelper {
 
     private boolean keep = true;
 
+    private static final int MATCH_ALL_CUDF_VERSION = -1;
+
+    private static final int MATCH_NONE_CUDF_VERSION = -2;
+
+    protected enum VersionMatchMappingPolicy {
+        ALL_WHEN_NOT_FOUND, NONE_WHEN_NOT_FOUND;
+
+        public int whenNotDefined() {
+            return MATCH_ALL_CUDF_VERSION;
+        }
+
+        public int whenNotFound() {
+            switch (this) {
+            case NONE_WHEN_NOT_FOUND:
+                return MATCH_NONE_CUDF_VERSION;
+            default:
+                return MATCH_ALL_CUDF_VERSION;
+            }
+        }
+    }
+
     /**
      * @since 5.9.2
      * @param keep Whether to keep the installed packages in the resolution
@@ -381,7 +402,8 @@ public class CUDFHelper {
         sb2.append(cudfPackage.getCUDFStanza());
         sb2.append(CUDFPackage.TAG_DEPENDS + formatCUDFDeps(cudfPackage.getDependencies(), false, true) + newLine);
         // Add conflicts to other versions of the same package
-        String conflictsFormatted = formatCUDFDeps(cudfPackage.getConflicts(), false, false);
+        String conflictsFormatted = formatCUDFDeps(cudfPackage.getConflicts(), false, false,
+                VersionMatchMappingPolicy.NONE_WHEN_NOT_FOUND);
         conflictsFormatted += (conflictsFormatted.trim().length() > 0 ? ", " : "") + cudfPackage.getCUDFName() + " != "
                 + cudfPackage.getCUDFVersion();
         sb2.append(CUDFPackage.TAG_CONFLICTS + conflictsFormatted + newLine);
@@ -391,6 +413,14 @@ public class CUDFHelper {
 
     protected String formatCUDFDeps(PackageDependency[] dependencies, boolean failOnError, boolean warnOnError)
             throws DependencyException {
+        return formatCUDFDeps(dependencies, failOnError, warnOnError, VersionMatchMappingPolicy.ALL_WHEN_NOT_FOUND);
+    }
+
+    /**
+     * @since 1.7.1
+     */
+    protected String formatCUDFDeps(PackageDependency[] dependencies, boolean failOnError, boolean warnOnError,
+            VersionMatchMappingPolicy versionMatchMappingPolicy) throws DependencyException {
         if (dependencies == null) {
             return "";
         }
@@ -412,29 +442,31 @@ public class CUDFHelper {
             VersionRange versionRange = packageDependency.getVersionRange();
             int cudfMinVersion, cudfMaxVersion;
             if (versionRange.getMinVersion() == null) {
-                cudfMinVersion = -1;
+                cudfMinVersion = versionMatchMappingPolicy.whenNotDefined();
             } else {
                 CUDFPackage cudfPackage = versionsMap.get(versionRange.getMinVersion());
-                cudfMinVersion = (cudfPackage == null) ? -1 : cudfPackage.getCUDFVersion();
+                cudfMinVersion = (cudfPackage == null) ? versionMatchMappingPolicy.whenNotFound()
+                        : cudfPackage.getCUDFVersion();
             }
             if (versionRange.getMaxVersion() == null) {
-                cudfMaxVersion = -1;
+                cudfMaxVersion = versionMatchMappingPolicy.whenNotDefined();
             } else {
                 CUDFPackage cudfPackage = versionsMap.get(versionRange.getMaxVersion());
-                cudfMaxVersion = (cudfPackage == null) ? -1 : cudfPackage.getCUDFVersion();
+                cudfMaxVersion = (cudfPackage == null) ? versionMatchMappingPolicy.whenNotFound()
+                        : cudfPackage.getCUDFVersion();
             }
             if (cudfMinVersion == cudfMaxVersion) {
-                if (cudfMinVersion == -1) {
+                if (cudfMinVersion == MATCH_ALL_CUDF_VERSION) {
                     sb.append(cudfName + ", ");
                 } else {
                     sb.append(cudfName + " = " + cudfMinVersion + ", ");
                 }
                 continue;
             }
-            if (cudfMinVersion != -1) {
+            if (cudfMinVersion != MATCH_ALL_CUDF_VERSION && cudfMinVersion != MATCH_NONE_CUDF_VERSION) {
                 sb.append(cudfName + " >= " + cudfMinVersion + ", ");
             }
-            if (cudfMaxVersion != -1) {
+            if (cudfMaxVersion != MATCH_ALL_CUDF_VERSION && cudfMaxVersion != MATCH_NONE_CUDF_VERSION) {
                 sb.append(cudfName + " <= " + cudfMaxVersion + ", ");
             }
         }
