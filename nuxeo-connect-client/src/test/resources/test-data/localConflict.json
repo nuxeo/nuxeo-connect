@@ -1,0 +1,1 @@
+{"id":"nuxeo-9.10-HF01-1.0.0","name":"nuxeo-9.10-HF01", "version":"1.0.0", "conflicts": ["nuxeo-jsf-ui:9.10.0:9.10.0"], "title":"Nuxeo 9.10 HF01","description":"Hotfix 01 for Nuxeo 9.10", "type":"hotfix", "state":5}

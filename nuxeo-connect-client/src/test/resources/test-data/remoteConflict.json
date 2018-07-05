@@ -1,0 +1,2 @@
+{"id":"nuxeo-jsf-ui-9.10.0","name":"nuxeo-jsf-ui", "version":"9.10.0","title":"Nuxeo JSF UI 9.10.0","description":"Nuxeo JSF UI for Nuxeo 9.10", "type":"addon", "state":0}
+{"id":"nuxeo-jsf-ui-9.10.0-HF01","name":"nuxeo-jsf-ui", "version":"9.10.0-HF01", "dependencies": ["nuxeo-9.10-HF01"], "title":"Nuxeo JSF UI 9.10.0-HF01","description":"Nuxeo JSF UI for Nuxeo 9.10 HF01", "type":"addon", "state":0}
