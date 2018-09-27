@@ -85,9 +85,22 @@ public class NuxeoConnectClient {
         return cbHolder.getUpdateService();
     }
 
+    /**
+     * @deprecated since 1.7.2, prefer to use {@link #getPackageManager(String)}
+     */
+    @Deprecated
     public static synchronized PackageManager getPackageManager() {
+        return getPackageManager(null);
+    }
+
+    /**
+     * @since 1.7.2
+     */
+    public static synchronized PackageManager getPackageManager(String currentTargetPlatform) {
         if (packageManager == null) {
-            packageManager = new PackageManagerImpl();
+            packageManager = new PackageManagerImpl(currentTargetPlatform);
+        } else {
+            packageManager.setCurrentTargetPlatform(currentTargetPlatform);
         }
         return packageManager;
     }

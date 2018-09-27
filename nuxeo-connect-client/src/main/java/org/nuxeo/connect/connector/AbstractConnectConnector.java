@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,12 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.PrefixFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -90,6 +91,8 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     public static final String CONNECT_SERVER_REACHABLE_PROPERTY = "org.nuxeo.connect.server.reachable";
 
+    private static final String CACHE_FILE_PREFIX = "pkg_cache_";
+
     protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
 
     protected String getBaseUrl() {
@@ -107,7 +110,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         String cacheDir = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
         try {
             URL connectUrl = new URL(connectUrlString);
-            String cachePrefix = connectUrl.getHost() + "_";
+            String cachePrefix = CACHE_FILE_PREFIX + connectUrl.getHost() + "_";
             int port = connectUrl.getPort();
             if (port == -1) {
                 port = connectUrl.getDefaultPort();
@@ -128,12 +131,10 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public void flushCache() {
-        for (PackageType type : PackageType.values()) {
-            File cacheFile = getCacheFileFor(type.getValue());
+        String cacheDir = NuxeoConnectClient.getProperty(NUXEO_TMP_DIR_PROPERTY, System.getProperty("java.io.tmpdir"));
+        for (File cacheFile : FileUtils.listFiles(new File(cacheDir), new PrefixFileFilter(CACHE_FILE_PREFIX), null)) {
             FileUtils.deleteQuietly(cacheFile);
         }
-        FileUtils.deleteQuietly(getCacheFileFor(null));
-        FileUtils.deleteQuietly(getCacheFileFor(STUDIO_REGISTERED_CACHE_SUFFIX));
     }
 
     protected ConnectServerResponse execCall(String url) throws ConnectServerError {
@@ -206,13 +207,35 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
-        String typeStr = String.valueOf(type);
-        return getDownloads(typeStr, typeStr);
+        return getDownloads(type, null);
+    }
+
+    @Override
+    public List<DownloadablePackage> getDownloads(PackageType type, String currentTargetPlatform)
+            throws ConnectServerError {
+        String fileSuffix = String.valueOf(type);
+        String urlSuffix = fileSuffix;
+        if (StringUtils.isNotBlank(currentTargetPlatform)) {
+            urlSuffix += "?targetPlatform=" + currentTargetPlatform;
+            fileSuffix += "_" + currentTargetPlatform;
+        }
+        return getDownloads(fileSuffix, urlSuffix);
     }
 
     @Override
     public List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError {
-        return getDownloads(STUDIO_REGISTERED_CACHE_SUFFIX, PackageType.STUDIO + "?registered=true");
+        return getRegisteredStudio(null);
+    }
+
+    @Override
+    public List<DownloadablePackage> getRegisteredStudio(String currentTargetPlatform) throws ConnectServerError {
+        String fileSuffix = STUDIO_REGISTERED_CACHE_SUFFIX;
+        String urlSuffix = PackageType.STUDIO + "?registered=true";
+        if (StringUtils.isNotBlank(currentTargetPlatform)) {
+            urlSuffix += "&targetPlatform=" + currentTargetPlatform;
+            fileSuffix += "_" + currentTargetPlatform;
+        }
+        return getDownloads(fileSuffix, urlSuffix);
     }
 
     protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
