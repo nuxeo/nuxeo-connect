@@ -578,4 +578,27 @@ public interface PackageManager extends BasePackageManager {
      */
     void checkOptionalDependenciesOnInstalledPackages(DependencyResolution res);
 
+    /**
+     * @since 1.7.2
+     */
+    String getCurrentTargetPlatform();
+
+    /**
+     * @since 1.7.2
+     */
+    void setCurrentTargetPlatform(String currentTargetPlatform);
+
+    /**
+     * @since 1.7.2
+     * @return All downloadable packages from given sources filtered on type if not null
+     */
+    List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type);
+
+    /**
+     * @since 1.7.2
+     * @return All downloadable packages from given sources, optionally filtered on type and/or target platform if not
+     *         null
+     */
+    List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type, String targetPlatform);
+
 }

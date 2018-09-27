@@ -40,6 +40,11 @@ public interface PackageSource {
 
     List<DownloadablePackage> listPackages(PackageType type);
 
+    /**
+     * @since 1.7.2
+     */
+    List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform);
+
     void flushCache();
 
     /**
@@ -53,10 +58,25 @@ public interface PackageSource {
      */
     Collection<? extends DownloadablePackage> listPackagesByName(String packageName);
 
+
+    /**
+     * @param packageName Must not be null
+     * @since 1.7.2
+     */
+    Collection<? extends DownloadablePackage> listPackagesByName(String pkgName, String currentTargetPlatform);
+
     /**
      * @return Studio packages associated with the current registration.
      * @since 1.4.19
      */
     List<DownloadablePackage> listStudioPackages();
+
+    /**
+     * @param currentTargetPlatform
+     * @return Studio packages associated with the current registration, filtered by the given currentTargetPlatform.
+     * @since 1.7.2
+     */
+    List<DownloadablePackage> listStudioPackages(String currentTargetPlatform);
+
 
 }

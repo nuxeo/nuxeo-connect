@@ -61,6 +61,8 @@ public class TestConnectHttpConnector {
 
     private static final int PORT = 17488;
 
+    private final String testTargetPlatform = "server-10.3";
+
     private ConnectHttpConnector httpConnector;
 
     public class CustomTestRequestHandler extends AbstractHandler {
@@ -160,7 +162,7 @@ public class TestConnectHttpConnector {
         getCustomHandler().setExpectedJSONResponse("[{\"name\" : \"test1\"}, {\"name\" : \"test2\"}]");
 
         // WHEN getting downloads
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
 
         // THEN it should not have throw any exception and have created a list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(2);
@@ -205,7 +207,7 @@ public class TestConnectHttpConnector {
         getCustomHandler().setExpectedJSONResponse("[{\"name\" : \"test1\"}, {\"name\" : \"test2\"}]");
 
         // WHEN getting downloads
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
 
         // THEN it should not have throw any exception and have created a list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(2);
@@ -253,7 +255,7 @@ public class TestConnectHttpConnector {
         getCustomHandler().setExpectedResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 
         // WHEN getting downloads
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
 
         // THEN it should not have throw any exception and have returned an empty list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(0);
@@ -296,7 +298,7 @@ public class TestConnectHttpConnector {
         String typeStr = String.valueOf(PackageType.ADDON);
         getCustomHandler().setExpectedTargetSuffix(AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr);
         try {
-            httpConnector.getDownloads(PackageType.ADDON);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
@@ -340,7 +342,7 @@ public class TestConnectHttpConnector {
         String typeStr = String.valueOf(PackageType.ADDON);
         getCustomHandler().setExpectedTargetSuffix(AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr);
         try {
-            httpConnector.getDownloads(PackageType.ADDON);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
@@ -384,7 +386,7 @@ public class TestConnectHttpConnector {
         String typeStr = String.valueOf(PackageType.ADDON);
         getCustomHandler().setExpectedTargetSuffix(AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr);
         try {
-            httpConnector.getDownloads(PackageType.ADDON);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
@@ -434,7 +436,7 @@ public class TestConnectHttpConnector {
         String typeStr = String.valueOf(PackageType.ADDON);
         getCustomHandler().setExpectedTargetSuffix(AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr);
         try {
-            httpConnector.getDownloads(PackageType.ADDON);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
             Fail.failBecauseExceptionWasNotThrown(ConnectClientVersionMismatchError.class);
         } catch (ConnectClientVersionMismatchError e) {
             // THEN it should have thrown a ConnectClientVersionMismatchError with the correct message
