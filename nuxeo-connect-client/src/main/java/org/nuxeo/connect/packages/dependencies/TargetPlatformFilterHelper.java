@@ -19,7 +19,7 @@ package org.nuxeo.connect.packages.dependencies;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
-
+import org.apache.commons.lang.StringUtils;
 import org.nuxeo.connect.update.Package;
 
 /**
@@ -37,7 +37,7 @@ public class TargetPlatformFilterHelper {
      * @since 1.4.24
      */
     public static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
-        if (targetPlatform == null || targetPlatforms == null || targetPlatforms.length == 0) {
+        if (StringUtils.isBlank(targetPlatform) || targetPlatforms == null || targetPlatforms.length == 0) {
             return true;
         }
         for (String target : targetPlatforms) {

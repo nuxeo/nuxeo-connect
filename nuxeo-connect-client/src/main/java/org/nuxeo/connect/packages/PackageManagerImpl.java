@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,8 @@ public class PackageManagerImpl implements PackageManager {
 
     protected DependencyResolver resolver;
 
+    private String currentTargetPlatform;
+
     @Override
     public List<PackageSource> getAllSources() {
         List<PackageSource> allSources = new ArrayList<>();
@@ -93,11 +95,33 @@ public class PackageManagerImpl implements PackageManager {
         return allSources;
     }
 
+    /**
+     * @deprecated since 1.7.2, prefer to use {@link #PackageManagerImpl(String)}
+     */
+    @Deprecated
     public PackageManagerImpl() {
+        this(null);
+    }
+
+    /**
+     * @since 1.7.2
+     */
+    public PackageManagerImpl(String currentTargetPlatform) {
         registerSource(new RemotePackageSource(), false);
         registerSource(new DownloadingPackageSource(), true);
         registerSource(new LocalPackageSource(), true);
         setResolver(DEFAULT_DEPENDENCY_RESOLVER);
+        this.currentTargetPlatform = currentTargetPlatform;
+    }
+
+    @Override
+    public String getCurrentTargetPlatform() {
+        return currentTargetPlatform;
+    }
+
+    @Override
+    public void setCurrentTargetPlatform(String currentTargetPlatform) {
+        this.currentTargetPlatform = currentTargetPlatform;
     }
 
     /**
@@ -166,20 +190,13 @@ public class PackageManagerImpl implements PackageManager {
         return result;
     }
 
-    /**
-     * @since 1.4
-     * @return All downloadable packages from given sources filtered on type if not null
-     */
-    protected List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type) {
-        return getAllPackages(sources, type, null);
+    @Override
+    public List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type) {
+        return getAllPackages(sources, type, currentTargetPlatform);
     }
 
-    /**
-     * @since 1.4
-     * @return All downloadable packages from given sources, optionally filtered on type and/or target platform if not
-     *         null
-     */
-    protected List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type,
+    @Override
+    public List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type,
             String targetPlatform) {
         Map<String, DownloadablePackage> packagesById = getAllPackagesByID(sources, type, targetPlatform);
         return new ArrayList<>(packagesById.values());
@@ -190,7 +207,7 @@ public class PackageManagerImpl implements PackageManager {
      * @return a Map of all packages from given sources filtered on type if not null
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(List<PackageSource> sources, PackageType type) {
-        return getAllPackagesByID(sources, type, null);
+        return getAllPackagesByID(sources, type, currentTargetPlatform);
     }
 
     /**
@@ -201,16 +218,9 @@ public class PackageManagerImpl implements PackageManager {
             String targetPlatform) {
         Map<String, DownloadablePackage> packagesById = new HashMap<>();
         for (PackageSource source : sources) {
-            List<DownloadablePackage> packages = null;
-            if (type == null) {
-                packages = source.listPackages();
-            } else {
-                packages = source.listPackages(type);
-            }
+            List<DownloadablePackage> packages = source.listPackages(type, targetPlatform);
             for (DownloadablePackage pkg : packages) {
-                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                    packagesById.put(pkg.getId(), pkg);
-                }
+                packagesById.put(pkg.getId(), pkg);
             }
         }
         return packagesById;
@@ -234,12 +244,7 @@ public class PackageManagerImpl implements PackageManager {
             PackageType type) {
         Map<String, List<DownloadablePackage>> packagesByName = new HashMap<>();
         for (PackageSource source : sources) {
-            List<DownloadablePackage> packages = null;
-            if (type == null) {
-                packages = source.listPackages();
-            } else {
-                packages = source.listPackages(type);
-            }
+            List<DownloadablePackage> packages = source.listPackages(type, currentTargetPlatform);
             for (DownloadablePackage pkg : packages) {
                 List<DownloadablePackage> pkgsForName;
                 if (!packagesByName.containsKey(pkg.getName())) {
@@ -258,7 +263,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> findRemotePackages(String packageName) {
         List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            pkgs.addAll(source.listPackagesByName(packageName));
+            pkgs.addAll(source.listPackagesByName(packageName, currentTargetPlatform));
         }
         return pkgs;
     }
@@ -353,7 +358,7 @@ public class PackageManagerImpl implements PackageManager {
             }
         }
         for (PackageSource source : remoteSources) {
-            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, currentTargetPlatform)) {
                 remoteVersions.add(pkg.getVersion());
             }
         }
@@ -369,12 +374,9 @@ public class PackageManagerImpl implements PackageManager {
     public List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform) {
         List<Version> versions = new ArrayList<>();
         for (PackageSource source : getAllSources()) {
-            for (DownloadablePackage pkg : source.listPackagesByName(pkgName)) {
-                if (range.matchVersion(pkg.getVersion())
-                        && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                    if (!versions.contains(pkg.getVersion())) {
-                        versions.add(pkg.getVersion());
-                    }
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, targetPlatform)) {
+                if (range.matchVersion(pkg.getVersion()) && !versions.contains(pkg.getVersion())) {
+                    versions.add(pkg.getVersion());
                 }
             }
         }
@@ -383,7 +385,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listPackages() {
-        return listPackages(null, null);
+        return listPackages(null, currentTargetPlatform);
     }
 
     @Override
@@ -393,7 +395,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-        return listPackages(type, null);
+        return listPackages(type, currentTargetPlatform);
     }
 
     @Override
@@ -471,12 +473,12 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listRemotePackages() {
-        return listRemotePackages(null, null);
+        return listRemotePackages(null, currentTargetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> listRemotePackages(PackageType pkgType) {
-        return listRemotePackages(pkgType, null);
+        return listRemotePackages(pkgType, currentTargetPlatform);
     }
 
     @Override
@@ -508,12 +510,12 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listUpdatePackages() {
-        return listUpdatePackages(null, null);
+        return listUpdatePackages(null, currentTargetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
-        return listUpdatePackages(type, null);
+        return listUpdatePackages(type, currentTargetPlatform);
     }
 
     @Override
@@ -526,8 +528,8 @@ public class PackageManagerImpl implements PackageManager {
         List<String> installedPackagesNames = listInstalledPackagesNames(type);
         List<String> hotfixesNames = null;
         if (type == null || type == PackageType.HOT_FIX) {
-            // list last version of available hot-fixes too
-            hotfixesNames = listHotfixesNames(targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+            // list last version of available hot-fixes too, but always for the current target platform
+            hotfixesNames = listHotfixesNames(currentTargetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
             hotfixesNames.removeAll(installedPackagesNames);
         }
         DependencyResolution resolution = resolveDependencies(hotfixesNames, null, installedPackagesNames,
@@ -632,7 +634,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public DownloadablePackage getRemotePackage(String pkgId) {
-        List<DownloadablePackage> pkgs = listRemotePackages();
+        List<DownloadablePackage> pkgs = listRemotePackages(null, null);
         return getPkgInList(pkgs, pkgId);
     }
 
@@ -651,13 +653,13 @@ public class PackageManagerImpl implements PackageManager {
     @Deprecated
     @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages() {
-        return listRemoteOrLocalPackages(null, null);
+        return listRemoteOrLocalPackages(null, currentTargetPlatform);
     }
 
     @Deprecated
     @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType) {
-        return listRemoteOrLocalPackages(pkgType, null);
+        return listRemoteOrLocalPackages(pkgType, currentTargetPlatform);
     }
 
     @Override
@@ -703,13 +705,13 @@ public class PackageManagerImpl implements PackageManager {
     @Deprecated
     @Override
     public List<DownloadablePackage> listOnlyRemotePackages() {
-        return listOnlyRemotePackages(null, null);
+        return listOnlyRemotePackages(null, currentTargetPlatform);
     }
 
     @Deprecated
     @Override
     public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType) {
-        return listOnlyRemotePackages(pkgType, null);
+        return listOnlyRemotePackages(pkgType, currentTargetPlatform);
     }
 
     @Override

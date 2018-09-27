@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2018 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,28 +53,26 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
 
     @Override
     public List<DownloadablePackage> listPackages() {
-        List<DownloadablePackage> all = new ArrayList<>();
-        for (PackageType type : PackageType.values()) {
-            all.addAll(listPackages(type));
-        }
-        return all;
+        return listPackages(null, null);
     }
 
     @Override
-    public List<DownloadablePackage> listStudioPackages() {
+    public List<DownloadablePackage> listStudioPackages(String currentTargetPlatform) {
         List<DownloadablePackage> result = new ArrayList<>();
         if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistered()) {
             log.info("Server is not registered");
             return result;
         }
-        result = cache.getFromCache(PackageListCache.STUDIO_REGISTERED_KEY);
+        String cacheKey = PackageListCache.STUDIO_REGISTERED_KEY
+                + ((currentTargetPlatform != null) ? "_" + currentTargetPlatform : "");
+        result = cache.getFromCache(cacheKey);
         if (!result.isEmpty()) {
             return result;
         }
         try {
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-            result = crs.getConnector().getRegisteredStudio();
-            cache.add(result, PackageListCache.STUDIO_REGISTERED_KEY);
+            result = crs.getConnector().getRegisteredStudio(currentTargetPlatform);
+            cache.add(result, cacheKey);
         } catch (ConnectServerError e) {
             log.debug(e, e);
             log.warn("Unable to fetch remote packages list: " + e.getMessage());
@@ -84,24 +82,29 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type) {
+    public List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform) {
         if (type == null) {
-            return listPackages();
+            List<DownloadablePackage> all = new ArrayList<>();
+            for (PackageType pkgType : PackageType.values()) {
+                all.addAll(listPackages(pkgType, currentTargetPlatform));
+            }
+            return all;
         }
-        List<DownloadablePackage> result = cache.getFromCache(type.toString());
+        String cacheKey = type.toString() + ((currentTargetPlatform != null) ? "_" + currentTargetPlatform : "");
+        List<DownloadablePackage> result = cache.getFromCache(cacheKey);
         if (!result.isEmpty()) {
             return result;
         }
         try {
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-            result = crs.getConnector().getDownloads(type);
+            result = crs.getConnector().getDownloads(type, currentTargetPlatform);
         } catch (ConnectServerError e) {
             log.debug(e, e);
             log.warn("Unable to fetch remote packages list: " + e.getMessage());
             // store an empty list to avoid calling back the server since anyway we probably have no connection...
             result = new ArrayList<>();
         }
-        cache.add(result, type.toString());
+        cache.add(result, cacheKey);
         return result;
     }
 
@@ -133,10 +136,10 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     }
 
     @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName, String currentTargetPlatform) {
         List<DownloadablePackage> result = new ArrayList<>();
         for (PackageType type : PackageType.values()) {
-            for (DownloadablePackage pkg : listPackages(type)) {
+            for (DownloadablePackage pkg : listPackages(type, currentTargetPlatform)) {
                 if (packageName.equals(pkg.getName())) {
                     result.add(pkg);
                 }
