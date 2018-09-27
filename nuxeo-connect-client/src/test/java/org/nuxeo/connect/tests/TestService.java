@@ -96,7 +96,7 @@ public class TestService extends TestCase {
         assertNotNull(pm);
         for (PackageSource packageSource : pm.getAllSources()) {
             assertNotNull(packageSource.listPackages());
-            assertNotNull(packageSource.listPackages(null));
+            assertNotNull(packageSource.listPackages(null, null));
             assertNotNull(packageSource.listStudioPackages());
         }
 
