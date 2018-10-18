@@ -246,10 +246,11 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
         // Try reading from the cache first
         result = readCacheFile(fileSuffix);
-        if (!result.isEmpty()) {
+        if (result != null) {
             log.debug("Using cache for " + fileSuffix);
             return result;
         }
+        result = new ArrayList<>();
         log.debug("Cache empty or expired for " + fileSuffix + ". Sending request to " + getBaseUrl());
         // Fallback on the real source
         String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + urlSuffix;
@@ -294,7 +295,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
      * @see PackageListCache In-memory cache PackageListCache
      */
     public List<DownloadablePackage> readCacheFile(String suffix) {
-        List<DownloadablePackage> result = new ArrayList<>();
         long cacheMaxAge = Long.parseLong(
                 NuxeoConnectClient.getProperty(CONNECT_CONNECTOR_CACHE_MINUTES_PROPERTY, DEFAULT_CACHE_TIME_MINUTES))
                 * 60 * 1000;
@@ -303,8 +303,9 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         }
         File cacheFile = getCacheFileFor(suffix);
         if (!cacheFile.exists() || ((new Date().getTime() - cacheFile.lastModified()) > cacheMaxAge)) {
-            return result;
+            return null;
         }
+        List<DownloadablePackage> result = new ArrayList<>();
         try {
             String json = FileUtils.readFileToString(cacheFile);
             JSONArray array = new JSONArray(json);
