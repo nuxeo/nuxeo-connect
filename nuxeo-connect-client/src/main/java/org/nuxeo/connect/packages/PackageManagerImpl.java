@@ -634,7 +634,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public DownloadablePackage getRemotePackage(String pkgId) {
-        List<DownloadablePackage> pkgs = listRemotePackages(null, null);
+        List<DownloadablePackage> pkgs = listRemotePackages();
         return getPkgInList(pkgs, pkgId);
     }
 
