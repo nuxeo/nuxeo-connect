@@ -140,7 +140,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
             setPackageState(PackageState.DOWNLOADING);
             HttpGet method = new HttpGet(sourceUrl);
-            if (!sourceUrl.contains(ConnectUrlConfig.CONNECT_TEST_MODE_BASEURL + "test")) { // for testing
+            if (!sourceUrl.contains(ConnectUrlConfig.getBaseUrl() + "test")) { // for testing
                 Map<String, String> headers = SecurityHeaderGenerator.getHeaders();
                 for (String headerName : headers.keySet()) {
                     method.addHeader(headerName, headers.get(headerName));
