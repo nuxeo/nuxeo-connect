@@ -27,7 +27,6 @@ import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
@@ -72,7 +71,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public NuxeoValidationState validationState;
 
-    public PackageVisibility visibility;
+    public boolean subscriptionRequired;
 
     public FakeDownloadablePackage(String name, Version version) {
         this.name = name;
@@ -240,8 +239,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     }
 
     @Override
-    public PackageVisibility getVisibility() {
-        return visibility;
+    public boolean hasSubscriptionRequired() {
+        return subscriptionRequired;
     }
-
 }

@@ -28,7 +28,6 @@ import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
@@ -271,8 +270,8 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
-    public PackageVisibility getVisibility() {
-        return localPackage.getVisibility();
+    public boolean hasSubscriptionRequired() {
+        return false;
     }
 
 }
