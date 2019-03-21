@@ -544,10 +544,9 @@ public class PackageManagerImpl implements PackageManager {
         Collections.sort(allPackages, new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
-            // TODO replace with downloadablePackage.hasOwner() or smth like that
-//            if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
+            if (downloadablePackage.getOwner() != null) {
                 allPrivatePackages.add(downloadablePackage);
-//            }
+            }
         }
         return allPrivatePackages;
     }

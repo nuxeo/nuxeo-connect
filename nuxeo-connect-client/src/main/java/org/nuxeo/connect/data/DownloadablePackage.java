@@ -21,10 +21,8 @@ package org.nuxeo.connect.data;
 import org.nuxeo.connect.update.Package;
 
 /**
- * Interface for {@link Package} that can be downloaded in Nuxeo Connect.
- *
- * Compared to a {@link Package} it adds some external meta-data that are
- * managed by Nuxeo Connect but are not part of the XML package descriptor
+ * Interface for {@link Package} that can be downloaded in Nuxeo Connect. Compared to a {@link Package} it adds some
+ * external meta-data that are managed by Nuxeo Connect but are not part of the XML package descriptor
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
@@ -45,5 +43,7 @@ public interface DownloadablePackage extends Package {
     int getDownloadsCount();
 
     boolean hasSubscriptionRequired();
+
+    String getOwner();
 
 }
