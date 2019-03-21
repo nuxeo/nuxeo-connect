@@ -73,6 +73,8 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public boolean subscriptionRequired;
 
+    public String owner;
+
     public FakeDownloadablePackage(String name, Version version) {
         this.name = name;
         this.version = version;
@@ -241,5 +243,10 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     @Override
     public boolean hasSubscriptionRequired() {
         return subscriptionRequired;
+    }
+
+    @Override
+    public String getOwner() {
+        return owner;
     }
 }
