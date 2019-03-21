@@ -44,4 +44,6 @@ public interface DownloadablePackage extends Package {
 
     int getDownloadsCount();
 
+    boolean hasSubscriptionRequired();
+
 }
