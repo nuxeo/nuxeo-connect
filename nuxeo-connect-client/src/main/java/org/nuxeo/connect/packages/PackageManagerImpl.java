@@ -56,7 +56,6 @@ import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
-import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.VersionRange;
 import org.nuxeo.connect.update.task.Task;
@@ -545,9 +544,10 @@ public class PackageManagerImpl implements PackageManager {
         Collections.sort(allPackages, new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
-            if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
+            // TODO replace with downloadablePackage.hasOwner() or smth like that
+//            if (downloadablePackage.getVisibility() == PackageVisibility.PRIVATE) {
                 allPrivatePackages.add(downloadablePackage);
-            }
+//            }
         }
         return allPrivatePackages;
     }

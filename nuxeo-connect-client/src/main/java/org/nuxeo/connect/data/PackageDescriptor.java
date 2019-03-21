@@ -29,7 +29,6 @@ import org.apache.commons.lang.mutable.MutableObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
@@ -38,7 +37,6 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
@@ -152,7 +150,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     protected boolean supportsHotReload;
 
     @JSONExportableField
-    protected PackageVisibility visibility;
+    protected boolean subscriptionRequired;
 
     private boolean local = false;
 
@@ -163,7 +161,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     /**
      * @since 1.4
      */
-    public PackageDescriptor(Package descriptor) {
+    public PackageDescriptor(DownloadablePackage descriptor) {
         super();
         classifier = descriptor.getClassifier();
         dependencies = descriptor.getDependencies();
@@ -182,10 +180,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         type = descriptor.getType();
         vendor = descriptor.getVendor();
         version = descriptor.getVersion();
-        visibility = descriptor.getVisibility();
         nuxeoValidationState = descriptor.getValidationState();
         supported = descriptor.isSupported();
         supportsHotReload = descriptor.supportsHotReload();
+        subscriptionRequired = descriptor.hasSubscriptionRequired();
     }
 
     @Override
@@ -440,11 +438,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Override
     public Version getVersion() {
         return version;
-    }
-
-    @Override
-    public PackageVisibility getVisibility() {
-        return visibility;
     }
 
     @Override
@@ -758,15 +751,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         version = new Version(v);
     }
 
-    public void setVisibility(PackageVisibility visibility) {
-        this.visibility = visibility;
-    }
-
-    @JSONImportMethod(name = "visibility")
-    public void setVisibilityAsJSON(String strVisibility) {
-        visibility = PackageVisibility.valueOf(strVisibility);
-    }
-
     @Override
     public boolean supportsHotReload() {
         return supportsHotReload;
@@ -775,6 +759,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Override
     public String toString() {
         return getId();
+    }
+
+    @Override
+    public boolean hasSubscriptionRequired() {
+        return subscriptionRequired;
     }
 
 }
