@@ -274,4 +274,9 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
         return false;
     }
 
+    @Override
+    public String getOwner() {
+        return null;
+    }
+
 }
