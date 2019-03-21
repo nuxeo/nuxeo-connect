@@ -152,6 +152,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @JSONExportableField
     protected boolean subscriptionRequired;
 
+    @JSONExportableField
+    protected String owner;
+
     private boolean local = false;
 
     public PackageDescriptor() {
@@ -184,6 +187,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         supported = descriptor.isSupported();
         supportsHotReload = descriptor.supportsHotReload();
         subscriptionRequired = descriptor.hasSubscriptionRequired();
+        owner = descriptor.getOwner();
     }
 
     @Override
@@ -764,6 +768,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Override
     public boolean hasSubscriptionRequired() {
         return subscriptionRequired;
+    }
+
+    @Override
+    public String getOwner() {
+        return owner;
     }
 
 }
