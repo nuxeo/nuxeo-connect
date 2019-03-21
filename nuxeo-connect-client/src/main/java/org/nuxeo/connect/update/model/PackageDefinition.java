@@ -22,7 +22,6 @@ import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.PackageVisibility;
 import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
@@ -276,10 +275,5 @@ public interface PackageDefinition extends Package {
      */
     void setRequireTermsAndConditionsAcceptance(
             boolean requireTermsAndConditionsAcceptance);
-
-    /**
-     * @since 1.4
-     */
-    void setVisibility(PackageVisibility visibility);
 
 }

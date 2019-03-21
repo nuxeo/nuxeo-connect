@@ -182,11 +182,4 @@ public interface Package {
      */
     boolean isSupported();
 
-    /**
-     * The package visibility: marketplace, dev, public
-     *
-     * @since 1.4
-     */
-    PackageVisibility getVisibility();
-
 }
