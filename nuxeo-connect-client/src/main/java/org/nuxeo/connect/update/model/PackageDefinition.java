@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2019 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -18,17 +18,15 @@
  */
 package org.nuxeo.connect.update.model;
 
-import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.task.Task;
 
 /**
- * Describe a package.
+ * Describe the APIs to write the minimal package properties and the getters not exposed from {@link Package}.
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
@@ -83,14 +81,6 @@ public interface PackageDefinition extends Package {
      * @param vendor
      */
     void setVendor(String vendor);
-
-    /**
-     * Set the package web page URL.
-     *
-     * @param homePage
-     * @see #getHomePage()
-     */
-    void setHomePage(String homePage);
 
     /**
      * Get the package license name. E.g. LGPL, BSD etc.
@@ -253,22 +243,7 @@ public interface PackageDefinition extends Package {
     /**
      * @since 1.4
      */
-    void setSupported(boolean supported);
-
-    /**
-     * @since 1.4
-     */
     void setHotReloadSupport(boolean hotReloadSupport);
-
-    /**
-     * @since 1.4
-     */
-    void setValidationState(NuxeoValidationState validationState);
-
-    /**
-     * @since 1.4
-     */
-    void setProductionState(ProductionState productionState);
 
     /**
      * @since 1.4

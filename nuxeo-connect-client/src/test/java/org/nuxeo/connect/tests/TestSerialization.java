@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -37,11 +35,9 @@ import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
-import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 public class TestSerialization {
@@ -76,7 +72,6 @@ public class TestSerialization {
         PackageDescriptor p = new PackageDescriptor();
         p.setClassifier("MyClassifier");
         p.setDescription("MyDescription");
-        p.setHomePage("http://www.nuxeo.org");
         p.setName("testPackage");
         List<String> targets = new ArrayList<>();
         targets.add("5.3.0");
@@ -99,11 +94,7 @@ public class TestSerialization {
         p.setCommentsNumber(8);
         p.setRating(4);
         p.setDownloadsCount(1000);
-        p.setPictureUrl("http://xxx");
         p.setPackageState(PackageState.INSTALLED);
-        p.setNuxeoValidationState(NuxeoValidationState.NUXEO_CERTIFIED);
-        p.setProductionState(ProductionState.PRODUCTION_READY);
-        p.setSupported(true);
         p.setSupportsHotReload(true);
 
         String json = p.serializeAsJSON();
@@ -113,7 +104,6 @@ public class TestSerialization {
         PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(
                 PackageDescriptor.class, json);
         assertNotNull(p2);
-        assertEquals(p.getHomePage(), p2.getHomePage());
         assertEquals(p.getDescription(), p2.getDescription());
         assertEquals(p.getClassifier(), p2.getClassifier());
         assertEquals(p.getId(), p2.getId());
@@ -125,13 +115,8 @@ public class TestSerialization {
         assertEquals(p.getOptionalDependenciesAsString(), p2.getOptionalDependenciesAsString());
         assertEquals(p.getDownloadsCount(), p2.getDownloadsCount());
         assertEquals(p.getRating(), p2.getRating());
-        assertEquals(p.getPictureUrl(), p2.getPictureUrl());
         assertEquals(p.getCommentsNumber(), p2.getCommentsNumber());
         assertEquals(PackageState.INSTALLED, p2.getPackageState());
-        assertEquals(ProductionState.PRODUCTION_READY, p2.getProductionState());
-        assertEquals(NuxeoValidationState.NUXEO_CERTIFIED,
-                p2.getValidationState());
-        assertEquals(true, p2.isSupported());
         assertEquals(true, p2.supportsHotReload());
         Set<String> expectedTargetPlatforms = new HashSet<>(Arrays.asList("5.3.0", "5.3.1"));
         if (cap) {

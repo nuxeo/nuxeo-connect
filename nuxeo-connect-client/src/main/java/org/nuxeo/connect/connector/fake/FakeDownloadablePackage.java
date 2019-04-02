@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nuxeo.connect.data.DownloadablePackage;
-import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
@@ -61,15 +59,9 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public PackageState packageState = PackageState.UNKNOWN;
 
-    public String homePage;
-
     public String licenseType;
 
     public String licenseUrl;
-
-    public ProductionState productionState;
-
-    public NuxeoValidationState validationState;
 
     public boolean subscriptionRequired;
 
@@ -153,11 +145,6 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     }
 
     @Override
-    public String getHomePage() {
-        return homePage;
-    }
-
-    @Override
     public String getLicenseType() {
         return licenseType;
     }
@@ -178,22 +165,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     }
 
     @Override
-    public ProductionState getProductionState() {
-        return productionState;
-    }
-
-    @Override
-    public NuxeoValidationState getValidationState() {
-        return validationState;
-    }
-
-    @Override
     public boolean supportsHotReload() {
-        return false;
-    }
-
-    @Override
-    public boolean isSupported() {
         return false;
     }
 
@@ -219,11 +191,6 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public int getCommentsNumber() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getPictureUrl() {
         throw new UnsupportedOperationException();
     }
 

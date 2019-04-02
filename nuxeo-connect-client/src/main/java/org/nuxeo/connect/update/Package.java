@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2019 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -18,6 +18,7 @@
 package org.nuxeo.connect.update;
 
 /**
+ * Describe the APIs to read minimal package properties (i.e loaded from package.xml)
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public interface Package {
@@ -131,14 +132,6 @@ public interface Package {
     PackageState getPackageState();
 
     /**
-     * Get the URL where more information can be found about this package. Can
-     * be null.
-     *
-     * @return The package web page URL. May be null.
-     */
-    String getHomePage();
-
-    /**
      * Gets the license type. Examples: GPL, BSD, LGPL, etc.
      */
     String getLicenseType();
@@ -162,24 +155,8 @@ public interface Package {
     boolean isLocal();
 
     /**
-     * Get the production status of the package (testing, production ready ...)
-     */
-    ProductionState getProductionState();
-
-    /**
-     * Get the validation state of the package (not certified, in process,
-     * certified ...)
-     */
-    NuxeoValidationState getValidationState();
-
-    /**
      * Tests if the package can be hot reloaded
      */
     boolean supportsHotReload();
-
-    /**
-     * Test if the package is supported by Nuxeo
-     */
-    boolean isSupported();
 
 }
