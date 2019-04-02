@@ -32,12 +32,10 @@ import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
-import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Version;
 
 /**
@@ -71,9 +69,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     public static PackageDescriptor loadFromJSON(String json) throws JSONException {
         return loadFromJSON(new JSONObject(json));
     }
-
-    @JSONExportableField
-    protected String homePage;
 
     @JSONExportableField
     protected String classifier;
@@ -129,22 +124,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     protected int commentsNumber;
 
     @JSONExportableField
-    protected String pictureUrl;
-
-    @JSONExportableField
     protected int downloadsCount;
 
     @JSONExportableField
     protected int rating;
-
-    @JSONExportableField
-    protected ProductionState productionState;
-
-    @JSONExportableField
-    protected NuxeoValidationState nuxeoValidationState;
-
-    @JSONExportableField
-    protected boolean supported;
 
     @JSONExportableField
     protected boolean supportsHotReload;
@@ -171,11 +154,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         optionalDependencies = descriptor.getOptionalDependencies();
         conflicts = descriptor.getConflicts();
         description = descriptor.getDescription();
-        homePage = descriptor.getHomePage();
         license = descriptor.getLicenseType();
         licenseUrl = descriptor.getLicenseUrl();
         name = descriptor.getName();
-        productionState = descriptor.getProductionState();
         provides = descriptor.getProvides();
         packageState = descriptor.getPackageState();
         targetPlatforms = descriptor.getTargetPlatforms();
@@ -183,8 +164,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         type = descriptor.getType();
         vendor = descriptor.getVendor();
         version = descriptor.getVersion();
-        nuxeoValidationState = descriptor.getValidationState();
-        supported = descriptor.isSupported();
         supportsHotReload = descriptor.supportsHotReload();
         subscriptionRequired = descriptor.hasSubscriptionRequired();
         owner = descriptor.getOwner();
@@ -304,11 +283,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     @Override
-    public String getHomePage() {
-        return homePage;
-    }
-
-    @Override
     public String getId() {
         if (getVersion() == null) {
             return getName();
@@ -341,19 +315,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
             packageState = PackageState.UNKNOWN;
         }
         return packageState;
-    }
-
-    @Override
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    @Override
-    public ProductionState getProductionState() {
-        if (productionState == null) {
-            productionState = ProductionState.TESTING;
-        }
-        return productionState;
     }
 
     @Override
@@ -427,14 +388,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     @Override
-    public NuxeoValidationState getValidationState() {
-        if (nuxeoValidationState == null) {
-            nuxeoValidationState = NuxeoValidationState.NONE;
-        }
-        return nuxeoValidationState;
-    }
-
-    @Override
     public String getVendor() {
         return vendor;
     }
@@ -447,11 +400,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Override
     public boolean isLocal() {
         return local;
-    }
-
-    @Override
-    public boolean isSupported() {
-        return supported;
     }
 
     public void setClassifier(String classifier) {
@@ -534,10 +482,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         this.downloadsCount = downloadsCount;
     }
 
-    public void setHomePage(String homePage) {
-        this.homePage = homePage;
-    }
-
     public void setLicense(String license) {
         this.license = license;
     }
@@ -576,15 +520,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         return dependencies;
     }
 
-    public void setNuxeoValidationState(NuxeoValidationState nuxeoValidationState) {
-        this.nuxeoValidationState = nuxeoValidationState;
-    }
-
-    @JSONImportMethod(name = "nuxeoValidationState")
-    public void setNuxeoValidationStateAsJSON(String state) {
-        nuxeoValidationState = NuxeoValidationState.getByValue(state);
-    }
-
     /**
      * @since 1.4.17
      */
@@ -606,19 +541,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @JSONImportMethod(name = "packageState")
     public void setPackageStateAsJSON(String state) {
         setPackageState(PackageState.getByLabel(state));
-    }
-
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
-    }
-
-    public void setProductionState(ProductionState productionState) {
-        this.productionState = productionState;
-    }
-
-    @JSONImportMethod(name = "productionState")
-    public void setProductionStateAsJSON(String state) {
-        productionState = ProductionState.getByValue(state);
     }
 
     public void setProvides(PackageDependency[] provides) {
@@ -656,10 +578,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Deprecated
     public void setState(int state) {
         packageState = PackageState.getByValue(state);
-    }
-
-    public void setSupported(boolean supported) {
-        this.supported = supported;
     }
 
     public void setSupportsHotReload(boolean supportsHotReload) {
