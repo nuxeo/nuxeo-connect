@@ -22,13 +22,11 @@ import java.io.File;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.LocalPackage;
-import org.nuxeo.connect.update.NuxeoValidationState;
 import org.nuxeo.connect.update.PackageData;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
-import org.nuxeo.connect.update.ProductionState;
 import org.nuxeo.connect.update.Validator;
 import org.nuxeo.connect.update.Version;
 import org.nuxeo.connect.update.model.Form;
@@ -144,11 +142,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
-    public String getHomePage() {
-        return localPackage.getHomePage();
-    }
-
-    @Override
     public String getId() {
         return localPackage.getId();
     }
@@ -205,23 +198,8 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
-    public ProductionState getProductionState() {
-        return localPackage.getProductionState();
-    }
-
-    @Override
-    public NuxeoValidationState getValidationState() {
-        return localPackage.getValidationState();
-    }
-
-    @Override
     public boolean supportsHotReload() {
         return localPackage.supportsHotReload();
-    }
-
-    @Override
-    public boolean isSupported() {
-        return localPackage.isSupported();
     }
 
     @Override
@@ -237,11 +215,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     @Override
     public int getDownloadsCount() {
         return 0;
-    }
-
-    @Override
-    public String getPictureUrl() {
-        return null;
     }
 
     @Override

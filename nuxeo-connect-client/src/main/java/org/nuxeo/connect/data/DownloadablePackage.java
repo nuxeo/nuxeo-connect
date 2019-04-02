@@ -38,8 +38,6 @@ public interface DownloadablePackage extends Package {
 
     int getCommentsNumber();
 
-    String getPictureUrl();
-
     int getDownloadsCount();
 
     boolean hasSubscriptionRequired();
