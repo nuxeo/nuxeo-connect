@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -91,6 +93,10 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         ProxyHelper.configureProxyIfNeeded(httpClientBuilder, url);
         httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
+
+        // https://issues.apache.org/jira/browse/HTTPCLIENT-1763
+        httpClientBuilder.setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build());
+
         HttpUriRequest method = get ? new HttpGet(url) : new HttpPost(url);
 
         for (String name : headers.keySet()) {
