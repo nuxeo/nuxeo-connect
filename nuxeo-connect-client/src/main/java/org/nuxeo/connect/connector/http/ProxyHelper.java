@@ -46,6 +46,15 @@ public class ProxyHelper {
 
     protected static String PROXY_PAC_DIRECT = "DIRECT";
 
+    /**
+     * Configure proxy settings.
+     *
+     * Deprecated as it uses {@link HttpClientBuilder#setDefaultRequestConfig(RequestConfig)} that may
+     * be overridden by other calls that do not only affect proxy settings
+     *
+     * Prefer using {@link #configureProxyIfNeeded(org.apache.http.client.config.RequestConfig.Builder, CredentialsProvider, String)}
+     */
+    @Deprecated
     public static void configureProxyIfNeeded(HttpClientBuilder httpClientBuilder, String url) {
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();

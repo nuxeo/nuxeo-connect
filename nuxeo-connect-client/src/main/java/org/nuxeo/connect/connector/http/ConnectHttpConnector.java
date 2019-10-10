@@ -27,12 +27,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -91,12 +93,19 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
     protected ConnectServerResponse execServer(boolean get, String url, Map<String, String> headers)
             throws ConnectServerError {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        ProxyHelper.configureProxyIfNeeded(httpClientBuilder, url);
-        httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
+
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
 
         // https://issues.apache.org/jira/browse/HTTPCLIENT-1763
-        httpClientBuilder.setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build());
+        requestConfigBuilder.setCookieSpec(CookieSpecs.STANDARD);
 
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
+
+        httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
+        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+
+        httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
         HttpUriRequest method = get ? new HttpGet(url) : new HttpPost(url);
 
         for (String name : headers.keySet()) {
