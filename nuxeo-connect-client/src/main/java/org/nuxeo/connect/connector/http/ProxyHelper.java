@@ -49,10 +49,9 @@ public class ProxyHelper {
     /**
      * Configure proxy settings.
      *
-     * Deprecated as it uses {@link HttpClientBuilder#setDefaultRequestConfig(RequestConfig)} that may
-     * be overridden by other calls that do not only affect proxy settings
-     *
-     * Prefer using {@link #configureProxyIfNeeded(org.apache.http.client.config.RequestConfig.Builder, CredentialsProvider, String)}
+     * @deprecated since 1.7.8 as it uses {@link HttpClientBuilder#setDefaultRequestConfig(RequestConfig)} that may be
+     *             overridden by other calls that do not only affect proxy settings Prefer using
+     *             {@link #configureProxyIfNeeded(org.apache.http.client.config.RequestConfig.Builder, CredentialsProvider, String)}
      */
     @Deprecated
     public static void configureProxyIfNeeded(HttpClientBuilder httpClientBuilder, String url) {
