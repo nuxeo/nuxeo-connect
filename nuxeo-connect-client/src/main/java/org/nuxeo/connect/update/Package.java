@@ -19,15 +19,13 @@ package org.nuxeo.connect.update;
 
 /**
  * Describe the APIs to read minimal package properties (i.e loaded from package.xml)
+ * 
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public interface Package {
 
     /**
-     * Get the package unique ID.
-     *
-     * The ID is composed by the package name and version:
-     * <code>name-version</code>
+     * Get the package unique ID. The ID is composed by the package name and version: <code>name-version</code>
      */
     String getId();
 
@@ -52,8 +50,7 @@ public interface Package {
     PackageType getType();
 
     /**
-     * Get the package vendor ID. The vendor represent the entity providing the
-     * package.
+     * Get the package vendor ID. The vendor represent the entity providing the package.
      */
     String getVendor();
 
@@ -68,8 +65,13 @@ public interface Package {
     String[] getTargetPlatforms();
 
     /**
-     * Gets the list of package dependencies for this package. If no dependency
-     * exists, either null or an empty array is returned.
+     * @since 1.79 The range of platforms that supports this package.
+     */
+    String getTargetPlatformRange();
+
+    /**
+     * Gets the list of package dependencies for this package. If no dependency exists, either null or an empty array is
+     * returned.
      *
      * @see PackageDependency
      * @see #getConflicts()
@@ -92,20 +94,17 @@ public interface Package {
     }
 
     /**
-     * Gets the list of conflicts of this package. If no conflict
-     * exists, either null or an empty array is returned.
+     * Gets the list of conflicts of this package. If no conflict exists, either null or an empty array is returned.
      *
      * @see PackageDependency
      * @see #getDependencies()
      * @see #getProvides()
-     *
      * @since 1.3.3
      */
     PackageDependency[] getConflicts();
 
     /**
-     * Gets the list of provides of this package. If no provide
-     * exists, either null or an empty array is returned.
+     * Gets the list of provides of this package. If no provide exists, either null or an empty array is returned.
      *
      * @see PackageDependency
      * @see #getDependencies()
@@ -137,9 +136,8 @@ public interface Package {
     String getLicenseType();
 
     /**
-     * Gets an URL for the license. Return null if no URL exists. In that case
-     * the license content must be included in the package as the content of the
-     * license.txt file.
+     * Gets an URL for the license. Return null if no URL exists. In that case the license content must be included in
+     * the package as the content of the license.txt file.
      */
     String getLicenseUrl();
 
@@ -149,8 +147,7 @@ public interface Package {
     String getClassifier(); // TODO use enum
 
     /**
-     * Tests whether this package is local or a remote one. A local package has
-     * a package data attached.
+     * Tests whether this package is local or a remote one. A local package has a package data attached.
      */
     boolean isLocal();
 

@@ -57,7 +57,7 @@ public class PackageDependency {
 
     protected String name;
 
-    protected VersionRange range = VersionRange.ANY;
+    protected PackageVersionRange range = PackageVersionRange.ANY;
 
     public PackageDependency(String expr) {
         int p = expr.indexOf(':');
@@ -65,19 +65,19 @@ public class PackageDependency {
             name = expr;
         } else {
             name = expr.substring(0, p);
-            range = new VersionRange(expr.substring(p + 1));
+            range = new PackageVersionRange(expr.substring(p + 1));
         }
     }
 
     public PackageDependency(String name, Version minVersion) {
-        this(name, new VersionRange(minVersion));
+        this(name, new PackageVersionRange(minVersion));
     }
 
     public PackageDependency(String name, Version minVersion, Version maxVersion) {
-        this(name, new VersionRange(minVersion, maxVersion));
+        this(name, new PackageVersionRange(minVersion, maxVersion));
     }
 
-    public PackageDependency(String name, VersionRange range) {
+    public PackageDependency(String name, PackageVersionRange range) {
         this.name = name;
         this.range = range;
     }
@@ -86,7 +86,7 @@ public class PackageDependency {
         return name;
     }
 
-    public VersionRange getVersionRange() {
+    public PackageVersionRange getVersionRange() {
         return range;
     }
 

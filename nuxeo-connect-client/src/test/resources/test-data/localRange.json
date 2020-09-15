@@ -1,0 +1,4 @@
+{"id":"pkgMatchEverything-1.0.1","targetPlatformRange":"1.0","name":"pkgMatchEverything", "version":"1.0.1","title":"My Pkg Match everything","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgHigherBoundInclusive-1.0.1","targetPlatformRange":"(,10.10]","name":"pkgHigherBoundInclusive", "version":"1.0.1","title":"My Pkg Higher Bound Inclusive","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgLowerBoundExclusive-1.0.1","targetPlatformRange":"(10.10,)","name":"pkgLowerBoundExclusive", "version":"1.0.1","title":"My Pkg Lower Bound Exclusive","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgInvalidRange-1.0.1","targetPlatformRange":"(,)","targetPlatforms":["server-10.10*"],"name":"pkgInvalidRange", "version":"1.0.1","title":"My Pkg Invalid range","description":"My Pkg Description", "type":"addon"}

@@ -34,8 +34,8 @@ import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageException;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageUpdateService;
+import org.nuxeo.connect.update.PackageVersionRange;
 import org.nuxeo.connect.update.Version;
-import org.nuxeo.connect.update.VersionRange;
 
 /**
  * Service interface that wraps all {@link PackageSource} to provide an unified view The main purpose of this interface
@@ -72,7 +72,7 @@ public interface PackageManager extends BasePackageManager {
      *
      * @since 1.4
      */
-    List<DownloadablePackage> listPackages(String targetPlatform);
+    List<DownloadablePackage> listPackages(String targetPlatform, String targetPlatformVersion);
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all sources for a given {@link PackageType}.
@@ -87,7 +87,7 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listPackages(PackageType pkgType, String targetPlatform);
+    List<DownloadablePackage> listPackages(PackageType pkgType, String targetPlatform, String targetPlatformVersion);
 
     /**
      * Search for packages. (Currently not implemented)
@@ -125,7 +125,8 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listRemotePackages(PackageType pkgType, String targetPlatform);
+    List<DownloadablePackage> listRemotePackages(PackageType pkgType, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
@@ -145,14 +146,14 @@ public interface PackageManager extends BasePackageManager {
      * available on connect server for a given target platform. Also list all available hotfixes for the given
      * targetPlatform.
      */
-    List<DownloadablePackage> listUpdatePackages(String targetPlatform);
+    List<DownloadablePackage> listUpdatePackages(String targetPlatform, String targetPlatformVersion);
 
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
      * available on connect server for a given {@link PackageType} and target platform. Also list all available hotfixes
      * for the given targetPlatform if {@link PackageType} is null or is explicitly {@value PackageType#HOT_FIX}.
      */
-    List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform);
+    List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform, String targetPlatformVersion);
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
@@ -170,7 +171,7 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listOnlyRemotePackages(String targetPlatform);
+    List<DownloadablePackage> listOnlyRemotePackages(String targetPlatform, String targetPlatformVersion);
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
@@ -189,7 +190,8 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, String targetPlatform);
+    List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * Lists all versions of the studio packages the user has access to. This was used to return only the Studio
@@ -229,7 +231,7 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listRemoteOrLocalPackages(String targetPlatform);
+    List<DownloadablePackage> listRemoteOrLocalPackages(String targetPlatform, String targetPlatformVersion);
 
     /**
      * Lists packages availab.e in remote and potentially overridden by a local package.
@@ -247,7 +249,8 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType, String targetPlatform);
+    List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * Lists all local or remote private packages, filtered on package type if {@code pkgType} is not null.
@@ -256,13 +259,14 @@ public interface PackageManager extends BasePackageManager {
      * @param targetPlatform
      * @since 1.4
      */
-    List<DownloadablePackage> listPrivatePackages(PackageType pkgType, String targetPlatform);
+    List<DownloadablePackage> listPrivatePackages(PackageType pkgType, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * @since 1.4
      * @see #listPrivatePackages(PackageType, String)
      */
-    List<DownloadablePackage> listPrivatePackages(String targetPlatform);
+    List<DownloadablePackage> listPrivatePackages(String targetPlatform, String targetPlatformVersion);
 
     /**
      * List all installed packages names (without version), filtered on package type if {@code pkgType} is not null.
@@ -277,7 +281,7 @@ public interface PackageManager extends BasePackageManager {
      * @param allowSNAPSHOT whether to return hotfixes names with only a snapshot version available.
      * @since 1.4.26
      */
-    List<String> listHotfixesNames(String targetPlatform, boolean allowSNAPSHOT);
+    List<String> listHotfixesNames(String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT);
 
     /**
      * List last version of available hotfixes, already installed or not, for the given targetPlatform.
@@ -286,7 +290,7 @@ public interface PackageManager extends BasePackageManager {
      * @return the id of the filtered hotfixes.
      * @since 1.6.1
      */
-    List<String> listLastHotfixes(String targetPlatform, boolean allowSNAPSHOT);
+    List<String> listLastHotfixes(String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT);
 
     /**
      * Register a new {@link PackageSource}
@@ -346,7 +350,7 @@ public interface PackageManager extends BasePackageManager {
      * @deprecated since 1.4.26 use {@link #resolveDependencies(List, List, List, String)} instead
      */
     @Deprecated
-    DependencyResolution resolveDependencies(String pkgId, String targetPlatform);
+    DependencyResolution resolveDependencies(String pkgId, String targetPlatform, String targetPlatformVersion);
 
     /**
      * @param pkgInstall
@@ -356,7 +360,7 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform);
+            String targetPlatform, String targetPlatformVersion);
 
     /**
      * Returns the packages uninstalled if the given {@link Package} is removed
@@ -374,7 +378,8 @@ public interface PackageManager extends BasePackageManager {
      * @return List of all {@link DownloadablePackage} that must be uninstalled too
      * @since 1.4
      */
-    List<DownloadablePackage> getUninstallDependencies(Package pkg, String targetPlatform);
+    List<DownloadablePackage> getUninstallDependencies(Package pkg, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * @return all the packages, in all versions, properly managing classifiers
@@ -445,14 +450,15 @@ public interface PackageManager extends BasePackageManager {
     List<Version> findLocalPackageInstalledVersions(String packageName);
 
     /**
-     * Returns all {@link Package} versions for a given name and {@link VersionRange}
+     * Returns all {@link Package} versions for a given name and {@link PackageVersionRange}
      *
      * @param pkgName
      * @param range
      * @param targetPlatform
      * @since 1.4
      */
-    List<Version> getAvailableVersion(String pkgName, VersionRange range, String targetPlatform);
+    List<Version> getAvailableVersion(String pkgName, PackageVersionRange range, String targetPlatform,
+            String targetPlatformVersion);
 
     /**
      * Order dependencies to install and to remove.
@@ -483,16 +489,19 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4
      */
     @Deprecated
-    String getNonCompliant(List<String> packages, String targetPlatform) throws PackageException;
+    String getNonCompliant(List<String> packages, String targetPlatform, String targetPlatformVersion)
+            throws PackageException;
 
     /**
      * @param packages
      * @param targetPlatform The target platform to be compliant with.
+     * @param targetPlatformVersion
      * @return List of non compliant packages. Empty list if none.
      * @throws PackageException
      * @since 1.4.17
      */
-    List<String> getNonCompliantList(List<String> packages, String targetPlatform) throws PackageException;
+    List<String> getNonCompliantList(List<String> packages, String targetPlatform, String targetPlatformVersion)
+            throws PackageException;
 
     /**
      * @param requestPkgStr
@@ -500,7 +509,8 @@ public interface PackageManager extends BasePackageManager {
      * @return true if {@code requestPkgStr} is compliant with {@code targetPlatform}
      * @throws PackageException
      */
-    boolean matchesPlatform(String requestPkgStr, String targetPlatform) throws PackageException;
+    boolean matchesPlatform(String requestPkgStr, String targetPlatform, String targetPlatformVersion)
+            throws PackageException;
 
     /**
      * @since 1.4.11
@@ -539,7 +549,7 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4.13
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT);
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT);
 
     /**
      * @param allowSNAPSHOT Whether to allow SNAPSHOT versions or not. Even if not allowed, SNAPSHOT versions of a given
@@ -549,7 +559,7 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4.14
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep);
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep);
 
     /**
      * @param allowSNAPSHOT Whether to allow SNAPSHOT versions or not. Even if not allowed, SNAPSHOT versions of a given
@@ -560,7 +570,8 @@ public interface PackageManager extends BasePackageManager {
      * @since 1.4.27
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution);
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            boolean isSubResolution);
 
     /**
      * @since public since 1.4.21, was protected before that
@@ -589,6 +600,16 @@ public interface PackageManager extends BasePackageManager {
     void setCurrentTargetPlatform(String currentTargetPlatform);
 
     /**
+     * @since 1.7.9
+     */
+    String getCurrentTargetPlatformVersion();
+
+    /**
+     * @since 1.7.9
+     */
+    void setCurrentTargetPlatformVersion(String currentTargetPlatformVersion);
+
+    /**
      * @since 1.7.2
      * @return All downloadable packages from given sources filtered on type if not null
      */
@@ -599,6 +620,7 @@ public interface PackageManager extends BasePackageManager {
      * @return All downloadable packages from given sources, optionally filtered on type and/or target platform if not
      *         null
      */
-    List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type, String targetPlatform);
+    List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type, String targetPlatform,
+            String targetPlatformVersion);
 
 }

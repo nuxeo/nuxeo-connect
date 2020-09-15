@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -53,11 +52,12 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
 
     @Override
     public List<DownloadablePackage> listPackages() {
-        return listPackages(null, null);
+        return listPackages(null, null, null);
     }
 
     @Override
-    public List<DownloadablePackage> listStudioPackages(String currentTargetPlatform) {
+    public List<DownloadablePackage> listStudioPackages(String currentTargetPlatform,
+            String currentTargetPlatformVersion) {
         List<DownloadablePackage> result = new ArrayList<>();
         if (!NuxeoConnectClient.getConnectGatewayComponent().isInstanceRegistered()) {
             log.info("Server is not registered");
@@ -71,7 +71,7 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
         }
         try {
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-            result = crs.getConnector().getRegisteredStudio(currentTargetPlatform);
+            result = crs.getConnector().getRegisteredStudio(currentTargetPlatform, currentTargetPlatformVersion);
             cache.add(result, cacheKey);
         } catch (ConnectServerError e) {
             log.debug(e, e);
@@ -82,11 +82,12 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform) {
+    public List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform,
+            String currentTargetPlatformVersion) {
         if (type == null) {
             List<DownloadablePackage> all = new ArrayList<>();
             for (PackageType pkgType : PackageType.values()) {
-                all.addAll(listPackages(pkgType, currentTargetPlatform));
+                all.addAll(listPackages(pkgType, currentTargetPlatform, currentTargetPlatformVersion));
             }
             return all;
         }
@@ -97,7 +98,7 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
         }
         try {
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
-            result = crs.getConnector().getDownloads(type, currentTargetPlatform);
+            result = crs.getConnector().getDownloads(type, currentTargetPlatform, currentTargetPlatformVersion);
         } catch (ConnectServerError e) {
             log.debug(e, e);
             log.warn("Unable to fetch remote packages list: " + e.getMessage());
@@ -136,10 +137,11 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
     }
 
     @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName, String currentTargetPlatform) {
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName,
+            String currentTargetPlatform, String currentTargetPlatformVersion) {
         List<DownloadablePackage> result = new ArrayList<>();
         for (PackageType type : PackageType.values()) {
-            for (DownloadablePackage pkg : listPackages(type, currentTargetPlatform)) {
+            for (DownloadablePackage pkg : listPackages(type, currentTargetPlatform, currentTargetPlatformVersion)) {
                 if (packageName.equals(pkg.getName())) {
                     result.add(pkg);
                 }

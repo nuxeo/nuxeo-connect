@@ -20,6 +20,12 @@ package org.nuxeo.connect.packages.dependencies;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.nuxeo.connect.packages.dependencies.versioning.DefaultTargetPlatformVersion;
+import org.nuxeo.connect.packages.dependencies.versioning.InvalidVersionSpecificationException;
+import org.nuxeo.connect.packages.dependencies.versioning.TargetPlatformVersion;
+import org.nuxeo.connect.packages.dependencies.versioning.TargetPlatformVersionRange;
 import org.nuxeo.connect.update.Package;
 
 /**
@@ -27,8 +33,28 @@ import org.nuxeo.connect.update.Package;
  */
 public class TargetPlatformFilterHelper {
 
-    public static boolean isCompatibleWithTargetPlatform(Package pkg, String targetPlatform) {
-        return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+    protected static Log log = LogFactory.getLog(TargetPlatformFilterHelper.class);
+
+    public static boolean isCompatibleWithTargetPlatform(Package pkg, String targetPlatform,
+            String targetPlatformVersion) {
+        String tpRangeSpec = pkg.getTargetPlatformRange();
+        if (StringUtils.isBlank(pkg.getTargetPlatformRange()) || targetPlatformVersion == null) {
+            // keep backward compatibility with former target platforms list
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+        }
+
+        try {
+            TargetPlatformVersion tpVersion = new DefaultTargetPlatformVersion(targetPlatformVersion);
+            TargetPlatformVersionRange pkgAllowedTpRange = TargetPlatformVersionRange.createFromVersionSpec(
+                    tpRangeSpec);
+            return pkgAllowedTpRange.containsVersion(tpVersion);
+        } catch (InvalidVersionSpecificationException e) {
+            log.warn(String.format(
+                    "Could not parse target platform range expression '%s' for package '%s', using former compatibility format.",
+                    tpRangeSpec, pkg.getId()), e);
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+        }
+
     }
 
     /**
@@ -36,7 +62,7 @@ public class TargetPlatformFilterHelper {
      * @param targetPlatform The target platform to match with.
      * @since 1.4.24
      */
-    public static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
+    private static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
         if (StringUtils.isBlank(targetPlatform) || targetPlatforms == null || targetPlatforms.length == 0) {
             return true;
         }

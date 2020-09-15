@@ -20,8 +20,6 @@ package org.nuxeo.connect.tests;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectConnector;
@@ -35,6 +33,8 @@ import org.nuxeo.connect.packages.PackageSource;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.MockPackageUpdateService;
 
+import junit.framework.TestCase;
+
 public class TestService extends TestCase {
 
     @Override
@@ -44,8 +44,8 @@ public class TestService extends TestCase {
 
         LogicalInstanceIdentifier.cleanUp();
         NuxeoConnectClient.resetPackageManager();
-        ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(new MockPackageUpdateService(
-                NuxeoConnectClient.getPackageManager()));
+        ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(
+                new MockPackageUpdateService(NuxeoConnectClient.getPackageManager()));
     }
 
     public void testServiceLookup() {
@@ -96,7 +96,7 @@ public class TestService extends TestCase {
         assertNotNull(pm);
         for (PackageSource packageSource : pm.getAllSources()) {
             assertNotNull(packageSource.listPackages());
-            assertNotNull(packageSource.listPackages(null, null));
+            assertNotNull(packageSource.listPackages(null, null, null));
             assertNotNull(packageSource.listStudioPackages());
         }
 

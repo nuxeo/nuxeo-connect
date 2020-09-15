@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nuxeo.connect.update.Version;
-import org.nuxeo.connect.update.VersionRange;
+import org.nuxeo.connect.update.PackageVersionRange;
 
 /**
 *
-* Because Connect Dependencies are exposed as {@link VersionRange} there can be several versions
+* Because Connect Dependencies are exposed as {@link PackageVersionRange} there can be several versions
 * of a package to fulfill dependencies.
 * The system will evaluate the different dep versions set.
 *

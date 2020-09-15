@@ -168,6 +168,11 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
+    public String getTargetPlatformRange() {
+        return localPackage.getTargetPlatformRange();
+    }
+
+    @Override
     public String getTitle() {
         return localPackage.getTitle();
     }

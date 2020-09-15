@@ -27,28 +27,23 @@ import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageVersionRange;
 import org.nuxeo.connect.update.Version;
-import org.nuxeo.connect.update.VersionRange;
 
 /**
- * This is the "heart" of this dumb resolution system
- *
- * For each possible {@link DependencySet} it checks if it matches the
- * constraints.
- * If yes it verifies that installation can be done without breaking already
- * installed packages.
- *
- * The update checks is for now very limited because it does not re-run the
- * complete resolution system.
+ * This is the "heart" of this dumb resolution system For each possible {@link DependencySet} it checks if it matches
+ * the constraints. If yes it verifies that installation can be done without breaking already installed packages. The
+ * update checks is for now very limited because it does not re-run the complete resolution system.
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
- *
  */
 public class RecursiveDependencyResolver {
 
     protected String packageId;
 
     protected String targetPlatform;
+
+    protected String targetPlatformVersion;
 
     protected PackageManager pm;
 
@@ -64,11 +59,12 @@ public class RecursiveDependencyResolver {
 
     protected List<DownloadablePackage> installedPackages;
 
-    public RecursiveDependencyResolver(String packageId,
-            PackageManager pm, String targetPlatform) {
+    public RecursiveDependencyResolver(String packageId, PackageManager pm, String targetPlatform,
+            String targetPlatformVersion) {
         this.packageId = packageId;
         this.pm = pm;
         this.targetPlatform = targetPlatform;
+        this.targetPlatformVersion = targetPlatformVersion;
     }
 
     public void sort() {
@@ -109,8 +105,7 @@ public class RecursiveDependencyResolver {
         }
     }
 
-    protected void buildDependencySet(DependencySet set, String packageName,
-            Version v) {
+    protected void buildDependencySet(DependencySet set, String packageName, Version v) {
         set.set(packageName, v);
         if (!resolved) {
             if (!set.isComplete()) {
@@ -129,18 +124,16 @@ public class RecursiveDependencyResolver {
                         resolved = true;
                     } else {
                         if (!updateRes.isUpdatePossible()) {
-                            resolution.markAsFailed("Update impossible for "
-                                    + updateRes.getLastUpdateImpossiblePkgName());
+                            resolution.markAsFailed(
+                                    "Update impossible for " + updateRes.getLastUpdateImpossiblePkgName());
                             for (DownloadablePackage pkg : updateRes.getPackagesToRemove()) {
-                                resolution.markPackageForRemoval(pkg.getName(),
-                                        pkg.getVersion());
+                                resolution.markPackageForRemoval(pkg.getName(), pkg.getVersion());
                             }
                             fallBacks.add(resolution);
                         } else {
                             if (updateRes.isTransparentUpdate()) {
                                 for (DownloadablePackage pkg : updateRes.getPackagesToAdd()) {
-                                    resolution.addPackage(pkg.getName(),
-                                            pkg.getVersion());
+                                    resolution.addPackage(pkg.getName(), pkg.getVersion());
                                 }
                                 resolution.sort(pm);
                                 resolved = true;
@@ -162,8 +155,7 @@ public class RecursiveDependencyResolver {
     }
 
     /**
-     * check if one of the dependency chosen implies to upgrade a locally
-     * installed package
+     * check if one of the dependency chosen implies to upgrade a locally installed package
      */
     protected UpdateCheckResult checkForUpdates(DependencySet set) {
 
@@ -174,8 +166,7 @@ public class RecursiveDependencyResolver {
         for (DownloadablePackage pkg : getInstalledPackages()) {
             for (PackageDependency dep : pkg.getDependencies()) {
                 if (set.getTargetVersion(dep.getName()) != null) {
-                    if (!dep.getVersionRange().matchVersion(
-                            set.getTargetVersion(dep.getName()))) {
+                    if (!dep.getVersionRange().matchVersion(set.getTargetVersion(dep.getName()))) {
                         // oops : we need to upgrade
                         result.setRequireUpdate(true);
                         // first check if this is possible
@@ -184,8 +175,8 @@ public class RecursiveDependencyResolver {
                             List<DownloadablePackage> unfiltredPossibleUpdates = pm.findRemotePackages(pkg.getName());
                             possibleUpdates = new ArrayList<DownloadablePackage>();
                             for (DownloadablePackage pup : unfiltredPossibleUpdates) {
-                                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(
-                                        pup, targetPlatform)) {
+                                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pup, targetPlatform,
+                                        targetPlatformVersion)) {
                                     possibleUpdates.add(pup);
                                 }
                             }
@@ -195,8 +186,7 @@ public class RecursiveDependencyResolver {
                         for (DownloadablePackage pupdate : possibleUpdates) {
                             for (PackageDependency newDep : pupdate.getDependencies()) {
                                 if (newDep.getName().equals(dep.getName())) {
-                                    if (newDep.getVersionRange().matchVersion(
-                                            set.getTargetVersion(dep.getName()))) {
+                                    if (newDep.getVersionRange().matchVersion(set.getTargetVersion(dep.getName()))) {
                                         filtredPossibleUpdates.add(pupdate);
                                     }
                                 }
@@ -208,8 +198,7 @@ public class RecursiveDependencyResolver {
                             result.addPackageToRemove(pkg);
                         } else {
                             result.setUpdatePossible(pkg.getName(), true);
-                            toUpdatePackageNames.put(pkg.getName(),
-                                    filtredPossibleUpdates);
+                            toUpdatePackageNames.put(pkg.getName(), filtredPossibleUpdates);
                         }
                     }
                 }
@@ -226,26 +215,23 @@ public class RecursiveDependencyResolver {
 
         // try to solve package upgrade
         List<DownloadablePackage> choosenPackgesToUpdate = new ArrayList<DownloadablePackage>();
-        Map<String, VersionRange> dependencyUpdates = new HashMap<String, VersionRange>();
+        Map<String, PackageVersionRange> dependencyUpdates = new HashMap<String, PackageVersionRange>();
         // run through all packages to update to choose right version and gather
         // deps
         for (String pkgName : toUpdatePackageNames.keySet()) {
-            Map<String, VersionRange> oneDependencyUpdatesOptimal = new HashMap<String, VersionRange>();
+            Map<String, PackageVersionRange> oneDependencyUpdatesOptimal = new HashMap<String, PackageVersionRange>();
             // see what versions are available
             for (DownloadablePackage pkg : toUpdatePackageNames.get(pkgName)) {
-                Map<String, VersionRange> oneDependencyUpdates = new HashMap<String, VersionRange>();
+                Map<String, PackageVersionRange> oneDependencyUpdates = new HashMap<String, PackageVersionRange>();
                 // check dependencies
                 for (PackageDependency dep : pkg.getDependencies()) {
                     if (set.getTargetVersion(dep.getName()) == null) {
                         // this version needs a new dep
-                        oneDependencyUpdates.put(dep.getName(),
-                                dep.getVersionRange());
+                        oneDependencyUpdates.put(dep.getName(), dep.getVersionRange());
                     } else {
-                        if (!dep.getVersionRange().matchVersion(
-                                set.getTargetVersion(dep.getName()))) {
+                        if (!dep.getVersionRange().matchVersion(set.getTargetVersion(dep.getName()))) {
                             // this version needs to update an existing dep ...
-                            oneDependencyUpdates.put(dep.getName(),
-                                    dep.getVersionRange());
+                            oneDependencyUpdates.put(dep.getName(), dep.getVersionRange());
                         } else {
                             // no need to update : all good
                         }
@@ -304,22 +290,19 @@ public class RecursiveDependencyResolver {
         return res;
     }
 
-    protected void recurseResolve(Package pkg, DependencyResolution res,
-            DependencySet depSet) {
+    protected void recurseResolve(Package pkg, DependencyResolution res, DependencySet depSet) {
         res.addPackage(pkg.getName(), pkg.getVersion());
         for (PackageDependency dep : pkg.getDependencies()) {
             Version targetVersion = depSet.getTargetVersion(dep.getName());
             if (!dep.getVersionRange().matchVersion(targetVersion)) {
-                res.markAsFailed(dep.toString() + " doesn't match "
-                        + targetVersion);
+                res.markAsFailed(dep.toString() + " doesn't match " + targetVersion);
                 return;
             } else {
                 if (!res.addPackage(dep.getName(), targetVersion)) {
                     return;
                 }
             }
-            Package subPkg = pm.findPackageById(dep.getName() + "-"
-                    + targetVersion.toString());
+            Package subPkg = pm.findPackageById(dep.getName() + "-" + targetVersion.toString());
             recurseResolve(subPkg, res, depSet);
         }
     }
@@ -332,6 +315,7 @@ public class RecursiveDependencyResolver {
         return res;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         for (String pkgName : deps.keySet()) {

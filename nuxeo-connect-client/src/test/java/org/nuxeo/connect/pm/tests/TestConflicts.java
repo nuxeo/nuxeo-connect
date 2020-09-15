@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -47,7 +46,8 @@ public class TestConflicts extends AbstractPackageManagerTestCase {
 
     public void testUninstallOnConflict() throws Exception {
         // verify that nuxeo-jsf-ui-9.10.0 installation triggers nuxeo-9.10-HF01 uninstall
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui-9.10.0"), null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui-9.10.0"), null, null,
+                null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToRemove().size());
@@ -58,7 +58,8 @@ public class TestConflicts extends AbstractPackageManagerTestCase {
 
     public void testInstallWithoutConflict() throws Exception {
         // verify that nuxeo-jsf-ui-9.10.0-HF01 installation is ok when not precising the version of jsf-ui to install
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui"), null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui"), null, null, null,
+                null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
@@ -68,8 +69,9 @@ public class TestConflicts extends AbstractPackageManagerTestCase {
         // Change remote source to make only nuxeo-jsf-ui-9.10.0-HF01 available
         remoteSource.reset(getDownloads("remoteConflict2.json"));
 
-        // verify that nuxeo-jsf-ui-9.10.0-HF01 installation is ok when nuxeo-jsf-ui-9.10.0 is not available (see NXP-25164)
-        depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui-9.10.0-HF01"), null, null, null);
+        // verify that nuxeo-jsf-ui-9.10.0-HF01 installation is ok when nuxeo-jsf-ui-9.10.0 is not available (see
+        // NXP-25164)
+        depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-jsf-ui-9.10.0-HF01"), null, null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());

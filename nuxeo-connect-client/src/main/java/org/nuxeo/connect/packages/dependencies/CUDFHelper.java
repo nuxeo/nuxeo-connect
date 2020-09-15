@@ -44,13 +44,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
+import org.nuxeo.connect.update.PackageVersionRange;
 import org.nuxeo.connect.update.Version;
-import org.nuxeo.connect.update.VersionRange;
 
 /**
  * @since 1.4
@@ -86,6 +85,8 @@ public class CUDFHelper {
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<>();
 
     private String targetPlatform;
+
+    private String targetPlatformVersion;
 
     private boolean allowSNAPSHOT = defaultAllowSNAPSHOT;
 
@@ -201,8 +202,8 @@ public class CUDFHelper {
             }
 
             // ignore incompatible packages when a targetPlatform is set
-            if (!pkg.getPackageState().isInstalled()
-                    && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
+            if (!pkg.getPackageState().isInstalled() && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg,
+                    targetPlatform, targetPlatformVersion)) {
                 log.debug("Ignore " + pkg + " (incompatible target platform)");
                 continue;
             }
@@ -439,7 +440,7 @@ public class CUDFHelper {
                 }
                 continue;
             }
-            VersionRange versionRange = packageDependency.getVersionRange();
+            PackageVersionRange versionRange = packageDependency.getVersionRange();
             int cudfMinVersion, cudfMaxVersion;
             if (versionRange.getMinVersion() == null) {
                 cudfMinVersion = versionMatchMappingPolicy.whenNotDefined();
@@ -602,7 +603,7 @@ public class CUDFHelper {
                 if (previous == null) {
                     deps.put(name, new PackageDependency(name, Version.ZERO, version));
                 } else {
-                    VersionRange versionRange = previous.getVersionRange();
+                    PackageVersionRange versionRange = previous.getVersionRange();
                     if (versionRange.getMaxVersion() != null) {
                         throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
                     }
@@ -614,7 +615,7 @@ public class CUDFHelper {
                 if (previous == null) {
                     deps.put(name, new PackageDependency(name, version));
                 } else {
-                    VersionRange versionRange = previous.getVersionRange();
+                    PackageVersionRange versionRange = previous.getVersionRange();
                     if (versionRange.getMinVersion() != null) {
                         throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
                     }
@@ -736,6 +737,13 @@ public class CUDFHelper {
 
     public void setTargetPlatform(String targetPlatform) {
         this.targetPlatform = targetPlatform;
+    }
+
+    /**
+     * @since 1.7.9
+     */
+    public void setTargetPlatformVersion(String targetPlatformVersion) {
+        this.targetPlatformVersion = targetPlatformVersion;
     }
 
     /**

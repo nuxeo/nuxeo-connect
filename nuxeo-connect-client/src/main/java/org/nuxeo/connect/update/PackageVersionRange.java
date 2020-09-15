@@ -19,9 +19,9 @@ package org.nuxeo.connect.update;
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
-public class VersionRange {
+public class PackageVersionRange {
 
-    public static final VersionRange ANY = new VersionRange((Version) null);
+    public static final PackageVersionRange ANY = new PackageVersionRange((Version) null);
 
     protected Version minVersion;
 
@@ -32,7 +32,7 @@ public class VersionRange {
      *
      * @param expr
      */
-    public VersionRange(String expr) {
+    public PackageVersionRange(String expr) {
         if (expr != null && expr.length() > 0) {
             int p = expr.indexOf(':');
             if (p == -1) { // only min version
@@ -44,11 +44,11 @@ public class VersionRange {
         }
     }
 
-    public VersionRange(Version minVersion) {
+    public PackageVersionRange(Version minVersion) {
         this.minVersion = minVersion;
     }
 
-    public VersionRange(Version minVersion, Version maxVersion) {
+    public PackageVersionRange(Version minVersion, Version maxVersion) {
         this.minVersion = minVersion == null && maxVersion != null ? Version.ZERO : minVersion;
         this.maxVersion = maxVersion;
     }
@@ -108,7 +108,7 @@ public class VersionRange {
      * @since 1.4.4
      * @return true if both version ranges overlap
      */
-    public boolean matchVersionRange(VersionRange versionRange) {
+    public boolean matchVersionRange(PackageVersionRange versionRange) {
         Version oMinVersion = versionRange.getMinVersion();
         Version oMaxVersion = versionRange.getMaxVersion();
         return (minVersion == null && maxVersion == null)

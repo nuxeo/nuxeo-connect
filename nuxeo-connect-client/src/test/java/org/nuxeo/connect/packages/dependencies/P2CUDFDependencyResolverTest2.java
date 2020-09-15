@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
@@ -51,7 +50,8 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
     // DM-5.4.0.1-HF05-1.0.0, DM-5.4.0.1-HF06-1.0.0, DM-5.4.0.1-HF07-1.1.0]
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("DM-5.4.0.1-HF07"), null, null, null);
+        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("DM-5.4.0.1-HF07"), null, null, null,
+                null);
         assertFalse(resolution.toString(), resolution.isFailed());
 
         log.info(resolution.toString());
@@ -71,13 +71,15 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
                 + resolution.getDownloadPackageIds() + "\n");
         assertEquals("There must be five packages to download and install", 4,
                 resolution.getDownloadPackageIds().size());
-        assertTrue(resolution.getDownloadPackageIds().containsAll(Arrays.asList(new String[] { "DM-5.4.0.1-HF04-1.0.0",
-                "DM-5.4.0.1-HF06-1.0.0", "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", })));
+        assertTrue(resolution.getDownloadPackageIds()
+                             .containsAll(Arrays.asList(new String[] { "DM-5.4.0.1-HF04-1.0.0", "DM-5.4.0.1-HF06-1.0.0",
+                                     "DM-5.4.0.1-HF05-1.0.0", "DM-5.4.0.1-HF07-1.1.0", })));
         log.info(
                 "Dependencies that are already installed on your instance and won't be changed: resolution.getUnchangedPackageIds()\n"
                         + resolution.getUnchangedPackageIds() + "\n");
         assertEquals("There must be two unchanged package", 2, resolution.getUnchangedPackageIds().size());
-        assertTrue(resolution.getUnchangedPackageIds().containsAll(
-                Arrays.asList(new String[] { "DM-5.4.0.1-HF02-1.0.0", "DM-5.4.0.1-HF03-1.0.0" })));
+        assertTrue(resolution.getUnchangedPackageIds()
+                             .containsAll(
+                                     Arrays.asList(new String[] { "DM-5.4.0.1-HF02-1.0.0", "DM-5.4.0.1-HF03-1.0.0" })));
     }
 }

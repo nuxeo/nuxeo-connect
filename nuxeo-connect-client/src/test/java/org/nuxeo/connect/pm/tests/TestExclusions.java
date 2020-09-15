@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -51,7 +50,8 @@ public class TestExclusions extends AbstractPackageManagerTestCase {
      */
     public void testResolutionOrder() throws Exception {
         // verify that CMF installation triggers DM uninstall
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-cmf-5.5.0"), null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-cmf-5.5.0"), null, null, null,
+                null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToRemove().size());
@@ -65,7 +65,7 @@ public class TestExclusions extends AbstractPackageManagerTestCase {
         source.reset(local2);
 
         // check reverse install: installing DM removes CMF
-        depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-dm-5.5.0"), null, null, null);
+        depResolution = pm.resolveDependencies(Arrays.asList("nuxeo-dm-5.5.0"), null, null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToRemove().size());
