@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -41,7 +40,7 @@ public class TestDowngrade extends AbstractPackageManagerTestCase {
 
     public void testResolutionOrder() throws Exception {
         DependencyResolution depResolution = pm.resolveDependencies(
-                Arrays.asList(new String[] { "nuxeo-birt-integration-2.0.0" }), null, null, null);
+                Arrays.asList(new String[] { "nuxeo-birt-integration-2.0.0" }), null, null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getOrderedPackageIdsToInstall().size());

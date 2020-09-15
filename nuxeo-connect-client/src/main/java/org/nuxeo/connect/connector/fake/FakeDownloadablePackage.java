@@ -57,6 +57,8 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public List<String> targetPlatforms = new ArrayList<>();
 
+    public String targetPlatformRange;
+
     public PackageState packageState = PackageState.UNKNOWN;
 
     public String licenseType;
@@ -111,6 +113,11 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     @Override
     public String[] getTargetPlatforms() {
         return targetPlatforms.toArray(new String[targetPlatforms.size()]);
+    }
+
+    @Override
+    public String getTargetPlatformRange() {
+        return targetPlatformRange;
     }
 
     @Override

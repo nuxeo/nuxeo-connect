@@ -19,7 +19,8 @@
 package org.nuxeo.connect.connector.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 public class TestConnectHttpConnector {
 
     private final String testTargetPlatform = "server-10.3";
+
+    private final String testTargetPlatformVersion = "10.3";
 
     private ConnectHttpConnector httpConnector;
 
@@ -106,12 +109,13 @@ public class TestConnectHttpConnector {
 
         // WHEN getting downloads
         String typeStr = String.valueOf(PackageType.ADDON);
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform,
+                testTargetPlatformVersion);
 
         // THEN it should not have throw any exception and have created a list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(2);
         assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                + "?targetPlatform=" + testTargetPlatform);
+                + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
     }
 
     @Test
@@ -156,12 +160,13 @@ public class TestConnectHttpConnector {
         mockServer.enqueue(response);
 
         // WHEN getting downloads
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform,
+                testTargetPlatformVersion);
 
         // THEN it should not have throw any exception and have created a list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(2);
         assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                + "?targetPlatform=" + testTargetPlatform);
+                + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
     }
 
     @Test
@@ -207,12 +212,13 @@ public class TestConnectHttpConnector {
 
         // WHEN getting downloads
         String typeStr = String.valueOf(PackageType.ADDON);
-        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+        List<DownloadablePackage> downloads = httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform,
+                testTargetPlatformVersion);
 
         // THEN it should not have throw any exception and have returned an empty list of DownloadablePackage objects
         assertThat(downloads).isNotNull().hasSize(0);
         assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                + "?targetPlatform=" + testTargetPlatform);
+                + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
     }
 
     @Test
@@ -255,13 +261,13 @@ public class TestConnectHttpConnector {
         // WHEN getting downloads
         mockServer.enqueue(response);
         try {
-            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform, testTargetPlatformVersion);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
             String typeStr = String.valueOf(PackageType.ADDON);
             assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                    + "?targetPlatform=" + testTargetPlatform);
+                    + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
             assertThat(e.getMessage()).isEqualTo("Connect server refused authentication (returned 401)");
         }
 
@@ -307,13 +313,13 @@ public class TestConnectHttpConnector {
         // WHEN getting downloads
         mockServer.enqueue(response);
         try {
-            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform, testTargetPlatformVersion);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
             String typeStr = String.valueOf(PackageType.ADDON);
             assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                    + "?targetPlatform=" + testTargetPlatform);
+                    + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
             assertThat(e.getMessage()).isEqualTo("Timeout " + HttpServletResponse.SC_GATEWAY_TIMEOUT);
         }
 
@@ -357,12 +363,12 @@ public class TestConnectHttpConnector {
         mockServer.enqueue(response);
         String typeStr = String.valueOf(PackageType.ADDON);
         try {
-            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform, testTargetPlatformVersion);
             Fail.failBecauseExceptionWasNotThrown(ConnectServerError.class);
         } catch (ConnectServerError e) {
             // THEN it should have thrown a ConnectServerError with the correct message
             assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                    + "?targetPlatform=" + testTargetPlatform);
+                    + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
             assertThat(e.getMessage()).isEqualTo("Timeout " + HttpServletResponse.SC_REQUEST_TIMEOUT);
         }
 
@@ -415,12 +421,12 @@ public class TestConnectHttpConnector {
         // WHEN getting downloads
         String typeStr = String.valueOf(PackageType.ADDON);
         try {
-            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+            httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform, testTargetPlatformVersion);
             Fail.failBecauseExceptionWasNotThrown(ConnectClientVersionMismatchError.class);
         } catch (ConnectClientVersionMismatchError e) {
             // THEN it should have thrown a ConnectClientVersionMismatchError with the correct message
             assertThatPathIsCalled(mockServer, AbstractConnectConnector.GET_DOWNLOADS_SUFFIX + "/" + typeStr
-                    + "?targetPlatform=" + testTargetPlatform);
+                    + "?targetPlatform=" + testTargetPlatform + "&targetPlatformVersion=" + testTargetPlatformVersion);
             assertThat(e.getMessage()).isEqualTo("server message");
         }
 
@@ -480,8 +486,10 @@ public class TestConnectHttpConnector {
         SubscriptionStatus status = httpConnector.getConnectStatus();
         assertNotNull(status);
 
-        List<LoggingEvent> warnings = appender.getLog().stream().filter(l -> l.getLevel().equals(Level.WARN)).collect(
-                Collectors.toList());
+        List<LoggingEvent> warnings = appender.getLog()
+                                              .stream()
+                                              .filter(l -> l.getLevel().equals(Level.WARN))
+                                              .collect(Collectors.toList());
 
         // Then I should not get any warnings in the logs
         assertEquals(0, warnings.size());
@@ -497,7 +505,7 @@ public class TestConnectHttpConnector {
         assertThat(request.getHeader("Accept-Encoding")).contains("gzip");
 
         mockServer.enqueue(buildDefaultResponse().setBody("[]"));
-        httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform);
+        httpConnector.getDownloads(PackageType.ADDON, testTargetPlatform, testTargetPlatformVersion);
         request = mockServer.takeRequest();
         assertThat(request.getHeader("Accept-Encoding")).contains("gzip");
 

@@ -207,16 +207,17 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
-        return getDownloads(type, null);
+        return getDownloads(type, null, null);
     }
 
     @Override
-    public List<DownloadablePackage> getDownloads(PackageType type, String currentTargetPlatform)
-            throws ConnectServerError {
+    public List<DownloadablePackage> getDownloads(PackageType type, String currentTargetPlatform,
+            String currentTargetPlatformVersion) throws ConnectServerError {
         String fileSuffix = String.valueOf(type);
         String urlSuffix = fileSuffix;
         if (StringUtils.isNotBlank(currentTargetPlatform)) {
-            urlSuffix += "?targetPlatform=" + currentTargetPlatform;
+            urlSuffix += "?targetPlatform=" + currentTargetPlatform + "&targetPlatformVersion="
+                    + currentTargetPlatformVersion;
             fileSuffix += "_" + currentTargetPlatform;
         }
         return getDownloads(fileSuffix, urlSuffix);
@@ -224,15 +225,17 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError {
-        return getRegisteredStudio(null);
+        return getRegisteredStudio(null, null);
     }
 
     @Override
-    public List<DownloadablePackage> getRegisteredStudio(String currentTargetPlatform) throws ConnectServerError {
+    public List<DownloadablePackage> getRegisteredStudio(String currentTargetPlatform,
+            String currentTargetPlatformVersion) throws ConnectServerError {
         String fileSuffix = STUDIO_REGISTERED_CACHE_SUFFIX;
         String urlSuffix = PackageType.STUDIO + "?registered=true";
         if (StringUtils.isNotBlank(currentTargetPlatform)) {
-            urlSuffix += "&targetPlatform=" + currentTargetPlatform;
+            urlSuffix += "&targetPlatform=" + currentTargetPlatform + "&targetPlatformVersion="
+                    + currentTargetPlatformVersion;
             fileSuffix += "_" + currentTargetPlatform;
         }
         return getDownloads(fileSuffix, urlSuffix);

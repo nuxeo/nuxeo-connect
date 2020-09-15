@@ -90,17 +90,20 @@ public class NuxeoConnectClient {
      */
     @Deprecated
     public static synchronized PackageManager getPackageManager() {
-        return getPackageManager(null);
+        return getPackageManager(null, null);
     }
 
     /**
+     * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
-    public static synchronized PackageManager getPackageManager(String currentTargetPlatform) {
+    public static synchronized PackageManager getPackageManager(String currentTargetPlatform,
+            String currentTargetPlatformVersion) {
         if (packageManager == null) {
-            packageManager = new PackageManagerImpl(currentTargetPlatform);
+            packageManager = new PackageManagerImpl(currentTargetPlatform, currentTargetPlatformVersion);
         } else {
             packageManager.setCurrentTargetPlatform(currentTargetPlatform);
+            packageManager.setCurrentTargetPlatformVersion(currentTargetPlatformVersion);
         }
         return packageManager;
     }
@@ -128,8 +131,9 @@ public class NuxeoConnectClient {
     public static String getBuildVersion() {
         if (buildVersion == null) {
             try {
-                InputStream pomStream = NuxeoConnectClient.class.getClassLoader().getResourceAsStream(
-                        "META-INF/maven/org.nuxeo.connect/nuxeo-connect-client/pom.properties");
+                InputStream pomStream = NuxeoConnectClient.class.getClassLoader()
+                                                                .getResourceAsStream(
+                                                                        "META-INF/maven/org.nuxeo.connect/nuxeo-connect-client/pom.properties");
                 if (pomStream == null) {
                     buildVersion = "Unknown (no pom)";
                 } else {

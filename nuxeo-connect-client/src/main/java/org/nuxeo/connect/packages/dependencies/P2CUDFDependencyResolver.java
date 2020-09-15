@@ -35,7 +35,6 @@ import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
 import org.eclipse.equinox.p2.cudf.solver.SimplePlanner;
 import org.eclipse.equinox.p2.cudf.solver.SolverConfiguration;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.PackageDependency;
@@ -98,26 +97,29 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
+            String targetPlatform, String targetPlatformVersion) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion,
+                CUDFHelper.defaultAllowSNAPSHOT);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true);
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion, allowSNAPSHOT, true);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep, false);
-    }
-
-    @Override
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep)
             throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion, allowSNAPSHOT, doKeep,
+                false);
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            boolean isSubResolution) throws DependencyException {
         // By default, criteria are made for install, prioritizing the solution with the less changes
         String solverCriteria = SOLVER_CRITERIA_BASIC_INSTALL;
         if (!doKeep) {
@@ -135,23 +137,24 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
             // version
             solverCriteria = SOLVER_CRITERIA_LESS_VERSION_CHANGES;
         }
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true, solverCriteria,
-                isSubResolution);
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion, allowSNAPSHOT, true,
+                solverCriteria, isSubResolution);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, String solverCriteria) throws DependencyException {
-        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT, true,
-                solverCriteria, false);
+            String targetPlatform, String targetPlatformVersion, String solverCriteria) throws DependencyException {
+        return resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion,
+                CUDFHelper.defaultAllowSNAPSHOT, true, solverCriteria, false);
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria,
-            boolean isSubResolution) throws DependencyException {
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            String solverCriteria, boolean isSubResolution) throws DependencyException {
         cudfHelper = new CUDFHelper(pm);
         cudfHelper.setTargetPlatform(targetPlatform);
+        cudfHelper.setTargetPlatformVersion(targetPlatformVersion);
         cudfHelper.setAllowSNAPSHOT(allowSNAPSHOT);
         cudfHelper.setKeep(doKeep);
         // generate CUDF package universe and request stanza
@@ -204,7 +207,8 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
                     subRemove.add(pkgId);
                 }
             }
-            resolution = resolve(subInstall, subRemove, null, targetPlatform, allowSNAPSHOT, true);
+            resolution = resolve(subInstall, subRemove, null, targetPlatform, targetPlatformVersion, allowSNAPSHOT,
+                    true);
         }
         return resolution;
     }
@@ -228,10 +232,11 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     @Override
     @Deprecated
-    public DependencyResolution resolve(String pkgIdOrName, String targetPlatform) throws DependencyException {
+    public DependencyResolution resolve(String pkgIdOrName, String targetPlatform, String targetPlatformVersion)
+            throws DependencyException {
         List<String> pkgInstall = new ArrayList<>();
         pkgInstall.add(pkgIdOrName);
-        return resolve(pkgInstall, null, null, targetPlatform);
+        return resolve(pkgInstall, null, null, targetPlatform, targetPlatformVersion);
     }
 
 }

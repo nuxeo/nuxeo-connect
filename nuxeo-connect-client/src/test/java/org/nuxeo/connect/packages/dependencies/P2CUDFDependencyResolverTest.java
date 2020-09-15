@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.pm.tests.AbstractPackageManagerTestCase;
 import org.nuxeo.connect.pm.tests.DummyPackageSource;
@@ -50,7 +49,8 @@ public class P2CUDFDependencyResolverTest extends AbstractPackageManagerTestCase
 
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("nuxeo-dm-5.5.0"), null, null, "5.5.0");
+        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("nuxeo-dm-5.5.0"), null, null, "5.5.0",
+                null);
         assertFalse(resolution.toString(), resolution.isFailed());
         assertEquals(2, resolution.getRemovePackageIds().size());
         assertEquals(Arrays.asList(new String[] { "nuxeo-cmf-5.5.0", "nuxeo-content-browser-1.1.0-cmf" }),

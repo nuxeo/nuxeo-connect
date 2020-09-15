@@ -38,28 +38,31 @@ public interface DependencyResolver {
      * @deprecated since 1.4.26 Use {@link #resolve(List, List, List, String)} instead
      */
     @Deprecated
-    public DependencyResolution resolve(String pkgIdOrName, String targetPlatform) throws DependencyException;
+    public DependencyResolution resolve(String pkgIdOrName, String targetPlatform, String targetPlatformVersion)
+            throws DependencyException;
 
     /**
      * @throws DependencyException
      * @since 1.4
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform) throws DependencyException;
+            String targetPlatform, String targetPlatformVersion) throws DependencyException;
 
     /**
      * @throws DependencyException
      * @since 1.4.13
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException;
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) throws DependencyException;
 
     /**
+     * @param targetPlatformVersion
      * @throws DependencyException
      * @since 1.4.14
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) throws DependencyException;
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep)
+            throws DependencyException;
 
     /**
      * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
@@ -69,8 +72,8 @@ public interface DependencyResolver {
      * @since 1.4.27
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
-            throws DependencyException;
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            boolean isSubResolution) throws DependencyException;
 
     /**
      * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
@@ -81,7 +84,7 @@ public interface DependencyResolver {
      * @since 1.4.26
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, String solverCriteria) throws DependencyException;
+            String targetPlatform, String targetPlatformVersion, String solverCriteria) throws DependencyException;
 
     /**
      * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
@@ -96,6 +99,6 @@ public interface DependencyResolver {
      * @since 1.4.27
      */
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria,
-            boolean isSubResolution) throws DependencyException;
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            String solverCriteria, boolean isSubResolution) throws DependencyException;
 }

@@ -21,11 +21,14 @@
 
 package org.nuxeo.connect.connector.fake;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectServerError;
@@ -55,7 +58,7 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
             data = getJSONDataForStatus();
         } else if (url.contains("/" + GET_DOWNLOADS_SUFFIX + "/")) {
             String type = StringUtils.substringBetween(url, GET_DOWNLOADS_SUFFIX + "/", "?");
-            if(type == null) {
+            if (type == null) {
                 type = StringUtils.substringAfterLast(url, "/");
             }
             data = getJSONDataForDownloads(type);
@@ -74,11 +77,17 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
 
     @Override
     protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
-        String targetPlatform = StringUtils.substringAfter(urlSuffix, "?targetPlatform=");
-        return super.getDownloads(fileSuffix, urlSuffix).stream().filter(pkg -> {
-            return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(),
-                    targetPlatform);
-        }).collect(Collectors.toList());
+        List<DownloadablePackage> downloads = super.getDownloads(fileSuffix, urlSuffix);
+        if (StringUtils.contains(urlSuffix, "?")) { // filter on target platform if needed
+            List<NameValuePair> queryParams = URLEncodedUtils.parse(urlSuffix, Charset.forName("UTF-8"));
+            String targetPlatform = queryParams.get(0).getValue();
+            String targetPlatformVersion = queryParams.get(1).getValue();
+            return downloads.stream().filter(pkg -> {
+                return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform,
+                        targetPlatformVersion);
+            }).collect(Collectors.toList());
+        }
+        return downloads;
     }
 
 }

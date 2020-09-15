@@ -50,10 +50,11 @@ public class LegacyDependencyResolver implements DependencyResolver {
     }
 
     @Override
-    public DependencyResolution resolve(String pkgId, String targetPlatform) throws DependencyException {
+    public DependencyResolution resolve(String pkgId, String targetPlatform, String targetPlatformVersion)
+            throws DependencyException {
         // compute possible dependency sets
         log.debug("Computing possible dependency sets");
-        RecursiveDependencyResolver choices = computeAvailableChoices(pkgId, targetPlatform);
+        RecursiveDependencyResolver choices = computeAvailableChoices(pkgId, targetPlatform, targetPlatformVersion);
         log.debug("Resulting choices : ");
         log.debug(choices.toString());
         log.debug("Max possibilities : " + choices.getMaxPossibilities());
@@ -79,29 +80,31 @@ public class LegacyDependencyResolver implements DependencyResolver {
      */
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform) throws DependencyException {
+            String targetPlatform, String targetPlatformVersion) throws DependencyException {
         throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 
     /**
      * walk dep tree to find all possible needed versions of packages
      */
-    protected RecursiveDependencyResolver computeAvailableChoices(String pkgId, String targetPlatform)
-            throws DependencyException {
-        RecursiveDependencyResolver dc = new RecursiveDependencyResolver(pkgId, pm, targetPlatform);
+    protected RecursiveDependencyResolver computeAvailableChoices(String pkgId, String targetPlatform,
+            String targetPlatformVersion) throws DependencyException {
+        RecursiveDependencyResolver dc = new RecursiveDependencyResolver(pkgId, pm, targetPlatform,
+                targetPlatformVersion);
         String path = "/" + pkgId;
-        recurseOnAvailableChoices(pkgId, targetPlatform, dc, path);
+        recurseOnAvailableChoices(pkgId, targetPlatform, targetPlatformVersion, dc, path);
         return dc;
     }
 
-    protected void recurseOnAvailableChoices(String pkgId, String targetPlatform, RecursiveDependencyResolver dc,
-            String path) throws DependencyException {
+    protected void recurseOnAvailableChoices(String pkgId, String targetPlatform, String targetPlatformVersion,
+            RecursiveDependencyResolver dc, String path) throws DependencyException {
         Package pkg = pm.findPackageById(pkgId);
         if (pkg == null) {
             throw new DependencyException("Unable to find package " + pkgId);
         }
         for (PackageDependency dep : pkg.getDependencies()) {
-            List<Version> versions = pm.getAvailableVersion(dep.getName(), dep.getVersionRange(), targetPlatform);
+            List<Version> versions = pm.getAvailableVersion(dep.getName(), dep.getVersionRange(), targetPlatform,
+                    targetPlatformVersion);
             if (versions.size() == 0) {
                 throw new DependencyException("Unable to find a compatible version for package " + dep.getName() + " ("
                         + dep.getVersionRange().toString() + ")");
@@ -112,7 +115,7 @@ public class LegacyDependencyResolver implements DependencyResolver {
             }
             dc.addDep(dep.getName(), versions);
             for (Version v : versions) {
-                recurseOnAvailableChoices(dep.getName() + "-" + v.toString(), targetPlatform, dc,
+                recurseOnAvailableChoices(dep.getName() + "-" + v.toString(), targetPlatform, targetPlatformVersion, dc,
                         path + dep.getName() + "/");
             }
         }
@@ -120,33 +123,33 @@ public class LegacyDependencyResolver implements DependencyResolver {
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep) {
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep) {
         throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT) throws DependencyException {
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) throws DependencyException {
         throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, String solverCriteria) throws DependencyException {
+            String targetPlatform, String targetPlatformVersion, String solverCriteria) throws DependencyException {
         throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 
     @Override
     public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria,
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
+            String solverCriteria, boolean isSubResolution) throws DependencyException {
+        throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
+    }
+
+    @Override
+    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+            String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT, boolean doKeep,
             boolean isSubResolution) throws DependencyException {
-        throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
-    }
-
-    @Override
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
-            String targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
-            throws DependencyException {
         throw new UnsupportedOperationException("Legacy resolver does not support advanced resolution method");
     }
 

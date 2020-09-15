@@ -28,13 +28,13 @@ public class PackageDependencyTest {
     @Test
     public void testGetters() {
         PackageDependency pd;
-        VersionRange vr;
+        PackageVersionRange vr;
 
         pd = new PackageDependency("foo");
         vr = pd.getVersionRange();
         assertEquals("foo", pd.toString());
         assertEquals("foo", pd.getName());
-        assertEquals(VersionRange.ANY, vr);
+        assertEquals(PackageVersionRange.ANY, vr);
 
         pd = new PackageDependency("foo:1.2");
         vr = pd.getVersionRange();

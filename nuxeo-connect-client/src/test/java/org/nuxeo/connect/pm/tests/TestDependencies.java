@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
@@ -44,7 +43,7 @@ public class TestDependencies extends AbstractPackageManagerTestCase {
     public void testVersionResolutionWithDifferentDependencies() throws Exception {
         // pkgA-1.0.3 has a dependency on pkgB, other versions of pkgA have no dependencies
         DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList(new String[] { "pkgA" }), null, null,
-                null);
+                null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getOrderedPackageIdsToInstall().size());

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.update.PackageException;
@@ -47,7 +46,7 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
     // After: [nuxeo-dm-5.6.0, nuxeo-poll-1.0.0]
     public void testResolutionOrder() {
         DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList(new String[] { "nuxeo-poll" }), null,
-                null, null);
+                null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(3, depResolution.getOrderedPackageIdsToInstall().size());
@@ -57,16 +56,16 @@ public class TestInstallOfDeprecatedPkg extends AbstractPackageManagerTestCase {
     }
 
     public void testTargetPlatforms() throws PackageException {
-        assertTrue(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.5"));
-        assertFalse(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.6"));
+        assertTrue(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.5", "5.5"));
+        assertFalse(pm.matchesPlatform("nuxeo-birt-integration-2.1.0", "cap-5.6", "5.6"));
         // Such target platform is not valid...
-        assertTrue(pm.matchesPlatform("nuxeo-platform-user-registration-1.2.1", "Nuxeo CAP 5.6"));
+        assertTrue(pm.matchesPlatform("nuxeo-platform-user-registration-1.2.1", "Nuxeo CAP 5.6", "5.6"));
         // Test wildcards
-        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5"));
-        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF00"));
-        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF01"));
-        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-something"));
-        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.6.0"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5", "5.5"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF00", "5.5.0-HF00"));
+        assertTrue(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-HF01", "5.5.0-HF01"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.5.0-something", "5.5.0-something"));
+        assertFalse(pm.matchesPlatform("nuxeo-flavors-unicolor-1.0.0", "cap-5.6.0", "5.6.0"));
     }
 
 }

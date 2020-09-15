@@ -42,18 +42,22 @@ public abstract class AbstractPackageSource implements PackageSource {
      */
     @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-        return listPackages(type, null);
+        return listPackages(type, null, null);
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform) {
+    public List<DownloadablePackage> listPackages(PackageType type, String currentTargetPlatform,
+            String currentTargetPlatformVersion) {
         List<DownloadablePackage> all = listPackages();
-        return all.stream().filter(pkg -> {
-            // the TP filter only applies on remote packages
-            return (pkg.getPackageState() != PackageState.REMOTE || StringUtils.isBlank(currentTargetPlatform)
-                    || TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, currentTargetPlatform))
-                    && (type == null || type.equals(pkg.getType()));
-        }).collect(Collectors.toList());
+        return all.stream()
+                  .filter(pkg -> {
+                      // the TP filter only applies on remote packages
+                      return (pkg.getPackageState() != PackageState.REMOTE || StringUtils.isBlank(currentTargetPlatform)
+                              || TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, currentTargetPlatform,
+                                      currentTargetPlatformVersion))
+                              && (type == null || type.equals(pkg.getType()));
+                  })
+                  .collect(Collectors.toList());
     }
 
     @Override
@@ -63,13 +67,14 @@ public abstract class AbstractPackageSource implements PackageSource {
 
     @Override
     public Collection<? extends DownloadablePackage> listPackagesByName(String packageName) {
-        return listPackagesByName(packageName, null);
+        return listPackagesByName(packageName, null, null);
     }
 
     @Override
-    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName, String targetPlatform) {
+    public Collection<? extends DownloadablePackage> listPackagesByName(String packageName, String targetPlatform,
+            String currentTargetPlatformVersion) {
         List<DownloadablePackage> result = new ArrayList<>();
-        for (DownloadablePackage pkg : listPackages(null, targetPlatform)) {
+        for (DownloadablePackage pkg : listPackages(null, targetPlatform, currentTargetPlatformVersion)) {
             if (packageName.equals(pkg.getName())) {
                 result.add(pkg);
             }
@@ -80,12 +85,13 @@ public abstract class AbstractPackageSource implements PackageSource {
     @Override
     public List<DownloadablePackage> listStudioPackages() {
         // Should only return the registration-associated package
-        return listStudioPackages(null);
+        return listStudioPackages(null, null);
     }
 
     @Override
-    public List<DownloadablePackage> listStudioPackages(String currentTargetPlatform) {
-        return listPackages(PackageType.STUDIO, currentTargetPlatform);
+    public List<DownloadablePackage> listStudioPackages(String currentTargetPlatform,
+            String currentTargetPlatformVersion) {
+        return listPackages(PackageType.STUDIO, currentTargetPlatform, currentTargetPlatformVersion);
     }
 
     @Override

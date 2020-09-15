@@ -30,7 +30,7 @@ public class VersionRangeTest {
 
     /**
      * Test method for
-     * {@link org.nuxeo.connect.update.VersionRange#matchVersion(org.nuxeo.connect.update.Version)}
+     * {@link org.nuxeo.connect.update.PackageVersionRange#matchVersion(org.nuxeo.connect.update.Version)}
      * .
      */
     @Test
@@ -40,9 +40,9 @@ public class VersionRangeTest {
         Version v7 = new Version("7");
         Version v10 = new Version("10");
         Version v12 = new Version("12");
-        VersionRange vr5To10 = new VersionRange(v5, v10);
-        VersionRange vr5Min = new VersionRange(v5);
-        VersionRange vr10Max = new VersionRange(null, v10);
+        PackageVersionRange vr5To10 = new PackageVersionRange(v5, v10);
+        PackageVersionRange vr5Min = new PackageVersionRange(v5);
+        PackageVersionRange vr10Max = new PackageVersionRange(null, v10);
         // [5,10] versus 4, 5, 7, 10, 12
         assertFalse(vr5To10 + " must not match " + v4, vr5To10.matchVersion(v4));
         assertTrue(vr5To10 + " must match " + v5, vr5To10.matchVersion(v5));
@@ -65,7 +65,7 @@ public class VersionRangeTest {
                 vr10Max.matchVersion(v12));
 
         // Check SNAPSHOT keyword and date-based releases
-        VersionRange vr = new VersionRange("5.7-I20121210_0116:5.7");
+        PackageVersionRange vr = new PackageVersionRange("5.7-I20121210_0116:5.7");
         assertTrue(vr.matchVersion(new Version("5.7-I20121210_0116")));
         assertTrue(vr.matchVersion(new Version("5.7-SNAPSHOT")));
         assertTrue(vr.matchVersion(new Version("5.7-I20130101_0101")));
@@ -77,16 +77,16 @@ public class VersionRangeTest {
 
     /**
      * Test method for
-     * {@link org.nuxeo.connect.update.VersionRange#matchVersionRange(org.nuxeo.connect.update.VersionRange)}
+     * {@link org.nuxeo.connect.update.PackageVersionRange#matchVersionRange(org.nuxeo.connect.update.PackageVersionRange)}
      * .
      */
     @Test
     public void testMatchVersionRange() {
-        VersionRange vr5To10 = new VersionRange("5:10");
-        VersionRange vr15To20 = new VersionRange("15:20");
-        VersionRange vr7To25 = new VersionRange("7:25");
-        VersionRange vr12Min = new VersionRange("12");
-        VersionRange vr12Max = new VersionRange(null, new Version("12"));
+        PackageVersionRange vr5To10 = new PackageVersionRange("5:10");
+        PackageVersionRange vr15To20 = new PackageVersionRange("15:20");
+        PackageVersionRange vr7To25 = new PackageVersionRange("7:25");
+        PackageVersionRange vr12Min = new PackageVersionRange("12");
+        PackageVersionRange vr12Max = new PackageVersionRange(null, new Version("12"));
         // [5,10] versus [5,10], [15,20], [7,25], [12,), (,12]
         assertTrue(vr5To10 + " must match " + vr5To10,
                 vr5To10.matchVersionRange(vr5To10));

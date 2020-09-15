@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.update.Version;
@@ -44,7 +43,7 @@ public class TestRemoveP2CUDF extends AbstractPackageManagerTestCase {
         List<String> uninstalls = new ArrayList<>();
         uninstalls.add("nuxeo-content-browser:1.0.0");
         // SNAPSHOT allowed
-        DependencyResolution depResolution = pm.resolveDependencies(null, uninstalls, null, null, true);
+        DependencyResolution depResolution = pm.resolveDependencies(null, uninstalls, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(3, depResolution.getRemovePackageIds().size());
@@ -53,7 +52,7 @@ public class TestRemoveP2CUDF extends AbstractPackageManagerTestCase {
                 depResolution.getOrderedPackageIdsToRemove().toString());
         assertEquals(new Version("1.1.0"), depResolution.getLocalPackagesToRemove().get("nuxeo-content-browser"));
         // SNAPSHOT forbidden
-        depResolution = pm.resolveDependencies(null, uninstalls, null, null, false);
+        depResolution = pm.resolveDependencies(null, uninstalls, null, null, null, false);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(3, depResolution.getRemovePackageIds().size());
