@@ -21,18 +21,20 @@
 
 package org.nuxeo.connect.packages.dependencies.versioning;
 
-public class Restriction {
-    private final TargetPlatformVersion lowerBound;
+import org.apache.commons.lang3.StringUtils;
+
+public class PlatformVersionRange {
+    private final PlatformVersion lowerBound;
 
     private final boolean lowerBoundInclusive;
 
-    private final TargetPlatformVersion upperBound;
+    private final PlatformVersion upperBound;
 
     private final boolean upperBoundInclusive;
 
-    public static final Restriction EVERYTHING = new Restriction(null, false, null, false);
+    public static final PlatformVersionRange EVERYTHING = new PlatformVersionRange(null, false, null, false);
 
-    public Restriction(TargetPlatformVersion lowerBound, boolean lowerBoundInclusive, TargetPlatformVersion upperBound,
+    public PlatformVersionRange(PlatformVersion lowerBound, boolean lowerBoundInclusive, PlatformVersion upperBound,
             boolean upperBoundInclusive) {
         this.lowerBound = lowerBound;
         this.lowerBoundInclusive = lowerBoundInclusive;
@@ -40,7 +42,7 @@ public class Restriction {
         this.upperBoundInclusive = upperBoundInclusive;
     }
 
-    public TargetPlatformVersion getLowerBound() {
+    public PlatformVersion getLowerBound() {
         return lowerBound;
     }
 
@@ -48,7 +50,7 @@ public class Restriction {
         return lowerBoundInclusive;
     }
 
-    public TargetPlatformVersion getUpperBound() {
+    public PlatformVersion getUpperBound() {
         return upperBound;
     }
 
@@ -56,7 +58,68 @@ public class Restriction {
         return upperBoundInclusive;
     }
 
-    public boolean containsVersion(TargetPlatformVersion version) {
+    public static PlatformVersionRange fromRangeSpec(String rangeSpec) {
+        if (StringUtils.isBlank(rangeSpec)) {
+            throw new IllegalArgumentException("Range cannot be blank");
+        }
+        rangeSpec = rangeSpec.trim();
+        boolean lowerBoundInclusive = rangeSpec.startsWith("[");
+        boolean upperBoundInclusive = rangeSpec.endsWith("]");
+
+        String process;
+        if (!rangeSpec.contains(",")) {
+            // this is a single version
+            if (lowerBoundInclusive && upperBoundInclusive) {
+                process = rangeSpec.substring(1, rangeSpec.length() - 1).trim();
+            } else if (lowerBoundInclusive || upperBoundInclusive || rangeSpec.startsWith("(")
+                    || rangeSpec.endsWith(")")) {
+                throw new IllegalArgumentException(
+                        "Single version can only have inclusive boundaries ('[x.y.z]'): " + rangeSpec);
+            } else {
+                process = rangeSpec.trim();
+                lowerBoundInclusive = upperBoundInclusive = true;
+            }
+
+            PlatformVersion version = new PlatformVersion(process);
+            return new PlatformVersionRange(version, lowerBoundInclusive, version, upperBoundInclusive);
+        } else {
+            // this is a range
+            if (!lowerBoundInclusive && !rangeSpec.startsWith("(")) {
+                throw new IllegalArgumentException("Range should start with '[' or '(': " + rangeSpec);
+            }
+            if (!upperBoundInclusive && !rangeSpec.endsWith(")")) {
+                throw new IllegalArgumentException("Range should end with ']' or ')': " + rangeSpec);
+            }
+            process = rangeSpec.substring(1, rangeSpec.length() - 1).trim();
+            int index = process.indexOf(',');
+
+            String lowerBound = process.substring(0, index).trim();
+            String upperBound = process.substring(index + 1).trim();
+
+            PlatformVersion lowerVersion = null;
+            if (lowerBound.length() > 0) {
+                lowerVersion = new PlatformVersion(lowerBound);
+            }
+            PlatformVersion upperVersion = null;
+            if (upperBound.length() > 0) {
+                upperVersion = new PlatformVersion(upperBound);
+            }
+
+            if (upperVersion != null && lowerVersion != null) {
+                if ((!lowerBoundInclusive || !upperBoundInclusive) && upperVersion.equals(lowerVersion)) {
+                    throw new IllegalArgumentException(
+                            "Range cannot have identical boundaries with exclusions: " + rangeSpec);
+                }
+                if (upperVersion.compareTo(lowerVersion) < 0) {
+                    throw new IllegalArgumentException("Range defies version ordering: " + rangeSpec);
+                }
+            }
+
+            return new PlatformVersionRange(lowerVersion, lowerBoundInclusive, upperVersion, upperBoundInclusive);
+        }
+    }
+
+    public boolean containsVersion(PlatformVersion version) {
         if (lowerBound != null) {
             int comparison = lowerBound.compareTo(version);
 
@@ -110,11 +173,11 @@ public class Restriction {
             return true;
         }
 
-        if (!(other instanceof Restriction)) {
+        if (!(other instanceof PlatformVersionRange)) {
             return false;
         }
 
-        Restriction restriction = (Restriction) other;
+        PlatformVersionRange restriction = (PlatformVersionRange) other;
         if (lowerBound != null) {
             if (!lowerBound.equals(restriction.lowerBound)) {
                 return false;
