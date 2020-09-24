@@ -1,4 +1,9 @@
-{"id":"pkgMatchEverything-1.0.1","targetPlatformRange":"1.0","name":"pkgMatchEverything", "version":"1.0.1","title":"My Pkg Match everything","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgMatchEverything-1.0.1","targetPlatformRange":"[0,)","name":"pkgMatchEverything", "version":"1.0.1","title":"My Pkg Match everything","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgSingleVersion-1.0.1","targetPlatformRange":"10.10.1","name":"pkgSingleVersion", "version":"1.0.1","title":"My Pkg Single Version","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgInclusiveBounds-1.0.1","targetPlatformRange":"[9.10,10.10-HF02]","name":"pkgInclusiveBounds", "version":"1.0.1","title":"My Pkg Inclusive Bounds","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgExclusiveBounds-1.0.1","targetPlatformRange":"(9.10,10.10-HF02)","name":"pkgExclusiveBounds", "version":"1.0.1","title":"My Pkg Exclusive Bounds","description":"My Pkg Description", "type":"addon"}
 {"id":"pkgHigherBoundInclusive-1.0.1","targetPlatformRange":"(,10.10]","name":"pkgHigherBoundInclusive", "version":"1.0.1","title":"My Pkg Higher Bound Inclusive","description":"My Pkg Description", "type":"addon"}
 {"id":"pkgLowerBoundExclusive-1.0.1","targetPlatformRange":"(10.10,)","name":"pkgLowerBoundExclusive", "version":"1.0.1","title":"My Pkg Lower Bound Exclusive","description":"My Pkg Description", "type":"addon"}
-{"id":"pkgInvalidRange-1.0.1","targetPlatformRange":"(,)","targetPlatforms":["server-10.10*"],"name":"pkgInvalidRange", "version":"1.0.1","title":"My Pkg Invalid range","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgInvalidRange-1.0.1","targetPlatformRange":"(1,1)","targetPlatforms":["server-10.10*"],"name":"pkgInvalidRange", "version":"1.0.1","title":"My Pkg Invalid range","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgInvalidRange-1.0.2","targetPlatformRange":"","targetPlatforms":["server-10.10*"],"name":"pkgInvalidRange", "version":"1.0.2","title":"My Pkg Invalid range 2","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgNoRange-1.0.3","targetPlatforms":["server-10.10*"],"name":"pkgNoRange", "version":"1.0.1","title":"My Pkg No range","description":"My Pkg Description", "type":"addon"}
