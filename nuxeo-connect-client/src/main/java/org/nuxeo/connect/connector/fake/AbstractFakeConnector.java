@@ -78,7 +78,8 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
     protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
         List<DownloadablePackage> downloads = super.getDownloads(fileSuffix, urlSuffix);
         if (StringUtils.contains(urlSuffix, "?")) { // filter on target platform if needed
-            Map<String, String> queryParams = URLEncodedUtils.parse(urlSuffix, Charset.forName("UTF-8"))
+            Map<String, String> queryParams = URLEncodedUtils.parse(StringUtils.substringAfter(urlSuffix, "?"),
+                    Charset.forName("UTF-8"))
                                                              .stream()
                                                              .collect(Collectors.toMap(pair -> pair.getName(),
                                                                      pair -> pair.getValue()));
