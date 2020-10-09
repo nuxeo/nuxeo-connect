@@ -18,7 +18,7 @@
  * 
  * @origin https://github.com/apache/maven/blob/master/maven-artifact/src/main/java/org/apache/maven/artifact/versioning/DefaultArtifactVersion.java
  */
-package org.nuxeo.connect.packages.dependencies.versioning;
+package org.nuxeo.connect.platform;
 
 import static org.apache.commons.lang3.math.NumberUtils.isDigits;
 
@@ -178,12 +178,41 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
 
     @Override
     public String toString() {
+        StringBuilder builder = new StringBuilder(asString());
+        builder.append(" (").append(comparable).append(")");
+        return builder.toString();
+    }
+
+    public String asString() {
         StringBuilder builder = new StringBuilder();
         builder.append(getMajorVersion()).append(".").append(getMinorVersion()).append(".").append(getBuildNumber());
         if (StringUtils.isNotBlank(qualifier)) {
             builder.append("-").append(qualifier);
         }
-        builder.append(" (").append(comparable).append(")");
         return builder.toString();
+    }
+
+    public boolean isEqualTo(PlatformVersion otherVersion) {
+        return this.compareTo(otherVersion) == 0;
+    }
+
+    public boolean isBeforeIncluding(PlatformVersion otherVersion) {
+        return this.compareTo(otherVersion) <= 0;
+    }
+
+    public boolean isAfterIncluding(PlatformVersion otherVersion) {
+        return this.compareTo(otherVersion) >= 0;
+    }
+
+    public boolean isBefore(PlatformVersion otherVersion) {
+        return this.compareTo(otherVersion) < 0;
+    }
+
+    public boolean isAfter(PlatformVersion otherVersion) {
+        return this.compareTo(otherVersion) > 0;
+    }
+
+    public boolean isBetween(PlatformVersion left, PlatformVersion right) {
+        return isAfter(left) && isBefore(right);
     }
 }

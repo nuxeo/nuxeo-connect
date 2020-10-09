@@ -19,7 +19,7 @@
  * @origin https://github.com/apache/maven/blob/master/maven-artifact/src/main/java/org/apache/maven/artifact/versioning/Restriction.java
  */
 
-package org.nuxeo.connect.packages.dependencies.versioning;
+package org.nuxeo.connect.platform;
 
 import org.apache.commons.lang3.StringUtils;
 
