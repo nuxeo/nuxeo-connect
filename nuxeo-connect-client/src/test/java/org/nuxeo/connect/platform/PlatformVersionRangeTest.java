@@ -1,9 +1,11 @@
-package org.nuxeo.connect.packages.dependencies.versioning;
+package org.nuxeo.connect.platform;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import org.junit.Test;
+import org.nuxeo.connect.platform.PlatformVersion;
+import org.nuxeo.connect.platform.PlatformVersionRange;
 
 public class PlatformVersionRangeTest {
 

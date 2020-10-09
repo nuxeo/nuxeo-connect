@@ -22,8 +22,8 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.connect.packages.dependencies.versioning.PlatformVersion;
-import org.nuxeo.connect.packages.dependencies.versioning.PlatformVersionRange;
+import org.nuxeo.connect.platform.PlatformVersion;
+import org.nuxeo.connect.platform.PlatformVersionRange;
 import org.nuxeo.connect.update.Package;
 
 /**
