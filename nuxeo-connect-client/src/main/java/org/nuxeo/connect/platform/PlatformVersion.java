@@ -185,7 +185,10 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
 
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(getMajorVersion()).append(".").append(getMinorVersion()).append(".").append(getBuildNumber());
+        builder.append(getMajorVersion()).append(".").append(getMinorVersion());
+        if (getBuildNumber() > 0) {
+            builder.append(".").append(getBuildNumber());
+        }
         if (StringUtils.isNotBlank(qualifier)) {
             builder.append("-").append(qualifier);
         }

@@ -50,8 +50,7 @@ public class P2CUDFDependencyResolverTest2 extends AbstractPackageManagerTestCas
     // DM-5.4.0.1-HF05-1.0.0, DM-5.4.0.1-HF06-1.0.0, DM-5.4.0.1-HF07-1.1.0]
     @Test
     public void testResolve() throws Exception {
-        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("DM-5.4.0.1-HF07"), null, null, null,
-                null);
+        DependencyResolution resolution = pm.resolveDependencies(Arrays.asList("DM-5.4.0.1-HF07"), null, null, null);
         assertFalse(resolution.toString(), resolution.isFailed());
 
         log.info(resolution.toString());

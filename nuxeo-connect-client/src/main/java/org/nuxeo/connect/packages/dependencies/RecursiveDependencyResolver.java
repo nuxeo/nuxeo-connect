@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.Package;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageVersionRange;
@@ -41,9 +42,7 @@ public class RecursiveDependencyResolver {
 
     protected String packageId;
 
-    protected String targetPlatform;
-
-    protected String targetPlatformVersion;
+    protected PlatformId targetPlatform;
 
     protected PackageManager pm;
 
@@ -59,12 +58,10 @@ public class RecursiveDependencyResolver {
 
     protected List<DownloadablePackage> installedPackages;
 
-    public RecursiveDependencyResolver(String packageId, PackageManager pm, String targetPlatform,
-            String targetPlatformVersion) {
+    public RecursiveDependencyResolver(String packageId, PackageManager pm, PlatformId targetPlatform) {
         this.packageId = packageId;
         this.pm = pm;
         this.targetPlatform = targetPlatform;
-        this.targetPlatformVersion = targetPlatformVersion;
     }
 
     public void sort() {
@@ -175,8 +172,7 @@ public class RecursiveDependencyResolver {
                             List<DownloadablePackage> unfiltredPossibleUpdates = pm.findRemotePackages(pkg.getName());
                             possibleUpdates = new ArrayList<DownloadablePackage>();
                             for (DownloadablePackage pup : unfiltredPossibleUpdates) {
-                                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pup, targetPlatform,
-                                        targetPlatformVersion)) {
+                                if (TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pup, targetPlatform)) {
                                     possibleUpdates.add(pup);
                                 }
                             }

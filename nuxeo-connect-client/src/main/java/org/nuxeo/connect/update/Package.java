@@ -65,9 +65,14 @@ public interface Package {
     String[] getTargetPlatforms();
 
     /**
-     * @since 1.79 The range of platforms that supports this package.
+     * @since 1.8.0 The range of platforms that supports this package.
      */
     String getTargetPlatformRange();
+
+    /**
+     * @since 1.8.0 The name of platforms that supports this package.
+     */
+    String getTargetPlatformName();
 
     /**
      * Gets the list of package dependencies for this package. If no dependency exists, either null or an empty array is

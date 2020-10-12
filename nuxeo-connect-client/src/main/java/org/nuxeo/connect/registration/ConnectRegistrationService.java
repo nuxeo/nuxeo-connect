@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.connect.connector.ConnectConnector;
-import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.ConnectProject;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;

@@ -59,6 +59,8 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     public String targetPlatformRange;
 
+    public String targetPlatformName;
+
     public PackageState packageState = PackageState.UNKNOWN;
 
     public String licenseType;
@@ -118,6 +120,11 @@ public class FakeDownloadablePackage implements DownloadablePackage {
     @Override
     public String getTargetPlatformRange() {
         return targetPlatformRange;
+    }
+
+    @Override
+    public String getTargetPlatformName() {
+        return targetPlatformName;
     }
 
     @Override

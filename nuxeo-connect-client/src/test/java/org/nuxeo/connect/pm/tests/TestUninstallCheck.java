@@ -54,7 +54,7 @@ public class TestUninstallCheck extends AbstractPackageManagerTestCase {
     }
 
     protected List<DownloadablePackage> performUninstall(DownloadablePackage pkg) {
-        return pm.getUninstallDependencies(pkg, null, null);
+        return pm.getUninstallDependencies(pkg, null);
     }
 
 }

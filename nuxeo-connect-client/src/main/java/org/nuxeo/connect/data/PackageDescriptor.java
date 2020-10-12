@@ -97,6 +97,9 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @JSONExportableField
     protected String targetPlatformRange;
 
+    @JSONExportableField
+    protected String targetPlatformName;
+
     protected PackageDependency[] dependencies;
 
     protected PackageDependency[] optionalDependencies;
@@ -163,6 +166,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         provides = descriptor.getProvides();
         packageState = descriptor.getPackageState();
         targetPlatforms = descriptor.getTargetPlatforms();
+        targetPlatformName = descriptor.getTargetPlatformName();
         targetPlatformRange = descriptor.getTargetPlatformRange();
         title = descriptor.getTitle();
         type = descriptor.getType();
@@ -384,6 +388,11 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @Override
     public String getTargetPlatformRange() {
         return targetPlatformRange;
+    }
+
+    @Override
+    public String getTargetPlatformName() {
+        return targetPlatformName;
     }
 
     @Override

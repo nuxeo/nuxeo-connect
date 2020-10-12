@@ -49,6 +49,7 @@ import org.nuxeo.connect.packages.dependencies.DependencyResolver;
 import org.nuxeo.connect.packages.dependencies.LegacyDependencyResolver;
 import org.nuxeo.connect.packages.dependencies.P2CUDFDependencyResolver;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.LocalPackage;
 import org.nuxeo.connect.update.Package;
@@ -84,9 +85,7 @@ public class PackageManagerImpl implements PackageManager {
 
     protected DependencyResolver resolver;
 
-    private String currentTargetPlatform;
-
-    private String currentTargetPlatformVersion;
+    private PlatformId currentTargetPlatform;
 
     @Override
     public List<PackageSource> getAllSources() {
@@ -97,44 +96,33 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     /**
-     * @deprecated since 1.7.2, prefer to use {@link #PackageManagerImpl(String)}
+     * @deprecated since 1.7.2, prefer to use {@link #PackageManagerImpl(PlatformId)}
      */
     @Deprecated
     public PackageManagerImpl() {
-        this(null, null);
+        this(null);
     }
 
     /**
      * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
-    public PackageManagerImpl(String currentTargetPlatform, String currentTargetPlatformVersion) {
+    public PackageManagerImpl(PlatformId currentTargetPlatform) {
         registerSource(new RemotePackageSource(), false);
         registerSource(new DownloadingPackageSource(), true);
         registerSource(new LocalPackageSource(), true);
         setResolver(DEFAULT_DEPENDENCY_RESOLVER);
         this.currentTargetPlatform = currentTargetPlatform;
-        this.currentTargetPlatformVersion = currentTargetPlatformVersion;
     }
 
     @Override
-    public String getCurrentTargetPlatform() {
+    public PlatformId getCurrentTargetPlatform() {
         return currentTargetPlatform;
     }
 
     @Override
-    public void setCurrentTargetPlatform(String currentTargetPlatform) {
+    public void setCurrentTargetPlatform(PlatformId currentTargetPlatform) {
         this.currentTargetPlatform = currentTargetPlatform;
-    }
-
-    @Override
-    public String getCurrentTargetPlatformVersion() {
-        return currentTargetPlatformVersion;
-    }
-
-    @Override
-    public void setCurrentTargetPlatformVersion(String currentTargetPlatformVersion) {
-        this.currentTargetPlatformVersion = currentTargetPlatformVersion;
     }
 
     /**
@@ -166,11 +154,11 @@ public class PackageManagerImpl implements PackageManager {
      * Merge packages, keeping only greater versions
      */
     protected List<DownloadablePackage> doMergePackages(List<PackageSource> sources, PackageType type,
-            String targetPlatform, String targetPlatformVersion) {
-        List<DownloadablePackage> allPackages = getAllPackages(sources, type, targetPlatform, targetPlatformVersion);
+            PlatformId targetPlatform) {
+        List<DownloadablePackage> allPackages = getAllPackages(sources, type, targetPlatform);
         Map<String, Map<String, DownloadablePackage>> packagesByIdAndTargetPlatform = new HashMap<>();
         for (DownloadablePackage pkg : allPackages) {
-            String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform }
+            String[] targetPlatforms = targetPlatform != null ? new String[] { targetPlatform.asString() }
                     : pkg.getTargetPlatforms();
             if (targetPlatforms == null) { // if the package doesn't specify any target platform
                 targetPlatforms = new String[] { null };
@@ -205,14 +193,13 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type) {
-        return getAllPackages(sources, type, currentTargetPlatform, currentTargetPlatformVersion);
+        return getAllPackages(sources, type, currentTargetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> getAllPackages(List<PackageSource> sources, PackageType type,
-            String targetPlatform, String targetPlatformVersion) {
-        Map<String, DownloadablePackage> packagesById = getAllPackagesByID(sources, type, targetPlatform,
-                targetPlatformVersion);
+            PlatformId targetPlatform) {
+        Map<String, DownloadablePackage> packagesById = getAllPackagesByID(sources, type, targetPlatform);
         return new ArrayList<>(packagesById.values());
     }
 
@@ -221,7 +208,7 @@ public class PackageManagerImpl implements PackageManager {
      * @return a Map of all packages from given sources filtered on type if not null
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(List<PackageSource> sources, PackageType type) {
-        return getAllPackagesByID(sources, type, currentTargetPlatform, currentTargetPlatformVersion);
+        return getAllPackagesByID(sources, type, currentTargetPlatform);
     }
 
     /**
@@ -229,10 +216,10 @@ public class PackageManagerImpl implements PackageManager {
      * @return a Map of all packages from given sources, optionally filtered on type and/or target platform if not null
      */
     protected Map<String, DownloadablePackage> getAllPackagesByID(List<PackageSource> sources, PackageType type,
-            String targetPlatform, String targetPlatformVersion) {
+            PlatformId targetPlatform) {
         Map<String, DownloadablePackage> packagesById = new HashMap<>();
         for (PackageSource source : sources) {
-            List<DownloadablePackage> packages = source.listPackages(type, targetPlatform, targetPlatformVersion);
+            List<DownloadablePackage> packages = source.listPackages(type, targetPlatform);
             for (DownloadablePackage pkg : packages) {
                 packagesById.put(pkg.getId(), pkg);
             }
@@ -258,8 +245,7 @@ public class PackageManagerImpl implements PackageManager {
             PackageType type) {
         Map<String, List<DownloadablePackage>> packagesByName = new HashMap<>();
         for (PackageSource source : sources) {
-            List<DownloadablePackage> packages = source.listPackages(type, currentTargetPlatform,
-                    currentTargetPlatformVersion);
+            List<DownloadablePackage> packages = source.listPackages(type, currentTargetPlatform);
             for (DownloadablePackage pkg : packages) {
                 List<DownloadablePackage> pkgsForName;
                 if (!packagesByName.containsKey(pkg.getName())) {
@@ -278,7 +264,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> findRemotePackages(String packageName) {
         List<DownloadablePackage> pkgs = new ArrayList<>();
         for (PackageSource source : remoteSources) {
-            pkgs.addAll(source.listPackagesByName(packageName, currentTargetPlatform, currentTargetPlatformVersion));
+            pkgs.addAll(source.listPackagesByName(packageName, currentTargetPlatform));
         }
         return pkgs;
     }
@@ -373,8 +359,7 @@ public class PackageManagerImpl implements PackageManager {
             }
         }
         for (PackageSource source : remoteSources) {
-            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, currentTargetPlatform,
-                    currentTargetPlatformVersion)) {
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, currentTargetPlatform)) {
                 remoteVersions.add(pkg.getVersion());
             }
         }
@@ -387,11 +372,10 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<Version> getAvailableVersion(String pkgName, PackageVersionRange range, String targetPlatform,
-            String targetPlatformVersion) {
+    public List<Version> getAvailableVersion(String pkgName, PackageVersionRange range, PlatformId targetPlatform) {
         List<Version> versions = new ArrayList<>();
         for (PackageSource source : getAllSources()) {
-            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, targetPlatform, targetPlatformVersion)) {
+            for (DownloadablePackage pkg : source.listPackagesByName(pkgName, targetPlatform)) {
                 if (range.matchVersion(pkg.getVersion()) && !versions.contains(pkg.getVersion())) {
                     versions.add(pkg.getVersion());
                 }
@@ -402,23 +386,22 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listPackages() {
-        return listPackages(null, currentTargetPlatform, currentTargetPlatformVersion);
+        return listPackages(null, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(String targetPlatform, String targetPlatformVersion) {
-        return listPackages(null, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listPackages(PlatformId targetPlatform) {
+        return listPackages(null, targetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> listPackages(PackageType type) {
-        return listPackages(type, currentTargetPlatform, currentTargetPlatformVersion);
+        return listPackages(type, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listPackages(PackageType pkgType, String targetPlatform,
-            String targetPlatformVersion) {
-        return doMergePackages(getAllSources(), pkgType, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listPackages(PackageType pkgType, PlatformId targetPlatform) {
+        return doMergePackages(getAllSources(), pkgType, targetPlatform);
     }
 
     @Override
@@ -468,8 +451,8 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<String> listHotfixesNames(String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) {
-        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform, targetPlatformVersion);
+    public List<String> listHotfixesNames(PlatformId targetPlatform, boolean allowSNAPSHOT) {
+        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
         // filter on snapshots and collect unique names
         List<String> hotFixesNames = hotFixes.stream()
                                              .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
@@ -480,8 +463,8 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<String> listLastHotfixes(String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) {
-        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform, targetPlatformVersion);
+    public List<String> listLastHotfixes(PlatformId targetPlatform, boolean allowSNAPSHOT) {
+        List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
         // filter on snapshots and collect last versions
         Map<String, List<DownloadablePackage>> hotfixesByName = hotFixes.stream()
                                                                         .filter(pkg -> (allowSNAPSHOT
@@ -499,18 +482,17 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listRemotePackages() {
-        return listRemotePackages(null, currentTargetPlatform, currentTargetPlatformVersion);
+        return listRemotePackages(null, currentTargetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> listRemotePackages(PackageType pkgType) {
-        return listRemotePackages(pkgType, currentTargetPlatform, currentTargetPlatformVersion);
+        return listRemotePackages(pkgType, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listRemotePackages(PackageType pkgType, String targetPlatform,
-            String targetPlatformVersion) {
-        return doMergePackages(remoteSources, pkgType, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listRemotePackages(PackageType pkgType, PlatformId targetPlatform) {
+        return doMergePackages(remoteSources, pkgType, targetPlatform);
     }
 
     @Override
@@ -537,32 +519,30 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<DownloadablePackage> listUpdatePackages() {
-        return listUpdatePackages(null, currentTargetPlatform, currentTargetPlatformVersion);
+        return listUpdatePackages(null, currentTargetPlatform);
     }
 
     @Override
     public List<DownloadablePackage> listUpdatePackages(PackageType type) {
-        return listUpdatePackages(type, currentTargetPlatform, currentTargetPlatformVersion);
+        return listUpdatePackages(type, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listUpdatePackages(String targetPlatform, String targetPlatformVersion) {
-        return listUpdatePackages(null, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listUpdatePackages(PlatformId targetPlatform) {
+        return listUpdatePackages(null, targetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listUpdatePackages(PackageType type, String targetPlatform,
-            String targetPlatformVersion) {
+    public List<DownloadablePackage> listUpdatePackages(PackageType type, PlatformId targetPlatform) {
         List<String> installedPackagesNames = listInstalledPackagesNames(type);
         List<String> hotfixesNames = null;
         if (type == null || type == PackageType.HOT_FIX) {
             // list last version of available hot-fixes too, but always for the current target platform
-            hotfixesNames = listHotfixesNames(currentTargetPlatform, currentTargetPlatformVersion,
-                    CUDFHelper.defaultAllowSNAPSHOT);
+            hotfixesNames = listHotfixesNames(currentTargetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
             hotfixesNames.removeAll(installedPackagesNames);
         }
         DependencyResolution resolution = resolveDependencies(hotfixesNames, null, installedPackagesNames,
-                targetPlatform, targetPlatformVersion, CUDFHelper.defaultAllowSNAPSHOT);
+                targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
 
         List<String> toUpdateIds = resolution.getOrderedPackageIdsToInstall();
         List<DownloadablePackage> toUpdate = toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
@@ -571,10 +551,8 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<DownloadablePackage> listPrivatePackages(PackageType pkgType, String targetPlatform,
-            String targetPlatformVersion) {
-        List<DownloadablePackage> allPackages = getAllPackages(getAllSources(), pkgType, targetPlatform,
-                targetPlatformVersion);
+    public List<DownloadablePackage> listPrivatePackages(PackageType pkgType, PlatformId targetPlatform) {
+        List<DownloadablePackage> allPackages = getAllPackages(getAllSources(), pkgType, targetPlatform);
         Collections.sort(allPackages, new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
@@ -586,8 +564,8 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<DownloadablePackage> listPrivatePackages(String targetPlatform, String targetPlatformVersion) {
-        return listPrivatePackages(null, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listPrivatePackages(PlatformId targetPlatform) {
+        return listPrivatePackages(null, targetPlatform);
     }
 
     @Override
@@ -684,26 +662,25 @@ public class PackageManagerImpl implements PackageManager {
     @Deprecated
     @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages() {
-        return listRemoteOrLocalPackages(null, currentTargetPlatform, currentTargetPlatformVersion);
+        return listRemoteOrLocalPackages(null, currentTargetPlatform);
     }
 
     @Deprecated
     @Override
     public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType) {
-        return listRemoteOrLocalPackages(pkgType, currentTargetPlatform, currentTargetPlatformVersion);
+        return listRemoteOrLocalPackages(pkgType, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listRemoteOrLocalPackages(String targetPlatform, String targetPlatformVersion) {
-        return listRemoteOrLocalPackages(null, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listRemoteOrLocalPackages(PlatformId targetPlatform) {
+        return listRemoteOrLocalPackages(null, targetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType, String targetPlatform,
-            String targetPlatformVersion) {
+    public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType, PlatformId targetPlatform) {
         List<DownloadablePackage> result = new ArrayList<>();
-        List<DownloadablePackage> all = listPackages(pkgType, targetPlatform, targetPlatformVersion);
-        List<DownloadablePackage> remotes = listRemotePackages(pkgType, targetPlatform, targetPlatformVersion);
+        List<DownloadablePackage> all = listPackages(pkgType, targetPlatform);
+        List<DownloadablePackage> remotes = listRemotePackages(pkgType, targetPlatform);
         // Return only packages which are available on remote sources
         for (DownloadablePackage pkg : all) {
             for (DownloadablePackage remote : remotes) {
@@ -737,24 +714,23 @@ public class PackageManagerImpl implements PackageManager {
     @Deprecated
     @Override
     public List<DownloadablePackage> listOnlyRemotePackages() {
-        return listOnlyRemotePackages(null, currentTargetPlatform, currentTargetPlatformVersion);
+        return listOnlyRemotePackages(null, currentTargetPlatform);
     }
 
     @Deprecated
     @Override
     public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType) {
-        return listOnlyRemotePackages(pkgType, currentTargetPlatform, currentTargetPlatformVersion);
+        return listOnlyRemotePackages(pkgType, currentTargetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listOnlyRemotePackages(String targetPlatform, String targetPlatformVersion) {
-        return listOnlyRemotePackages(null, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listOnlyRemotePackages(PlatformId targetPlatform) {
+        return listOnlyRemotePackages(null, targetPlatform);
     }
 
     @Override
-    public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, String targetPlatform,
-            String targetPlatformVersion) {
-        List<DownloadablePackage> result = listRemotePackages(pkgType, targetPlatform, targetPlatformVersion);
+    public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, PlatformId targetPlatform) {
+        List<DownloadablePackage> result = listRemotePackages(pkgType, targetPlatform);
         List<DownloadablePackage> local = listLocalPackages(pkgType);
         for (DownloadablePackage pkg : local) {
             for (DownloadablePackage remote : result) {
@@ -797,9 +773,9 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     @Deprecated
-    public DependencyResolution resolveDependencies(String pkgId, String targetPlatform, String targetPlatformVersion) {
+    public DependencyResolution resolveDependencies(String pkgId, PlatformId targetPlatform) {
         try {
-            DependencyResolution resolution = resolver.resolve(pkgId, targetPlatform, targetPlatformVersion);
+            DependencyResolution resolution = resolver.resolve(pkgId, targetPlatform);
             log.debug(beforeAfterResolutionToString(resolution));
             return resolution;
         } catch (DependencyException e) {
@@ -828,33 +804,30 @@ public class PackageManagerImpl implements PackageManager {
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
-            List<String> pkgUpgrade, String targetPlatform, String targetPlatformVersion) {
-        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion,
-                CUDFHelper.defaultAllowSNAPSHOT, true);
+            List<String> pkgUpgrade, PlatformId targetPlatform) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, CUDFHelper.defaultAllowSNAPSHOT,
+                true);
     }
 
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
-            List<String> pkgUpgrade, String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT) {
-        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion,
-                allowSNAPSHOT, true);
+            List<String> pkgUpgrade, PlatformId targetPlatform, boolean allowSNAPSHOT) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, true);
     }
 
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
-            List<String> pkgUpgrade, String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT,
-            boolean doKeep) {
-        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, targetPlatformVersion,
-                allowSNAPSHOT, doKeep, false);
+            List<String> pkgUpgrade, PlatformId targetPlatform, boolean allowSNAPSHOT, boolean doKeep) {
+        return resolveDependencies(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform, allowSNAPSHOT, doKeep, false);
     }
 
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
-            List<String> pkgUpgrade, String targetPlatform, String targetPlatformVersion, boolean allowSNAPSHOT,
-            boolean doKeep, boolean isSubResolution) {
+            List<String> pkgUpgrade, PlatformId targetPlatform, boolean allowSNAPSHOT, boolean doKeep,
+            boolean isSubResolution) {
         try {
             DependencyResolution resolution = resolver.resolve(pkgInstall, pkgRemove, pkgUpgrade, targetPlatform,
-                    targetPlatformVersion, allowSNAPSHOT, doKeep, isSubResolution);
+                    allowSNAPSHOT, doKeep, isSubResolution);
 
             log.debug(beforeAfterResolutionToString(resolution));
             return resolution;
@@ -864,13 +837,11 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<DownloadablePackage> getUninstallDependencies(Package pkg, String targetPlatform,
-            String targetPlatformVersion) {
+    public List<DownloadablePackage> getUninstallDependencies(Package pkg, PlatformId targetPlatform) {
         List<DownloadablePackage> packagesToUninstall = new ArrayList<>();
         List<String> removes = new ArrayList<>();
         removes.add(pkg.getName());
-        DependencyResolution resolution = resolveDependencies(null, removes, null, targetPlatform,
-                targetPlatformVersion);
+        DependencyResolution resolution = resolveDependencies(null, removes, null, targetPlatform);
         if (!resolution.isFailed() && !resolution.isEmpty()) {
             List<String> idsToRemove = resolution.getOrderedPackageIdsToRemove();
             idsToRemove.remove(pkg.getId());
@@ -1114,10 +1085,9 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public String getNonCompliant(List<String> packages, String targetPlatform, String targetPlatformVersion)
-            throws PackageException {
+    public String getNonCompliant(List<String> packages, PlatformId targetPlatform) throws PackageException {
         for (String pkg : packages) {
-            if (!matchesPlatform(pkg, targetPlatform, targetPlatformVersion)) {
+            if (!matchesPlatform(pkg, targetPlatform)) {
                 return pkg;
             }
         }
@@ -1125,11 +1095,10 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public List<String> getNonCompliantList(List<String> packages, String targetPlatform, String targetPlatformVersion)
-            throws PackageException {
+    public List<String> getNonCompliantList(List<String> packages, PlatformId targetPlatform) throws PackageException {
         List<String> nonCompliant = new ArrayList<>();
         for (String pkg : packages) {
-            if (!matchesPlatform(pkg, targetPlatform, targetPlatformVersion)) {
+            if (!matchesPlatform(pkg, targetPlatform)) {
                 nonCompliant.add(pkg);
             }
         }
@@ -1137,13 +1106,12 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     @Override
-    public boolean matchesPlatform(String requestPkgStr, String targetPlatform, String targetPlatformVersion)
-            throws PackageException {
+    public boolean matchesPlatform(String requestPkgStr, PlatformId targetPlatform) throws PackageException {
         Map<String, DownloadablePackage> allPackagesByID = getAllPackagesByID();
         // Try ID match first
         if (allPackagesByID.containsKey(requestPkgStr)) {
             return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(allPackagesByID.get(requestPkgStr),
-                    targetPlatform, targetPlatformVersion);
+                    targetPlatform);
         }
         // Fallback on name match
         List<DownloadablePackage> allPackagesForName = getAllPackagesByName().get(requestPkgStr);
@@ -1151,8 +1119,8 @@ public class PackageManagerImpl implements PackageManager {
             throw new PackageException("Package not found: " + requestPkgStr);
         }
         for (DownloadablePackage pkg : allPackagesForName) {
-            if (requestPkgStr.equals(pkg.getName()) && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg,
-                    targetPlatform, targetPlatformVersion)) {
+            if (requestPkgStr.equals(pkg.getName())
+                    && TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                 return true;
             }
         }

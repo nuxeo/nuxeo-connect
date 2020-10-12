@@ -24,15 +24,14 @@ import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageType;
 
 import junit.framework.TestCase;
 
 public class TestFakeConnector extends TestCase {
 
-    private final String testTargetPlatform = "server-10.3";
-
-    private final String testTargetPlatformVersion = "10.3";
+    private final PlatformId testTargetPlatform = PlatformId.parse("server-10.3");
 
     public void testFakeConnector() throws Exception {
         LogicalInstanceIdentifier CLID = new LogicalInstanceIdentifier("toto--titi", "myInstance");
@@ -45,14 +44,13 @@ public class TestFakeConnector extends TestCase {
         assertNotNull(status);
         assertEquals("active", status.getContractStatus());
 
-        List<DownloadablePackage> packages = connector.getDownloads(PackageType.HOT_FIX, testTargetPlatform,
-                testTargetPlatformVersion);
+        List<DownloadablePackage> packages = connector.getDownloads(PackageType.HOT_FIX, testTargetPlatform);
         assertNotNull(packages);
         assertEquals(2, packages.size());
         assertEquals("hot fix 1", packages.get(0).getTitle());
         assertEquals(PackageType.HOT_FIX, packages.get(0).getType());
 
-        packages = connector.getDownloads(PackageType.STUDIO, testTargetPlatform, testTargetPlatformVersion);
+        packages = connector.getDownloads(PackageType.STUDIO, testTargetPlatform);
         assertNotNull(packages);
         assertEquals(1, packages.size());
         assertEquals("my project", packages.get(0).getTitle());

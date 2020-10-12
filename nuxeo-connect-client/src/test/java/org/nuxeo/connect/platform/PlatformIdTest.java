@@ -35,8 +35,11 @@ public class PlatformIdTest {
 
     @Test
     public void asString() {
-        assertThat(PlatformId.of("server", new PlatformVersion("9.10")).asString()).isEqualTo("server-9.10.0");
+        assertThat(PlatformId.of("server", new PlatformVersion("9.10")).asString()).isEqualTo("server-9.10");
+        assertThat(PlatformId.of("server", new PlatformVersion("9.10.3")).asString()).isEqualTo("server-9.10.3");
         assertThat(PlatformId.of("server", new PlatformVersion("10.10-SNAPSHOT")).asString()).isEqualTo(
-                "server-10.10.0-SNAPSHOT");
+                "server-10.10-SNAPSHOT");
+        assertThat(PlatformId.of("server", new PlatformVersion("10.10.2-SNAPSHOT")).asString()).isEqualTo(
+                "server-10.10.2-SNAPSHOT");
     }
 }

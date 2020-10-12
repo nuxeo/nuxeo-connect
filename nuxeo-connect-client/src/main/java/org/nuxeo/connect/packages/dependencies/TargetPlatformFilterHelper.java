@@ -22,7 +22,7 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.connect.platform.PlatformVersion;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.platform.PlatformVersionRange;
 import org.nuxeo.connect.update.Package;
 
@@ -33,24 +33,25 @@ public class TargetPlatformFilterHelper {
 
     protected static Log log = LogFactory.getLog(TargetPlatformFilterHelper.class);
 
-    public static boolean isCompatibleWithTargetPlatform(Package pkg, String targetPlatform,
-            String targetPlatformVersion) {
-        String tpRangeSpec = pkg.getTargetPlatformRange();
-        if (StringUtils.isBlank(tpRangeSpec) || targetPlatformVersion == null) {
-            // keep backward compatibility with former target platforms list
-            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+    public static boolean isCompatibleWithTargetPlatform(Package pkg, PlatformId targetPlatform) {
+        if (targetPlatform == null) {
+            return true;
+        }
+        if (StringUtils.isBlank(pkg.getTargetPlatformRange()) || StringUtils.isBlank(pkg.getTargetPlatformName())) {
+            // Use former target platforms list
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform.asString());
         }
 
         try {
-            PlatformVersion tpVersion = new PlatformVersion(targetPlatformVersion);
-            PlatformVersionRange pkgAllowedTpRange = PlatformVersionRange.fromRangeSpec(tpRangeSpec);
-            return pkgAllowedTpRange.containsVersion(tpVersion);
+            PlatformVersionRange pkgAllowedTpRange = PlatformVersionRange.fromRangeSpec(pkg.getTargetPlatformRange());
+            return pkgAllowedTpRange.containsVersion(targetPlatform.version())
+                    && pkg.getTargetPlatformName().equalsIgnoreCase(targetPlatform.name());
         } catch (IllegalArgumentException e) {
             log.warn(String.format(
-                    "Could not parse target platform range expression '%s' for package '%s' "
-                            + "or current platform version '%s', using former compatibility format.",
-                    tpRangeSpec, pkg.getId(), targetPlatformVersion), e);
-            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
+                    "Could not parse target platform range expression '%s' for package '%s', using former compatibility format.",
+                    pkg.getTargetPlatformRange(), pkg.getId()), e);
+            // Use former target platforms list
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform.asString());
         }
 
     }
@@ -61,7 +62,7 @@ public class TargetPlatformFilterHelper {
      * @since 1.4.24
      */
     private static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
-        if (StringUtils.isBlank(targetPlatform) || targetPlatforms == null || targetPlatforms.length == 0) {
+        if (targetPlatforms == null || targetPlatforms.length == 0) {
             return true;
         }
         for (String target : targetPlatforms) {

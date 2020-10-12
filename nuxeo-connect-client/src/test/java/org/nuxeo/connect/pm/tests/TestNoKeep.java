@@ -38,7 +38,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         pm.registerSource(new DummyPackageSource(local, "localNoKeep1"), true);
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
-        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, null, false, false);
+        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToInstall().size());
@@ -60,7 +60,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
         pkgToSet.add("D");
-        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, null, false, false);
+        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -78,7 +78,7 @@ public class TestNoKeep extends AbstractPackageManagerTestCase {
         pm.registerSource(new DummyPackageSource(local, "localNoKeep3"), true);
         List<String> pkgToSet = new ArrayList<>();
         pkgToSet.add("B");
-        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, null, false, false);
+        DependencyResolution depResolution = pm.resolveDependencies(pkgToSet, null, null, null, false, false);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(2, depResolution.getLocalPackagesToInstall().size());

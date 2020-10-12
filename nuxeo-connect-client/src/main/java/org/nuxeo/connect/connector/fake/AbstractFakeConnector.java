@@ -34,6 +34,7 @@ import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
+import org.nuxeo.connect.platform.PlatformId;
 
 /**
  * Fake abstract implementation of the {@link ConnectConnector} interface for testing purpose.
@@ -83,11 +84,9 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
                                                              .stream()
                                                              .collect(Collectors.toMap(pair -> pair.getName(),
                                                                      pair -> pair.getValue()));
-            String targetPlatform = queryParams.get("targetPlatform");
-            String targetPlatformVersion = queryParams.get("targetPlatformVersion");
+            PlatformId targetPlatform = PlatformId.parse(queryParams.get("targetPlatform"));
             return downloads.stream().filter(pkg -> {
-                return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform,
-                        targetPlatformVersion);
+                return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform);
             }).collect(Collectors.toList());
         }
         return downloads;
