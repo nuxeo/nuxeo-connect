@@ -21,6 +21,7 @@ import java.util.List;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.SubscriptionStatus;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageType;
 
 /**
@@ -48,8 +49,8 @@ public interface ConnectConnector {
      * @throws ConnectServerError
      * @since 1.7.2
      */
-    List<DownloadablePackage> getDownloads(PackageType type, String currentTargetPlatform,
-            String currentTargetPlatformVersion) throws ConnectServerError;
+    List<DownloadablePackage> getDownloads(PackageType type, PlatformId currentTargetPlatform)
+            throws ConnectServerError;
 
     DownloadingPackage getDownload(String id) throws ConnectServerError;
 
@@ -69,12 +70,10 @@ public interface ConnectConnector {
     List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
 
     /**
-     * @param currentTargetPlatformVersion
      * @since 1.7.2
      * @return The list of the downloadable Studio packages for the given targetPlatform. May be empty.
      */
-    List<DownloadablePackage> getRegisteredStudio(String currentTargetPlatform, String currentTargetPlatformVersion)
-            throws ConnectServerError;
+    List<DownloadablePackage> getRegisteredStudio(PlatformId currentTargetPlatform) throws ConnectServerError;
 
     /**
      * Renews the current registration with the Connect server.

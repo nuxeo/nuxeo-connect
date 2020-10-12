@@ -36,7 +36,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -53,6 +52,7 @@ import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
 import org.nuxeo.connect.packages.PackageListCache;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageType;
 
 /**
@@ -207,36 +207,33 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     @Override
     public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
-        return getDownloads(type, null, null);
+        return getDownloads(type, null);
     }
 
     @Override
-    public List<DownloadablePackage> getDownloads(PackageType type, String currentTargetPlatform,
-            String currentTargetPlatformVersion) throws ConnectServerError {
+    public List<DownloadablePackage> getDownloads(PackageType type, PlatformId currentTargetPlatform)
+            throws ConnectServerError {
         String fileSuffix = String.valueOf(type);
         String urlSuffix = fileSuffix;
-        if (StringUtils.isNotBlank(currentTargetPlatform)) {
-            urlSuffix += "?targetPlatform=" + currentTargetPlatform + "&targetPlatformVersion="
-                    + currentTargetPlatformVersion;
-            fileSuffix += "_" + currentTargetPlatform;
+        if (currentTargetPlatform != null) {
+            urlSuffix += "?targetPlatform=" + currentTargetPlatform.asString();
+            fileSuffix += "_" + currentTargetPlatform.asString();
         }
         return getDownloads(fileSuffix, urlSuffix);
     }
 
     @Override
     public List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError {
-        return getRegisteredStudio(null, null);
+        return getRegisteredStudio(null);
     }
 
     @Override
-    public List<DownloadablePackage> getRegisteredStudio(String currentTargetPlatform,
-            String currentTargetPlatformVersion) throws ConnectServerError {
+    public List<DownloadablePackage> getRegisteredStudio(PlatformId currentTargetPlatform) throws ConnectServerError {
         String fileSuffix = STUDIO_REGISTERED_CACHE_SUFFIX;
         String urlSuffix = PackageType.STUDIO + "?registered=true";
-        if (StringUtils.isNotBlank(currentTargetPlatform)) {
-            urlSuffix += "&targetPlatform=" + currentTargetPlatform + "&targetPlatformVersion="
-                    + currentTargetPlatformVersion;
-            fileSuffix += "_" + currentTargetPlatform;
+        if (currentTargetPlatform != null) {
+            urlSuffix += "&targetPlatform=" + currentTargetPlatform.asString();
+            fileSuffix += "_" + currentTargetPlatform.asString();
         }
         return getDownloads(fileSuffix, urlSuffix);
     }

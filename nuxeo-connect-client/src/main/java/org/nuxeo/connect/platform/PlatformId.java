@@ -46,7 +46,7 @@ public abstract class PlatformId { // NOSONAR
     public abstract PlatformVersion version();
 
     public String asString() {
-        return name() + '-' + version().asString();
+        return name() + "-" + version().asString();
     }
 
 }

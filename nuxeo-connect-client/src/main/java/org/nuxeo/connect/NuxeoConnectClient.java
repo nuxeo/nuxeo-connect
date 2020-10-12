@@ -24,6 +24,7 @@ import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.packages.PackageManagerImpl;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.registration.ConnectRegistrationService;
 import org.nuxeo.connect.update.PackageUpdateService;
 
@@ -90,20 +91,18 @@ public class NuxeoConnectClient {
      */
     @Deprecated
     public static synchronized PackageManager getPackageManager() {
-        return getPackageManager(null, null);
+        return getPackageManager(null);
     }
 
     /**
      * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
-    public static synchronized PackageManager getPackageManager(String currentTargetPlatform,
-            String currentTargetPlatformVersion) {
+    public static synchronized PackageManager getPackageManager(PlatformId currentTargetPlatform) {
         if (packageManager == null) {
-            packageManager = new PackageManagerImpl(currentTargetPlatform, currentTargetPlatformVersion);
+            packageManager = new PackageManagerImpl(currentTargetPlatform);
         } else {
             packageManager.setCurrentTargetPlatform(currentTargetPlatform);
-            packageManager.setCurrentTargetPlatformVersion(currentTargetPlatformVersion);
         }
         return packageManager;
     }

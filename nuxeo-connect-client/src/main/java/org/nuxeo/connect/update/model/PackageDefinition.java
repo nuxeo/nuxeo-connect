@@ -147,6 +147,14 @@ public interface PackageDefinition extends Package {
     void setTargetPlatformRange(String targetPlatformRange);
 
     /**
+     * Set the target platform name of this package.
+     * 
+     * @param targetPlatformName
+     * @see #getTargetPlatformRange()
+     */
+    void setTargetPlatformName(String targetPlatformName);
+
+    /**
      * Set the package dependencies.
      *
      * @param deps

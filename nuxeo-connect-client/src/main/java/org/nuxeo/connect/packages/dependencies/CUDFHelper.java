@@ -46,6 +46,7 @@ import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
+import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.PackageVersionRange;
@@ -84,9 +85,7 @@ public class CUDFHelper {
      */
     protected Map<String, NuxeoCUDFPackage> CUDF2NuxeoMap = new HashMap<>();
 
-    private String targetPlatform;
-
-    private String targetPlatformVersion;
+    private PlatformId targetPlatform;
 
     private boolean allowSNAPSHOT = defaultAllowSNAPSHOT;
 
@@ -202,8 +201,8 @@ public class CUDFHelper {
             }
 
             // ignore incompatible packages when a targetPlatform is set
-            if (!pkg.getPackageState().isInstalled() && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg,
-                    targetPlatform, targetPlatformVersion)) {
+            if (!pkg.getPackageState().isInstalled()
+                    && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
                 log.debug("Ignore " + pkg + " (incompatible target platform)");
                 continue;
             }
@@ -735,15 +734,8 @@ public class CUDFHelper {
         }
     }
 
-    public void setTargetPlatform(String targetPlatform) {
+    public void setTargetPlatform(PlatformId targetPlatform) {
         this.targetPlatform = targetPlatform;
-    }
-
-    /**
-     * @since 1.7.9
-     */
-    public void setTargetPlatformVersion(String targetPlatformVersion) {
-        this.targetPlatformVersion = targetPlatformVersion;
     }
 
     /**

@@ -53,7 +53,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1-SNAPSHOT","name":"A","state":2,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"A","state":0,"type":"addon"}
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("A"), null, null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("A"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertFalse(depResolution.requireChanges());
@@ -65,7 +65,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.1-SNAPSHOT, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("A-1.0.1-SNAPSHOT");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -83,7 +83,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1","name":"B","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"B","state":2,"type":"addon"}
         // After: [A-1.0.0, B-1.0.2-SNAPSHOT, B2-1.0.1-SNAPSHOT]
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("B-1.0.2-SNAPSHOT"), null, null, null,
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("B-1.0.2-SNAPSHOT"), null, null,
                 null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
@@ -103,7 +103,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("B-1.0.1");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null);
+        depResolution = pm.resolveDependencies(installs, null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -122,7 +122,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.2-SNAPSHOT","name":"B2","state":2,"type":"addon"}
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("B2-1.0.2-SNAPSHOT"), null, null,
-                null, null);
+                null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -139,7 +139,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT]
         List<String> uninstalls = new ArrayList<>();
         uninstalls.add("B2");
-        depResolution = pm.resolveDependencies(null, uninstalls, null, null, null);
+        depResolution = pm.resolveDependencies(null, uninstalls, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -158,7 +158,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         uninstalls.add("B");
         // this is a downgrade
         uninstalls.add("B2-1.0.1-SNAPSHOT");
-        depResolution = pm.resolveDependencies(null, uninstalls, null, null, null);
+        depResolution = pm.resolveDependencies(null, uninstalls, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -175,7 +175,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
-        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("C"), null, null, null, null);
+        DependencyResolution depResolution = pm.resolveDependencies(Arrays.asList("C"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -191,7 +191,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
-        depResolution = pm.resolveDependencies(Arrays.asList("C-1.0.1"), null, null, null, null);
+        depResolution = pm.resolveDependencies(Arrays.asList("C-1.0.1"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -207,7 +207,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // {"version":"1.0.1","name":"C","state":0,"type":"addon"}
         // {"version":"1.0.2-SNAPSHOT","name":"C","state":2,"type":"addon"}
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1-SNAPSHOT]
-        depResolution = pm.resolveDependencies(Arrays.asList("C-1.0.1-SNAPSHOT"), null, null, null, null);
+        depResolution = pm.resolveDependencies(Arrays.asList("C-1.0.1-SNAPSHOT"), null, null, null);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -226,7 +226,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("A");
-        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertFalse(depResolution.requireChanges());
@@ -243,7 +243,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.2-SNAPSHOT, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("A-1.0.2-SNAPSHOT");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -263,7 +263,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("B");
-        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertFalse(depResolution.requireChanges());
@@ -281,7 +281,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.2-SNAPSHOT, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("B-1.0.2-SNAPSHOT");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -299,7 +299,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1, B2-1.0.2-SNAPSHOT]
         installs = new ArrayList<>();
         installs.add("B-1.0.1");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
@@ -319,7 +319,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.2-SNAPSHOT]
         List<String> installs = new ArrayList<>();
         installs.add("C");
-        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        DependencyResolution depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(1, depResolution.getLocalPackagesToInstall().size());
@@ -336,7 +336,7 @@ public class TestSNAPSHOT extends AbstractPackageManagerTestCase {
         // After: [A-1.0.0, B-1.0.1-SNAPSHOT, B2-1.0.2-SNAPSHOT, C-1.0.1]
         installs = new ArrayList<>();
         installs.add("C-1.0.1");
-        depResolution = pm.resolveDependencies(installs, null, null, null, null, true);
+        depResolution = pm.resolveDependencies(installs, null, null, null, true);
         log.info(depResolution.toString());
         assertTrue(depResolution.isValidated());
         assertEquals(0, depResolution.getLocalPackagesToInstall().size());
