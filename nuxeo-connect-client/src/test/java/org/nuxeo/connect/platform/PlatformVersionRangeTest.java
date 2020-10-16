@@ -186,6 +186,6 @@ public class PlatformVersionRangeTest {
 
         assertThatIllegalArgumentException().isThrownBy(() -> new PlatformVersion("1-qualifier with space"))
                                             .withMessage(
-                                                    "Version cannot contain whitespaces in qualifier: '1-qualifier with space'");
+                                                    "Version cannot contain whitespaces in qualifier: 1-qualifier with space");
     }
 }
