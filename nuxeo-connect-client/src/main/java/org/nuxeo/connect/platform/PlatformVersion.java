@@ -20,13 +20,7 @@
  */
 package org.nuxeo.connect.platform;
 
-import static org.apache.commons.lang3.math.NumberUtils.isDigits;
-
 import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implementation of a Nuxeo platform version.<br />
@@ -40,8 +34,8 @@ import org.apache.commons.logging.LogFactory;
  * </ul>
  */
 public class PlatformVersion implements Comparable<PlatformVersion> {
-
-    private static final Log log = LogFactory.getLog(PlatformVersion.class);
+    // Cannot use apachae.commons logs because of GWT compliance
+    // private static final Log log = LogFactory.getLog(PlatformVersion.class);
 
     public static final int MAX_VERSION_PART_VALUE = 9_999;
 
@@ -103,19 +97,19 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
     }
 
     public final void parseVersion(String version) {
-        if (StringUtils.isBlank(version)) {
+        if (isBlank(version)) {
             throw new IllegalArgumentException("Version cannot be blank");
         }
-        if (StringUtils.containsAny(version, ",", "[", "]", "(", ")")) {
-            throw new IllegalArgumentException(String.format(
-                    "Version cannot contain commas (','), brackets ('[]') or parenthesis ('()'): %s", version));
+        if (version.contains(",") || version.contains("[") || version.contains("]") || version.contains("(")
+                || version.contains(")")) {
+            throw new IllegalArgumentException(
+                    "Version cannot contain commas (','), brackets ('[]') or parenthesis ('()'): " + version);
         }
         String[] parts = version.split("-", -1);
         // version
         String[] versionParts = parts[0].split("\\.");
         if (!isDigits(versionParts[0].trim())) {
-            throw new IllegalArgumentException(
-                    String.format("Version should at least explicit a major number: %s", version));
+            throw new IllegalArgumentException("Version should at least explicit a major number: " + version);
         }
         majorVersion = tryParseVersionPartInt(versionParts[0].trim());
         if (versionParts.length >= 2) {
@@ -125,15 +119,14 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
             buildNumber = tryParseVersionPartInt(versionParts[2].trim());
         }
         if (versionParts.length >= 4) {
-            log.warn(String.format("Too many parts in version '%s', parts after the 3rd dot will be ignored", version));
+            // log.warn("Too many parts in version '" + version + "', parts after the 3rd dot will be ignored");
         }
 
         // qualifier
         if (parts.length >= 2) {
             String trimmedQualifier = version.substring(version.indexOf("-") + 1).trim();
-            if (StringUtils.containsWhitespace(trimmedQualifier)) {
-                throw new IllegalArgumentException(
-                        String.format("Version cannot contain whitespaces in qualifier: '%s'", version));
+            if (containsWhitespace(trimmedQualifier)) {
+                throw new IllegalArgumentException("Version cannot contain whitespaces in qualifier: " + version);
             }
             qualifier = trimmedQualifier;
         }
@@ -143,23 +136,30 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
 
     public static String computeComparable(PlatformVersion version) {
         StringBuilder builder = new StringBuilder();
-
-        builder.append(String.format("%04d", version.getMajorVersion()))
+        builder.append(formatOn4Digits(version.getMajorVersion()))
                .append(".")
-               .append(String.format("%04d", version.getMinorVersion()))
+               .append(formatOn4Digits(version.getMinorVersion()))
                .append(".")
-               .append(String.format("%04d", version.getBuildNumber()));
+               .append(formatOn4Digits(version.getBuildNumber()));
         String qualifier = version.getQualifier();
-        if (StringUtils.isNotBlank(qualifier)) {
+        if (!isBlank(qualifier)) {
             builder.append("-").append(qualifier.toUpperCase(Locale.ROOT));
         }
         return builder.toString();
     }
 
+    private static String formatOn4Digits(int number) {
+        String result = "" + number;
+        while (result.length() < 4) {
+            result = "0" + result;
+        }
+        return result;
+    }
+
     private static Integer tryParseVersionPartInt(String s) {
         // for performance, check digits instead of relying later on catching NumberFormatException
         if (!isDigits(s)) {
-            log.warn(String.format("Version part '%s' is not a digit and will be ignored", s));
+            // log.warn("Version part '" + s + "' is not a digit and will be ignored");
             return null;
         }
 
@@ -170,8 +170,8 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
             }
             return (int) longValue;
         } catch (NumberFormatException e) {
-            log.warn(String.format("Version part '%s' does not contain a parsable integer "
-                    + "(may be outside the range for integers) and will be ignored", s));
+            // log.warn("Version part '" + s + "' does not contain a parsable integer "
+            // + "(may be outside the range for integers) and will be ignored");
             return null;
         }
     }
@@ -189,7 +189,7 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
         if (getBuildNumber() > 0) {
             builder.append(".").append(getBuildNumber());
         }
-        if (StringUtils.isNotBlank(qualifier)) {
+        if (!isBlank(qualifier)) {
             builder.append("-").append(qualifier);
         }
         return builder.toString();
@@ -217,5 +217,46 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
 
     public boolean isBetween(PlatformVersion left, PlatformVersion right) {
         return isAfter(left) && isBefore(right);
+    }
+
+    /** Copy of org.apache.commons.lang3.StringUtils methods for GWT compliance */
+
+    public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean containsWhitespace(final CharSequence seq) {
+        if (seq == null) {
+            return false;
+        }
+        final int strLen = seq.length();
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(seq.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isDigits(final CharSequence cs) {
+        if (cs == null || cs.length() == 0) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
