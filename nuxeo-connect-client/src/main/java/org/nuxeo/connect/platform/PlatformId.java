@@ -1,20 +1,73 @@
 /*
- * (C) Copyright 2018 Nuxeo (http://nuxeo.com/).
- * This is unpublished proprietary source code of Nuxeo SA. All rights reserved.
- * Notice of copyright on this source code does not indicate publication.
+ * (C) Copyright 2010-2020 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * Contributors:
- *      Mincong Huang
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
  */
 package org.nuxeo.connect.platform;
-
-import com.google.auto.value.AutoValue;
 
 /**
  * Identifier for a platform
  */
-@AutoValue
-public abstract class PlatformId { // NOSONAR
+public class PlatformId {
+
+    private final String name;
+
+    private final PlatformVersion version;
+
+    PlatformId(String name, PlatformVersion version) {
+        if (name == null) {
+            throw new NullPointerException("Null name");
+        }
+        this.name = name;
+        if (version == null) {
+            throw new NullPointerException("Null version");
+        }
+        this.version = version;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public PlatformVersion version() {
+        return version;
+    }
+
+    @Override
+    public String toString() {
+        return "PlatformId{" + "name=" + name + ", " + "version=" + version + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof PlatformId) {
+            PlatformId that = (PlatformId) o;
+            return (this.name.equals(that.name())) && (this.version.equals(that.version()));
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int h$ = 1;
+        h$ *= 1000003;
+        h$ ^= name.hashCode();
+        h$ *= 1000003;
+        h$ ^= version.hashCode();
+        return h$;
+    }
 
     public static PlatformId parse(String id) {
         return parseWithHyphen(id, id.lastIndexOf('-'));
@@ -38,12 +91,8 @@ public abstract class PlatformId { // NOSONAR
     }
 
     public static PlatformId of(String name, PlatformVersion version) {
-        return new AutoValue_PlatformId(name, version);
+        return new PlatformId(name, version);
     }
-
-    public abstract String name();
-
-    public abstract PlatformVersion version();
 
     public String asString() {
         return name() + "-" + version().asString();
