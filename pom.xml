@@ -3,7 +3,7 @@
 
   <groupId>org.nuxeo.connect</groupId>
   <artifactId>nuxeo-connect-client-parent</artifactId>
-  <version>1.8.0-SNAPSHOT</version>
+  <version>1.8.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Nuxeo Connect Client Parent</name>
   <description>Nuxeo Connect Client Parent</description>
