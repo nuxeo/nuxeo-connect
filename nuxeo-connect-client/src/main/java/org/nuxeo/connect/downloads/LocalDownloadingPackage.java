@@ -27,21 +27,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
-import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.DownloadingPackage;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.SecurityHeaderGenerator;
@@ -129,13 +127,8 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
     @Override
     public void run() {
         setPackageState(PackageState.REMOTE);
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom().setSocketTimeout(
-                SO_TIMEOUT_MS).setConnectTimeout(CONNECTION_TIMEOUT_MS);
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, sourceUrl);
-        httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
-        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+        HttpClientBuilder httpClientBuilder = HttpClientBuilderHelper.getHttpClientBuilder(SO_TIMEOUT_MS,
+                CONNECTION_TIMEOUT_MS, sourceUrl);
 
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
             setPackageState(PackageState.DOWNLOADING);

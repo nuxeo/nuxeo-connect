@@ -20,6 +20,8 @@
  */
 package org.nuxeo.connect.connector.http.proxy;
 
+import static org.nuxeo.connect.HttpClientBuilderHelper.getHttpClientBuilder;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -43,7 +45,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
@@ -55,13 +56,29 @@ import org.nuxeo.connect.connector.http.ConnectUrlConfig;
  */
 public class NashornProxyPacResolver extends ProxyPacResolver {
 
-    private static final Log log = LogFactory.getLog(NashornProxyPacResolver.class);
-
     protected static final String PAC_FUNCTIONS_FILE = "proxy_pac_functions.js";
 
     protected static final String EXEC_PAC_FUNC = "FindProxyForURL";
 
+    private static final Log log = LogFactory.getLog(NashornProxyPacResolver.class);
+
     protected SimpleStringCache fileCache = new SimpleStringCache(5);
+
+    public static String dnsResolve(String host) {
+        try {
+            return InetAddress.getByName(host).getHostAddress();
+        } catch (UnknownHostException e) {
+            return "";
+        }
+    }
+
+    public static String myIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "127.0.0.1";
+        }
+    }
 
     @Override
     public String[] findPacProxies(String url) {
@@ -102,34 +119,18 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
         }
 
         if (fileCache.getValue() == null) {
-            try (CloseableHttpClient httpClient = HttpClients.createDefault();
-                    CloseableHttpResponse httpResponse = httpClient.execute(
-                            new HttpGet(ConnectUrlConfig.getProxyPacUrl()))) {
+            String url = ConnectUrlConfig.getProxyPacUrl();
+            try (CloseableHttpClient httpClient = getHttpClientBuilder(null, null, url).build();
+                    CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url))) {
                 StatusLine statusLine = httpResponse.getStatusLine();
                 if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
                     fileCache.saveValue(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
-                    throw new IOException("Unable to get pac file: "+ statusLine);
+                    throw new IOException("Unable to get pac file: " + statusLine);
                 }
             }
         }
         return new StringReader(fileCache.getValue());
-    }
-
-    public static String dnsResolve(String host) {
-        try {
-            return InetAddress.getByName(host).getHostAddress();
-        } catch (UnknownHostException e) {
-            return "";
-        }
-    }
-
-    public static String myIpAddress() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            return "127.0.0.1";
-        }
     }
 
 }
