@@ -19,6 +19,7 @@
  */
 package org.nuxeo.connect.registration;
 
+import static org.nuxeo.connect.HttpClientBuilderHelper.getHttpClientBuilder;
 import static org.nuxeo.connect.connector.http.ConnectUrlConfig.getTrialRegistrationBaseUrl;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -51,7 +53,6 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -79,12 +80,12 @@ public class RegistrationHelper {
 
     protected static final Log log = LogFactory.getLog(RegistrationHelper.class);
 
+    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "email",
+            "login", "connectreg:projectName", "firstName", "lastName");
+
     protected static String getBaseUrl() {
         return ConnectUrlConfig.getRegistrationBaseUrl();
     }
-
-    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "email",
-            "login", "connectreg:projectName", "firstName", "lastName");
 
     protected static HttpClientContext getHttpClientContext(String url, String login, String password) {
         HttpClientContext context = HttpClientContext.create();
@@ -109,7 +110,9 @@ public class RegistrationHelper {
         context.setAuthCache(authCache);
 
         // Create request configuration
-        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom().setConnectTimeout(10000);
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom()
+                                                                  .setConnectTimeout(10000)
+                                                                  .setCookieSpec(CookieSpecs.STANDARD);
 
         // Configure the http proxy if needed
         ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
@@ -121,7 +124,8 @@ public class RegistrationHelper {
     public static List<ConnectProject> getAvailableProjectsForRegistration(String login, String password) {
         String url = getBaseUrl() + GET_PROJECTS_SUFFIX;
         List<ConnectProject> result = new ArrayList<>();
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        try (CloseableHttpClient httpClient = getHttpClientBuilder(null, null, url).build();
                 CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url),
                         getHttpClientContext(url, login, password))) {
             int rc = httpResponse.getStatusLine().getStatusCode();
@@ -160,7 +164,7 @@ public class RegistrationHelper {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+        try (CloseableHttpClient httpClient = getHttpClientBuilder(null, null, url).build();
                 CloseableHttpResponse httpResponse = httpClient.execute(method,
                         getHttpClientContext(url, login, password))) {
             int rc = httpResponse.getStatusLine().getStatusCode();
@@ -195,7 +199,7 @@ public class RegistrationHelper {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+        try (CloseableHttpClient httpClient = getHttpClientBuilder(null, null, url).build();
                 CloseableHttpResponse httpResponse = httpClient.execute(method,
                         getHttpClientContext(url, null, null))) {
             int rc = httpResponse.getStatusLine().getStatusCode();
