@@ -143,7 +143,7 @@ public class CUDFHelper {
         CUDF2NuxeoMap.clear();
         Map<String, PackageDependency> upgradesMap = new HashMap<>();
         Set<String> involvedPackages = new HashSet<>();
-        List<String> installedOrRequiredSNAPSHOTPackages = new ArrayList<>();
+        Set<String> installedOrRequiredSNAPSHOTPackages = new HashSet<>();
         if (upgrades != null) {
             computeInvolvedPackages(upgrades, upgradesMap, involvedPackages, installedOrRequiredSNAPSHOTPackages);
         }
@@ -261,7 +261,7 @@ public class CUDFHelper {
      * @since 1.4.18
      */
     protected void computeInvolvedPackages(PackageDependency[] packageDependencies, Set<String> involvedPackages,
-            List<String> installedOrRequiredSNAPSHOTPackages) {
+            Set<String> installedOrRequiredSNAPSHOTPackages) {
         computeInvolvedPackages(packageDependencies, null, involvedPackages, installedOrRequiredSNAPSHOTPackages);
     }
 
@@ -272,13 +272,13 @@ public class CUDFHelper {
      */
     protected void computeInvolvedPackages(PackageDependency[] packageDependencies,
             Map<String, PackageDependency> upgradesMap, Set<String> involvedPackages,
-            List<String> installedOrRequiredSNAPSHOTPackages) {
+            Set<String> installedOrRequiredSNAPSHOTPackages) {
         for (PackageDependency packageDependency : packageDependencies) {
             if (upgradesMap != null) {
                 upgradesMap.put(packageDependency.getName(), packageDependency);
             }
             involvedPackages.add(packageDependency.getName());
-            addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, packageDependency);
+            addIfStrictSNAPSHOT(installedOrRequiredSNAPSHOTPackages, packageDependency);
         }
     }
 
@@ -289,13 +289,15 @@ public class CUDFHelper {
      * @since 1.4.18
      */
     protected void computeInvolvedReferences(Set<String> involvedPackages,
-            List<String> installedOrRequiredSNAPSHOTPackages, DownloadablePackage pkg,
+            Set<String> installedOrRequiredSNAPSHOTPackages,
+            DownloadablePackage pkg,
             Map<String, List<DownloadablePackage>> allPackagesMap) {
         if (involvedPackages.contains(pkg.getName())) {
+            boolean isPkgInstalledOrRequiredSNAPSHOT = installedOrRequiredSNAPSHOTPackages.contains(pkg.getName());
             computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getDependencies(),
-                    allPackagesMap);
+                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT);
             computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getConflicts(),
-                    allPackagesMap);
+                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT);
             for (PackageDependency pkgDep : pkg.getProvides()) {
                 involvedPackages.add(pkgDep.getName());
             }
@@ -308,11 +310,15 @@ public class CUDFHelper {
      * @since 1.4.18
      */
     protected void computeInvolvedReferences(Set<String> involvedPackages,
-            List<String> installedOrRequiredSNAPSHOTPackages, PackageDependency[] pkgDeps,
-            Map<String, List<DownloadablePackage>> allPackagesMap) {
+            Set<String> installedOrRequiredSNAPSHOTPackages,
+            PackageDependency[] pkgDeps,
+            Map<String, List<DownloadablePackage>> allPackagesMap, boolean isParentInstalledOrRequiredSNAPSHOT) {
         for (PackageDependency pkgDep : pkgDeps) {
+            if (isParentInstalledOrRequiredSNAPSHOT) {
+                // no SNAPSHOT references if parent SNAPSHOT is not installed or required
+                addIfStrictSNAPSHOT(installedOrRequiredSNAPSHOTPackages, pkgDep);
+            }
             if (involvedPackages.add(pkgDep.getName())) {
-                addIfSNAPSHOT(installedOrRequiredSNAPSHOTPackages, pkgDep);
                 List<DownloadablePackage> downloadablePkgDeps = allPackagesMap.get(pkgDep.getName());
                 if (downloadablePkgDeps == null) {
                     log.warn("Unknown dependency: " + pkgDep);
@@ -326,10 +332,10 @@ public class CUDFHelper {
         }
     }
 
-    protected void addIfSNAPSHOT(List<String> installedOrRequiredSNAPSHOTPackages, PackageDependency pd) {
+    protected void addIfStrictSNAPSHOT(Set<String> installedOrRequiredSNAPSHOTPackages, PackageDependency pd) {
         Version minVersion = pd.getVersionRange().getMinVersion();
         Version maxVersion = pd.getVersionRange().getMaxVersion();
-        if (minVersion != null && minVersion.isSnapshot() || maxVersion != null && maxVersion.isSnapshot()) {
+        if (minVersion != null && minVersion.isSnapshot() && maxVersion != null && maxVersion.isSnapshot()) {
             installedOrRequiredSNAPSHOTPackages.add(pd.getName());
         }
     }

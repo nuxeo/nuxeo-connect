@@ -1036,7 +1036,9 @@ public class PackageManagerImpl implements PackageManager {
                 }
                 listToOrder.clear();
             } else {
-                throw new DependencyException(String.format("Couldn't order %s missing %s.", listToOrder, missingDeps));
+                throw new DependencyException(
+                        String.format("Couldn't order %s missing %s (consider using --relax true or --snapshot).",
+                                listToOrder, missingDeps));
             }
         }
         listToOrder.addAll(orderedMap.keySet());
