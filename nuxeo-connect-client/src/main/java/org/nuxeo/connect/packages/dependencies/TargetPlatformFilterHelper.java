@@ -17,6 +17,9 @@
  */
 package org.nuxeo.connect.packages.dependencies;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +42,7 @@ public class TargetPlatformFilterHelper {
         }
         if (StringUtils.isBlank(pkg.getTargetPlatformRange()) || StringUtils.isBlank(pkg.getTargetPlatformName())) {
             // Use former target platforms list
-            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform.asString());
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
         }
 
         try {
@@ -51,7 +54,7 @@ public class TargetPlatformFilterHelper {
                     "Could not parse target platform range expression '%s' for package '%s', using former compatibility format.",
                     pkg.getTargetPlatformRange(), pkg.getId()), e);
             // Use former target platforms list
-            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform.asString());
+            return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
         }
 
     }
@@ -61,15 +64,37 @@ public class TargetPlatformFilterHelper {
      * @param targetPlatform The target platform to match with.
      * @since 1.4.24
      */
-    private static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, String targetPlatform) {
+    private static boolean isCompatibleWithTargetPlatform(String[] targetPlatforms, PlatformId targetPlatform) {
         if (targetPlatforms == null || targetPlatforms.length == 0) {
             return true;
         }
+        Set<String> possibleStringForms = getPossibleStringForms(targetPlatform);
         for (String target : targetPlatforms) {
-            if (FilenameUtils.wildcardMatch(targetPlatform, target, IOCase.INSENSITIVE)) {
+            if (possibleStringForms.stream()
+                                   .anyMatch(tpString -> FilenameUtils.wildcardMatch(tpString, target,
+                                           IOCase.INSENSITIVE))) {
                 return true;
             }
         }
         return false;
+    }
+
+    protected static Set<String> getPossibleStringForms(PlatformId targetPlatform) {
+        Set<String> result = new HashSet<>();
+        String defaultAsString = targetPlatform.asString();
+        result.add(defaultAsString);
+        if (targetPlatform.version().getBuildNumber() == 0) {
+            String qualifier = targetPlatform.version().getQualifier();
+            boolean hasQualifier = StringUtils.isNotBlank(qualifier);
+            String qualifierSuffix = hasQualifier ? "-" + qualifier : "";
+            String noQualifier = StringUtils.removeEnd(defaultAsString, qualifierSuffix);
+            String with0BuildNumber = noQualifier + ".0" + qualifierSuffix;
+            result.add(with0BuildNumber);
+            if (targetPlatform.version().getMinorVersion() == 0) {
+                String without0Minor = StringUtils.removeEnd(noQualifier, ".0") + qualifierSuffix;
+                result.add(without0Minor);
+            }
+        }
+        return result;
     }
 }
