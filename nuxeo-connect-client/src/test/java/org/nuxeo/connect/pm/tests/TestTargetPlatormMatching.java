@@ -28,14 +28,14 @@ import org.nuxeo.connect.update.PackageException;
 /**
  * @since 1.7.9
  */
-public class TestTargetPlatormVersionRanges extends AbstractPackageManagerTestCase {
+public class TestTargetPlatormMatching extends AbstractPackageManagerTestCase {
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        List<DownloadablePackage> local = getDownloads("localRange.json");
+        List<DownloadablePackage> local = getDownloads("localTPMatching.json");
         assertTrue(CollectionUtils.isNotEmpty(local));
-        pm.registerSource(new DummyPackageSource(local, "localRange"), true);
+        pm.registerSource(new DummyPackageSource(local, "localTPMatching"), true);
     }
 
     public void testTargetPlatformVersionRangesMatchEverything() throws PackageException {
@@ -292,6 +292,56 @@ public class TestTargetPlatormVersionRanges extends AbstractPackageManagerTestCa
         assertFalse(pm.matchesPlatform("pkgNoName-1.0.1", PlatformId.parse("server", "10.11")));
         assertFalse(pm.matchesPlatform("pkgNoName-1.0.1", PlatformId.parse("server", "11.1")));
         assertFalse(pm.matchesPlatform("pkgNoName-1.0.1", PlatformId.parse("2022-LTS", "2022-LTS")));
+    }
+
+    public void testTargetPlatformPatternMatching() throws PackageException {
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.1", PlatformId.parse("lts", "2021.0.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.2", PlatformId.parse("lts", "2021.0.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.3", PlatformId.parse("lts", "2021.0.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.4", PlatformId.parse("lts", "2021.0.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.5", PlatformId.parse("lts", "2021.0.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.6", PlatformId.parse("lts", "2021.0.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.7", PlatformId.parse("lts", "2021.0.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.8", PlatformId.parse("lts", "2021.0.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.9", PlatformId.parse("lts", "2021.0.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.10", PlatformId.parse("lts", "2021.0.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.11", PlatformId.parse("lts", "2021.0.0")));
+
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.1", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.2", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.3", PlatformId.parse("lts", "2021.0.1")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.4", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.5", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.6", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.7", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.8", PlatformId.parse("lts", "2021.0.1")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.9", PlatformId.parse("lts", "2021.0.1")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.10", PlatformId.parse("lts", "2021.0.1")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.11", PlatformId.parse("lts", "2021.0.1")));
+
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.1", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.2", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.3", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.4", PlatformId.parse("lts", "2021.1.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.5", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.6", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.7", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.8", PlatformId.parse("lts", "2021.1.0")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.9", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.10", PlatformId.parse("lts", "2021.1.0")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.11", PlatformId.parse("lts", "2021.1.0")));
+
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.1", PlatformId.parse("lts", "2021-HF01")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.2", PlatformId.parse("lts", "2021-HF01")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.3", PlatformId.parse("lts", "2021-HF01")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.4", PlatformId.parse("lts", "2021-HF01")));
+        assertFalse(pm.matchesPlatform("pkgPattern-1.0.5", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.6", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.7", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.8", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.9", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.10", PlatformId.parse("lts", "2021-HF01")));
+        assertTrue(pm.matchesPlatform("pkgPattern-1.0.11", PlatformId.parse("lts", "2021-HF01")));
     }
 
 }

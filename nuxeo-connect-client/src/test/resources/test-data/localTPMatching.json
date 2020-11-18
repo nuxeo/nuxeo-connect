@@ -9,3 +9,14 @@
 {"id":"pkgInvalidName-1.0.1","targetPlatformName":" ","targetPlatformRange":"[10.10,)","targetPlatforms":["server-10.10*"],"name":"pkgInvalidName", "version":"1.0.1","title":"My Pkg Invalid name 2","description":"My Pkg Description", "type":"addon"}
 {"id":"pkgNoRange-1.0.3","targetPlatformName":"server","targetPlatforms":["server-10.10*"],"name":"pkgNoRange", "version":"1.0.1","title":"My Pkg No range","description":"My Pkg Description", "type":"addon"}
 {"id":"pkgNoName-1.0.1","targetPlatformRange":"[10.10,)","targetPlatforms":["server-10.10*"],"name":"pkgNoName", "version":"1.0.1","title":"My Pkg No name","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.1","targetPlatforms":["lts-2021.0.0"],"name":"pkgPattern", "version":"1.0.1","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.2","targetPlatforms":["lts-2021.0"],"name":"pkgPattern", "version":"1.0.2","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.3","targetPlatforms":["lts-2021"],"name":"pkgPattern", "version":"1.0.3","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.4","targetPlatforms":["lts-2021.0.1"],"name":"pkgPattern", "version":"1.0.4","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.5","targetPlatforms":["lts-2021.1"],"name":"pkgPattern", "version":"1.0.5","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.6","targetPlatforms":["lts-2021-HF01"],"name":"pkgPattern", "version":"1.0.6","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.7","targetPlatforms":["lts-2021.0-HF01"],"name":"pkgPattern", "version":"1.0.7","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.8","targetPlatforms":["lts-2021.0.0-HF01"],"name":"pkgPattern", "version":"1.0.8","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.9","targetPlatforms":["lts-2021*"],"name":"pkgPattern", "version":"1.0.9","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.10","targetPlatforms":["lts-2021.0*"],"name":"pkgPattern", "version":"1.0.10","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
+{"id":"pkgPattern-1.0.11","targetPlatforms":["lts-2021.0.0*"],"name":"pkgPattern", "version":"1.0.11","title":"My Pkg Pattern","description":"My Pkg Description", "type":"addon"}
