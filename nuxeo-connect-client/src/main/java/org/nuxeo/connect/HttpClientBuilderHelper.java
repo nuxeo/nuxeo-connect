@@ -40,6 +40,14 @@ public class HttpClientBuilderHelper {
             NuxeoConnectClient.getProperty(CONNECT_HTTP_TIMEOUT, "10000"));
 
     public static HttpClientBuilder getHttpClientBuilder(Integer socketTimeout, Integer connectTimeout, String url) {
+        return getHttpClientBuilder(socketTimeout, connectTimeout, url, true);
+    }
+
+    public static HttpClientBuilder getHttpClientBuilderWithoutProxy(Integer socketTimeout, Integer connectTimeout, String url) {
+        return getHttpClientBuilder(socketTimeout, connectTimeout, url, false);
+    }
+
+    protected static HttpClientBuilder getHttpClientBuilder(Integer socketTimeout, Integer connectTimeout, String url, boolean useProxy) {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // Define request configuration
@@ -54,7 +62,9 @@ public class HttpClientBuilderHelper {
         }
 
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
+        if (useProxy) {
+            ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
+        }
 
         httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
         httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);

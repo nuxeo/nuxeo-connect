@@ -20,7 +20,7 @@
  */
 package org.nuxeo.connect.connector.http.proxy;
 
-import static org.nuxeo.connect.HttpClientBuilderHelper.getHttpClientBuilder;
+import static org.nuxeo.connect.HttpClientBuilderHelper.getHttpClientBuilderWithoutProxy;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -84,7 +84,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
     public String[] findPacProxies(String url) {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
         ScriptContext context = new SimpleScriptContext();
-        engine.setContext(context); // set as default context, for invokeFunctino
+        engine.setContext(context); // set as default context, for invokeFunction
         SimpleBindings bindings = new SimpleBindings();
         context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
         try {
@@ -120,7 +120,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
 
         if (fileCache.getValue() == null) {
             String url = ConnectUrlConfig.getProxyPacUrl();
-            try (CloseableHttpClient httpClient = getHttpClientBuilder(null, null, url).build();
+            try (CloseableHttpClient httpClient = getHttpClientBuilderWithoutProxy(null, null, url).build();
                     CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url))) {
                 StatusLine statusLine = httpResponse.getStatusLine();
                 if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
