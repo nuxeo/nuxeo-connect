@@ -52,7 +52,8 @@ public class ProxyPacConfigurationTest {
         proxyPacServer = new MockWebServer();
         // Forces the useProxyPac computation
         ConnectUrlConfig.useProxyPac = null;
-        System.setProperty(NUXEO_PROXY_PAC_URL, String.format("http://%s/proxy.pac", proxyPacServer.getHostName()));
+        System.setProperty(NUXEO_PROXY_PAC_URL,
+                String.format("http://%s:%s/proxy.pac", proxyPacServer.getHostName(), proxyPacServer.getPort()));
         solver = ProxyHelper.pacResolver;
     }
 
