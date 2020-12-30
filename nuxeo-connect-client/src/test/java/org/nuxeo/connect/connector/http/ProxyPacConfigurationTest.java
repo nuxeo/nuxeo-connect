@@ -21,7 +21,9 @@ package org.nuxeo.connect.connector.http;
 import static org.junit.Assert.assertEquals;
 import static org.nuxeo.connect.connector.http.ConnectUrlConfig.NUXEO_PROXY_PAC_URL;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.nuxeo.connect.connector.http.proxy.ProxyPacResolver;
 import org.nuxeo.connect.connector.http.proxy.TestProxyPacResolver;
@@ -40,7 +42,10 @@ public class ProxyPacConfigurationTest {
 
     private MockWebServer proxyPacServer;
 
-    // private MockWebServer connectServer;
+    @BeforeClass
+    public static void beforeClass() {
+        System.setProperty("org.nuxeo.connect.client.testMode", "false");
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -49,6 +54,14 @@ public class ProxyPacConfigurationTest {
         ConnectUrlConfig.useProxyPac = null;
         System.setProperty(NUXEO_PROXY_PAC_URL, String.format("http://%s/proxy.pac", proxyPacServer.getHostName()));
         solver = ProxyHelper.pacResolver;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        proxyPacServer.shutdown();
+        System.getProperties().remove(NUXEO_PROXY_PAC_URL);
+        // Put back to init value
+        ConnectUrlConfig.useProxyPac = null;
     }
 
     @Test
