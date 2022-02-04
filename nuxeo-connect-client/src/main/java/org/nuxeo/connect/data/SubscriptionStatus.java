@@ -22,6 +22,7 @@ package org.nuxeo.connect.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
+import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
 
@@ -44,7 +45,6 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
     @JSONExportableField
     protected String description;
 
-    @JSONExportableField
     protected NuxeoClientInstanceType instanceType;
 
     public String getDescription() {
@@ -57,6 +57,11 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
 
     public NuxeoClientInstanceType getInstanceType() {
         return instanceType;
+    }
+
+    @JSONExportMethod(name = "instanceType")
+    public String getInstanceTypeAsJson() {
+        return instanceType.getValue();
     }
 
     public void setInstanceType(NuxeoClientInstanceType instanceType) {

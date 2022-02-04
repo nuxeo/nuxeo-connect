@@ -46,29 +46,13 @@ import org.nuxeo.connect.update.Version;
  */
 public class PackageDescriptor extends AbstractJSONSerializableData implements DownloadablePackage {
 
+    public static final String NUXEO_CAP_TARGET_PLATFORM_COMPAT = "nuxeo.cap.target.platform.compat";
+
     private static final String CAP_PREFIX = "cap-";
 
     private static final String SERVER_PREFIX = "server-";
 
     private static final String NUXEO_JSF_UI = "nuxeo-jsf-ui";
-
-    public static final String NUXEO_CAP_TARGET_PLATFORM_COMPAT = "nuxeo.cap.target.platform.compat";
-
-    /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
-        return loadFromJSON(PackageDescriptor.class, json);
-    }
-
-    /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
-        return loadFromJSON(new JSONObject(json));
-    }
 
     @JSONExportableField
     protected String classifier;
@@ -82,7 +66,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @JSONExportableField
     protected String vendor;
 
-    @JSONExportableField
     protected PackageState packageState;
 
     @JSONExportableField
@@ -111,10 +94,8 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     @JSONExportableField
     protected String title;
 
-    @JSONExportableField
     protected PackageType type;
 
-    @JSONExportableField
     protected Version version;
 
     @JSONExportableField
@@ -177,268 +158,20 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         owner = descriptor.getOwner();
     }
 
-    @Override
-    public String getClassifier() {
-        return classifier;
-    }
-
-    @Override
-    public int getCommentsNumber() {
-        return commentsNumber;
-    }
-
-    @Override
-    public PackageDependency[] getConflicts() {
-        if (conflicts == null) {
-            conflicts = new PackageDependency[0];
-        }
-        return conflicts;
-    }
-
-    @JSONExportMethod(name = "conflicts")
-    protected JSONArray getConflictsAsJSON() {
-        JSONArray deps = new JSONArray();
-        for (PackageDependency dep : getConflicts()) {
-            deps.put(dep.toString());
-        }
-        return deps;
-    }
-
-    public String getConflictsAsString() {
-        StringBuilder sb = new StringBuilder();
-        if (conflicts == null || conflicts.length == 0) {
-            return "";
-        }
-        for (PackageDependency dep : getConflicts()) {
-            sb.append(dep.toString());
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public PackageDependency[] getDependencies() {
-        if (dependencies == null) {
-            dependencies = new PackageDependency[0];
-        }
-        return dependencies;
-    }
-
-    @JSONExportMethod(name = "dependencies")
-    protected JSONArray getDependenciesAsJSON() {
-        JSONArray deps = new JSONArray();
-        for (PackageDependency dep : getDependencies()) {
-            deps.put(dep.toString());
-        }
-        return deps;
-    }
-
-    public String getDependenciesAsString() {
-        StringBuilder sb = new StringBuilder();
-        if (dependencies == null || dependencies.length == 0) {
-            return "";
-        }
-        for (PackageDependency dep : getDependencies()) {
-            sb.append(dep.toString());
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public PackageDependency[] getOptionalDependencies() {
-        if (optionalDependencies == null) {
-            optionalDependencies = new PackageDependency[0];
-        }
-        return optionalDependencies;
-    }
-
     /**
-     * @since 1.5.2
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
      */
-    @JSONExportMethod(name = "optionalDependencies")
-    protected JSONArray getOptionalDependenciesAsJSON() {
-        JSONArray deps = new JSONArray();
-        for (PackageDependency dep : getOptionalDependencies()) {
-            deps.put(dep.toString());
-        }
-        return deps;
-    }
-
-    /**
-     * @since 1.5.2
-     */
-    public String getOptionalDependenciesAsString() {
-        StringBuilder sb = new StringBuilder();
-        if (optionalDependencies == null || optionalDependencies.length == 0) {
-            return "";
-        }
-        for (PackageDependency dep : getOptionalDependencies()) {
-            sb.append(dep.toString());
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public int getDownloadsCount() {
-        return downloadsCount;
-    }
-
-    @Override
-    public String getId() {
-        if (getVersion() == null) {
-            return getName();
-        } else {
-            return getName() + "-" + getVersion();
-        }
-    }
-
-    @Override
-    public String getLicenseType() {
-        return license;
-    }
-
-    @Override
-    public String getLicenseUrl() {
-        return licenseUrl;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @since 1.4.17
-     */
-    @Override
-    public PackageState getPackageState() {
-        if (packageState == null) {
-            packageState = PackageState.UNKNOWN;
-        }
-        return packageState;
-    }
-
-    @Override
-    public PackageDependency[] getProvides() {
-        if (provides == null) {
-            provides = new PackageDependency[0];
-        }
-        return provides;
-    }
-
-    @JSONExportMethod(name = "provides")
-    protected JSONArray getProvidesAsJSON() {
-        JSONArray deps = new JSONArray();
-        for (PackageDependency dep : getProvides()) {
-            deps.put(dep.toString());
-        }
-        return deps;
-    }
-
-    public String getProvidesAsString() {
-        StringBuilder sb = new StringBuilder();
-        if (provides == null || provides.length == 0) {
-            return "";
-        }
-        for (PackageDependency dep : getProvides()) {
-            sb.append(dep.toString());
-            sb.append(",");
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public int getRating() {
-        return rating;
-    }
-
-    @Override
-    public String getSourceDigest() {
-        return sourceDigest;
-    }
-
-    @Override
-    public long getSourceSize() {
-        return sourceSize;
-    }
-
-    @Override
-    public String getSourceUrl() {
-        return sourceUrl;
-    }
-
     @Deprecated
-    @Override
-    public int getState() {
-        return packageState.getValue();
+    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
+        return loadFromJSON(PackageDescriptor.class, json);
     }
 
-    @Override
-    public String[] getTargetPlatforms() {
-        return targetPlatforms;
-    }
-
-    @Override
-    public String getTargetPlatformRange() {
-        return targetPlatformRange;
-    }
-
-    @Override
-    public String getTargetPlatformName() {
-        return targetPlatformName;
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
-    public PackageType getType() {
-        return type;
-    }
-
-    @Override
-    public String getVendor() {
-        return vendor;
-    }
-
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public boolean isLocal() {
-        return local;
-    }
-
-    public void setClassifier(String classifier) {
-        this.classifier = classifier;
-    }
-
-    public void setCommentsNumber(int commentsNumber) {
-        this.commentsNumber = commentsNumber;
-    }
-
-    public void setConflicts(PackageDependency[] conflicts) {
-        this.conflicts = conflicts;
-    }
-
-    @JSONImportMethod(name = "conflicts")
-    protected void setConflictsAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
-        }
-        setConflicts(deps);
+    /**
+     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
+     */
+    @Deprecated
+    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
+        return loadFromJSON(new JSONObject(json));
     }
 
     /**
@@ -460,64 +193,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         return set.toArray(new PackageDependency[0]);
     }
 
-    public void setDependencies(PackageDependency[] dependencies) {
-        this.dependencies = addPackageDependencies(this.dependencies, dependencies);
-    }
-
-    @JSONImportMethod(name = "dependencies")
-    protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
-        }
-        setDependencies(deps);
-    }
-
-    /**
-     * @since 1.4.26
-     */
-    public void setOptionalDependencies(PackageDependency[] optionalDependencies) {
-        this.optionalDependencies = addPackageDependencies(this.optionalDependencies, optionalDependencies);
-    }
-
-    /**
-     * @since 1.4.26
-     */
-    @JSONImportMethod(name = "optionalDependencies")
-    protected void setOptionalDependenciesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
-        }
-        setOptionalDependencies(deps);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDownloadsCount(int downloadsCount) {
-        this.downloadsCount = downloadsCount;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
-    }
-
-    public void setLicenseUrl(String licenseUrl) {
-        this.licenseUrl = licenseUrl;
-    }
-
-    public void setLocal(boolean isLocal) {
-        local = isLocal;
-    }
-
-    @JSONImportMethod(name = "name")
-    public void setName(String name) {
-        this.name = name;
-        dependencies = fixDependencies(name, dependencies);
-    }
-
     /**
      * If additional dependencies have already been set, check that we don't have ourselves in them.
      *
@@ -536,90 +211,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
             }
         }
         return dependencies;
-    }
-
-    /**
-     * @since 1.4.17
-     */
-    public void setPackageState(PackageState state) {
-        packageState = state;
-    }
-
-    /**
-     * @since 1.4.17
-     */
-    @JSONImportMethod(name = "state")
-    public void setPackageState(int state) {
-        packageState = PackageState.getByValue(state);
-    }
-
-    /**
-     * @since 1.4.17
-     */
-    @JSONImportMethod(name = "packageState")
-    public void setPackageStateAsJSON(String state) {
-        setPackageState(PackageState.getByLabel(state));
-    }
-
-    public void setProvides(PackageDependency[] provides) {
-        this.provides = provides;
-    }
-
-    @JSONImportMethod(name = "provides")
-    protected void setProvidesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
-        }
-        setProvides(deps);
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
-    public void setSourceDigest(String sourceDigest) {
-        this.sourceDigest = sourceDigest;
-    }
-
-    public void setSourceSize(long sourceSize) {
-        this.sourceSize = sourceSize;
-    }
-
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
-    }
-
-    /**
-     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
-     */
-    @Deprecated
-    public void setState(int state) {
-        packageState = PackageState.getByValue(state);
-    }
-
-    public void setSupportsHotReload(boolean supportsHotReload) {
-        this.supportsHotReload = supportsHotReload;
-    }
-
-    public void setTargetPlatforms(List<String> targetPlatforms) {
-        this.targetPlatforms = targetPlatforms == null ? new String[0]
-                : targetPlatforms.toArray(new String[targetPlatforms.size()]);
-    }
-
-    public void setTargetPlatforms(String[] targetPlatforms) {
-        this.targetPlatforms = targetPlatforms;
-    }
-
-    @JSONImportMethod(name = "targetPlatforms")
-    public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
-        String[] targets = new String[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            targets[i] = array.getString(i);
-        }
-        MutableObject packageDependencies = new MutableObject();
-        targetPlatforms = fixTargetPlatforms(name, targets, packageDependencies);
-        setDependencies((PackageDependency[]) packageDependencies.getValue());
     }
 
     /**
@@ -665,34 +256,460 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         return targets;
     }
 
+    @Override
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
+
+    @Override
+    public int getCommentsNumber() {
+        return commentsNumber;
+    }
+
+    public void setCommentsNumber(int commentsNumber) {
+        this.commentsNumber = commentsNumber;
+    }
+
+    @Override
+    public PackageDependency[] getConflicts() {
+        if (conflicts == null) {
+            conflicts = new PackageDependency[0];
+        }
+        return conflicts;
+    }
+
+    public void setConflicts(PackageDependency[] conflicts) {
+        this.conflicts = conflicts;
+    }
+
+    @JSONExportMethod(name = "conflicts")
+    protected JSONArray getConflictsAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getConflicts()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name = "conflicts")
+    protected void setConflictsAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setConflicts(deps);
+    }
+
+    public String getConflictsAsString() {
+        StringBuilder sb = new StringBuilder();
+        if (conflicts == null || conflicts.length == 0) {
+            return "";
+        }
+        for (PackageDependency dep : getConflicts()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public PackageDependency[] getDependencies() {
+        if (dependencies == null) {
+            dependencies = new PackageDependency[0];
+        }
+        return dependencies;
+    }
+
+    public void setDependencies(PackageDependency[] dependencies) {
+        this.dependencies = addPackageDependencies(this.dependencies, dependencies);
+    }
+
+    @JSONExportMethod(name = "dependencies")
+    protected JSONArray getDependenciesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getDependencies()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name = "dependencies")
+    protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setDependencies(deps);
+    }
+
+    public String getDependenciesAsString() {
+        StringBuilder sb = new StringBuilder();
+        if (dependencies == null || dependencies.length == 0) {
+            return "";
+        }
+        for (PackageDependency dep : getDependencies()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public PackageDependency[] getOptionalDependencies() {
+        if (optionalDependencies == null) {
+            optionalDependencies = new PackageDependency[0];
+        }
+        return optionalDependencies;
+    }
+
+    /**
+     * @since 1.4.26
+     */
+    public void setOptionalDependencies(PackageDependency[] optionalDependencies) {
+        this.optionalDependencies = addPackageDependencies(this.optionalDependencies, optionalDependencies);
+    }
+
+    /**
+     * @since 1.5.2
+     */
+    @JSONExportMethod(name = "optionalDependencies")
+    protected JSONArray getOptionalDependenciesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getOptionalDependencies()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    /**
+     * @since 1.4.26
+     */
+    @JSONImportMethod(name = "optionalDependencies")
+    protected void setOptionalDependenciesAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setOptionalDependencies(deps);
+    }
+
+    /**
+     * @since 1.5.2
+     */
+    public String getOptionalDependenciesAsString() {
+        StringBuilder sb = new StringBuilder();
+        if (optionalDependencies == null || optionalDependencies.length == 0) {
+            return "";
+        }
+        for (PackageDependency dep : getOptionalDependencies()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public int getDownloadsCount() {
+        return downloadsCount;
+    }
+
+    public void setDownloadsCount(int downloadsCount) {
+        this.downloadsCount = downloadsCount;
+    }
+
+    @Override
+    public String getId() {
+        if (getVersion() == null) {
+            return getName();
+        } else {
+            return getName() + "-" + getVersion();
+        }
+    }
+
+    @Override
+    public String getLicenseType() {
+        return license;
+    }
+
+    @Override
+    public String getLicenseUrl() {
+        return licenseUrl;
+    }
+
+    public void setLicenseUrl(String licenseUrl) {
+        this.licenseUrl = licenseUrl;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @JSONImportMethod(name = "name")
+    public void setName(String name) {
+        this.name = name;
+        dependencies = fixDependencies(name, dependencies);
+    }
+
+    /**
+     * @since 1.4.17
+     */
+    @Override
+    public PackageState getPackageState() {
+        if (packageState == null) {
+            packageState = PackageState.UNKNOWN;
+        }
+        return packageState;
+    }
+
+    /**
+     * @since 1.4.17
+     */
+    public void setPackageState(PackageState state) {
+        packageState = state;
+    }
+
+    @JSONExportMethod(name = "packageState")
+    public String getPackageStateAsJson() {
+        return getPackageState().getLabel();
+    }
+
+    @JSONImportMethod(name = "packageState")
+    public void setPackageStateAsJson(String packageState) {
+        setPackageState(PackageState.getByLabel(packageState));
+    }
+
+    /**
+     * @since 1.4.17
+     */
+    @JSONImportMethod(name = "state")
+    public void setPackageState(int state) {
+        packageState = PackageState.getByValue(state);
+    }
+
+    @Override
+    public PackageDependency[] getProvides() {
+        if (provides == null) {
+            provides = new PackageDependency[0];
+        }
+        return provides;
+    }
+
+    public void setProvides(PackageDependency[] provides) {
+        this.provides = provides;
+    }
+
+    @JSONExportMethod(name = "provides")
+    protected JSONArray getProvidesAsJSON() {
+        JSONArray deps = new JSONArray();
+        for (PackageDependency dep : getProvides()) {
+            deps.put(dep.toString());
+        }
+        return deps;
+    }
+
+    @JSONImportMethod(name = "provides")
+    protected void setProvidesAsJSON(JSONArray array) throws JSONException {
+        PackageDependency[] deps = new PackageDependency[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            deps[i] = new PackageDependency(array.getString(i));
+        }
+        setProvides(deps);
+    }
+
+    public String getProvidesAsString() {
+        StringBuilder sb = new StringBuilder();
+        if (provides == null || provides.length == 0) {
+            return "";
+        }
+        for (PackageDependency dep : getProvides()) {
+            sb.append(dep.toString());
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    @Override
+    public String getSourceDigest() {
+        return sourceDigest;
+    }
+
+    public void setSourceDigest(String sourceDigest) {
+        this.sourceDigest = sourceDigest;
+    }
+
+    @Override
+    public long getSourceSize() {
+        return sourceSize;
+    }
+
+    public void setSourceSize(long sourceSize) {
+        this.sourceSize = sourceSize;
+    }
+
+    @Override
+    public String getSourceUrl() {
+        return sourceUrl;
+    }
+
+    public void setSourceUrl(String sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
+
+    @Deprecated
+    @Override
+    public int getState() {
+        return packageState.getValue();
+    }
+
+    /**
+     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
+     */
+    @Deprecated
+    public void setState(int state) {
+        packageState = PackageState.getByValue(state);
+    }
+
+    @Override
+    public String[] getTargetPlatforms() {
+        return targetPlatforms;
+    }
+
+    public void setTargetPlatforms(List<String> targetPlatforms) {
+        this.targetPlatforms = targetPlatforms == null ? new String[0]
+                : targetPlatforms.toArray(new String[targetPlatforms.size()]);
+    }
+
+    public void setTargetPlatforms(String[] targetPlatforms) {
+        this.targetPlatforms = targetPlatforms;
+    }
+
+    @Override
+    public String getTargetPlatformRange() {
+        return targetPlatformRange;
+    }
+
     public void setTargetPlatformRange(String targetPlatformRange) {
         this.targetPlatformRange = targetPlatformRange;
+    }
+
+    @Override
+    public String getTargetPlatformName() {
+        return targetPlatformName;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    @Override
+    public PackageType getType() {
+        return type;
+    }
+
+    @JSONExportMethod(name = "type")
+    public String getTypeAsJson() {
+        return type.getValue();
+    }
+
     public void setType(PackageType type) {
         this.type = type;
     }
 
-    @JSONImportMethod(name = "type")
-    public void setTypeAsJSON(String strType) {
-        type = PackageType.getByValue(strType);
+    @Override
+    public String getVendor() {
+        return vendor;
     }
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
     }
 
+    @Override
+    public Version getVersion() {
+        return version;
+    }
+
     public void setVersion(Version version) {
         this.version = version;
+    }
+
+    @JSONExportMethod(name = "version")
+    public String getVersionAsJSON() {
+        return version.toString();
     }
 
     @JSONImportMethod(name = "version")
     public void setVersionAsJSON(String v) {
         version = new Version(v);
+    }
+
+    @Override
+    public boolean isLocal() {
+        return local;
+    }
+
+    public void setLocal(boolean isLocal) {
+        local = isLocal;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    /**
+     * @since 1.4.17
+     */
+    @JSONImportMethod(name = "packageState")
+    public void setPackageStateAsJSON(String state) {
+        setPackageState(PackageState.getByValue(state));
+    }
+
+    public void setSupportsHotReload(boolean supportsHotReload) {
+        this.supportsHotReload = supportsHotReload;
+    }
+
+    @JSONImportMethod(name = "targetPlatforms")
+    public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
+        String[] targets = new String[array.length()];
+        for (int i = 0; i < array.length(); i++) {
+            targets[i] = array.getString(i);
+        }
+        MutableObject packageDependencies = new MutableObject();
+        targetPlatforms = fixTargetPlatforms(name, targets, packageDependencies);
+        setDependencies((PackageDependency[]) packageDependencies.getValue());
+    }
+
+    @JSONImportMethod(name = "type")
+    public void setTypeAsJSON(String strType) {
+        type = PackageType.getByValue(strType);
     }
 
     @Override
