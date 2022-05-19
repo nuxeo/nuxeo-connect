@@ -531,6 +531,16 @@ public class TestConnectHttpConnector {
     class TestAppender extends AppenderSkeleton {
         private final List<LoggingEvent> log = new ArrayList<LoggingEvent>();
 
+        public static final String DEFAULT_NAME = "test-appender";
+
+        public TestAppender() {
+            this(DEFAULT_NAME);
+        }
+
+        public TestAppender(String name) {
+            this.name = name;
+        }
+
         @Override
         public boolean requiresLayout() {
             return false;
