@@ -1,15 +1,21 @@
-nuxeo-connect
+nuxeo-connect-client
 =============
 
-Nuxeo Connect
+Nuxeo Connect Client is the Java client used by the Nuxeo platform and the `nuxeoctl` command line tool to communicate with the Nuxeo Connect Server.
 
 # Building
 
     mvn clean install
 
-## QA results
+# Release
 
-[![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=master/nuxeo-connect-master)](https://qa.nuxeo.org/jenkins/job/master/job/nuxeo-connect-master/)
+This project uses jgitver for versioning, see https://github.com/jgitver/jgitver.
+
+To release this project just push an annotated Git tag following the 'vX.Y.Z' pattern on any branch
+```
+    git tag -a vX.Y.Z -m "Release X.Y.Z"
+    git push origin vX.Y.Z
+```
 
 # About Nuxeo
 
