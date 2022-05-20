@@ -42,7 +42,7 @@ jobs:
       run: git checkout ${GITHUB_HEAD_REF}
     - name: Force branch name for jgitver on master
       if: ${{ github.event_name != 'pull_request'}}
-      run: git checkout ${GITHUB_REF_NAME}
+      run: git checkout ${GITHUB_REF#refs/*/}
     - name: Build with Maven
       run: mvn package
     - name: Publish Test Report
