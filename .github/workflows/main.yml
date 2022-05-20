@@ -20,6 +20,9 @@ jobs:
         fetch-depth: 0 # Allow jgitver versionning by fetching all tags and branches
     - name: Setup upterm session
       uses: lhotari/action-upterm@v1
+      with:
+        ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+        limit-access-to-actor: true
     - uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
