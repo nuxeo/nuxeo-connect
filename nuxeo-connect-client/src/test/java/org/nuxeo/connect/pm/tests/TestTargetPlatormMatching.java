@@ -20,7 +20,7 @@ package org.nuxeo.connect.pm.tests;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageException;

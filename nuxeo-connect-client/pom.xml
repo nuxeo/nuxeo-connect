@@ -13,8 +13,8 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -106,7 +106,7 @@
               <artifactSet>
                 <excludes>
                   <exclude>commons-httpclient:commons-httpclient</exclude>
-                  <exclude>commons-collections:commons-collections</exclude>
+                  <exclude>org.apache.commons:commons-collections4</exclude>
                   <exclude>commons-io:commons-io</exclude>
                   <exclude>commons-codec:commons-codec</exclude>
                   <exclude>commons-logging:commons-logging</exclude>
