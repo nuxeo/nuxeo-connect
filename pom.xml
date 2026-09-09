@@ -18,6 +18,8 @@
 
     <!-- for use in maven-surefire-plugin, maven-failsafe-plugin, jacoco-maven-plugin -->
     <it.failsafe.argLine></it.failsafe.argLine>
+
+    <log4j.version>2.26.0</log4j.version>
   </properties>
 
   <modules>
@@ -121,7 +123,12 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-1.2-api</artifactId>
-        <version>2.17.2</version>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.nuxeo.connect</groupId>
