@@ -16,6 +16,11 @@
  */
 package org.nuxeo.connect.update;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.nuxeo.connect.update.PackageDependency.PackageDependencyXMLAdapter;
+
 /**
  * Example of dependencies:
  * <ul>
@@ -27,7 +32,24 @@ package org.nuxeo.connect.update;
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
+@XmlJavaTypeAdapter(PackageDependencyXMLAdapter.class)
 public class PackageDependency {
+
+    /**
+     * @since 1.4.5
+     */
+    public static class PackageDependencyXMLAdapter extends XmlAdapter<String, PackageDependency> {
+
+        @Override
+        public String marshal(PackageDependency dependency) throws Exception {
+            return dependency.toString();
+        }
+
+        @Override
+        public PackageDependency unmarshal(String dependency) throws Exception {
+            return new PackageDependency(dependency);
+        }
+    }
 
     protected String name;
 
@@ -84,10 +106,7 @@ public class PackageDependency {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof PackageDependency)) {
-            return false;
-        }
-        return toString().equals(((PackageDependency) other).toString());
+        return other instanceof PackageDependency packageDependency && toString().equals(packageDependency.toString());
     }
 
 }

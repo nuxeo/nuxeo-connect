@@ -29,7 +29,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -141,28 +140,28 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
             try (CloseableHttpResponse httpResponse = httpClient.execute(method)) {
                 int rc = httpResponse.getStatusLine().getStatusCode();
                 switch (rc) {
-                    case HttpStatus.SC_OK:
+                    case HttpStatus.SC_OK -> {
                         if (sourceSize == 0) {
-                            Header clheader = httpResponse.getFirstHeader("content-length");
+                            var clheader = httpResponse.getFirstHeader("content-length");
                             if (clheader != null) {
                                 sourceSize = Long.parseLong(clheader.getValue());
                             }
                         }
-                        InputStream in = httpResponse.getEntity().getContent();
+                        var in = httpResponse.getEntity().getContent();
                         saveStreamAsFile(in);
                         registerDownloadedPackage();
                         setPackageState(PackageState.DOWNLOADED);
-                        break;
-
-                    case HttpStatus.SC_NOT_FOUND:
+                    }
+                    case HttpStatus.SC_NOT_FOUND ->
                         throw new ConnectServerError(String.format("Package not found (%s).", rc));
-                    case HttpStatus.SC_FORBIDDEN:
+                    case HttpStatus.SC_FORBIDDEN ->
                         throw new ConnectServerError(String.format("Access refused (%s).", rc));
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case HttpStatus.SC_UNAUTHORIZED ->
                         throw new ConnectServerError(String.format("Registration required (%s).", rc));
-                    default:
+                    default -> {
                         serverError = true;
                         throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
+                    }
                 }
             }
         } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException

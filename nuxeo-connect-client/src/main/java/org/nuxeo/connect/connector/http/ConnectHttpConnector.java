@@ -119,29 +119,30 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             httpResponse = httpClient.execute(method);
             int rc = httpResponse.getStatusLine().getStatusCode();
             switch (rc) {
-                case HttpStatus.SC_OK:
-                case HttpStatus.SC_NO_CONTENT:
-                case HttpStatus.SC_NOT_FOUND:
+                case HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT, HttpStatus.SC_NOT_FOUND -> {
                     return new ConnectHttpResponse(httpClient, httpResponse);
-                case HttpStatus.SC_UNAUTHORIZED:
+                }
+                case HttpStatus.SC_UNAUTHORIZED -> {
                     httpResponse.close();
                     httpClient.close();
                     throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
-                case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED:
+                }
+                case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED -> {
                     httpResponse.close();
                     httpClient.close();
                     throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
-                case HttpStatus.SC_GATEWAY_TIMEOUT:
-                case HttpStatus.SC_REQUEST_TIMEOUT:
+                }
+                case HttpStatus.SC_GATEWAY_TIMEOUT, HttpStatus.SC_REQUEST_TIMEOUT -> {
                     httpResponse.close();
                     httpClient.close();
                     throw new ConnectServerError("Timeout " + rc);
-                default:
+                }
+                default -> {
                     try {
-                        String body = EntityUtils.toString(httpResponse.getEntity());
-                        JSONObject obj = new JSONObject(body);
-                        String message = obj.getString("message");
-                        String errorClass = obj.getString("errorClass");
+                        var body = EntityUtils.toString(httpResponse.getEntity());
+                        var obj = new JSONObject(body);
+                        var message = obj.getString("message");
+                        var errorClass = obj.getString("errorClass");
                         ConnectServerError error;
                         if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
                             error = new ConnectSecurityError(message);
@@ -158,6 +159,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                         httpResponse.close();
                         httpClient.close();
                     }
+                }
             }
         } catch (ConnectServerError cse) {
             throw cse;

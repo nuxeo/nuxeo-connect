@@ -144,19 +144,13 @@ public class LogicalInstanceIdentifier {
     }
 
     public void save() throws IOException {
-        String data = CLID1 + "\n" + CLID2 + "\n" + instanceDescription + "\n";
+        String data = "%s\n%s\n%s\n".formatted(CLID1, CLID2, instanceDescription);
         if (USE_BASE64_SAVE) {
             data = Base64.encodeBytes(data.getBytes());
         }
         File file = new File(getSaveFileName(false));
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data.getBytes());
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
         }
     }
 
@@ -183,15 +177,15 @@ public class LogicalInstanceIdentifier {
      * @since 1.4.17
      */
     public static LogicalInstanceIdentifier load(String path) throws IOException, InvalidCLID {
-        File file = new File(path);
+        var file = new File(path);
         if (!file.exists()) {
             throw new FileNotFoundException(path);
         }
-        List<String> lines = readLines(file);
+        var lines = readLines(file);
         if (USE_BASE64_SAVE) {
-            byte[] data = Base64.decode(lines.get(0));
-            String strData = new String(data);
-            String[] parts = strData.split("\n");
+            var data = Base64.decode(lines.getFirst());
+            var strData = new String(data);
+            var parts = strData.split("\n");
             lines = new ArrayList<>();
             for (String part : parts) {
                 lines.add(part);
@@ -202,7 +196,7 @@ public class LogicalInstanceIdentifier {
             throw new InvalidCLID(String.format("CLID file (%s) is invalid", path));
         }
 
-        String id = makeCLID(lines.get(0), lines.get(1));
+        String id = makeCLID(lines.getFirst(), lines.get(1));
         String description = lines.size() > 2 ? lines.get(2) : "";
         instance = new LogicalInstanceIdentifier(id, description);
         return instance;

@@ -140,11 +140,8 @@ public class PackageManagerImpl implements PackageManager {
                 targetPlatforms = new String[] { null };
             }
             for (String tp : targetPlatforms) {
-                Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
-                if (packagesById == null) {
-                    packagesById = new HashMap<>();
-                    packagesByIdAndTargetPlatform.put(tp, packagesById);
-                }
+                Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.computeIfAbsent(tp,
+                        k -> new HashMap<>());
                 String key = pkg.getId();
                 if (packagesById.containsKey(key)) {
                     if (pkg.getVersion().greaterThan(packagesById.get(key).getVersion())) {
@@ -163,7 +160,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
     }
 
@@ -408,7 +405,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(res, new PackageComparator());
+        res.sort(new PackageComparator());
         return res;
     }
 
@@ -482,7 +479,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
     }
 
@@ -521,7 +518,7 @@ public class PackageManagerImpl implements PackageManager {
     @Override
     public List<DownloadablePackage> listPrivatePackages(PackageType pkgType, PlatformId targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(getAllSources(), pkgType, targetPlatform);
-        Collections.sort(allPackages, new PackageComparator());
+        allPackages.sort(new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
             if (downloadablePackage.getOwner() != null) {
@@ -631,8 +628,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
         List<DownloadablePackage> remote = listRemoteAssociatedStudioPackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
-        List<DownloadablePackage> result = new ArrayList<>();
-        result.addAll(local);
+        List<DownloadablePackage> result = new ArrayList<>(local);
         REMOTE: for (DownloadablePackage rpkg : remote) {
             for (DownloadablePackage lpkg : local) {
                 if (lpkg.getId().equals(rpkg.getId())) {
@@ -641,7 +637,7 @@ public class PackageManagerImpl implements PackageManager {
             }
             result.add(rpkg);
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
     }
 
@@ -954,7 +950,7 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<? extends Package> sort(List<? extends Package> pkgs) {
-        Collections.sort(pkgs, new PackageComparator());
+        pkgs.sort(new PackageComparator());
         return pkgs;
     }
 

@@ -40,7 +40,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -88,10 +87,10 @@ public class RegistrationHelper {
     }
 
     protected static HttpClientContext getHttpClientContext(String url, String login, String password) {
-        HttpClientContext context = HttpClientContext.create();
+        var context = HttpClientContext.create();
 
         // Set credentials provider
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        var credentialsProvider = new BasicCredentialsProvider();
         if (login != null) {
             Credentials ba = new UsernamePasswordCredentials(login, password);
             credentialsProvider.setCredentials(AuthScope.ANY, ba);

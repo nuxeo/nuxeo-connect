@@ -223,7 +223,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public boolean equals(Object o) {
-        return (this == o || o != null && (o instanceof Version) && compareTo((Version) o) == 0);
+        return this == o || o instanceof Version version && compareTo(version) == 0;
     }
 
     @Override

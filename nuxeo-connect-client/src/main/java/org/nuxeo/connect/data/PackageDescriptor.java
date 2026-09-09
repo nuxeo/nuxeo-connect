@@ -565,8 +565,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     public void setTargetPlatforms(List<String> targetPlatforms) {
-        this.targetPlatforms = targetPlatforms == null ? new String[0]
-                : targetPlatforms.toArray(new String[targetPlatforms.size()]);
+        this.targetPlatforms = targetPlatforms == null ? new String[0] : targetPlatforms.toArray(String[]::new);
     }
 
     public void setTargetPlatforms(String[] targetPlatforms) {
