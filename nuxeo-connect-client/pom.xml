@@ -45,8 +45,8 @@
       <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
     <!-- needed by NashornProxyPacResolver, removed from the JDK since Java 15 -->
     <dependency>
@@ -123,7 +123,6 @@
                   <exclude>logkit:logkit</exclude>
                   <exclude>avalon-framework:avalon-framework</exclude>
                   <exclude>log4j:log4j</exclude>
-                  <exclude>org.json:json</exclude>
                 </excludes>
               </artifactSet>
               <filters>

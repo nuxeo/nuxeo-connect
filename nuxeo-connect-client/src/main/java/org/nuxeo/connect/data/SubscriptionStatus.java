@@ -16,12 +16,14 @@
  */
 package org.nuxeo.connect.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.IOException;
+
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * DTO to transfer Subscription related information.
@@ -99,12 +101,12 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
     }
 
     @Deprecated
-    public static SubscriptionStatus loadFromJSON(JSONObject ob) throws JSONException {
+    public static SubscriptionStatus loadFromJSON(ObjectNode ob) throws IOException {
         return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, ob);
     }
 
     @Deprecated
-    public static SubscriptionStatus loadFromJSON(String json) throws JSONException {
+    public static SubscriptionStatus loadFromJSON(String json) throws IOException {
         return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, json);
     }
 

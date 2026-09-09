@@ -18,12 +18,15 @@
  */
 package org.nuxeo.connect.registration.response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.JSONHelper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
@@ -34,10 +37,10 @@ public class TrialErrorResponse extends TrialRegistrationResponse {
     protected List<Error> errors = new ArrayList<>();
 
     @Override
-    protected void readValue(Object value) throws JSONException {
-        JSONArray array = (JSONArray) value;
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject ob = (JSONObject) array.get(i);
+    protected void readValue(JsonNode value) throws IOException {
+        ArrayNode array = JSONHelper.toArrayNode(value);
+        for (int i = 0; i < array.size(); i++) {
+            ObjectNode ob = JSONHelper.toObjectNode(array.get(i));
             errors.add(new Error(ob));
         }
     }
@@ -51,9 +54,9 @@ public class TrialErrorResponse extends TrialRegistrationResponse {
 
         private final String field;
 
-        Error(JSONObject obj) throws JSONException {
-            this.message = obj.getString("message");
-            this.field = obj.getString("field");
+        Error(ObjectNode obj) throws IOException {
+            this.message = JSONHelper.getString(obj, "message");
+            this.field = JSONHelper.getString(obj, "field");
         }
 
         public String getMessage() {

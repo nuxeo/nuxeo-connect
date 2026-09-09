@@ -34,8 +34,6 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
@@ -45,7 +43,11 @@ import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectSecurityError;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
+import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.data.SubscriptionStatus;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Real HTTP based {@link ConnectConnector} implementation. Manages communication with the Nuxeo Connect Server via
@@ -129,9 +131,9 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                         if (StringUtils.isBlank(body)) {
                             throw new ConnectServerError("Server returned a code " + rc);
                         }
-                        JSONObject obj = new JSONObject(body);
-                        String message = obj.getString("message");
-                        String errorClass = obj.getString("errorClass");
+                        ObjectNode obj = JSONHelper.readObject(body);
+                        String message = JSONHelper.getString(obj, "message");
+                        String errorClass = JSONHelper.getString(obj, "errorClass");
                         ConnectServerError error;
                         if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
                             error = new ConnectSecurityError(message);
@@ -141,7 +143,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                             error = new ConnectServerError(message);
                         }
                         throw error;
-                    } catch (JSONException | ParseException e) {
+                    } catch (IOException | ParseException | JacksonException | IllegalArgumentException e) {
                         log.debug("Can't parse server error " + rc, e);
                         throw new ConnectServerError("Server returned a code " + rc);
                     } finally {

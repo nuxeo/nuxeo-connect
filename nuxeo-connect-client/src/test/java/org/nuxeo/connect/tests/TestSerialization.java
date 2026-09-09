@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.junit.Test;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -43,7 +42,7 @@ public class TestSerialization {
     private static final Log log = LogFactory.getLog(TestSerialization.class);
 
     @Test
-    public void testSerializeSubscriptionStatus() throws JSONException {
+    public void testSerializeSubscriptionStatus() throws Exception {
         SubscriptionStatus status = new SubscriptionStatus();
         status.setEndDate("25/11/2011");
         status.setContractStatus("OK");

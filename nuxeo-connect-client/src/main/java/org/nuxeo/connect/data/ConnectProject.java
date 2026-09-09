@@ -16,9 +16,11 @@
  */
 package org.nuxeo.connect.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.IOException;
+
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * DTO representing a (client) Project.
@@ -61,12 +63,12 @@ public class ConnectProject extends AbstractJSONSerializableData {
     }
 
     @Deprecated
-    public static ConnectProject loadFromJSON(JSONObject ob) throws JSONException {
+    public static ConnectProject loadFromJSON(ObjectNode ob) throws IOException {
         return ConnectProject.loadFromJSON(ConnectProject.class, ob);
     }
 
     @Deprecated
-    public static ConnectProject loadFromJSON(String json) throws JSONException {
+    public static ConnectProject loadFromJSON(String json) throws IOException {
         return ConnectProject.loadFromJSON(ConnectProject.class, json);
     }
 

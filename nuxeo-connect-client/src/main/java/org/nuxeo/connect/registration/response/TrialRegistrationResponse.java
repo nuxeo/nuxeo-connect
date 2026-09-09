@@ -20,8 +20,11 @@ package org.nuxeo.connect.registration.response;
 
 import java.io.IOException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.JSONHelper;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
@@ -29,7 +32,7 @@ import org.json.JSONObject;
  */
 public abstract class TrialRegistrationResponse {
 
-    protected JSONObject json;
+    protected ObjectNode json;
 
     protected String type;
 
@@ -45,37 +48,31 @@ public abstract class TrialRegistrationResponse {
 
     public static TrialRegistrationResponse read(String body) throws IOException {
         try {
-            JSONObject obj = new JSONObject(body);
-            TrialRegistrationResponse o;
-            String oType = obj.getString("type");
-            switch (oType) {
-                case "error":
-                    o = new TrialErrorResponse();
-                    break;
-                case "message":
-                    o = new TrialSuccessResponse();
-                    break;
-                default:
-                    throw new IOException("Unknown type: " + oType);
-            }
+            var obj = JSONHelper.readObject(body);
+            var oType = JSONHelper.getString(obj, "type");
+            var o = switch (oType) {
+                case "error" -> new TrialErrorResponse();
+                case "message" -> new TrialSuccessResponse();
+                default -> throw new IOException("Unknown type: " + oType);
+            };
 
             o.readJSON(obj);
             return o;
-        } catch (JSONException e) {
+        } catch (JacksonException | IllegalArgumentException e) {
             throw new IOException(e);
         }
     }
 
-    protected void readJSON(JSONObject obj) throws JSONException {
+    protected void readJSON(ObjectNode obj) throws IOException {
         this.json = obj;
-        this.type = obj.getString("type");
-        this.message = obj.getString("message");
+        this.type = JSONHelper.getString(obj, "type");
+        this.message = JSONHelper.getString(obj, "message");
         if (obj.has("value")) {
             readValue(obj.get("value"));
         }
     }
 
-    protected abstract void readValue(Object value) throws JSONException;
+    protected abstract void readValue(JsonNode value) throws IOException;
 
     public boolean isError() {
         return "error".equals(type);
