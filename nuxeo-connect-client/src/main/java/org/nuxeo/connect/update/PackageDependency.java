@@ -19,16 +19,13 @@ package org.nuxeo.connect.update;
 /**
  * Example of dependencies:
  * <ul>
- * <li>Any version of my-package (the last available version will be used)
- * <code>my-package</code>
+ * <li>Any version of my-package (the last available version will be used) <code>my-package</code>
  * <li>Minimum 1.0 version my-package: <code>my-package:1</code>
  * <li>Maximum 2.0 version my-package: <code>my-package:0:1</code>
- * <li>Versions between 1.1 and 2.3 of my-package:
- * <code>my-package:1.1:2.3</code>
+ * <li>Versions between 1.1 and 2.3 of my-package: <code>my-package:1.1:2.3</code>
  * </ul>
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public class PackageDependency {
 
