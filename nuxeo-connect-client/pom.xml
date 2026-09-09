@@ -103,7 +103,10 @@
               </transformers>
               <!-- <createSourcesJar>true</createSourcesJar> -->
               <!-- <shadeSourcesContent>true</shadeSourcesContent> -->
-              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <!-- this execution only produces an attached classified artifact: a reduced pom must not be
+                   generated, otherwise it overwrites the main artifact's pom, stripping dependencies that were
+                   shaded into this classified jar but that the main (unshaded) jar still needs -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
               <!-- <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope> -->
               <!-- <promoteTransitiveDependencies>false</promoteTransitiveDependencies> -->
               <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -186,7 +189,10 @@
               </transformers>
               <!-- <createSourcesJar>true</createSourcesJar> -->
               <!-- <shadeSourcesContent>true</shadeSourcesContent> -->
-              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <!-- this execution only produces an attached classified artifact: a reduced pom must not be
+                   generated, otherwise it overwrites the main artifact's pom, stripping dependencies that were
+                   shaded into this classified jar but that the main (unshaded) jar still needs -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
               <!-- <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope> -->
               <!-- <promoteTransitiveDependencies>false</promoteTransitiveDependencies> -->
               <shadedArtifactAttached>true</shadedArtifactAttached>
