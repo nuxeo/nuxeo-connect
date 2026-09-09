@@ -55,17 +55,19 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.util.Timeout;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.connector.http.ProxyHelper;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
+import org.nuxeo.connect.data.ConnectJSONException;
 import org.nuxeo.connect.data.ConnectProject;
+import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
 import org.nuxeo.connect.registration.response.TrialErrorResponse;
 import org.nuxeo.connect.registration.response.TrialRegistrationResponse;
+
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper to manage Registration to Nuxeo Connect.
@@ -137,9 +139,9 @@ public class RegistrationHelper {
                 HttpEntity responseEntity = httpResponse.getEntity();
                 if (responseEntity != null) {
                     String json = EntityUtils.toString(responseEntity);
-                    JSONArray array = new JSONArray(json);
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject ob = (JSONObject) array.get(i);
+                    ArrayNode array = JSONHelper.readArray(json);
+                    for (int i = 0; i < array.size(); i++) {
+                        ObjectNode ob = JSONHelper.toObjectNode(array.get(i));
                         result.add(AbstractJSONSerializableData.loadFromJSON(ConnectProject.class, ob));
                     }
                 }
@@ -148,7 +150,7 @@ public class RegistrationHelper {
             }
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
-        } catch (JSONException e) {
+        } catch (ConnectJSONException e) {
             log.debug(e, e);
         }
         return result;
