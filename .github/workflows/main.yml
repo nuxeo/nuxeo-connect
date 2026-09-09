@@ -26,16 +26,11 @@ jobs:
     - name: Setup Maven Settings
       uses: s4u/maven-settings-action@v2.6.0
       with:
-        mirrors: '[{"id": "team", "name": "team", "mirrorOf": "external:*", "url": "https://nexus-jx.nos.build.nuxeo.com/repository/maven-group/"}]'
         servers: |
           [{
               "id": "packages",
               "username": "${{ secrets.M2_CREDENTIALS_PACKAGES_USERNAME }}",
               "password": "${{ secrets.M2_CREDENTIALS_PACKAGES_PASSWORD }}"
-          },{
-              "id": "team",
-              "username": "${{ secrets.M2_CREDENTIALS_TEAM_USERNAME }}",
-              "password": "${{ secrets.M2_CREDENTIALS_TEAM_PASSWORD }}"
           }]
     - name: Force branch name for jgitver on PR
       if: ${{ github.event_name == 'pull_request'}}
