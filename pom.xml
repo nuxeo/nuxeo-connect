@@ -80,6 +80,11 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.1.0</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
         <version>4.0.5</version>
