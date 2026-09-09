@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2013 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2013-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,9 +13,7 @@
  *
  * Contributors:
  *     Julien Carsique
- *
  */
-
 package org.nuxeo.connect.update;
 
 import java.io.File;
@@ -56,14 +54,12 @@ public class MockPackageUpdateService implements PackageUpdateService {
 
     @Override
     @Deprecated
-    public void setPackageState(LocalPackage pkg, int state)
-            throws PackageException {
+    public void setPackageState(LocalPackage pkg, int state) throws PackageException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setPackageState(LocalPackage pkg, PackageState state)
-            throws PackageException {
+    public void setPackageState(LocalPackage pkg, PackageState state) throws PackageException {
         throw new UnsupportedOperationException();
     }
 
@@ -98,8 +94,7 @@ public class MockPackageUpdateService implements PackageUpdateService {
     }
 
     @Override
-    public PackageDefinition loadPackageFromZip(File zip)
-            throws PackageException {
+    public PackageDefinition loadPackageFromZip(File zip) throws PackageException {
         throw new UnsupportedOperationException();
     }
 
@@ -109,8 +104,7 @@ public class MockPackageUpdateService implements PackageUpdateService {
     }
 
     @Override
-    public PackageDefinition loadPackage(InputStream in)
-            throws PackageException {
+    public PackageDefinition loadPackage(InputStream in) throws PackageException {
         throw new UnsupportedOperationException();
     }
 

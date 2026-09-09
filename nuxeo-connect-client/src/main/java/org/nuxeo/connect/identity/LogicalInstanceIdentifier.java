@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,9 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
  */
-
 package org.nuxeo.connect.identity;
 
 import java.io.BufferedReader;
@@ -94,6 +92,7 @@ public class LogicalInstanceIdentifier {
     public static String makeCLID(String clid1, String clid2) {
         return clid1 + ID_SEP + clid2;
     }
+
     public String getCLID() {
         return makeCLID(CLID1, CLID2);
     }

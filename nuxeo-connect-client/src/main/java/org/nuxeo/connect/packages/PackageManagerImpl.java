@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
@@ -104,7 +102,6 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     /**
-     * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
     public PackageManagerImpl(PlatformId currentTargetPlatform) {
@@ -330,7 +327,6 @@ public class PackageManagerImpl implements PackageManager {
     /**
      * @since 1.4
      * @param packageId Package ID to look for in {@code sources}
-     * @param sources
      * @return The package searched by ID or null if not found.
      */
     protected DownloadablePackage findPackageById(String packageId, List<PackageSource> sources) {
@@ -441,25 +437,21 @@ public class PackageManagerImpl implements PackageManager {
     public List<String> listInstalledPackagesNames(PackageType pkgType) {
         List<DownloadablePackage> installedPackages = listInstalledPackages();
         // filter on type and collect names
-        List<String> installedPackagesNames = installedPackages.stream()
-                                                               .filter(pkg -> (pkgType == null
-                                                                       || pkg.getType() == pkgType))
-                                                               .map(DownloadablePackage::getName)
-                                                               .collect(Collectors.toList());
-
-        return installedPackagesNames;
+        return installedPackages.stream()
+                                .filter(pkg -> (pkgType == null || pkg.getType() == pkgType))
+                                .map(DownloadablePackage::getName)
+                                .collect(Collectors.toList());
     }
 
     @Override
     public List<String> listHotfixesNames(PlatformId targetPlatform, boolean allowSNAPSHOT) {
         List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
         // filter on snapshots and collect unique names
-        List<String> hotFixesNames = hotFixes.stream()
-                                             .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
-                                             .map(DownloadablePackage::getName)
-                                             .distinct()
-                                             .collect(Collectors.toList());
-        return hotFixesNames;
+        return hotFixes.stream()
+                       .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
+                       .map(DownloadablePackage::getName)
+                       .distinct()
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -471,13 +463,11 @@ public class PackageManagerImpl implements PackageManager {
                                                                                 || !pkg.getVersion().isSnapshot())) //
                                                                         .collect(Collectors.groupingBy(
                                                                                 DownloadablePackage::getName));
-        List<String> lastHotFixes = hotfixesByName.values()
-                                                  .stream() //
-                                                  .map(list -> Collections.max(list,
-                                                          Comparator.comparing(DownloadablePackage::getVersion))) //
-                                                  .map(DownloadablePackage::getId) //
-                                                  .collect(Collectors.toList());
-        return lastHotFixes;
+        return hotfixesByName.values()
+                             .stream() //
+                             .map(list -> Collections.max(list, Comparator.comparing(DownloadablePackage::getVersion))) //
+                             .map(DownloadablePackage::getId) //
+                             .collect(Collectors.toList());
     }
 
     @Override
@@ -545,9 +535,8 @@ public class PackageManagerImpl implements PackageManager {
                 targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
 
         List<String> toUpdateIds = resolution.getOrderedPackageIdsToInstall();
-        List<DownloadablePackage> toUpdate = toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
 
-        return toUpdate;
+        return toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
     }
 
     @Override
@@ -789,18 +778,18 @@ public class PackageManagerImpl implements PackageManager {
      */
     public String beforeAfterResolutionToString(DependencyResolution resolution) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nBefore: " + listInstalledPackages());
+        sb.append("\nBefore: ").append(listInstalledPackages());
         List<String> after = new ArrayList<>();
         after.addAll(resolution.getUnchangedPackageIds());
         after.addAll(resolution.getInstallPackageIds());
         Collections.sort(after);
-        sb.append("\nAfter:  " + after);
+        sb.append("\nAfter:  ").append(after);
         return sb.toString();
     }
 
     /**
      * @since 1.4
-     * @see PackageManager#resolveDependencies(List, List, List, String, boolean)
+     * @see PackageManager#resolveDependencies(List, List, List, PlatformId, boolean)
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,

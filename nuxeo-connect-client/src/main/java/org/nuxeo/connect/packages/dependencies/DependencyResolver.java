@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.List;
@@ -37,31 +35,27 @@ public interface DependencyResolver {
      * with the current implementation (1.4.26) to upgrade a single package without specifying its version, so calling
      * this method on an already installed package will return a no-change solution.
      *
-     * @deprecated since 1.4.26 Use {@link #resolve(List, List, List, String)} instead
+     * @deprecated since 1.4.26 Use {@link #resolve(List, List, List, PlatformId)} instead
      */
     @Deprecated
-    public DependencyResolution resolve(String pkgIdOrName, PlatformId targetPlatform) throws DependencyException;
+    DependencyResolution resolve(String pkgIdOrName, PlatformId targetPlatform) throws DependencyException;
 
     /**
-     * @throws DependencyException
      * @since 1.4
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform) throws DependencyException;
 
     /**
-     * @throws DependencyException
      * @since 1.4.13
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform, boolean allowSNAPSHOT) throws DependencyException;
 
     /**
-     * @param targetPlatformVersion
-     * @throws DependencyException
      * @since 1.4.14
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform, boolean allowSNAPSHOT, boolean doKeep) throws DependencyException;
 
     /**
@@ -71,25 +65,25 @@ public interface DependencyResolver {
      * @param isSubResolution if true, do not check for optional dependencies on installed packages
      * @since 1.4.27
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform, boolean allowSNAPSHOT, boolean doKeep, boolean isSubResolution)
             throws DependencyException;
 
     /**
      * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
-     * for the specified target platform. <b>Note</b> : prefer to use {@link #resolve(List, List, List, String)} if you
-     * are not sure of what to give as a solverCriteria
+     * for the specified target platform. <b>Note</b> : prefer to use {@link #resolve(List, List, List, PlatformId)} if
+     * you are not sure of what to give as a solverCriteria
      *
      * @param solverCriteria specify the criteria string to be used by the solver
      * @since 1.4.26
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform, String solverCriteria) throws DependencyException;
 
     /**
      * Compute a {@link DependencyResolution} that will match the requested packages installation, remove and upgrade
      * for the specified target platform. <b>Note</b> : prefer to use
-     * {@link #resolve(List, List, List, String, boolean, boolean)} if you are not sure of what to give as a
+     * {@link #resolve(List, List, List, PlatformId, boolean, boolean)} if you are not sure of what to give as a
      * solverCriteria
      *
      * @param allowSNAPSHOT true to allow SNAPSHOT packages to be part of the computed solution
@@ -98,7 +92,7 @@ public interface DependencyResolver {
      * @param isSubResolution if true, do not check for optional dependencies on installed packages
      * @since 1.4.27
      */
-    public DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
+    DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform, boolean allowSNAPSHOT, boolean doKeep, String solverCriteria,
             boolean isSubResolution) throws DependencyException;
 }

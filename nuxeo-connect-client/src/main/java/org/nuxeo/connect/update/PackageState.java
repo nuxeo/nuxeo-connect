@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -24,15 +24,13 @@ import java.util.EnumSet;
 public enum PackageState {
 
     /**
-     * Unknown package state. That should never be used. This value exists to
-     * avoid the use of a null value.
+     * Unknown package state. That should never be used. This value exists to avoid the use of a null value.
      */
     UNKNOWN(-1, "unknown"),
 
     /**
-     * The package is on the remote server. It is listed and can be downloaded
-     * locally. This happens when the user wants to see package content (then
-     * the package is downloaded and goes to DONLOADED state)
+     * The package is on the remote server. It is listed and can be downloaded locally. This happens when the user wants
+     * to see package content (then the package is downloaded and goes to DONLOADED state)
      */
     REMOTE(0, "remote"),
 
@@ -42,36 +40,30 @@ public enum PackageState {
     DOWNLOADING(1, "downloading"),
 
     /**
-     * The package is in local cache. All information about the package are
-     * available. A downloaded package can be installed. (if package guards
-     * allows it)
+     * The package is in local cache. All information about the package are available. A downloaded package can be
+     * installed. (if package guards allows it)
      */
     DOWNLOADED(2, "downloaded"),
 
     /**
-     * A local package is in the install process. The install process begin when
-     * the user click on install (after the package was validated) and finish
-     * when the package is either rollbacked, either installed. If rollbacked
-     * the package goes to {@link #DOWNLOADED} state otherwise to INSTALLED
-     * state. After installing a package it will be either automatically enter
-     * {@link #STARTED} state (if it doesn't require server restart) or
-     * INSTALLED state if a restart is required.
+     * A local package is in the install process. The install process begin when the user click on install (after the
+     * package was validated) and finish when the package is either rollbacked, either installed. If rollbacked the
+     * package goes to {@link #DOWNLOADED} state otherwise to INSTALLED state. After installing a package it will be
+     * either automatically enter {@link #STARTED} state (if it doesn't require server restart) or INSTALLED state if a
+     * restart is required.
      */
     INSTALLING(3, "installing"),
 
     /**
-     * An installed package. THese packages are in this state only after an
-     * install and before being started. This happens when the package is
-     * requiring a server restart. After the next server restart the package
-     * will be put in STARTED state. From installed state a package can be
-     * uninstalled and thus goes back to {@link #DOWNLOADED} state.
+     * An installed package. THese packages are in this state only after an install and before being started. This
+     * happens when the package is requiring a server restart. After the next server restart the package will be put in
+     * STARTED state. From installed state a package can be uninstalled and thus goes back to {@link #DOWNLOADED} state.
      */
     INSTALLED(4, "installed"),
 
     /**
-     * A started package is an installed package that is currently running in
-     * the platform. From started state the package can be uninstalled and this
-     * way it goes back to {@link #DOWNLOADED} state
+     * A started package is an installed package that is currently running in the platform. From started state the
+     * package can be uninstalled and this way it goes back to {@link #DOWNLOADED} state
      */
     STARTED(5, "started");
 
@@ -85,8 +77,7 @@ public enum PackageState {
     }
 
     /**
-     * @deprecated Since 1.4.5. Set as deprecated to encourage use of enum
-     *             instead of int.
+     * @deprecated Since 1.4.5. Set as deprecated to encourage use of enum instead of int.
      */
     @Deprecated
     public int getValue() {
@@ -109,8 +100,7 @@ public enum PackageState {
     /**
      * @param value A String representing an enum value (int), not a label.
      */
-    public static PackageState getByValue(String value)
-            throws NumberFormatException {
+    public static PackageState getByValue(String value) throws NumberFormatException {
         return getByValue(Integer.valueOf(value));
     }
 
@@ -124,8 +114,7 @@ public enum PackageState {
     }
 
     /**
-     * A package is considered as "installed" if it is in a state of installing,
-     * installed or started.
+     * A package is considered as "installed" if it is in a state of installing, installed or started.
      */
     public boolean isInstalled() {
         return this == INSTALLING || this == INSTALLED || this == STARTED;
