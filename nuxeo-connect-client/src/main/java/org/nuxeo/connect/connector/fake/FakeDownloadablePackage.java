@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,9 +14,7 @@
  * Contributors:
  *     Julien Carsique
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.connector.fake;
 
 import java.util.ArrayList;

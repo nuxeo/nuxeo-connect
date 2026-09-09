@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
@@ -211,7 +209,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {
         List<PackageDependency> list = new ArrayList<>();
-        if (pkgList == null || pkgList.size() == 0) {
+        if (pkgList == null || pkgList.isEmpty()) {
             return list.toArray(new PackageDependency[0]);
         }
         Map<String, DownloadablePackage> packagesByID = pm.getAllPackagesByID();

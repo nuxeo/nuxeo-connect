@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2020 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,13 @@ public class HttpClientBuilderHelper {
         return getHttpClientBuilder(socketTimeout, connectTimeout, url, true);
     }
 
-    public static HttpClientBuilder getHttpClientBuilderWithoutProxy(Integer socketTimeout, Integer connectTimeout, String url) {
+    public static HttpClientBuilder getHttpClientBuilderWithoutProxy(Integer socketTimeout, Integer connectTimeout,
+            String url) {
         return getHttpClientBuilder(socketTimeout, connectTimeout, url, false);
     }
 
-    protected static HttpClientBuilder getHttpClientBuilder(Integer socketTimeout, Integer connectTimeout, String url, boolean useProxy) {
+    protected static HttpClientBuilder getHttpClientBuilder(Integer socketTimeout, Integer connectTimeout, String url,
+            boolean useProxy) {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // Define request configuration

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  * Contributors:
  *     Nuxeo
  */
-
 package org.nuxeo.connect.registration.response;
 
 import java.io.IOException;
@@ -50,14 +49,14 @@ public abstract class TrialRegistrationResponse {
             TrialRegistrationResponse o;
             String oType = obj.getString("type");
             switch (oType) {
-            case "error":
-                o = new TrialErrorResponse();
-                break;
-            case "message":
-                o = new TrialSuccessResponse();
-                break;
-            default:
-                throw new IOException("Unknown type: " + oType);
+                case "error":
+                    o = new TrialErrorResponse();
+                    break;
+                case "message":
+                    o = new TrialSuccessResponse();
+                    break;
+                default:
+                    throw new IOException("Unknown type: " + oType);
             }
 
             o.readJSON(obj);

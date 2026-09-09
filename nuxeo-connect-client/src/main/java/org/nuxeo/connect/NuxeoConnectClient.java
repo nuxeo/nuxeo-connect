@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -87,7 +87,7 @@ public class NuxeoConnectClient {
     }
 
     /**
-     * @deprecated since 1.7.2, prefer to use {@link #getPackageManager(String)}
+     * @deprecated since 1.7.2, prefer to use {@link #getPackageManager(PlatformId)}
      */
     @Deprecated
     public static synchronized PackageManager getPackageManager() {
@@ -95,7 +95,6 @@ public class NuxeoConnectClient {
     }
 
     /**
-     * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
     public static synchronized PackageManager getPackageManager(PlatformId currentTargetPlatform) {
