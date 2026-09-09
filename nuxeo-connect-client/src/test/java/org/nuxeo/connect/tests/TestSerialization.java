@@ -27,10 +27,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.junit.Test;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
+import org.nuxeo.connect.data.ConnectJSONException;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.update.PackageDependency;
@@ -43,7 +43,7 @@ public class TestSerialization {
     private static final Log log = LogFactory.getLog(TestSerialization.class);
 
     @Test
-    public void testSerializeSubscriptionStatus() throws JSONException {
+    public void testSerializeSubscriptionStatus() throws ConnectJSONException {
         SubscriptionStatus status = new SubscriptionStatus();
         status.setEndDate("25/11/2011");
         status.setContractStatus("OK");

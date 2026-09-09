@@ -22,8 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.ConnectJSONException;
+import org.nuxeo.connect.data.JSONHelper;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
@@ -38,11 +41,11 @@ public class TrialSuccessResponse extends TrialRegistrationResponse {
     protected Map<String, String> token;
 
     @Override
-    protected void readValue(Object value) throws JSONException {
-        JSONObject obj = (JSONObject) value;
-        this.email = obj.getString("email");
-        this.company = obj.getString("company");
-        this.token = parseToken(obj.getString("wizardToken"));
+    protected void readValue(JsonNode value) throws ConnectJSONException {
+        ObjectNode obj = JSONHelper.toObjectNode(value);
+        this.email = JSONHelper.getString(obj, "email");
+        this.company = JSONHelper.getString(obj, "company");
+        this.token = parseToken(JSONHelper.getString(obj, "wizardToken"));
     }
 
     protected static Map<String, String> parseToken(String wizToken) {
