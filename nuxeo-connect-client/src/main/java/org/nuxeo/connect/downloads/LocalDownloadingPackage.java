@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  *     Nuxeo
  *     Yannis JULIENNE
  */
-
 package org.nuxeo.connect.downloads;
 
 import java.io.File;
@@ -142,28 +141,28 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
             try (CloseableHttpResponse httpResponse = httpClient.execute(method)) {
                 int rc = httpResponse.getStatusLine().getStatusCode();
                 switch (rc) {
-                case HttpStatus.SC_OK:
-                    if (sourceSize == 0) {
-                        Header clheader = httpResponse.getFirstHeader("content-length");
-                        if (clheader != null) {
-                            sourceSize = Long.parseLong(clheader.getValue());
+                    case HttpStatus.SC_OK:
+                        if (sourceSize == 0) {
+                            Header clheader = httpResponse.getFirstHeader("content-length");
+                            if (clheader != null) {
+                                sourceSize = Long.parseLong(clheader.getValue());
+                            }
                         }
-                    }
-                    InputStream in = httpResponse.getEntity().getContent();
-                    saveStreamAsFile(in);
-                    registerDownloadedPackage();
-                    setPackageState(PackageState.DOWNLOADED);
-                    break;
+                        InputStream in = httpResponse.getEntity().getContent();
+                        saveStreamAsFile(in);
+                        registerDownloadedPackage();
+                        setPackageState(PackageState.DOWNLOADED);
+                        break;
 
-                case HttpStatus.SC_NOT_FOUND:
-                    throw new ConnectServerError(String.format("Package not found (%s).", rc));
-                case HttpStatus.SC_FORBIDDEN:
-                    throw new ConnectServerError(String.format("Access refused (%s).", rc));
-                case HttpStatus.SC_UNAUTHORIZED:
-                    throw new ConnectServerError(String.format("Registration required (%s).", rc));
-                default:
-                    serverError = true;
-                    throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
+                    case HttpStatus.SC_NOT_FOUND:
+                        throw new ConnectServerError(String.format("Package not found (%s).", rc));
+                    case HttpStatus.SC_FORBIDDEN:
+                        throw new ConnectServerError(String.format("Access refused (%s).", rc));
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        throw new ConnectServerError(String.format("Registration required (%s).", rc));
+                    default:
+                        serverError = true;
+                        throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
                 }
             }
         } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException

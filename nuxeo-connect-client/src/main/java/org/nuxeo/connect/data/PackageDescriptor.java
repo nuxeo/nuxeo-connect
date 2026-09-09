@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,9 +14,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.data;
 
 import java.util.ArrayList;

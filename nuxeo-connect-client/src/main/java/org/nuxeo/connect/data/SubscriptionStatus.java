@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,10 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
- * $Id$
  */
-
 package org.nuxeo.connect.data;
 
 import org.json.JSONException;
@@ -68,7 +65,7 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
         this.instanceType = instanceType;
     }
 
-    @JSONImportMethod(name="instanceType")
+    @JSONImportMethod(name = "instanceType")
     protected void setInstanceType(String instanceType) {
         this.instanceType = NuxeoClientInstanceType.fromString(instanceType);
     }
@@ -92,9 +89,11 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
     public void setContractStatus(String contractStatus) {
         this.contractStatus = contractStatus;
     }
+
     public String getEndDate() {
         return endDate;
     }
+
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.connector.http;
 
 import java.io.IOException;
@@ -121,45 +119,45 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             httpResponse = httpClient.execute(method);
             int rc = httpResponse.getStatusLine().getStatusCode();
             switch (rc) {
-            case HttpStatus.SC_OK:
-            case HttpStatus.SC_NO_CONTENT:
-            case HttpStatus.SC_NOT_FOUND:
-                return new ConnectHttpResponse(httpClient, httpResponse);
-            case HttpStatus.SC_UNAUTHORIZED:
-                httpResponse.close();
-                httpClient.close();
-                throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
-            case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED:
-                httpResponse.close();
-                httpClient.close();
-                throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
-            case HttpStatus.SC_GATEWAY_TIMEOUT:
-            case HttpStatus.SC_REQUEST_TIMEOUT:
-                httpResponse.close();
-                httpClient.close();
-                throw new ConnectServerError("Timeout " + rc);
-            default:
-                try {
-                    String body = EntityUtils.toString(httpResponse.getEntity());
-                    JSONObject obj = new JSONObject(body);
-                    String message = obj.getString("message");
-                    String errorClass = obj.getString("errorClass");
-                    ConnectServerError error;
-                    if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
-                        error = new ConnectSecurityError(message);
-                    } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(errorClass)) {
-                        error = new ConnectClientVersionMismatchError(message);
-                    } else {
-                        error = new ConnectServerError(message);
-                    }
-                    throw error;
-                } catch (JSONException e) {
-                    log.debug("Can't parse server error " + rc, e);
-                    throw new ConnectServerError("Server returned a code " + rc);
-                } finally {
+                case HttpStatus.SC_OK:
+                case HttpStatus.SC_NO_CONTENT:
+                case HttpStatus.SC_NOT_FOUND:
+                    return new ConnectHttpResponse(httpClient, httpResponse);
+                case HttpStatus.SC_UNAUTHORIZED:
                     httpResponse.close();
                     httpClient.close();
-                }
+                    throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
+                case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED:
+                    httpResponse.close();
+                    httpClient.close();
+                    throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
+                case HttpStatus.SC_GATEWAY_TIMEOUT:
+                case HttpStatus.SC_REQUEST_TIMEOUT:
+                    httpResponse.close();
+                    httpClient.close();
+                    throw new ConnectServerError("Timeout " + rc);
+                default:
+                    try {
+                        String body = EntityUtils.toString(httpResponse.getEntity());
+                        JSONObject obj = new JSONObject(body);
+                        String message = obj.getString("message");
+                        String errorClass = obj.getString("errorClass");
+                        ConnectServerError error;
+                        if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
+                            error = new ConnectSecurityError(message);
+                        } else if (ConnectClientVersionMismatchError.class.getSimpleName().equals(errorClass)) {
+                            error = new ConnectClientVersionMismatchError(message);
+                        } else {
+                            error = new ConnectServerError(message);
+                        }
+                        throw error;
+                    } catch (JSONException e) {
+                        log.debug("Can't parse server error " + rc, e);
+                        throw new ConnectServerError("Server returned a code " + rc);
+                    } finally {
+                        httpResponse.close();
+                        httpClient.close();
+                    }
             }
         } catch (ConnectServerError cse) {
             throw cse;
