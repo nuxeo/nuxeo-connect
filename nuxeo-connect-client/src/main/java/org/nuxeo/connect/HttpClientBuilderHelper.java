@@ -20,13 +20,15 @@ package org.nuxeo.connect;
 
 import static org.nuxeo.connect.connector.http.ConnectHttpConnector.CONNECT_HTTP_TIMEOUT;
 
-import java.util.concurrent.TimeUnit;
-
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.nuxeo.connect.connector.http.ProxyHelper;
 
 /**
@@ -55,22 +57,30 @@ public class HttpClientBuilderHelper {
         // Define request configuration
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         // https://issues.apache.org/jira/browse/HTTPCLIENT-1763
-        requestConfigBuilder.setCookieSpec(CookieSpecs.STANDARD);
+        requestConfigBuilder.setCookieSpec(StandardCookieSpec.RELAXED);
         if (socketTimeout != null) {
-            requestConfigBuilder.setSocketTimeout(socketTimeout);
+            requestConfigBuilder.setResponseTimeout(Timeout.ofMilliseconds(socketTimeout));
         }
         if (connectTimeout != null) {
-            requestConfigBuilder.setConnectTimeout(connectTimeout);
+            requestConfigBuilder.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout));
         }
 
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        CredentialsStore credentialsProvider = new BasicCredentialsProvider();
         if (useProxy) {
             ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
         }
 
         httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
         httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-        httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
+        httpClientBuilder.setConnectionManager(
+                PoolingHttpClientConnectionManagerBuilder.create()
+                                                         .setDefaultConnectionConfig(
+                                                                 ConnectionConfig.custom()
+                                                                                 .setTimeToLive(
+                                                                                         TimeValue.ofMilliseconds(
+                                                                                                 connectHttpTimeout))
+                                                                                 .build())
+                                                         .build());
 
         return httpClientBuilder;
     }

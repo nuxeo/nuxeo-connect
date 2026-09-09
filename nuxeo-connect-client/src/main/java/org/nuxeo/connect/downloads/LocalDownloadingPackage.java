@@ -29,12 +29,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpStatus;
 import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
@@ -139,7 +139,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
                 }
             }
             try (CloseableHttpResponse httpResponse = httpClient.execute(method)) {
-                int rc = httpResponse.getStatusLine().getStatusCode();
+                int rc = httpResponse.getCode();
                 switch (rc) {
                     case HttpStatus.SC_OK:
                         if (sourceSize == 0) {

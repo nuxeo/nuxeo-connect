@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.hc.core5.net.URLEncodedUtils;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectServerError;
