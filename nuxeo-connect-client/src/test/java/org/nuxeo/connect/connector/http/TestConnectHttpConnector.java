@@ -466,6 +466,9 @@ public class TestConnectHttpConnector {
 
     @Test
     public void call_with_set_cookie_with_expires_should_not_raise_a_warning() throws Exception {
+        // this used to guard against HttpClient 4.x's HTTPCLIENT-1763 (a buggy Netscape-draft cookie parser
+        // fallback warning on valid RFC 6265 Expires dates); HttpClient 5's cookie specs don't have that fallback
+        // and no longer warn regardless of the configured spec, so this is now a plain regression guard
         // Setup log4j to capture logs
         TestAppender appender = new TestAppender();
         Logger logger = Logger.getRootLogger();

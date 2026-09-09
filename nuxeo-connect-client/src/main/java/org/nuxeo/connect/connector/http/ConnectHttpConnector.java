@@ -21,23 +21,21 @@ package org.nuxeo.connect.connector.http;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.CanNotReachConnectServer;
@@ -90,20 +88,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
 
     protected ConnectServerResponse execServer(boolean get, String url, Map<String, String> headers)
             throws ConnectServerError {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
-        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-
-        // https://issues.apache.org/jira/browse/HTTPCLIENT-1763
-        requestConfigBuilder.setCookieSpec(CookieSpecs.STANDARD);
-
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
-
-        httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
-        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-
-        httpClientBuilder.setConnectionTimeToLive(connectHttpTimeout, TimeUnit.MILLISECONDS);
+        HttpClientBuilder httpClientBuilder = HttpClientBuilderHelper.getHttpClientBuilder(null, null, url);
         HttpUriRequest method = get ? new HttpGet(url) : new HttpPost(url);
 
         for (String name : headers.keySet()) {
@@ -117,7 +102,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             // not consumed in the ConnectHttpResponse
             httpClient = httpClientBuilder.build();
             httpResponse = httpClient.execute(method);
-            int rc = httpResponse.getStatusLine().getStatusCode();
+            int rc = httpResponse.getCode();
             switch (rc) {
                 case HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT, HttpStatus.SC_NOT_FOUND -> {
                     return new ConnectHttpResponse(httpClient, httpResponse);
@@ -139,7 +124,11 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                 }
                 default -> {
                     try {
-                        var body = EntityUtils.toString(httpResponse.getEntity());
+                        var entity = httpResponse.getEntity();
+                        var body = entity == null ? null : EntityUtils.toString(entity);
+                        if (StringUtils.isBlank(body)) {
+                            throw new ConnectServerError("Server returned a code " + rc);
+                        }
                         var obj = new JSONObject(body);
                         var message = obj.getString("message");
                         var errorClass = obj.getString("errorClass");
@@ -152,7 +141,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                             error = new ConnectServerError(message);
                         }
                         throw error;
-                    } catch (JSONException e) {
+                    } catch (JSONException | ParseException e) {
                         log.debug("Can't parse server error " + rc, e);
                         throw new ConnectServerError("Server returned a code " + rc);
                     } finally {
