@@ -396,9 +396,52 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>3.10.2</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.nuxeo</groupId>
+              <artifactId>nuxeo-build-tools</artifactId>
+              <version>3</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <ratchetFrom>origin/master</ratchetFrom>
+            <java>
+              <endWithNewline/>
+              <indent>
+                <spaces>true</spaces>
+                <spacesPerTab>4</spacesPerTab>
+              </indent>
+              <removeUnusedImports />
+              <forbidWildcardImports />
+              <importOrder>
+                <file>nuxeo.importorder</file>
+              </importOrder>
+              <eclipse>
+                <file>nuxeo_formatter.xml</file>
+                <version>4.35</version>
+              </eclipse>
+            </java>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>validate</phase>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
