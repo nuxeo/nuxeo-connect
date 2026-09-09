@@ -112,7 +112,7 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public String[] getTargetPlatforms() {
-        return targetPlatforms.toArray(new String[targetPlatforms.size()]);
+        return targetPlatforms.toArray(String[]::new);
     }
 
     @Override
@@ -127,17 +127,17 @@ public class FakeDownloadablePackage implements DownloadablePackage {
 
     @Override
     public PackageDependency[] getDependencies() {
-        return dependencies.toArray(new PackageDependency[dependencies.size()]);
+        return dependencies.toArray(PackageDependency[]::new);
     }
 
     @Override
     public PackageDependency[] getOptionalDependencies() {
-        return optionalDependencies.toArray(new PackageDependency[optionalDependencies.size()]);
+        return optionalDependencies.toArray(PackageDependency[]::new);
     }
 
     @Override
     public PackageDependency[] getConflicts() {
-        return conflicts.toArray(new PackageDependency[conflicts.size()]);
+        return conflicts.toArray(PackageDependency[]::new);
     }
 
     @Override

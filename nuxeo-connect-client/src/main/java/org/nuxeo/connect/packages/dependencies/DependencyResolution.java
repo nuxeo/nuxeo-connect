@@ -129,7 +129,7 @@ public class DependencyResolution {
             if (fifo) {
                 orderedInstallablePackages.add(pkgName + "-" + v.toString());
             } else {
-                orderedInstallablePackages.add(0, pkgName + "-" + v.toString());
+                orderedInstallablePackages.addFirst(pkgName + "-" + v.toString());
             }
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with " + allPackages.get(pkgName));
@@ -165,7 +165,7 @@ public class DependencyResolution {
         if (fifo) {
             orderedRemovablePackages.add(pkgName + "-" + v.toString());
         } else {
-            orderedRemovablePackages.add(0, pkgName + "-" + v.toString());
+            orderedRemovablePackages.addFirst(pkgName + "-" + v.toString());
         }
     }
 
@@ -185,7 +185,7 @@ public class DependencyResolution {
             } else {
                 if (!installedVersions.isEmpty() && !installedVersions.contains(pkg.getVersion())) {
                     // Upgrade case: already installed in other version(s)
-                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
+                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.getLast());
                 }
                 if (pkg.getPackageState() == PackageState.REMOTE) {
                     // Needs to be download
@@ -285,8 +285,7 @@ public class DependencyResolution {
      * @since 1.4.26
      */
     public List<String> getRemovePackageNames() {
-        List<String> res = new ArrayList<>();
-        res.addAll(getLocalPackagesToRemove().keySet());
+        List<String> res = new ArrayList<>(getLocalPackagesToRemove().keySet());
         Collections.sort(res);
         return res;
     }

@@ -92,8 +92,7 @@ public class RecursiveDependencyResolver {
             return resolution;
         } else {
             if (fallBacks.size() > 0) {
-                DependencyResolution fbRes = fallBacks.get(0); // XXX choose the
-                                                               // best one
+                DependencyResolution fbRes = fallBacks.getFirst();
                 fbRes.markAsSuccess();
                 return fbRes;
             }

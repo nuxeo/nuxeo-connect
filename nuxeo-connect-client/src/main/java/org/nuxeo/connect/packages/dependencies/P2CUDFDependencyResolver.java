@@ -221,6 +221,6 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
                 list.add(new PackageDependency(pkgStr));
             }
         }
-        return list.toArray(new PackageDependency[list.size()]);
+        return list.toArray(PackageDependency[]::new);
     }
 }

@@ -172,11 +172,10 @@ public class PlatformVersionRange {
             return true;
         }
 
-        if (!(other instanceof PlatformVersionRange)) {
+        if (!(other instanceof PlatformVersionRange restriction)) {
             return false;
         }
 
-        PlatformVersionRange restriction = (PlatformVersionRange) other;
         if (lowerBound != null) {
             if (!lowerBound.equals(restriction.lowerBound)) {
                 return false;
