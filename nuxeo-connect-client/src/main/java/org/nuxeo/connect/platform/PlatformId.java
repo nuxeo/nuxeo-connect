@@ -51,9 +51,8 @@ public class PlatformId {
         if (o == this) {
             return true;
         }
-        if (o instanceof PlatformId) {
-            PlatformId that = (PlatformId) o;
-            return (this.name.equals(that.name())) && (this.version.equals(that.version()));
+        if (o instanceof PlatformId that) {
+            return name.equals(that.name()) && version.equals(that.version());
         }
         return false;
     }

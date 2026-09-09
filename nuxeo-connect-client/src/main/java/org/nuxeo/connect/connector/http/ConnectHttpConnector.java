@@ -30,7 +30,6 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -47,7 +46,6 @@ import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.data.SubscriptionStatus;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Real HTTP based {@link ConnectConnector} implementation. Manages communication with the Nuxeo Connect Server via
@@ -107,33 +105,34 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
             httpResponse = httpClient.execute(method);
             int rc = httpResponse.getCode();
             switch (rc) {
-                case HttpStatus.SC_OK:
-                case HttpStatus.SC_NO_CONTENT:
-                case HttpStatus.SC_NOT_FOUND:
+                case HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT, HttpStatus.SC_NOT_FOUND -> {
                     return new ConnectHttpResponse(httpClient, httpResponse);
-                case HttpStatus.SC_UNAUTHORIZED:
+                }
+                case HttpStatus.SC_UNAUTHORIZED -> {
                     httpResponse.close();
                     httpClient.close();
                     throw new ConnectSecurityError("Connect server refused authentication (returned 401)");
-                case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED:
+                }
+                case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED -> {
                     httpResponse.close();
                     httpClient.close();
-                    throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
-                case HttpStatus.SC_GATEWAY_TIMEOUT:
-                case HttpStatus.SC_REQUEST_TIMEOUT:
+                    throw new ConnectSecurityError("Proxy server requires authentication (returned 407)");
+                }
+                case HttpStatus.SC_GATEWAY_TIMEOUT, HttpStatus.SC_REQUEST_TIMEOUT -> {
                     httpResponse.close();
                     httpClient.close();
                     throw new ConnectServerError("Timeout " + rc);
-                default:
+                }
+                default -> {
                     try {
-                        HttpEntity entity = httpResponse.getEntity();
-                        String body = entity == null ? null : EntityUtils.toString(entity);
+                        var entity = httpResponse.getEntity();
+                        var body = entity == null ? null : EntityUtils.toString(entity);
                         if (StringUtils.isBlank(body)) {
                             throw new ConnectServerError("Server returned a code " + rc);
                         }
-                        ObjectNode obj = JSONHelper.readObject(body);
-                        String message = JSONHelper.getString(obj, "message");
-                        String errorClass = JSONHelper.getString(obj, "errorClass");
+                        var obj = JSONHelper.readObject(body);
+                        var message = JSONHelper.getString(obj, "message");
+                        var errorClass = JSONHelper.getString(obj, "errorClass");
                         ConnectServerError error;
                         if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
                             error = new ConnectSecurityError(message);
@@ -150,6 +149,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                         httpResponse.close();
                         httpClient.close();
                     }
+                }
             }
         } catch (ConnectServerError cse) {
             throw cse;

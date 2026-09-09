@@ -75,12 +75,15 @@ public class ProxyPacConfigurationTest {
     }
 
     private MockResponse buildProxyPacResponse() {
-        MockResponse response = new MockResponse()//
-                                                  .setResponseCode(200)
-                                                  .setBody("function FindProxyForURL(url, host) {\n"
-                                                          + "    if (dnsResolve(host) == \"127.0.0.1\") {\n"
-                                                          + "        return \"PROXY 127.0.0.1\";\n" + "    }\n"
-                                                          + "    return \"DIRECT\";\n}");
+        var response = new MockResponse()//
+                                         .setResponseCode(200)
+                                         .setBody("""
+                                                 function FindProxyForURL(url, host) {
+                                                     if (dnsResolve(host) == "127.0.0.1") {
+                                                         return "PROXY 127.0.0.1";
+                                                     }
+                                                     return "DIRECT";
+                                                 }""");
         return response;
     }
 }

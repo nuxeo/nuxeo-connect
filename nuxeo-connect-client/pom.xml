@@ -48,6 +48,10 @@
       <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
     <!-- needed by NashornProxyPacResolver, removed from the JDK since Java 15 -->
     <dependency>
       <groupId>org.openjdk.nashorn</groupId>

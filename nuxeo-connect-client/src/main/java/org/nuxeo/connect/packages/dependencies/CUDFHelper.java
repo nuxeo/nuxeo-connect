@@ -101,12 +101,10 @@ public class CUDFHelper {
         }
 
         public int whenNotFound() {
-            switch (this) {
-                case NONE_WHEN_NOT_FOUND:
-                    return MATCH_NONE_CUDF_VERSION;
-                default:
-                    return MATCH_ALL_CUDF_VERSION;
-            }
+            return switch (this) {
+                case NONE_WHEN_NOT_FOUND -> MATCH_NONE_CUDF_VERSION;
+                default -> MATCH_ALL_CUDF_VERSION;
+            };
         }
     }
 
@@ -594,44 +592,40 @@ public class CUDFHelper {
             Version version = new Version(split[2].trim());
             PackageDependency previous = deps.get(name);
             switch (rel) {
-                case "=":
+                case "=" -> {
                     if (previous != null) {
                         throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
                     }
                     deps.put(name, new PackageDependency(name, version, version));
-                    break;
-                case "<": // Not managed, let's consider it's "<="
-                case "<=":
+                }
+                case "<", "<=" -> {
                     if (previous == null) {
                         deps.put(name, new PackageDependency(name, Version.ZERO, version));
                     } else {
-                        PackageVersionRange versionRange = previous.getVersionRange();
+                        var versionRange = previous.getVersionRange();
                         if (versionRange.getMaxVersion() != null) {
                             throw new DependencyException(
                                     "Conflicting dependency value: " + value + " with " + previous);
                         }
                         versionRange.setMaxVersion(version);
                     }
-                    break;
-                case ">": // Not managed, let's consider it's ">="
-                case ">=":
+                }
+                case ">", ">=" -> {
                     if (previous == null) {
                         deps.put(name, new PackageDependency(name, version));
                     } else {
-                        PackageVersionRange versionRange = previous.getVersionRange();
+                        var versionRange = previous.getVersionRange();
                         if (versionRange.getMinVersion() != null) {
                             throw new DependencyException(
                                     "Conflicting dependency value: " + value + " with " + previous);
                         }
                         versionRange.setMinVersion(version);
                     }
-                    break;
-
-                case "!=": // Not managed, ignore
-                    break;
-
-                default:
-                    throw new DependencyException("Invalid dependency value: " + value);
+                }
+                case "!=" -> {
+                    // Not managed, ignore
+                }
+                default -> throw new DependencyException("Invalid dependency value: " + value);
             }
 
         }

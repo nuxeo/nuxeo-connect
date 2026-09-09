@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.auth.AuthCache;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
-import org.apache.hc.client5.http.auth.CredentialsStore;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -83,18 +81,18 @@ public class RegistrationHelper {
 
     protected static final Log log = LogFactory.getLog(RegistrationHelper.class);
 
-    protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "email",
-            "login", "connectreg:projectName", "firstName", "lastName");
+    protected static List<String> ALLOWED_TRIAL_FIELDS = List.of("termsAndConditions", "company", "email", "login",
+            "connectreg:projectName", "firstName", "lastName");
 
     protected static String getBaseUrl() {
         return ConnectUrlConfig.getRegistrationBaseUrl();
     }
 
     protected static HttpClientContext getHttpClientContext(String url, String login, String password) {
-        HttpClientContext context = HttpClientContext.create();
+        var context = HttpClientContext.create();
 
         // Set credentials provider
-        CredentialsStore credentialsProvider = new BasicCredentialsProvider();
+        var credentialsProvider = new BasicCredentialsProvider();
         Credentials credentials = null;
         if (login != null) {
             credentials = new UsernamePasswordCredentials(login, password == null ? null : password.toCharArray());

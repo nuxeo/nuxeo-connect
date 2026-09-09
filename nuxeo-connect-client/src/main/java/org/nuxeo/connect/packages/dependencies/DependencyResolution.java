@@ -193,7 +193,7 @@ public class DependencyResolution {
             } else {
                 if (installedVersions.size() > 0 && !installedVersions.contains(pkg.getVersion())) {
                     // Upgrade case: already installed in other version(s)
-                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
+                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.getLast());
                 }
                 if (pkg.getPackageState() == PackageState.REMOTE) {
                     // Needs to be download

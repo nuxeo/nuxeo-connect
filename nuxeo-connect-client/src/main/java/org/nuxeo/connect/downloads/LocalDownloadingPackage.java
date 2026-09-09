@@ -33,7 +33,6 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpStatus;
 import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
@@ -141,28 +140,28 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
             try (CloseableHttpResponse httpResponse = httpClient.execute(method)) {
                 int rc = httpResponse.getCode();
                 switch (rc) {
-                    case HttpStatus.SC_OK:
+                    case HttpStatus.SC_OK -> {
                         if (sourceSize == 0) {
-                            Header clheader = httpResponse.getFirstHeader("content-length");
+                            var clheader = httpResponse.getFirstHeader("content-length");
                             if (clheader != null) {
                                 sourceSize = Long.parseLong(clheader.getValue());
                             }
                         }
-                        InputStream in = httpResponse.getEntity().getContent();
+                        var in = httpResponse.getEntity().getContent();
                         saveStreamAsFile(in);
                         registerDownloadedPackage();
                         setPackageState(PackageState.DOWNLOADED);
-                        break;
-
-                    case HttpStatus.SC_NOT_FOUND:
+                    }
+                    case HttpStatus.SC_NOT_FOUND ->
                         throw new ConnectServerError(String.format("Package not found (%s).", rc));
-                    case HttpStatus.SC_FORBIDDEN:
+                    case HttpStatus.SC_FORBIDDEN ->
                         throw new ConnectServerError(String.format("Access refused (%s).", rc));
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case HttpStatus.SC_UNAUTHORIZED ->
                         throw new ConnectServerError(String.format("Registration required (%s).", rc));
-                    default:
+                    default -> {
                         serverError = true;
                         throw new ConnectServerError(String.format("Connect server HTTP response code %s.", rc));
+                    }
                 }
             }
         } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException
