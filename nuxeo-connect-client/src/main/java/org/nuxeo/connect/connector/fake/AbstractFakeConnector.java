@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectServerError;
@@ -77,11 +77,11 @@ public abstract class AbstractFakeConnector extends AbstractConnectConnector {
     protected List<DownloadablePackage> getDownloads(String fileSuffix, String urlSuffix) throws ConnectServerError {
         List<DownloadablePackage> downloads = super.getDownloads(fileSuffix, urlSuffix);
         if (StringUtils.contains(urlSuffix, "?")) { // filter on target platform if needed
-            Map<String, String> queryParams = URLEncodedUtils.parse(StringUtils.substringAfter(urlSuffix, "?"),
+            Map<String, String> queryParams = WWWFormCodec.parse(StringUtils.substringAfter(urlSuffix, "?"),
                     Charset.forName("UTF-8"))
-                                                             .stream()
-                                                             .collect(Collectors.toMap(pair -> pair.getName(),
-                                                                     pair -> pair.getValue()));
+                                                          .stream()
+                                                          .collect(Collectors.toMap(pair -> pair.getName(),
+                                                                  pair -> pair.getValue()));
             PlatformId targetPlatform = PlatformId.parse(queryParams.get("targetPlatform"));
             return downloads.stream().filter(pkg -> {
                 return TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform);
