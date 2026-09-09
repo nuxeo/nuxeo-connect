@@ -25,12 +25,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.packages.PackageManager;
@@ -80,7 +79,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
     }
 
-    protected static List<DownloadablePackage> getDownloads(String filename) throws IOException, JSONException {
+    protected static List<DownloadablePackage> getDownloads(String filename) throws IOException {
         return getDownloads(filename, false);
     }
 
@@ -88,17 +87,15 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
      * @param filename
      * @param isLocal
      * @throws IOException
-     * @throws JSONException
      * @since 1.4.13
      */
-    protected static List<DownloadablePackage> getDownloads(String filename, boolean isLocal)
-            throws IOException, JSONException {
+    protected static List<DownloadablePackage> getDownloads(String filename, boolean isLocal) throws IOException {
         List<DownloadablePackage> result = new ArrayList<>();
         InputStream is = TestPackageManager.class.getClassLoader().getResourceAsStream(TEST_DATA + filename);
         List<String> lines = readLines(is);
         for (String data : lines) {
             PackageDescriptor pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class,
-                    new JSONObject(data));
+                    JSONHelper.readObject(data));
             if (isLocal) {
                 pkg.setLocal(true);
             }

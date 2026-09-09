@@ -33,8 +33,6 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
@@ -44,6 +42,8 @@ import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectSecurityError;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
+import org.nuxeo.connect.data.ConnectJSONException;
+import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.data.SubscriptionStatus;
 
 /**
@@ -115,7 +115,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                 case HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED -> {
                     httpResponse.close();
                     httpClient.close();
-                    throw new ConnectSecurityError("Proxy server require authentication (returned 407)");
+                    throw new ConnectSecurityError("Proxy server requires authentication (returned 407)");
                 }
                 case HttpStatus.SC_GATEWAY_TIMEOUT, HttpStatus.SC_REQUEST_TIMEOUT -> {
                     httpResponse.close();
@@ -129,9 +129,9 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                         if (StringUtils.isBlank(body)) {
                             throw new ConnectServerError("Server returned a code " + rc);
                         }
-                        var obj = new JSONObject(body);
-                        var message = obj.getString("message");
-                        var errorClass = obj.getString("errorClass");
+                        var obj = JSONHelper.readObject(body);
+                        var message = JSONHelper.getString(obj, "message");
+                        var errorClass = JSONHelper.getString(obj, "errorClass");
                         ConnectServerError error;
                         if (ConnectSecurityError.class.getSimpleName().equals(errorClass)) {
                             error = new ConnectSecurityError(message);
@@ -141,7 +141,7 @@ public class ConnectHttpConnector extends AbstractConnectConnector {
                             error = new ConnectServerError(message);
                         }
                         throw error;
-                    } catch (JSONException | ParseException e) {
+                    } catch (IOException | ParseException | ConnectJSONException e) {
                         log.debug("Can't parse server error " + rc, e);
                         throw new ConnectServerError("Server returned a code " + rc);
                     } finally {

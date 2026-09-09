@@ -16,8 +16,10 @@
  */
 package org.nuxeo.connect.connector;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.ConnectJSONException;
+import org.nuxeo.connect.data.JSONHelper;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Exception class for security errors returned by Nuxeo Connect Server.
@@ -37,14 +39,20 @@ public class ConnectServerError extends Exception {
     }
 
     public String toJSON() {
-        JSONObject json = new JSONObject();
+        ObjectNode json = JSONHelper.objectNode();
         try {
             json.put("errorClass", this.getClass().getSimpleName());
-            json.put("message", this.getMessage());
-            if (this.getCause() != null) {
-                json.put("cause", this.getCause().getMessage());
+            String message = this.getMessage();
+            if (message != null) {
+                json.put("message", message);
             }
-        } catch (JSONException e) {
+            if (this.getCause() != null) {
+                String causeMessage = this.getCause().getMessage();
+                if (causeMessage != null) {
+                    json.put("cause", causeMessage);
+                }
+            }
+        } catch (ConnectJSONException e) {
             // NOP
         }
         return json.toString();
