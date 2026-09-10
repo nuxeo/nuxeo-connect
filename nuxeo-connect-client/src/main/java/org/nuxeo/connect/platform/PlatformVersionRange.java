@@ -18,7 +18,6 @@
  * 
  * @origin https://github.com/apache/maven/blob/master/maven-artifact/src/main/java/org/apache/maven/artifact/versioning/Restriction.java
  */
-
 package org.nuxeo.connect.platform;
 
 import org.apache.commons.lang3.StringUtils;
@@ -173,11 +172,10 @@ public class PlatformVersionRange {
             return true;
         }
 
-        if (!(other instanceof PlatformVersionRange)) {
+        if (!(other instanceof PlatformVersionRange restriction)) {
             return false;
         }
 
-        PlatformVersionRange restriction = (PlatformVersionRange) other;
         if (lowerBound != null) {
             if (!lowerBound.equals(restriction.lowerBound)) {
                 return false;

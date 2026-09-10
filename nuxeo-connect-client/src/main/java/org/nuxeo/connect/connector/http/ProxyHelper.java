@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,17 @@
  *     Nuxeo
  *     Yannis JULIENNE
  */
-
 package org.nuxeo.connect.connector.http;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.auth.NTCredentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpHost;
 import org.nuxeo.connect.connector.http.proxy.NashornProxyPacResolver;
 import org.nuxeo.connect.connector.http.proxy.ProxyPacResolver;
 
@@ -51,19 +50,19 @@ public class ProxyHelper {
      *
      * @deprecated since 1.7.8 as it uses {@link HttpClientBuilder#setDefaultRequestConfig(RequestConfig)} that may be
      *             overridden by other calls that do not only affect proxy settings Prefer using
-     *             {@link #configureProxyIfNeeded(org.apache.http.client.config.RequestConfig.Builder, CredentialsProvider, String)}
+     *             {@link #configureProxyIfNeeded(org.apache.hc.client5.http.config.RequestConfig.Builder, CredentialsStore, String)}
      */
     @Deprecated
     public static void configureProxyIfNeeded(HttpClientBuilder httpClientBuilder, String url) {
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        CredentialsStore credentialsProvider = new BasicCredentialsProvider();
         ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
         httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
         httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
     }
 
     public static void configureProxyIfNeeded(RequestConfig.Builder requestConfigBuilder,
-            CredentialsProvider credentialsProvider, String url) {
+            CredentialsStore credentialsProvider, String url) {
         if (ConnectUrlConfig.useProxy()) {
             // configure proxy host
             HttpHost proxyHost = null;
@@ -80,16 +79,17 @@ public class ProxyHelper {
                 requestConfigBuilder.setProxy(proxyHost);
                 // configure proxy auth in BA
                 if (ConnectUrlConfig.isProxyAuthenticated()) {
-                    AuthScope authScope = new AuthScope(proxyHost.getHostName(), proxyHost.getPort(),
-                            AuthScope.ANY_REALM);
+                    AuthScope authScope = new AuthScope(proxyHost);
+                    String proxyPassword = ConnectUrlConfig.getProxyPassword();
+                    char[] proxyPasswordChars = proxyPassword == null ? null : proxyPassword.toCharArray();
                     if (ConnectUrlConfig.isProxyNTLM()) {
                         NTCredentials ntlmCredential = new NTCredentials(ConnectUrlConfig.getProxyLogin(),
-                                ConnectUrlConfig.getProxyPassword(), ConnectUrlConfig.getProxyNTLMHost(),
+                                proxyPasswordChars, ConnectUrlConfig.getProxyNTLMHost(),
                                 ConnectUrlConfig.getProxyNTLMDomain());
                         credentialsProvider.setCredentials(authScope, ntlmCredential);
                     } else {
                         Credentials ba = new UsernamePasswordCredentials(ConnectUrlConfig.getProxyLogin(),
-                                ConnectUrlConfig.getProxyPassword());
+                                proxyPasswordChars);
                         credentialsProvider.setCredentials(authScope, ba);
                     }
                 }

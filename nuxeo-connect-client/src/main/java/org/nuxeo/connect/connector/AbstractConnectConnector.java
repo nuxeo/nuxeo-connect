@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
  *     jcarsique
  *     Yannis JULIENNE
  */
-
 package org.nuxeo.connect.connector;
 
 import java.io.File;
@@ -38,14 +37,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
+import org.nuxeo.connect.data.JSONHelper;
 import org.nuxeo.connect.data.PackageDescriptor;
 import org.nuxeo.connect.data.SubscriptionStatus;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -54,6 +51,10 @@ import org.nuxeo.connect.identity.SecurityHeaderGenerator;
 import org.nuxeo.connect.packages.PackageListCache;
 import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.update.PackageType;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Base class for {@link ConnectConnector} implementers. Provides url binding and marshaling logic.
@@ -194,7 +195,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
                 return null;
             }
             pkg = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
-        } catch (JSONException e) {
+        } catch (IOException | JacksonException | IllegalArgumentException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
             response.release();
@@ -258,14 +259,14 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         try {
             String json = response.getString();
             if (json != null) {
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject ob = (JSONObject) array.get(i);
+                ArrayNode array = JSONHelper.readArray(json);
+                for (int i = 0; i < array.size(); i++) {
+                    ObjectNode ob = JSONHelper.toObjectNode(array.get(i));
                     result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
                 }
                 writeCacheFile(fileSuffix, json);
             }
-        } catch (JSONException e) {
+        } catch (IOException | JacksonException | IllegalArgumentException e) {
             throw new ConnectServerError("Unable to parse response", e);
         } finally {
             response.release();
@@ -308,15 +309,15 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         List<DownloadablePackage> result = new ArrayList<>();
         try {
             String json = FileUtils.readFileToString(cacheFile);
-            JSONArray array = new JSONArray(json);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject ob = (JSONObject) array.get(i);
+            ArrayNode array = JSONHelper.readArray(json);
+            for (int i = 0; i < array.size(); i++) {
+                ObjectNode ob = JSONHelper.toObjectNode(array.get(i));
                 result.add(AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, ob));
             }
         } catch (IOException e) {
             // Issue reading the file
             log.debug(e.getMessage(), e);
-        } catch (JSONException e) {
+        } catch (JacksonException | IllegalArgumentException e) {
             // Issue parsing the file
             log.debug(e.getMessage(), e);
         }

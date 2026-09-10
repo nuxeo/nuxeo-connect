@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -58,7 +58,8 @@ public class Version implements Comparable<Version> {
     /**
      * @since 1.4.4
      */
-    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile("^(((RC|rc|alpha|ALPHA|beta|BETA)\\d*)|([a-zA-Z][0-9]{8})).*$");
+    public static final Pattern SPECIAL_CLASSIFIER = Pattern.compile(
+            "^(((RC|rc|alpha|ALPHA|beta|BETA)\\d*)|([a-zA-Z][0-9]{8})).*$");
 
     /**
      * @since 1.4.4
@@ -222,7 +223,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public boolean equals(Object o) {
-        return (this == o || o != null && (o instanceof Version) && compareTo((Version) o) == 0);
+        return this == o || o instanceof Version version && compareTo(version) == 0;
     }
 
     @Override

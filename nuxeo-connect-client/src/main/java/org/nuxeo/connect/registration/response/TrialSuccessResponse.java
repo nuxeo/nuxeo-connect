@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
  * Contributors:
  *     Nuxeo
  */
-
 package org.nuxeo.connect.registration.response;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.JSONHelper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author <a href="mailto:ak@nuxeo.com">Arnaud Kervern</a>
@@ -39,11 +41,11 @@ public class TrialSuccessResponse extends TrialRegistrationResponse {
     protected Map<String, String> token;
 
     @Override
-    protected void readValue(Object value) throws JSONException {
-        JSONObject obj = (JSONObject) value;
-        this.email = obj.getString("email");
-        this.company = obj.getString("company");
-        this.token = parseToken(obj.getString("wizardToken"));
+    protected void readValue(JsonNode value) throws IOException {
+        ObjectNode obj = JSONHelper.toObjectNode(value);
+        this.email = JSONHelper.getString(obj, "email");
+        this.company = JSONHelper.getString(obj, "company");
+        this.token = parseToken(JSONHelper.getString(obj, "wizardToken"));
     }
 
     protected static Map<String, String> parseToken(String wizToken) {

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
  *     tdelprat
  *     jcarsique
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
@@ -29,12 +27,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
@@ -196,7 +193,7 @@ public class DependencyResolution {
             } else {
                 if (installedVersions.size() > 0 && !installedVersions.contains(pkg.getVersion())) {
                     // Upgrade case: already installed in other version(s)
-                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
+                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.getLast());
                 }
                 if (pkg.getPackageState() == PackageState.REMOTE) {
                     // Needs to be download

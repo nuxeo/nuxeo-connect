@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2014 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,9 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
  */
-
 package org.nuxeo.connect.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +27,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.junit.Test;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -45,7 +42,7 @@ public class TestSerialization {
     private static final Log log = LogFactory.getLog(TestSerialization.class);
 
     @Test
-    public void testSerializeSubscriptionStatus() throws JSONException {
+    public void testSerializeSubscriptionStatus() throws Exception {
         SubscriptionStatus status = new SubscriptionStatus();
         status.setEndDate("25/11/2011");
         status.setContractStatus("OK");
@@ -57,8 +54,7 @@ public class TestSerialization {
         assertNotNull(json);
         log.info(json);
 
-        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(
-                SubscriptionStatus.class, json);
+        SubscriptionStatus s2 = AbstractJSONSerializableData.loadFromJSON(SubscriptionStatus.class, json);
         assertNotNull(s2);
 
         assertEquals(status.getContractStatus(), s2.getContractStatus());
@@ -83,12 +79,10 @@ public class TestSerialization {
         p.setTitle("My Title");
         p.setType(PackageType.STUDIO);
         p.setVersion(new Version(1, 0, 2));
-        PackageDependency[] deps = {
-                new PackageDependency("my-package:1.1:1.2"),
+        PackageDependency[] deps = { new PackageDependency("my-package:1.1:1.2"),
                 new PackageDependency("my-package:2.0:2.2") };
         p.setDependencies(deps);
-        PackageDependency[] optDeps = {
-                new PackageDependency("my-opt-package:1.1:1.2"),
+        PackageDependency[] optDeps = { new PackageDependency("my-opt-package:1.1:1.2"),
                 new PackageDependency("my-opt-package:2.0:2.2") };
         p.setOptionalDependencies(optDeps);
         p.setCommentsNumber(8);
@@ -101,8 +95,7 @@ public class TestSerialization {
         assertNotNull(json);
         log.info(json);
 
-        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(
-                PackageDescriptor.class, json);
+        PackageDescriptor p2 = AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
         assertNotNull(p2);
         assertEquals(p.getDescription(), p2.getDescription());
         assertEquals(p.getClassifier(), p2.getClassifier());

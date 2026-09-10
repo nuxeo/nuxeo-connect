@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.connector.fake;
 
 import java.nio.charset.Charset;
@@ -27,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.hc.core5.net.URLEncodedUtils;
 import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.ConnectServerError;

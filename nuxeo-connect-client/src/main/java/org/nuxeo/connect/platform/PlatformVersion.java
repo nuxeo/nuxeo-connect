@@ -64,11 +64,7 @@ public class PlatformVersion implements Comparable<PlatformVersion> {
             return true;
         }
 
-        if (!(other instanceof PlatformVersion)) {
-            return false;
-        }
-
-        return compareTo((PlatformVersion) other) == 0;
+        return other instanceof PlatformVersion platformVersion && compareTo(platformVersion) == 0;
     }
 
     @Override

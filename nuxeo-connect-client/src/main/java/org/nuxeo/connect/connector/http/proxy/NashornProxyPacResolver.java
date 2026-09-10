@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ import javax.script.SimpleScriptContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 
@@ -122,12 +122,14 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
             String url = ConnectUrlConfig.getProxyPacUrl();
             try (CloseableHttpClient httpClient = getHttpClientBuilderWithoutProxy(null, null, url).build();
                     CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url))) {
-                StatusLine statusLine = httpResponse.getStatusLine();
-                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                if (httpResponse.getCode() == HttpStatus.SC_OK) {
                     fileCache.saveValue(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
-                    throw new IOException("Unable to get pac file: " + statusLine);
+                    throw new IOException(
+                            "Unable to get pac file: " + httpResponse.getCode() + " " + httpResponse.getReasonPhrase());
                 }
+            } catch (ParseException e) {
+                throw new IOException("Unable to read pac file", e);
             }
         }
         return new StringReader(fileCache.getValue());

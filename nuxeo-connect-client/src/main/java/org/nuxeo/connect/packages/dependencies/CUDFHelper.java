@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@
  *     Mathieu Guillaume
  *     Julien Carsique
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.io.BufferedReader;
@@ -103,12 +101,10 @@ public class CUDFHelper {
         }
 
         public int whenNotFound() {
-            switch (this) {
-            case NONE_WHEN_NOT_FOUND:
-                return MATCH_NONE_CUDF_VERSION;
-            default:
-                return MATCH_ALL_CUDF_VERSION;
-            }
+            return switch (this) {
+                case NONE_WHEN_NOT_FOUND -> MATCH_NONE_CUDF_VERSION;
+                default -> MATCH_ALL_CUDF_VERSION;
+            };
         }
     }
 
@@ -289,8 +285,7 @@ public class CUDFHelper {
      * @since 1.4.18
      */
     protected void computeInvolvedReferences(Set<String> involvedPackages,
-            Set<String> installedOrRequiredSNAPSHOTPackages,
-            DownloadablePackage pkg,
+            Set<String> installedOrRequiredSNAPSHOTPackages, DownloadablePackage pkg,
             Map<String, List<DownloadablePackage>> allPackagesMap) {
         if (involvedPackages.contains(pkg.getName())) {
             boolean isPkgInstalledOrRequiredSNAPSHOT = installedOrRequiredSNAPSHOTPackages.contains(pkg.getName());
@@ -310,8 +305,7 @@ public class CUDFHelper {
      * @since 1.4.18
      */
     protected void computeInvolvedReferences(Set<String> involvedPackages,
-            Set<String> installedOrRequiredSNAPSHOTPackages,
-            PackageDependency[] pkgDeps,
+            Set<String> installedOrRequiredSNAPSHOTPackages, PackageDependency[] pkgDeps,
             Map<String, List<DownloadablePackage>> allPackagesMap, boolean isParentInstalledOrRequiredSNAPSHOT) {
         for (PackageDependency pkgDep : pkgDeps) {
             if (isParentInstalledOrRequiredSNAPSHOT) {
@@ -534,30 +528,30 @@ public class CUDFHelper {
                     continue;
                 }
                 switch (tag) {
-                case CUDFPackage.TAG_VERSION:
-                    nuxeoCUDFPkgDesc.setCUDFVersion(Integer.parseInt(value));
-                    break;
-                case CUDFPackage.TAG_INSTALLED:
-                    nuxeoCUDFPkgDesc.setInstalled(Boolean.parseBoolean(value));
-                    break;
-                case CUDFPackage.TAG_DEPENDS:
-                    nuxeoCUDFPkgDesc.setDependencies(parseCUDFDeps(value));
-                    break;
-                case CUDFPackage.TAG_CONFLICTS:
-                    nuxeoCUDFPkgDesc.setConflicts(parseCUDFDeps(value));
-                    break;
-                case CUDFPackage.TAG_PROVIDES:
-                    nuxeoCUDFPkgDesc.setProvides(parseCUDFDeps(value));
-                    break;
-                case CUDFPackage.TAG_REQUEST:
-                case CUDFPackage.TAG_INSTALL:
-                case CUDFPackage.TAG_REMOVE:
-                case CUDFPackage.TAG_UPGRADE:
-                    log.debug("Ignore request stanza " + line);
-                    break;
-                case CUDFPackage.TAG_PACKAGE:
-                default:
-                    throw new DependencyException("Invalid CUDF line: " + line);
+                    case CUDFPackage.TAG_VERSION:
+                        nuxeoCUDFPkgDesc.setCUDFVersion(Integer.parseInt(value));
+                        break;
+                    case CUDFPackage.TAG_INSTALLED:
+                        nuxeoCUDFPkgDesc.setInstalled(Boolean.parseBoolean(value));
+                        break;
+                    case CUDFPackage.TAG_DEPENDS:
+                        nuxeoCUDFPkgDesc.setDependencies(parseCUDFDeps(value));
+                        break;
+                    case CUDFPackage.TAG_CONFLICTS:
+                        nuxeoCUDFPkgDesc.setConflicts(parseCUDFDeps(value));
+                        break;
+                    case CUDFPackage.TAG_PROVIDES:
+                        nuxeoCUDFPkgDesc.setProvides(parseCUDFDeps(value));
+                        break;
+                    case CUDFPackage.TAG_REQUEST:
+                    case CUDFPackage.TAG_INSTALL:
+                    case CUDFPackage.TAG_REMOVE:
+                    case CUDFPackage.TAG_UPGRADE:
+                        log.debug("Ignore request stanza " + line);
+                        break;
+                    case CUDFPackage.TAG_PACKAGE:
+                    default:
+                        throw new DependencyException("Invalid CUDF line: " + line);
                 }
             }
         }
@@ -598,42 +592,40 @@ public class CUDFHelper {
             Version version = new Version(split[2].trim());
             PackageDependency previous = deps.get(name);
             switch (rel) {
-            case "=":
-                if (previous != null) {
-                    throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
-                }
-                deps.put(name, new PackageDependency(name, version, version));
-                break;
-            case "<": // Not managed, let's consider it's "<="
-            case "<=":
-                if (previous == null) {
-                    deps.put(name, new PackageDependency(name, Version.ZERO, version));
-                } else {
-                    PackageVersionRange versionRange = previous.getVersionRange();
-                    if (versionRange.getMaxVersion() != null) {
+                case "=" -> {
+                    if (previous != null) {
                         throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
                     }
-                    versionRange.setMaxVersion(version);
+                    deps.put(name, new PackageDependency(name, version, version));
                 }
-                break;
-            case ">": // Not managed, let's consider it's ">="
-            case ">=":
-                if (previous == null) {
-                    deps.put(name, new PackageDependency(name, version));
-                } else {
-                    PackageVersionRange versionRange = previous.getVersionRange();
-                    if (versionRange.getMinVersion() != null) {
-                        throw new DependencyException("Conflicting dependency value: " + value + " with " + previous);
+                case "<", "<=" -> {
+                    if (previous == null) {
+                        deps.put(name, new PackageDependency(name, Version.ZERO, version));
+                    } else {
+                        var versionRange = previous.getVersionRange();
+                        if (versionRange.getMaxVersion() != null) {
+                            throw new DependencyException(
+                                    "Conflicting dependency value: " + value + " with " + previous);
+                        }
+                        versionRange.setMaxVersion(version);
                     }
-                    versionRange.setMinVersion(version);
                 }
-                break;
-
-            case "!=": // Not managed, ignore
-                break;
-
-            default:
-                throw new DependencyException("Invalid dependency value: " + value);
+                case ">", ">=" -> {
+                    if (previous == null) {
+                        deps.put(name, new PackageDependency(name, version));
+                    } else {
+                        var versionRange = previous.getVersionRange();
+                        if (versionRange.getMinVersion() != null) {
+                            throw new DependencyException(
+                                    "Conflicting dependency value: " + value + " with " + previous);
+                        }
+                        versionRange.setMinVersion(version);
+                    }
+                }
+                case "!=" -> {
+                    // Not managed, ignore
+                }
+                default -> throw new DependencyException("Invalid dependency value: " + value);
             }
 
         }

@@ -4,7 +4,7 @@
     <groupId>org.nuxeo.connect</groupId>
     <artifactId>nuxeo-connect-client-parent</artifactId>
     <!-- version controlled by jgitver -->
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>nuxeo-connect-client</artifactId>
@@ -17,8 +17,8 @@
       <artifactId>commons-collections4</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -45,8 +45,17 @@
       <artifactId>org.eclipse.equinox.p2.cudf</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <!-- needed by NashornProxyPacResolver, removed from the JDK since Java 15 -->
+    <dependency>
+      <groupId>org.openjdk.nashorn</groupId>
+      <artifactId>nashorn-core</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -59,10 +68,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>provided</scope>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
@@ -72,6 +80,11 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-1.2-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -114,7 +127,6 @@
                   <exclude>logkit:logkit</exclude>
                   <exclude>avalon-framework:avalon-framework</exclude>
                   <exclude>log4j:log4j</exclude>
-                  <exclude>org.json:json</exclude>
                 </excludes>
               </artifactSet>
               <filters>
