@@ -23,8 +23,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.DefaultCallbackHolder;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -42,7 +42,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
 
     protected PackageManager pm;
 
-    protected static Log log = LogFactory.getLog(TestPackageManager.class);
+    protected static Logger log = LogManager.getLogger(TestPackageManager.class);
 
     public static final String TEST_DATA = "test-data/";
 

@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -40,7 +40,7 @@ import org.nuxeo.connect.update.Version;
 
 public class TestSerialization {
 
-    private static final Log log = LogFactory.getLog(TestSerialization.class);
+    private static final Logger log = LogManager.getLogger(TestSerialization.class);
 
     @Test
     public void testSerializeSubscriptionStatus() throws ConnectJSONException {

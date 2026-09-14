@@ -19,8 +19,8 @@ package org.nuxeo.connect.update;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Those versions are used in the Marketplace packages. They are in the form major.minor.patch-classifier with some
@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Version implements Comparable<Version> {
 
-    private static final Log log = LogFactory.getLog(Version.class);
+    private static final Logger log = LogManager.getLogger(Version.class);
 
     /**
      * @since 1.4
@@ -177,7 +177,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public int compareTo(Version o) {
-        log.trace("Comparing " + this + " with " + o);
+        log.trace("Comparing {} with {}", this, o);
         int d = major - o.major;
         if (d != 0) {
             return d;

@@ -33,8 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -65,7 +65,7 @@ import org.nuxeo.connect.update.task.Task;
  */
 public class PackageManagerImpl implements PackageManager {
 
-    protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
+    protected static final Logger log = LogManager.getLogger(PackageManagerImpl.class);
 
     protected List<PackageSource> localSources = new ArrayList<>();
 
@@ -114,8 +114,8 @@ public class PackageManagerImpl implements PackageManager {
         if (P2CUDF_DEPENDENCY_RESOLVER.equals(resolverType)) {
             resolver = new P2CUDFDependencyResolver(this);
         } else {
-            log.warn("Resolver " + resolverType + "is not supported - fallback on default resolver "
-                    + DEFAULT_DEPENDENCY_RESOLVER);
+            log.warn("Resolver {} is not supported - fallback on default resolver {}", resolverType,
+                    DEFAULT_DEPENDENCY_RESOLVER);
             resolver = new P2CUDFDependencyResolver(this);
         }
     }
@@ -391,7 +391,7 @@ public class PackageManagerImpl implements PackageManager {
                 remoteSources.add(source);
             }
         } else {
-            log.warn("Already registered a package source named " + name);
+            log.warn("Already registered a package source named {}", name);
         }
     }
 
@@ -547,7 +547,7 @@ public class PackageManagerImpl implements PackageManager {
             if (download != null) {
                 downloadings.add(download);
             } else {
-                log.error("Download failed for " + packageId);
+                log.error("Download failed for {}", packageId);
             }
         }
         return downloadings;
@@ -751,7 +751,7 @@ public class PackageManagerImpl implements PackageManager {
                 if (localPackage != null) {
                     packagesToUninstall.add(localPackage);
                 } else {
-                    log.error("Missing local package to remove: " + pkgIdToRemove);
+                    log.error("Missing local package to remove: {}", pkgIdToRemove);
                 }
             }
         }
@@ -891,8 +891,7 @@ public class PackageManagerImpl implements PackageManager {
         if (!optionalMissingDeps.isEmpty() && !isRemoveList) {
             for (Entry<String, Set<String>> entry : optionalMissingDeps.entrySet()) {
                 if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                    log.info(String.format("Optional dependencies %s will be ignored for '%s'.", entry.getValue(),
-                            entry.getKey()));
+                    log.info("Optional dependencies {} will be ignored for '{}'.", entry.getValue(), entry.getKey());
                 }
             }
         }

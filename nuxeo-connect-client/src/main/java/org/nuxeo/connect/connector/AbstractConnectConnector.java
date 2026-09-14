@@ -35,8 +35,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.data.AbstractJSONSerializableData;
@@ -94,7 +94,7 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
 
     private static final String CACHE_FILE_PREFIX = "pkg_cache_";
 
-    protected static Log log = LogFactory.getLog(AbstractConnectConnector.class);
+    protected static Logger log = LogManager.getLogger(AbstractConnectConnector.class);
 
     protected String getBaseUrl() {
         if (LogicalInstanceIdentifier.isRegistered()) {
@@ -238,11 +238,11 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
         // Try reading from the cache first
         result = readCacheFile(fileSuffix);
         if (result != null) {
-            log.debug("Using cache for " + fileSuffix);
+            log.debug("Using cache for {}", fileSuffix);
             return result;
         }
         result = new ArrayList<>();
-        log.debug("Cache empty or expired for " + fileSuffix + ". Sending request to " + getBaseUrl());
+        log.debug("Cache empty or expired for {}. Sending request to {}", fileSuffix, getBaseUrl());
         // Fallback on the real source
         String url = getBaseUrl() + GET_DOWNLOADS_SUFFIX + "/" + urlSuffix;
         ConnectServerResponse response = execCall(url);
