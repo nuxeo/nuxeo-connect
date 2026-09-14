@@ -33,8 +33,8 @@
       <artifactId>commons-codec</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -82,6 +82,21 @@
       <artifactId>log4j-1.2-api</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-jcl</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -122,9 +137,8 @@
                   <exclude>commons-codec:commons-codec</exclude>
                   <exclude>commons-logging:commons-logging</exclude>
                   <exclude>commons-lang:commons-lang</exclude>
-                  <exclude>logkit:logkit</exclude>
-                  <exclude>avalon-framework:avalon-framework</exclude>
                   <exclude>log4j:log4j</exclude>
+                  <exclude>org.slf4j:slf4j-api</exclude>
                 </excludes>
               </artifactSet>
               <filters>

@@ -22,13 +22,13 @@ package org.nuxeo.connect.connector.http;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.connector.ConnectServerResponse;
 
@@ -38,7 +38,7 @@ import org.nuxeo.connect.connector.ConnectServerResponse;
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
 public class ConnectHttpResponse implements ConnectServerResponse {
-    protected static final Log log = LogFactory.getLog(ConnectHttpResponse.class);
+    protected static final Logger log = LogManager.getLogger(ConnectHttpResponse.class);
 
     protected CloseableHttpClient httpClient;
 

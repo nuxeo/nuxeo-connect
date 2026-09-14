@@ -38,14 +38,14 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 
@@ -60,7 +60,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
 
     protected static final String EXEC_PAC_FUNC = "FindProxyForURL";
 
-    private static final Log log = LogFactory.getLog(NashornProxyPacResolver.class);
+    private static final Logger log = LogManager.getLogger(NashornProxyPacResolver.class);
 
     protected SimpleStringCache fileCache = new SimpleStringCache(5);
 
@@ -100,7 +100,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
             String proxies = (String) ((Invocable) engine).invokeFunction(EXEC_PAC_FUNC, url, getHost(url));
             return proxies.split(";");
         } catch (IOException | ScriptException | NoSuchMethodException e) {
-            log.warn(e, e);
+            log.warn(e.getMessage(), e);
         }
         return null;
     }

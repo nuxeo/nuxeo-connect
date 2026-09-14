@@ -17,8 +17,8 @@ package org.nuxeo.connect;
 import java.io.InputStream;
 import java.util.PropertyResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -30,7 +30,7 @@ import org.nuxeo.connect.update.PackageUpdateService;
 
 public class NuxeoConnectClient {
 
-    protected static final Log log = LogFactory.getLog(NuxeoConnectClient.class);
+    protected static final Logger log = LogManager.getLogger(NuxeoConnectClient.class);
 
     protected static final String PROTOCOL_VERSION = "1.4";
 

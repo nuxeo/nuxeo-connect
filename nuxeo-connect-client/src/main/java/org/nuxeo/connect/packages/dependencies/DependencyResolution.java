@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
@@ -46,7 +46,7 @@ import org.nuxeo.connect.update.Version;
  */
 public class DependencyResolution {
 
-    private static final Log log = LogFactory.getLog(DependencyResolution.class);
+    private static final Logger log = LogManager.getLogger(DependencyResolution.class);
 
     protected Boolean resolution = null;
 
@@ -124,7 +124,7 @@ public class DependencyResolution {
 
     public synchronized boolean addPackage(String pkgName, Version v, boolean fifo) {
         if (!allPackages.containsKey(pkgName)) { // Add package
-            log.debug("addPackage " + pkgName + " " + v);
+            log.debug("addPackage {} {}", pkgName, v);
             allPackages.put(pkgName, v);
             if (fifo) {
                 orderedInstallablePackages.add(pkgName + "-" + v.toString());
@@ -134,7 +134,7 @@ public class DependencyResolution {
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with " + allPackages.get(pkgName));
         } else { // Package already added in the same version
-            log.debug("addPackage ignored " + pkgName + " " + v);
+            log.debug("addPackage ignored {} {}", pkgName, v);
         }
         return !isFailed();
     }
@@ -144,13 +144,13 @@ public class DependencyResolution {
      */
     public boolean addUnchangedPackage(String pkgName, Version v) {
         if (!allPackages.containsKey(pkgName)) { // Add package
-            log.debug("addPackage " + pkgName + " " + v);
+            log.debug("addPackage {} {}", pkgName, v);
             allPackages.put(pkgName, v);
             // orderedInstallablePackages.add(pkgName + "-" + v.toString());
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with " + allPackages.get(pkgName));
         } else { // Package already added in the same version
-            log.debug("addPackage ignored " + pkgName + " " + v);
+            log.debug("addPackage ignored {} {}", pkgName, v);
         }
         return !isFailed();
     }
@@ -160,7 +160,7 @@ public class DependencyResolution {
     }
 
     public synchronized void markPackageForRemoval(String pkgName, Version v, boolean fifo) {
-        log.debug("markPackageForRemoval " + pkgName + " " + v);
+        log.debug("markPackageForRemoval {} {}", pkgName, v);
         localPackagesToRemove.put(pkgName, v);
         if (fifo) {
             orderedRemovablePackages.add(pkgName + "-" + v.toString());

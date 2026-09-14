@@ -18,16 +18,16 @@
 
 package org.nuxeo.connect.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier;
 import org.nuxeo.connect.identity.LogicalInstanceIdentifier.InvalidCLID;
 import org.nuxeo.connect.identity.TechnicalInstanceIdentifier;
@@ -36,7 +36,7 @@ public class TestIDGens {
 
     private static final String TOTO_TITI = "toto--titi";
 
-    private static final Log log = LogFactory.getLog(TestIDGens.class);
+    private static final Logger log = LogManager.getLogger(TestIDGens.class);
 
     @Test
     public void testCTIDGen() {
