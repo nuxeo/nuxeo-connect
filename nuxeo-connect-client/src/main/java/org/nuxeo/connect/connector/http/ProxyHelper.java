@@ -26,8 +26,6 @@ import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.nuxeo.connect.connector.http.proxy.NashornProxyPacResolver;
 import org.nuxeo.connect.connector.http.proxy.ProxyPacResolver;
 
@@ -44,22 +42,6 @@ public class ProxyHelper {
     public static ProxyPacResolver pacResolver = new NashornProxyPacResolver();
 
     protected static String PROXY_PAC_DIRECT = "DIRECT";
-
-    /**
-     * Configure proxy settings.
-     *
-     * @deprecated since 1.7.8 as it uses {@link HttpClientBuilder#setDefaultRequestConfig(RequestConfig)} that may be
-     *             overridden by other calls that do not only affect proxy settings Prefer using
-     *             {@link #configureProxyIfNeeded(org.apache.http.client.config.RequestConfig.Builder, CredentialsProvider, String)}
-     */
-    @Deprecated
-    public static void configureProxyIfNeeded(HttpClientBuilder httpClientBuilder, String url) {
-        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        ProxyHelper.configureProxyIfNeeded(requestConfigBuilder, credentialsProvider, url);
-        httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
-        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-    }
 
     public static void configureProxyIfNeeded(RequestConfig.Builder requestConfigBuilder,
             CredentialsProvider credentialsProvider, String url) {

@@ -145,12 +145,6 @@ public class FakeDownloadablePackage implements DownloadablePackage {
         return null;
     }
 
-    @Deprecated
-    @Override
-    public int getState() {
-        return packageState.getValue();
-    }
-
     @Override
     public PackageState getPackageState() {
         return packageState;

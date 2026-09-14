@@ -32,14 +32,6 @@ import org.nuxeo.connect.update.PackageType;
 public interface ConnectConnector {
 
     /**
-     * @param type Can be null since 1.4
-     * @return All type packages or all packages if type is null. Must not be null.
-     * @deprecated since 1.7.2, prefer to use {@link #getDownloads(PackageType, PlatformId)}
-     */
-    @Deprecated
-    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
-
-    /**
      * @param type The type of packages to retrieve, can be null.
      * @param currentTargetPlatform The target platform the retrieved packages must be compatible with, can be null.
      * @return The list of the downloadable packages of the given type, for the given targetPlatform. May be empty.
@@ -56,14 +48,6 @@ public interface ConnectConnector {
      * @since 1.4
      */
     void flushCache();
-
-    /**
-     * @since 1.4.19
-     * @return Must not be null.
-     * @deprecated since 1.7.2, prefer to use {@link #getRegisteredStudio(PlatformId)}
-     */
-    @Deprecated
-    List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
 
     /**
      * @since 1.7.2

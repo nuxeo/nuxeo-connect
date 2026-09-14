@@ -43,7 +43,7 @@ public class TestService extends TestCase {
         LogicalInstanceIdentifier.cleanUp();
         NuxeoConnectClient.resetPackageManager();
         ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(
-                new MockPackageUpdateService(NuxeoConnectClient.getPackageManager()));
+                new MockPackageUpdateService(NuxeoConnectClient.getPackageManager(null)));
     }
 
     public void testServiceLookup() {
@@ -90,7 +90,7 @@ public class TestService extends TestCase {
     }
 
     public void testPackageManagerSimple() throws Exception {
-        PackageManager pm = NuxeoConnectClient.getPackageManager();
+        PackageManager pm = NuxeoConnectClient.getPackageManager(null);
         assertNotNull(pm);
         for (PackageSource packageSource : pm.getAllSources()) {
             assertNotNull(packageSource.listPackages());

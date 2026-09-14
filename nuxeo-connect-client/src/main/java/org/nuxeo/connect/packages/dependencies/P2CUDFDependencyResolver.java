@@ -223,13 +223,4 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         }
         return list.toArray(new PackageDependency[list.size()]);
     }
-
-    @Override
-    @Deprecated
-    public DependencyResolution resolve(String pkgIdOrName, PlatformId targetPlatform) throws DependencyException {
-        List<String> pkgInstall = new ArrayList<>();
-        pkgInstall.add(pkgIdOrName);
-        return resolve(pkgInstall, null, null, targetPlatform);
-    }
-
 }

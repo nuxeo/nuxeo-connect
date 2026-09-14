@@ -68,22 +68,6 @@ public interface PackageDefinition extends Package {
     void setVendor(String vendor);
 
     /**
-     * Get the package license name. E.g. LGPL, BSD etc.
-     *
-     * @deprecated Since 1.4.5. Duplicates {@link #getLicenseType()}.
-     */
-    @Deprecated
-    String getLicense();
-
-    /**
-     * Set the package license name.
-     *
-     * @deprecated Since 1.4.5. Duplicates {@link #setLicenseType(String)}.
-     */
-    @Deprecated
-    void setLicense(String license);
-
-    /**
      * Set the package license name.
      */
     void setLicenseType(String license);
@@ -92,23 +76,6 @@ public interface PackageDefinition extends Package {
      * Set the license URL.
      */
     void setLicenseUrl(String url);
-
-    /**
-     * Get the target platforms where this package may be installed.
-     *
-     * @deprecated Since 1.4.5. Duplicates {@link #getTargetPlatforms()}.
-     */
-    @Deprecated
-    String[] getPlatforms();
-
-    /**
-     * Set the target platforms of this package.
-     *
-     * @see #getPlatforms()
-     * @deprecated Since 1.4.5. Duplicates {@link #setTargetPlatforms(String[])} .
-     */
-    @Deprecated
-    void setPlatforms(String[] platforms);
 
     /**
      * Set the target platforms of this package.

@@ -100,12 +100,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
-    @Deprecated
-    public void setState(int state) {
-        localPackage.setState(state);
-    }
-
-    @Override
     public void setState(PackageState state) {
         localPackage.setState(state);
     }
@@ -148,12 +142,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     @Override
     public String getName() {
         return localPackage.getName();
-    }
-
-    @Deprecated
-    @Override
-    public int getState() {
-        return localPackage.getState();
     }
 
     @Override

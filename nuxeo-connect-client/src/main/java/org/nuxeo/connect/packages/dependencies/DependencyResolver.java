@@ -31,16 +31,6 @@ import org.nuxeo.connect.platform.PlatformId;
 public interface DependencyResolver {
 
     /**
-     * This method was used for backward compatibility with the {@link LegacyDependencyResolver} API. It is not possible
-     * with the current implementation (1.4.26) to upgrade a single package without specifying its version, so calling
-     * this method on an already installed package will return a no-change solution.
-     *
-     * @deprecated since 1.4.26 Use {@link #resolve(List, List, List, PlatformId)} instead
-     */
-    @Deprecated
-    DependencyResolution resolve(String pkgIdOrName, PlatformId targetPlatform) throws DependencyException;
-
-    /**
      * @since 1.4
      */
     DependencyResolution resolve(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,

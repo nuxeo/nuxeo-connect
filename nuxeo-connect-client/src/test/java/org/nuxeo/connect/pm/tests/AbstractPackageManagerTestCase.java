@@ -72,7 +72,7 @@ public abstract class AbstractPackageManagerTestCase extends TestCase {
         super.setUp();
         System.setProperty("org.nuxeo.connect.client.testMode", "true");
         LogicalInstanceIdentifier.cleanUp();
-        pm = NuxeoConnectClient.getPackageManager();
+        pm = NuxeoConnectClient.getPackageManager(null);
         assertNotNull(pm);
         ((PackageManagerImpl) pm).resetSources();
         ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(
