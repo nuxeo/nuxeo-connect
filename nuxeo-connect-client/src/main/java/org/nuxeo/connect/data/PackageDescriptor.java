@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
@@ -154,22 +153,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         supportsHotReload = descriptor.supportsHotReload();
         subscriptionRequired = descriptor.hasSubscriptionRequired();
         owner = descriptor.getOwner();
-    }
-
-    /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
-        return loadFromJSON(PackageDescriptor.class, json);
-    }
-
-    /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
-        return loadFromJSON(new JSONObject(json));
     }
 
     /**
@@ -574,20 +557,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
 
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
-    }
-
-    @Deprecated
-    @Override
-    public int getState() {
-        return packageState.getValue();
-    }
-
-    /**
-     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
-     */
-    @Deprecated
-    public void setState(int state) {
-        packageState = PackageState.getByValue(state);
     }
 
     @Override

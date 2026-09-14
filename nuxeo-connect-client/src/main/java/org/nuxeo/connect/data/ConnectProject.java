@@ -16,8 +16,6 @@
  */
 package org.nuxeo.connect.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 
 /**
@@ -58,16 +56,6 @@ public class ConnectProject extends AbstractJSONSerializableData {
 
     public void setSymbolicName(String symbolicName) {
         this.symbolicName = symbolicName;
-    }
-
-    @Deprecated
-    public static ConnectProject loadFromJSON(JSONObject ob) throws JSONException {
-        return ConnectProject.loadFromJSON(ConnectProject.class, ob);
-    }
-
-    @Deprecated
-    public static ConnectProject loadFromJSON(String json) throws JSONException {
-        return ConnectProject.loadFromJSON(ConnectProject.class, json);
     }
 
     @Override

@@ -28,23 +28,6 @@ public class DummyPackageSource extends AbstractPackageSource implements Package
     protected List<DownloadablePackage> pkgs = new ArrayList<>();
 
     /**
-     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List)}
-     */
-    @Deprecated
-    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local) {
-        this(pkgs, "dummy");
-    }
-
-    /**
-     * @since 1.4.13
-     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List, String)}
-     */
-    @Deprecated
-    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local, String id) {
-        this(pkgs, id);
-    }
-
-    /**
      * @since 1.4.19
      */
     public DummyPackageSource(List<DownloadablePackage> pkgs) {

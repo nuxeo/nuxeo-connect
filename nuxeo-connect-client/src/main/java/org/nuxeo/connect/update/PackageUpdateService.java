@@ -45,15 +45,6 @@ public interface PackageUpdateService {
     void shutdown() throws PackageException;
 
     /**
-     * Set the state for the given package.
-     *
-     * @see PackageState
-     * @deprecated Since 1.4.5. See {@link #setPackageState(LocalPackage, PackageState)}
-     */
-    @Deprecated
-    void setPackageState(LocalPackage pkg, int state) throws PackageException;
-
-    /**
      * @since 1.4.5
      */
     void setPackageState(LocalPackage pkg, PackageState state) throws PackageException;

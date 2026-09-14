@@ -27,18 +27,6 @@ public class ConnectUrlConfig {
 
     public static final String CONNECT_DEFAULT_BASEURL = "https://connect.nuxeo.com/nuxeo/site/";
 
-    /**
-     * @deprecated since 1.7.5, use {@link #setTestPort} instead
-     */
-    @Deprecated
-    public static final int CONNECT_TEST_MODE_PORT = 8082;
-
-    /**
-     * @deprecated since 1.7.5, use {@link #getBaseUrl} instead
-     */
-    @Deprecated
-    public static final String CONNECT_TEST_MODE_BASEURL = "http://127.0.0.1:" + CONNECT_TEST_MODE_PORT + "/";
-
     public static final String CONNECT_URL_PROPERTY = "org.nuxeo.connect.url";
 
     /**

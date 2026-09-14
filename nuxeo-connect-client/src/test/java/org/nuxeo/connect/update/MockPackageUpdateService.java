@@ -53,12 +53,6 @@ public class MockPackageUpdateService implements PackageUpdateService {
     }
 
     @Override
-    @Deprecated
-    public void setPackageState(LocalPackage pkg, int state) throws PackageException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void setPackageState(LocalPackage pkg, PackageState state) throws PackageException {
         throw new UnsupportedOperationException();
     }

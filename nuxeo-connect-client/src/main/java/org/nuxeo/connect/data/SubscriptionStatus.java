@@ -16,8 +16,6 @@
  */
 package org.nuxeo.connect.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
@@ -96,16 +94,6 @@ public class SubscriptionStatus extends AbstractJSONSerializableData {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
-    }
-
-    @Deprecated
-    public static SubscriptionStatus loadFromJSON(JSONObject ob) throws JSONException {
-        return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, ob);
-    }
-
-    @Deprecated
-    public static SubscriptionStatus loadFromJSON(String json) throws JSONException {
-        return SubscriptionStatus.loadFromJSON(SubscriptionStatus.class, json);
     }
 
     @Override

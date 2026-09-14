@@ -87,14 +87,6 @@ public class NuxeoConnectClient {
     }
 
     /**
-     * @deprecated since 1.7.2, prefer to use {@link #getPackageManager(PlatformId)}
-     */
-    @Deprecated
-    public static synchronized PackageManager getPackageManager() {
-        return getPackageManager(null);
-    }
-
-    /**
      * @since 1.7.2
      */
     public static synchronized PackageManager getPackageManager(PlatformId currentTargetPlatform) {

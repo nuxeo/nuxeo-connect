@@ -205,11 +205,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
     }
 
     @Override
-    public List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError {
-        return getDownloads(type, null);
-    }
-
-    @Override
     public List<DownloadablePackage> getDownloads(PackageType type, PlatformId currentTargetPlatform)
             throws ConnectServerError {
         String fileSuffix = String.valueOf(type);
@@ -219,11 +214,6 @@ public abstract class AbstractConnectConnector implements ConnectConnector {
             fileSuffix += "_" + currentTargetPlatform.asString();
         }
         return getDownloads(fileSuffix, urlSuffix);
-    }
-
-    @Override
-    public List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError {
-        return getRegisteredStudio(null);
     }
 
     @Override

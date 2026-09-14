@@ -91,14 +91,6 @@ public class DependencyResolution {
     }
 
     /**
-     * @deprecated Since 1.4, use {@link #markAsFailed(String)} instead
-     */
-    @Deprecated
-    public void markAsFailed() {
-        resolution = false;
-    }
-
-    /**
      * @since 1.4
      * @param message failed message
      */

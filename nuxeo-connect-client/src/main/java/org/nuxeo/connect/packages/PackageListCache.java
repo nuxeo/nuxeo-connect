@@ -97,21 +97,10 @@ public class PackageListCache {
     }
 
     /**
-     * Is the given cache expired
-     *
-     * @see #CONNECT_CLIENT_CACHE_MINUTES_PROPERTY
-     * @since 1.4.18
-     * @deprecated use {@link PackageCacheEntry#isExpired(long)} instead
-     */
-    @Deprecated
-    public boolean isExpired(PackageListCacheEntry entry) {
-        return entry.isExpired(cache_duration);
-    }
-
-    /**
      * Is the cache associated to the given type expired
      *
-     * @see #isExpired(PackageListCacheEntry)
+     * @see #CONNECT_CLIENT_CACHE_MINUTES_PROPERTY
+     * @see PackageCacheEntry#isExpired(long)
      * @since 1.4.18
      */
     public boolean isExpired(PackageType type) {
