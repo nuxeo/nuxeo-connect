@@ -27,13 +27,13 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.HttpClientBuilderHelper;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
@@ -68,7 +68,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
      */
     public static final int SO_TIMEOUT_MS = 120000; // 120s
 
-    protected static final Log log = LogFactory.getLog(LocalDownloadingPackage.class);
+    protected static final Logger log = LogManager.getLogger(LocalDownloadingPackage.class);
 
     protected File file = null;
 
@@ -167,11 +167,11 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
         } catch (IOException e) { // Expected SocketTimeoutException or ConnectTimeoutException
             serverError = true;
             setPackageState(PackageState.REMOTE);
-            log.debug(e, e);
+            log.debug(e.getMessage(), e);
             errorMessage = e.getMessage();
         } catch (ConnectServerError e) {
             setPackageState(PackageState.REMOTE);
-            log.debug(e, e);
+            log.debug(e.getMessage(), e);
             errorMessage = e.getMessage();
         } finally {
             ConnectDownloadManager cdm = NuxeoConnectClient.getDownloadManager();
@@ -184,7 +184,7 @@ public class LocalDownloadingPackage extends PackageDescriptor implements Downlo
         PackageUpdateService pus = NuxeoConnectClient.getPackageUpdateService();
         try {
             pus.addPackage(file);
-            log.info("Added " + getId());
+            log.info("Added {}", getId());
         } catch (AlreadyExistsPackageException e) {
             log.error(e.getMessage());
         } catch (PackageException e) {

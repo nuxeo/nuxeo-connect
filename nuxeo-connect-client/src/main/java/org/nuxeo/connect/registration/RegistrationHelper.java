@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.auth.AuthCache;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
@@ -55,6 +53,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.util.Timeout;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.connector.NuxeoClientInstanceType;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 import org.nuxeo.connect.connector.http.ProxyHelper;
@@ -80,7 +80,7 @@ public class RegistrationHelper {
 
     public static final String POST_REGISTER_SUFFIX = "remoteRegisterInstance";
 
-    protected static final Log log = LogFactory.getLog(RegistrationHelper.class);
+    protected static final Logger log = LogManager.getLogger(RegistrationHelper.class);
 
     protected static List<String> ALLOWED_TRIAL_FIELDS = Arrays.asList("termsAndConditions", "company", "email",
             "login", "connectreg:projectName", "firstName", "lastName");
@@ -146,12 +146,12 @@ public class RegistrationHelper {
                     }
                 }
             } else {
-                log.error("Unhandled response code: " + rc);
+                log.error("Unhandled response code: {}", rc);
             }
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         } catch (ConnectJSONException e) {
-            log.debug(e, e);
+            log.debug(e.getMessage(), e);
         }
         return result;
     }
@@ -174,7 +174,7 @@ public class RegistrationHelper {
                 HttpEntity responseEntity = httpResponse.getEntity();
                 return responseEntity == null ? null : EntityUtils.toString(responseEntity);
             } else {
-                log.error("Unhandled response code: " + rc);
+                log.error("Unhandled response code: {}", rc);
             }
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
@@ -190,7 +190,7 @@ public class RegistrationHelper {
         List<NameValuePair> nvps = new ArrayList<>();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             if (!ALLOWED_TRIAL_FIELDS.contains(entry.getKey())) {
-                log.debug("Skipped field: " + entry.getKey() + " (" + entry.getValue() + ")");
+                log.debug("Skipped field: {} ({})", entry.getKey(), entry.getValue());
                 continue;
             }
             nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
@@ -201,7 +201,7 @@ public class RegistrationHelper {
                 CloseableHttpResponse httpResponse = httpClient.execute(method,
                         getHttpClientContext(url, null, null))) {
             int rc = httpResponse.getCode();
-            log.debug("Registration response code: " + rc);
+            log.debug("Registration response code: {}", rc);
             HttpEntity responseEntity = httpResponse.getEntity();
             if (responseEntity != null) {
                 String body = EntityUtils.toString(responseEntity);
@@ -210,7 +210,7 @@ public class RegistrationHelper {
                 } else if (rc == HttpStatus.SC_BAD_REQUEST) {
                     return TrialRegistrationResponse.read(body);
                 } else {
-                    log.error("Unhandled response code: " + rc);
+                    log.error("Unhandled response code: {}", rc);
                 }
             }
         } catch (IOException | ParseException e) {

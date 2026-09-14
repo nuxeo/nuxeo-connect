@@ -28,10 +28,11 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.assertj.core.api.Fail;
 import org.junit.After;
 import org.junit.Before;
@@ -468,7 +469,8 @@ public class TestConnectHttpConnector {
     public void call_with_set_cookie_with_expires_should_not_raise_a_warning() throws Exception {
         // Setup log4j to capture logs
         TestAppender appender = new TestAppender();
-        Logger logger = Logger.getRootLogger();
+        appender.start();
+        Logger logger = (Logger) LogManager.getRootLogger();
         logger.addAppender(appender);
 
         // Given a Connect server that returns a Set-Cookie with Expires value
@@ -482,14 +484,15 @@ public class TestConnectHttpConnector {
         SubscriptionStatus status = httpConnector.getConnectStatus();
         assertNotNull(status);
 
-        List<LoggingEvent> warnings = appender.getLog()
-                                              .stream()
-                                              .filter(l -> l.getLevel().equals(Level.WARN))
-                                              .collect(Collectors.toList());
+        List<LogEvent> warnings = appender.getLog()
+                                          .stream()
+                                          .filter(l -> l.getLevel().equals(Level.WARN))
+                                          .collect(Collectors.toList());
 
         // Then I should not get any warnings in the logs
         assertEquals(0, warnings.size());
         logger.removeAppender(appender);
+        appender.stop();
     }
 
     @Test
@@ -528,8 +531,8 @@ public class TestConnectHttpConnector {
         return response;
     }
 
-    class TestAppender extends AppenderSkeleton {
-        private final List<LoggingEvent> log = new ArrayList<LoggingEvent>();
+    class TestAppender extends AbstractAppender {
+        private final List<LogEvent> log = new ArrayList<>();
 
         public static final String DEFAULT_NAME = "test-appender";
 
@@ -538,25 +541,16 @@ public class TestConnectHttpConnector {
         }
 
         public TestAppender(String name) {
-            this.name = name;
+            super(name, null, null, false, null);
         }
 
         @Override
-        public boolean requiresLayout() {
-            return false;
+        public void append(final LogEvent loggingEvent) {
+            log.add(loggingEvent.toImmutable());
         }
 
-        @Override
-        protected void append(final LoggingEvent loggingEvent) {
-            log.add(loggingEvent);
-        }
-
-        @Override
-        public void close() {
-        }
-
-        public List<LoggingEvent> getLog() {
-            return new ArrayList<LoggingEvent>(log);
+        public List<LogEvent> getLog() {
+            return new ArrayList<>(log);
         }
     }
 

@@ -38,8 +38,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -55,7 +55,7 @@ import org.nuxeo.connect.update.Version;
  */
 public class CUDFHelper {
 
-    private static final Log log = LogFactory.getLog(CUDFHelper.class);
+    private static final Logger log = LogManager.getLogger(CUDFHelper.class);
 
     public static final String newLine = System.getProperty("line.separator");
 
@@ -178,7 +178,7 @@ public class CUDFHelper {
             // ignore not involved packages
             if (!involvedPackages.contains(pkg.getName())) {
                 if (installedOrRequiredSNAPSHOTPackages.contains(pkg.getName())) {
-                    log.error("Ignore installedOrRequiredSNAPSHOTPackage " + pkg);
+                    log.error("Ignore installedOrRequiredSNAPSHOTPackage {}", pkg);
                 }
 
                 // check provides
@@ -191,7 +191,7 @@ public class CUDFHelper {
                     }
                 }
                 if (!involved) {
-                    log.debug("Ignore " + pkg + " (not involved by request)");
+                    log.debug("Ignore {} (not involved by request)", pkg);
                     continue;
                 }
             }
@@ -199,13 +199,13 @@ public class CUDFHelper {
             // ignore incompatible packages when a targetPlatform is set
             if (!pkg.getPackageState().isInstalled()
                     && !TargetPlatformFilterHelper.isCompatibleWithTargetPlatform(pkg, targetPlatform)) {
-                log.debug("Ignore " + pkg + " (incompatible target platform)");
+                log.debug("Ignore {} (incompatible target platform)", pkg);
                 continue;
             }
             // Exclude SNAPSHOT by default for non Studio packages
             if (!allowSNAPSHOT && pkg.getVersion().isSnapshot() && pkg.getType() != PackageType.STUDIO
                     && !installedOrRequiredSNAPSHOTPackages.contains(pkg.getName())) {
-                log.debug("Ignore " + pkg + " (excluded SNAPSHOT)");
+                log.debug("Ignore {} (excluded SNAPSHOT)", pkg);
                 continue;
             }
 
@@ -215,7 +215,7 @@ public class CUDFHelper {
                 if (upgrade.getVersionRange().matchVersion(pkg.getVersion())) {
                     DownloadablePackage remotePackage = pm.getRemotePackage(pkg.getId());
                     if (remotePackage != null) {
-                        log.debug(String.format("Upgrade with remote %s", remotePackage));
+                        log.debug("Upgrade with remote {}", remotePackage);
                         pkg = remotePackage;
                     }
                 }
@@ -315,7 +315,7 @@ public class CUDFHelper {
             if (involvedPackages.add(pkgDep.getName())) {
                 List<DownloadablePackage> downloadablePkgDeps = allPackagesMap.get(pkgDep.getName());
                 if (downloadablePkgDeps == null) {
-                    log.warn("Unknown dependency: " + pkgDep);
+                    log.warn("Unknown dependency: {}", pkgDep);
                     continue;
                 }
                 for (DownloadablePackage downloadablePkgDep : downloadablePkgDeps) {
@@ -502,7 +502,7 @@ public class CUDFHelper {
                 break;
             }
             line = line.trim();
-            log.debug("Parsing line >> " + line);
+            log.debug("Parsing line >> {}", line);
             if (line.trim().isEmpty()) {
                 if (nuxeoCUDFPkgDesc == null) {
                     throw new DependencyException("Invalid CUDF file starting with an empty line");
@@ -534,7 +534,7 @@ public class CUDFHelper {
                     case CUDFPackage.TAG_CONFLICTS -> nuxeoCUDFPkgDesc.setConflicts(parseCUDFDeps(value));
                     case CUDFPackage.TAG_PROVIDES -> nuxeoCUDFPkgDesc.setProvides(parseCUDFDeps(value));
                     case CUDFPackage.TAG_REQUEST, CUDFPackage.TAG_INSTALL, CUDFPackage.TAG_REMOVE, CUDFPackage.TAG_UPGRADE ->
-                        log.debug("Ignore request stanza " + line);
+                        log.debug("Ignore request stanza {}", line);
                     case CUDFPackage.TAG_PACKAGE -> throw new DependencyException("Invalid CUDF line: " + line);
                     default -> throw new DependencyException("Invalid CUDF line: " + line);
                 }
@@ -647,12 +647,15 @@ public class CUDFHelper {
         if (solution == null) {
             throw new DependencyException("No solution found.");
         }
-        log.debug("\nP2CUDF resolution details: ");
-        for (Criteria criteria : Criteria.values()) {
-            if (!details.get(criteria).isEmpty()) {
-                log.debug(criteria.label + ": " + details.get(criteria));
+        log.debug(() -> {
+            StringBuilder sb = new StringBuilder("P2CUDF resolution details: ");
+            for (Criteria criteria : Criteria.values()) {
+                if (!details.get(criteria).isEmpty()) {
+                    sb.append("\n").append(criteria.label).append(": ").append(details.get(criteria));
+                }
             }
-        }
+            return sb.toString();
+        });
 
         DependencyResolution res = new DependencyResolution();
         completeResolution(res, details, solution);
@@ -686,34 +689,35 @@ public class CUDFHelper {
 
         List<InstallableUnit> sortedSolution = new ArrayList<>(solution);
         Collections.sort(sortedSolution);
-        log.debug("Solution: " + sortedSolution);
+        log.debug("Solution: {}", sortedSolution);
 
-        if (log.isTraceEnabled()) {
-            log.trace("P2CUDF printed solution");
+        log.trace(() -> {
+            StringBuilder sb = new StringBuilder("P2CUDF printed solution");
             for (InstallableUnit iu : sortedSolution) {
-                log.trace("  package: " + iu.getId());
-                log.trace("  version: " + iu.getVersion().getMajor());
-                log.trace("  installed: " + iu.isInstalled());
+                sb.append("\n  package: ").append(iu.getId());
+                sb.append("\n  version: ").append(iu.getVersion().getMajor());
+                sb.append("\n  installed: ").append(iu.isInstalled());
             }
-        }
+            return sb.toString();
+        });
 
         for (InstallableUnit iu : sortedSolution) {
             NuxeoCUDFPackage pkg = getCUDFPackage(iu.getId() + "-" + iu.getVersion());
             if (pkg == null) {
-                log.warn("Couldn't find " + pkg);
+                log.warn("Couldn't find {}", pkg);
                 continue;
             }
             if (details.get(Criteria.NEW).contains(iu.getId())
                     || details.get(Criteria.VERSION_CHANGED).contains(iu.getId())) {
                 if (!res.addPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion(), true)) {
-                    log.error("Failed to add " + pkg);
+                    log.error("Failed to add {}", pkg);
                 }
             } else if (!details.get(Criteria.REMOVED).contains(iu.getId())) {
                 if (!res.addUnchangedPackage(pkg.getNuxeoName(), pkg.getNuxeoVersion())) {
-                    log.error("Failed to add " + pkg);
+                    log.error("Failed to add {}", pkg);
                 }
             } else {
-                log.debug("Ignored: " + pkg);
+                log.debug("Ignored: {}", pkg);
             }
         }
     }

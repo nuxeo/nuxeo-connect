@@ -23,8 +23,8 @@ import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.platform.PlatformId;
 import org.nuxeo.connect.platform.PlatformVersionRange;
 import org.nuxeo.connect.update.Package;
@@ -34,7 +34,7 @@ import org.nuxeo.connect.update.Package;
  */
 public class TargetPlatformFilterHelper {
 
-    protected static Log log = LogFactory.getLog(TargetPlatformFilterHelper.class);
+    protected static Logger log = LogManager.getLogger(TargetPlatformFilterHelper.class);
 
     public static boolean isCompatibleWithTargetPlatform(Package pkg, PlatformId targetPlatform) {
         if (targetPlatform == null) {
@@ -50,9 +50,8 @@ public class TargetPlatformFilterHelper {
             return pkgAllowedTpRange.containsVersion(targetPlatform.version())
                     && pkg.getTargetPlatformName().equalsIgnoreCase(targetPlatform.name());
         } catch (IllegalArgumentException e) {
-            log.warn(String.format(
-                    "Could not parse target platform range expression '%s' for package '%s', using former compatibility format.",
-                    pkg.getTargetPlatformRange(), pkg.getId()), e);
+            log.warn("Could not parse target platform range expression '{}' for package '{}', "
+                    + "using former compatibility format.", pkg.getTargetPlatformRange(), pkg.getId(), e);
             // Use former target platforms list
             return isCompatibleWithTargetPlatform(pkg.getTargetPlatforms(), targetPlatform);
         }

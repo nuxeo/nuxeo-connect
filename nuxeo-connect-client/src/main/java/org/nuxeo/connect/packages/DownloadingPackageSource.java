@@ -21,9 +21,8 @@ package org.nuxeo.connect.packages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.data.DownloadingPackage;
@@ -36,7 +35,7 @@ import org.nuxeo.connect.downloads.ConnectDownloadManager;
  */
 public class DownloadingPackageSource extends AbstractPackageSource implements PackageSource {
 
-    protected static final Log log = LogFactory.getLog(DownloadingPackageSource.class);
+    protected static final Logger log = LogManager.getLogger(DownloadingPackageSource.class);
 
     public DownloadingPackageSource() {
         id = "downloading";
