@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,7 +14,6 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  */
-
 package org.nuxeo.connect.pm.tests;
 
 import java.util.ArrayList;
@@ -27,23 +26,6 @@ import org.nuxeo.connect.packages.PackageSource;
 public class DummyPackageSource extends AbstractPackageSource implements PackageSource {
 
     protected List<DownloadablePackage> pkgs = new ArrayList<>();
-
-    /**
-     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List)}
-     */
-    @Deprecated
-    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local) {
-        this(pkgs, "dummy");
-    }
-
-    /**
-     * @since 1.4.13
-     * @deprecated Since 1.4.19. Use {@link #DummyPackageSource(List, String)}
-     */
-    @Deprecated
-    public DummyPackageSource(List<DownloadablePackage> pkgs, boolean local, String id) {
-        this(pkgs, id);
-    }
 
     /**
      * @since 1.4.19

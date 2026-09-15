@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  *     Nuxeo
  *     Yannis JULIENNE
  */
-
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
@@ -98,21 +97,10 @@ public class PackageListCache {
     }
 
     /**
-     * Is the given cache expired
-     *
-     * @see #CONNECT_CLIENT_CACHE_MINUTES_PROPERTY
-     * @since 1.4.18
-     * @deprecated use {@link PackageCacheEntry#isExpired(long)} instead
-     */
-    @Deprecated
-    public boolean isExpired(PackageListCacheEntry entry) {
-        return entry.isExpired(cache_duration);
-    }
-
-    /**
      * Is the cache associated to the given type expired
      *
-     * @see #isExpired(PackageListCacheEntry)
+     * @see #CONNECT_CLIENT_CACHE_MINUTES_PROPERTY
+     * @see PackageCacheEntry#isExpired(long)
      * @since 1.4.18
      */
     public boolean isExpired(PackageType type) {

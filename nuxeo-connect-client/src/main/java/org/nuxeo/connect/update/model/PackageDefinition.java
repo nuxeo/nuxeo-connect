@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2019 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -34,106 +34,52 @@ public interface PackageDefinition extends Package {
 
     /**
      * Set the package name.
-     *
-     * @param name
      */
     void setName(String name);
 
     /**
      * Set the package version.
-     *
-     * @param version
      */
     void setVersion(Version version);
 
     /**
      * Set the package type.
-     *
-     * @param type
      */
     void setType(PackageType type);
 
     /**
      * Set the package title.
-     *
-     * @param title
      */
     void setTitle(String title);
 
     /**
      * Set the package description.
-     *
-     * @param description
      */
     void setDescription(String description);
 
     /**
      * Set the package classifier.
-     *
-     * @param classifier
      */
     void setClassifier(String classifier);
 
     /**
      * Set the package vendor string.
-     *
-     * @param vendor
      */
     void setVendor(String vendor);
 
     /**
-     * Get the package license name. E.g. LGPL, BSD etc.
-     *
-     * @deprecated Since 1.4.5. Duplicates {@link #getLicenseType()}.
-     */
-    @Deprecated
-    String getLicense();
-
-    /**
      * Set the package license name.
-     *
-     * @param license
-     * @deprecated Since 1.4.5. Duplicates {@link #setLicenseType(String)}.
-     */
-    @Deprecated
-    void setLicense(String license);
-
-    /**
-     * Set the package license name.
-     *
-     * @param license
      */
     void setLicenseType(String license);
 
     /**
      * Set the license URL.
-     *
-     * @param url
      */
     void setLicenseUrl(String url);
 
     /**
-     * Get the target platforms where this package may be installed.
-     *
-     * @deprecated Since 1.4.5. Duplicates {@link #getTargetPlatforms()}.
-     */
-    @Deprecated
-    String[] getPlatforms();
-
-    /**
      * Set the target platforms of this package.
      *
-     * @param platforms
-     * @see #getPlatforms()
-     * @deprecated Since 1.4.5. Duplicates {@link #setTargetPlatforms(String[])} .
-     */
-    @Deprecated
-    void setPlatforms(String[] platforms);
-
-    /**
-     * Set the target platforms of this package.
-     *
-     * @param platforms
      * @see #getTargetPlatforms()
      */
     void setTargetPlatforms(String[] platforms);
@@ -141,7 +87,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the target platform range of this package.
      * 
-     * @param targetPlatformRange
      * @see #getTargetPlatformRange()
      */
     void setTargetPlatformRange(String targetPlatformRange);
@@ -149,7 +94,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the target platform name of this package.
      * 
-     * @param targetPlatformName
      * @see #getTargetPlatformRange()
      */
     void setTargetPlatformName(String targetPlatformName);
@@ -157,7 +101,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package dependencies.
      *
-     * @param deps
      * @see #getDependencies()
      */
     void setDependencies(PackageDependency[] deps);
@@ -165,7 +108,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package optional dependencies.
      *
-     * @param deps
      * @see #getOptionalDependencies()
      * @since 1.5.2
      */
@@ -174,7 +116,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package conflicts.
      *
-     * @param deps
      * @see #getConflicts()
      */
     void setConflicts(PackageDependency[] deps);
@@ -182,7 +123,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package provides.
      *
-     * @param deps
      * @see #getProvides()
      */
     void setProvides(PackageDependency[] deps);
@@ -198,7 +138,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package installer.
      *
-     * @param installer
      * @see PackageDefinition#getInstaller()
      */
     void setInstaller(TaskDefinition installer);
@@ -214,7 +153,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package uninstaller.
      *
-     * @param uninstaller
      * @see #getUninstaller()
      */
     void setUninstaller(TaskDefinition uninstaller);
@@ -230,7 +168,6 @@ public interface PackageDefinition extends Package {
     /**
      * Set the package validator class name.
      *
-     * @param validator
      * @see #getValidator()
      */
     void setValidator(String validator);
@@ -238,12 +175,12 @@ public interface PackageDefinition extends Package {
     /**
      * Get an XML representation of this package definition.
      */
-    public String toXML();
+    String toXML();
 
     /**
      * Test if terms and conditions should be accepted by user
      */
-    public boolean requireTermsAndConditionsAcceptance();
+    boolean requireTermsAndConditionsAcceptance();
 
     /**
      * @since 1.4

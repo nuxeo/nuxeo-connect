@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2012-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
@@ -28,8 +26,8 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.equinox.p2.cudf.Parser;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.ProfileChangeRequest;
@@ -83,7 +81,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
      */
     public static final String SOLVER_CRITERIA_LESS_OUTDATED_WITH_REMOVE = "+removed,-notuptodate,-changed,-new,-versionchanged";
 
-    protected static Log log = LogFactory.getLog(P2CUDFDependencyResolver.class);
+    protected static Logger log = LogManager.getLogger(P2CUDFDependencyResolver.class);
 
     protected PackageManager pm;
 
@@ -156,7 +154,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
         cudfHelper.setKeep(doKeep);
         // generate CUDF package universe and request stanza
         String cudf = cudfHelper.getCUDFFile(str2PkgDep(pkgInstall), str2PkgDep(pkgRemove), str2PkgDep(pkgUpgrade));
-        log.debug("CUDF request:\n" + cudf);
+        log.debug("CUDF request:\n{}", cudf);
 
         // pass to p2cudf for solving
         ProfileChangeRequest req = new Parser().parse(IOUtils.toInputStream(cudf));
@@ -211,7 +209,7 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
 
     private PackageDependency[] str2PkgDep(List<String> pkgList) {
         List<PackageDependency> list = new ArrayList<>();
-        if (pkgList == null || pkgList.size() == 0) {
+        if (pkgList == null || pkgList.isEmpty()) {
             return list.toArray(new PackageDependency[0]);
         }
         Map<String, DownloadablePackage> packagesByID = pm.getAllPackagesByID();
@@ -223,15 +221,6 @@ public class P2CUDFDependencyResolver implements DependencyResolver {
                 list.add(new PackageDependency(pkgStr));
             }
         }
-        return list.toArray(new PackageDependency[list.size()]);
+        return list.toArray(PackageDependency[]::new);
     }
-
-    @Override
-    @Deprecated
-    public DependencyResolution resolve(String pkgIdOrName, PlatformId targetPlatform) throws DependencyException {
-        List<String> pkgInstall = new ArrayList<>();
-        pkgInstall.add(pkgIdOrName);
-        return resolve(pkgInstall, null, null, targetPlatform);
-    }
-
 }

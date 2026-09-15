@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2020 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -10,7 +10,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
 package org.nuxeo.connect.platform;
 
@@ -52,9 +51,8 @@ public class PlatformId {
         if (o == this) {
             return true;
         }
-        if (o instanceof PlatformId) {
-            PlatformId that = (PlatformId) o;
-            return (this.name.equals(that.name())) && (this.version.equals(that.version()));
+        if (o instanceof PlatformId that) {
+            return name.equals(that.name()) && version.equals(that.version());
         }
         return false;
     }

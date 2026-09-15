@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY" />
+      <PatternLayout pattern="%d{HH:mm:ss,SSS} %-5p [%C{1}] %m%n" />
+    </Console>
+    <File name="FILE" fileName="target/trace.log" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss,SSS} %-5p [%C{1}] %m%n" />
+    </File>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.nuxeo.connect.connector.http.proxy.NashornProxyPacResolver" level="ERROR" />
+    <Root level="TRACE">
+      <AppenderRef ref="CONSOLE" />
+      <AppenderRef ref="FILE" />
+    </Root>
+  </Loggers>
+</Configuration>

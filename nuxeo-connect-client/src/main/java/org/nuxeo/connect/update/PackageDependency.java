@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -16,24 +16,21 @@
  */
 package org.nuxeo.connect.update;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.nuxeo.connect.update.PackageDependency.PackageDependencyXMLAdapter;
 
 /**
  * Example of dependencies:
  * <ul>
- * <li>Any version of my-package (the last available version will be used)
- * <code>my-package</code>
+ * <li>Any version of my-package (the last available version will be used) <code>my-package</code>
  * <li>Minimum 1.0 version my-package: <code>my-package:1</code>
  * <li>Maximum 2.0 version my-package: <code>my-package:0:1</code>
- * <li>Versions between 1.1 and 2.3 of my-package:
- * <code>my-package:1.1:2.3</code>
+ * <li>Versions between 1.1 and 2.3 of my-package: <code>my-package:1.1:2.3</code>
  * </ul>
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 @XmlJavaTypeAdapter(PackageDependencyXMLAdapter.class)
 public class PackageDependency {
@@ -41,8 +38,7 @@ public class PackageDependency {
     /**
      * @since 1.4.5
      */
-    public static class PackageDependencyXMLAdapter extends
-            XmlAdapter<String, PackageDependency> {
+    public static class PackageDependencyXMLAdapter extends XmlAdapter<String, PackageDependency> {
 
         @Override
         public String marshal(PackageDependency dependency) throws Exception {
@@ -110,10 +106,7 @@ public class PackageDependency {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof PackageDependency)) {
-            return false;
-        }
-        return toString().equals(((PackageDependency) other).toString());
+        return other instanceof PackageDependency packageDependency && toString().equals(packageDependency.toString());
     }
 
 }

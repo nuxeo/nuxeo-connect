@@ -21,9 +21,8 @@ package org.nuxeo.connect.packages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.update.LocalPackage;
@@ -37,7 +36,7 @@ import org.nuxeo.connect.update.PackageUpdateService;
  */
 public class LocalPackageSource extends AbstractPackageSource implements PackageSource {
 
-    protected static final Log log = LogFactory.getLog(LocalPackageSource.class);
+    protected static final Logger log = LogManager.getLogger(LocalPackageSource.class);
 
     public LocalPackageSource() {
         id = "local";
@@ -69,7 +68,7 @@ public class LocalPackageSource extends AbstractPackageSource implements Package
                 pkg = new LocalPackageAsDownloadablePackage(localPackage);
             }
         } catch (PackageException e) {
-            log.error("Error when getting local package " + packageId, e);
+            log.error("Error when getting local package {}", packageId, e);
         }
         return pkg;
     }

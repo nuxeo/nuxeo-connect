@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -17,8 +17,8 @@ package org.nuxeo.connect;
 import java.io.InputStream;
 import java.util.PropertyResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.connector.ConnectConnector;
 import org.nuxeo.connect.connector.service.ConnectGatewayComponent;
 import org.nuxeo.connect.downloads.ConnectDownloadManager;
@@ -30,7 +30,7 @@ import org.nuxeo.connect.update.PackageUpdateService;
 
 public class NuxeoConnectClient {
 
-    protected static final Log log = LogFactory.getLog(NuxeoConnectClient.class);
+    protected static final Logger log = LogManager.getLogger(NuxeoConnectClient.class);
 
     protected static final String PROTOCOL_VERSION = "1.4";
 
@@ -87,15 +87,6 @@ public class NuxeoConnectClient {
     }
 
     /**
-     * @deprecated since 1.7.2, prefer to use {@link #getPackageManager(String)}
-     */
-    @Deprecated
-    public static synchronized PackageManager getPackageManager() {
-        return getPackageManager(null);
-    }
-
-    /**
-     * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
     public static synchronized PackageManager getPackageManager(PlatformId currentTargetPlatform) {

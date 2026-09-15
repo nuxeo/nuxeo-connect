@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.http.ConnectUrlConfig;
 
@@ -60,7 +60,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
 
     protected static final String EXEC_PAC_FUNC = "FindProxyForURL";
 
-    private static final Log log = LogFactory.getLog(NashornProxyPacResolver.class);
+    private static final Logger log = LogManager.getLogger(NashornProxyPacResolver.class);
 
     protected SimpleStringCache fileCache = new SimpleStringCache(5);
 
@@ -100,7 +100,7 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
             String proxies = (String) ((Invocable) engine).invokeFunction(EXEC_PAC_FUNC, url, getHost(url));
             return proxies.split(";");
         } catch (IOException | ScriptException | NoSuchMethodException e) {
-            log.warn(e, e);
+            log.warn(e.getMessage(), e);
         }
         return null;
     }
@@ -122,12 +122,14 @@ public class NashornProxyPacResolver extends ProxyPacResolver {
             String url = ConnectUrlConfig.getProxyPacUrl();
             try (CloseableHttpClient httpClient = getHttpClientBuilderWithoutProxy(null, null, url).build();
                     CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url))) {
-                StatusLine statusLine = httpResponse.getStatusLine();
-                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                if (httpResponse.getCode() == HttpStatus.SC_OK) {
                     fileCache.saveValue(EntityUtils.toString(httpResponse.getEntity()));
                 } else {
-                    throw new IOException("Unable to get pac file: " + statusLine);
+                    throw new IOException(
+                            "Unable to get pac file: " + httpResponse.getCode() + " " + httpResponse.getReasonPhrase());
                 }
+            } catch (ParseException e) {
+                throw new IOException("Unable to read pac file", e);
             }
         }
         return new StringReader(fileCache.getValue());

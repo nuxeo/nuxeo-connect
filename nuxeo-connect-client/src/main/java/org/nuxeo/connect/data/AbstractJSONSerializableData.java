@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,9 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
  */
-
 package org.nuxeo.connect.data;
 
 import java.lang.reflect.Field;
@@ -23,10 +21,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Base class for Data Transfer Object used for the communication between Nuxeo Connect Client and Server.
@@ -56,15 +54,16 @@ public abstract class AbstractJSONSerializableData {
         return asJSON().toString();
     }
 
-    public JSONObject asJSONold() {
-        return new JSONObject(this);
+    public ObjectNode asJSONold() {
+        return JSONHelper.asObjectNode(this);
     }
 
-    public JSONObject asJSON() {
-        return new JSONObject(IntrospectionHelper.getDataToSerialize(this));
+    public ObjectNode asJSON() {
+        return JSONHelper.asObjectNode(IntrospectionHelper.getDataToSerialize(this));
     }
 
-    protected static Object doLoadFromJSON(JSONObject data, Class<?> klass, Object instance) throws JSONException {
+    protected static Object doLoadFromJSON(ObjectNode data, Class<?> klass, Object instance)
+            throws ConnectJSONException {
 
         if (klass.getSuperclass() != null) {
             instance = doLoadFromJSON(data, klass.getSuperclass(), instance);
@@ -76,7 +75,7 @@ public abstract class AbstractJSONSerializableData {
                 try {
                     String name = method.getAnnotation(JSONImportMethod.class).name();
                     fieldNames.add(name);
-                    Object value = data.get(name);
+                    Object value = JSONHelper.getValue(data, name, method.getParameterTypes()[0]);
                     method.invoke(instance, new Object[] { value });
                 } catch (Exception e) {
                     // NOP
@@ -87,7 +86,7 @@ public abstract class AbstractJSONSerializableData {
         for (Field field : instance.getClass().getDeclaredFields()) {
             if (field.getAnnotation(JSONExportableField.class) != null && (!fieldNames.contains(field.getName()))) {
                 try {
-                    field.set(instance, data.get(field.getName()));
+                    field.set(instance, JSONHelper.getValue(data, field.getName(), field.getType()));
                 } catch (Exception e) {
                     // NOP
                 }
@@ -96,16 +95,17 @@ public abstract class AbstractJSONSerializableData {
         return instance;
     }
 
-    public static <T> T loadFromJSON(Class<T> targetClass, JSONObject data) throws JSONException {
+    public static <T> T loadFromJSON(Class<T> targetClass, ObjectNode data) throws ConnectJSONException {
         try {
-            return targetClass.cast(doLoadFromJSON(data, targetClass, targetClass.newInstance()));
+            return targetClass.cast(
+                    doLoadFromJSON(data, targetClass, targetClass.getDeclaredConstructor().newInstance()));
         } catch (Exception e) {
-            throw new JSONException(e);
+            throw new ConnectJSONException(e);
         }
     }
 
-    public static <T> T loadFromJSON(Class<T> targetClass, String dataStr) throws JSONException {
-        JSONObject data = new JSONObject(dataStr);
+    public static <T> T loadFromJSON(Class<T> targetClass, String dataStr) throws ConnectJSONException {
+        ObjectNode data = JSONHelper.readObject(dataStr);
         return loadFromJSON(targetClass, data);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,21 +32,9 @@ import org.nuxeo.connect.update.PackageType;
 public interface ConnectConnector {
 
     /**
-     * @param type Can be null since 1.4
-     * @return All type packages or all packages if type is null. Must not be null.
-     * @throws ConnectServerError
-     * @deprecated since 1.7.2, prefer to use {@link #getDownloads(PackageType, String)}
-     */
-    @Deprecated
-    List<DownloadablePackage> getDownloads(PackageType type) throws ConnectServerError;
-
-    /**
      * @param type The type of packages to retrieve, can be null.
      * @param currentTargetPlatform The target platform the retrieved packages must be compatible with, can be null.
-     * @param currentTargetPlatformVersion The target platform version the retrieved packages must be compatible with,
-     *            can be null.
      * @return The list of the downloadable packages of the given type, for the given targetPlatform. May be empty.
-     * @throws ConnectServerError
      * @since 1.7.2
      */
     List<DownloadablePackage> getDownloads(PackageType type, PlatformId currentTargetPlatform)
@@ -60,14 +48,6 @@ public interface ConnectConnector {
      * @since 1.4
      */
     void flushCache();
-
-    /**
-     * @since 1.4.19
-     * @return Must not be null.
-     * @deprecated since 1.7.2, prefer to use {@link #getRegisteredStudio(String)}
-     */
-    @Deprecated
-    List<DownloadablePackage> getRegisteredStudio() throws ConnectServerError;
 
     /**
      * @since 1.7.2

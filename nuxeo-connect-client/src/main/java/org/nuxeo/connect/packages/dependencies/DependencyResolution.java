@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
  *     tdelprat
  *     jcarsique
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages.dependencies;
 
 import java.util.ArrayList;
@@ -29,12 +27,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.update.Package;
@@ -49,7 +46,7 @@ import org.nuxeo.connect.update.Version;
  */
 public class DependencyResolution {
 
-    private static final Log log = LogFactory.getLog(DependencyResolution.class);
+    private static final Logger log = LogManager.getLogger(DependencyResolution.class);
 
     protected Boolean resolution = null;
 
@@ -94,14 +91,6 @@ public class DependencyResolution {
     }
 
     /**
-     * @deprecated Since 1.4, use {@link #markAsFailed(String)} instead
-     */
-    @Deprecated
-    public void markAsFailed() {
-        resolution = false;
-    }
-
-    /**
      * @since 1.4
      * @param message failed message
      */
@@ -135,17 +124,17 @@ public class DependencyResolution {
 
     public synchronized boolean addPackage(String pkgName, Version v, boolean fifo) {
         if (!allPackages.containsKey(pkgName)) { // Add package
-            log.debug("addPackage " + pkgName + " " + v);
+            log.debug("addPackage {} {}", pkgName, v);
             allPackages.put(pkgName, v);
             if (fifo) {
                 orderedInstallablePackages.add(pkgName + "-" + v.toString());
             } else {
-                orderedInstallablePackages.add(0, pkgName + "-" + v.toString());
+                orderedInstallablePackages.addFirst(pkgName + "-" + v.toString());
             }
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with " + allPackages.get(pkgName));
         } else { // Package already added in the same version
-            log.debug("addPackage ignored " + pkgName + " " + v);
+            log.debug("addPackage ignored {} {}", pkgName, v);
         }
         return !isFailed();
     }
@@ -155,13 +144,13 @@ public class DependencyResolution {
      */
     public boolean addUnchangedPackage(String pkgName, Version v) {
         if (!allPackages.containsKey(pkgName)) { // Add package
-            log.debug("addPackage " + pkgName + " " + v);
+            log.debug("addPackage {} {}", pkgName, v);
             allPackages.put(pkgName, v);
             // orderedInstallablePackages.add(pkgName + "-" + v.toString());
         } else if (!allPackages.get(pkgName).equals(v)) { // Version conflict
             markAsFailed("addPackage conflict " + pkgName + " " + v + " with " + allPackages.get(pkgName));
         } else { // Package already added in the same version
-            log.debug("addPackage ignored " + pkgName + " " + v);
+            log.debug("addPackage ignored {} {}", pkgName, v);
         }
         return !isFailed();
     }
@@ -171,12 +160,12 @@ public class DependencyResolution {
     }
 
     public synchronized void markPackageForRemoval(String pkgName, Version v, boolean fifo) {
-        log.debug("markPackageForRemoval " + pkgName + " " + v);
+        log.debug("markPackageForRemoval {} {}", pkgName, v);
         localPackagesToRemove.put(pkgName, v);
         if (fifo) {
             orderedRemovablePackages.add(pkgName + "-" + v.toString());
         } else {
-            orderedRemovablePackages.add(0, pkgName + "-" + v.toString());
+            orderedRemovablePackages.addFirst(pkgName + "-" + v.toString());
         }
     }
 
@@ -194,9 +183,9 @@ public class DependencyResolution {
                 // Already installed in the wanted version and not to be removed, nothing to do
                 localUnchangedPackages.put(pkg.getName(), pkg.getVersion());
             } else {
-                if (installedVersions.size() > 0 && !installedVersions.contains(pkg.getVersion())) {
+                if (!installedVersions.isEmpty() && !installedVersions.contains(pkg.getVersion())) {
                     // Upgrade case: already installed in other version(s)
-                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.get(installedVersions.size() - 1));
+                    localPackagesToUpgrade.put(pkg.getName(), installedVersions.getLast());
                 }
                 if (pkg.getPackageState() == PackageState.REMOTE) {
                     // Needs to be download
@@ -296,8 +285,7 @@ public class DependencyResolution {
      * @since 1.4.26
      */
     public List<String> getRemovePackageNames() {
-        List<String> res = new ArrayList<>();
-        res.addAll(getLocalPackagesToRemove().keySet());
+        List<String> res = new ArrayList<>(getLocalPackagesToRemove().keySet());
         Collections.sort(res);
         return res;
     }
@@ -367,7 +355,7 @@ public class DependencyResolution {
         if (!pkgList.isEmpty()) {
             append(sb, title, pkgList.size());
             for (String pkg : pkgList) {
-                sb.append(pkg + "/");
+                sb.append(pkg).append("/");
             }
             sb.replace(sb.length() - 1, sb.length(), "\n");
         }
@@ -375,7 +363,7 @@ public class DependencyResolution {
     }
 
     private void append(StringBuffer sb, String title, int size) {
-        if (title.length() > 0) {
+        if (!title.isEmpty()) {
             sb.append(String.format("  %-30s ", title + " (" + size + "):"));
         }
     }
@@ -385,7 +373,7 @@ public class DependencyResolution {
     }
 
     private String removeLineReturn(StringBuffer sb) {
-        if (sb.length() > 0) { // remove ending \n
+        if (!sb.isEmpty()) { // remove ending \n
             return sb.substring(0, sb.length() - 1);
         } else {
             return "";

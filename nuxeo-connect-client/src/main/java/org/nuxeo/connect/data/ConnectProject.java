@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,14 +13,9 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
- * $Id$
  */
-
 package org.nuxeo.connect.data;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 
 /**
@@ -61,16 +56,6 @@ public class ConnectProject extends AbstractJSONSerializableData {
 
     public void setSymbolicName(String symbolicName) {
         this.symbolicName = symbolicName;
-    }
-
-    @Deprecated
-    public static ConnectProject loadFromJSON(JSONObject ob) throws JSONException {
-        return ConnectProject.loadFromJSON(ConnectProject.class, ob);
-    }
-
-    @Deprecated
-    public static ConnectProject loadFromJSON(String json) throws JSONException {
-        return ConnectProject.loadFromJSON(ConnectProject.class, json);
     }
 
     @Override

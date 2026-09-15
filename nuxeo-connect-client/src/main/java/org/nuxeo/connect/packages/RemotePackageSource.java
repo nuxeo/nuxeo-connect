@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -41,7 +41,7 @@ import org.nuxeo.connect.update.PackageType;
  */
 public class RemotePackageSource extends AbstractPackageSource implements PackageSource {
 
-    protected static final Log log = LogFactory.getLog(RemotePackageSource.class);
+    protected static final Logger log = LogManager.getLogger(RemotePackageSource.class);
 
     protected PackageListCache cache;
 
@@ -74,8 +74,9 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
             result = crs.getConnector().getRegisteredStudio(currentTargetPlatform);
             cache.add(result, cacheKey);
         } catch (ConnectServerError e) {
-            log.debug(e, e);
-            log.warn("Unable to fetch remote packages list: " + e.getMessage());
+            log.atWarn()
+               .withThrowable(log.isDebugEnabled() ? e : null)
+               .log("Unable to fetch remote packages list: {}", e.getMessage());
             // do not store an empty list to force retries
         }
         return result;
@@ -100,8 +101,9 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
             ConnectRegistrationService crs = NuxeoConnectClient.getConnectRegistrationService();
             result = crs.getConnector().getDownloads(type, currentTargetPlatform);
         } catch (ConnectServerError e) {
-            log.debug(e, e);
-            log.warn("Unable to fetch remote packages list: " + e.getMessage());
+            log.atWarn()
+               .withThrowable(log.isDebugEnabled() ? e : null)
+               .log("Unable to fetch remote packages list: {}", e.getMessage());
             // store an empty list to avoid calling back the server since anyway we probably have no connection...
             result = new ArrayList<>();
         }
@@ -126,8 +128,9 @@ public class RemotePackageSource extends AbstractPackageSource implements Packag
             try {
                 pkg = crs.getConnector().getDownload(packageId);
             } catch (ConnectServerError e) {
-                log.debug(e, e);
-                log.warn("Unable to fetch remote package with ID '" + packageId + "': " + e.getMessage());
+                log.atWarn()
+                   .withThrowable(log.isDebugEnabled() ? e : null)
+                   .log("Unable to fetch remote package with ID '{}': {}", packageId, e.getMessage());
             }
             if (pkg != null) {
                 cache.add(pkg);

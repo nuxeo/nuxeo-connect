@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages;
 
 import java.util.ArrayList;
@@ -35,8 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.connect.NuxeoConnectClient;
 import org.nuxeo.connect.connector.ConnectServerError;
 import org.nuxeo.connect.data.DownloadablePackage;
@@ -46,7 +44,6 @@ import org.nuxeo.connect.packages.dependencies.CUDFHelper;
 import org.nuxeo.connect.packages.dependencies.DependencyException;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 import org.nuxeo.connect.packages.dependencies.DependencyResolver;
-import org.nuxeo.connect.packages.dependencies.LegacyDependencyResolver;
 import org.nuxeo.connect.packages.dependencies.P2CUDFDependencyResolver;
 import org.nuxeo.connect.packages.dependencies.TargetPlatformFilterHelper;
 import org.nuxeo.connect.platform.PlatformId;
@@ -66,22 +63,15 @@ import org.nuxeo.connect.update.task.Task;
  *
  * @author <a href="mailto:td@nuxeo.com">Thierry Delprat</a>
  */
-@SuppressWarnings("deprecation")
 public class PackageManagerImpl implements PackageManager {
 
-    protected static final Log log = LogFactory.getLog(PackageManagerImpl.class);
+    protected static final Logger log = LogManager.getLogger(PackageManagerImpl.class);
 
     protected List<PackageSource> localSources = new ArrayList<>();
 
     protected List<PackageSource> remoteSources = new ArrayList<>();
 
     protected List<String> sourcesNames = new ArrayList<>();
-
-    /**
-     * @deprecated Since 1.4.25. Unused.
-     */
-    @Deprecated
-    protected Map<String, DownloadablePackage> cachedPackageList = null;
 
     protected DependencyResolver resolver;
 
@@ -96,15 +86,6 @@ public class PackageManagerImpl implements PackageManager {
     }
 
     /**
-     * @deprecated since 1.7.2, prefer to use {@link #PackageManagerImpl(PlatformId)}
-     */
-    @Deprecated
-    public PackageManagerImpl() {
-        this(null);
-    }
-
-    /**
-     * @param currentTargetPlatformVersion
      * @since 1.7.2
      */
     public PackageManagerImpl(PlatformId currentTargetPlatform) {
@@ -132,11 +113,9 @@ public class PackageManagerImpl implements PackageManager {
     public void setResolver(String resolverType) {
         if (P2CUDF_DEPENDENCY_RESOLVER.equals(resolverType)) {
             resolver = new P2CUDFDependencyResolver(this);
-        } else if (LEGACY_DEPENDENCY_RESOLVER.equals(resolverType)) {
-            resolver = new LegacyDependencyResolver(this);
         } else {
-            log.warn("Resolver " + resolverType + "is not supported - fallback on default resolver "
-                    + DEFAULT_DEPENDENCY_RESOLVER);
+            log.warn("Resolver {} is not supported - fallback on default resolver {}", resolverType,
+                    DEFAULT_DEPENDENCY_RESOLVER);
             resolver = new P2CUDFDependencyResolver(this);
         }
     }
@@ -145,9 +124,6 @@ public class PackageManagerImpl implements PackageManager {
         localSources.clear();
         remoteSources.clear();
         sourcesNames.clear();
-        if (cachedPackageList != null) {
-            cachedPackageList.clear();
-        }
     }
 
     /**
@@ -164,11 +140,8 @@ public class PackageManagerImpl implements PackageManager {
                 targetPlatforms = new String[] { null };
             }
             for (String tp : targetPlatforms) {
-                Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.get(tp);
-                if (packagesById == null) {
-                    packagesById = new HashMap<>();
-                    packagesByIdAndTargetPlatform.put(tp, packagesById);
-                }
+                Map<String, DownloadablePackage> packagesById = packagesByIdAndTargetPlatform.computeIfAbsent(tp,
+                        k -> new HashMap<>());
                 String key = pkg.getId();
                 if (packagesById.containsKey(key)) {
                     if (pkg.getVersion().greaterThan(packagesById.get(key).getVersion())) {
@@ -187,7 +160,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
     }
 
@@ -330,7 +303,6 @@ public class PackageManagerImpl implements PackageManager {
     /**
      * @since 1.4
      * @param packageId Package ID to look for in {@code sources}
-     * @param sources
      * @return The package searched by ID or null if not found.
      */
     protected DownloadablePackage findPackageById(String packageId, List<PackageSource> sources) {
@@ -419,7 +391,7 @@ public class PackageManagerImpl implements PackageManager {
                 remoteSources.add(source);
             }
         } else {
-            log.warn("Already registered a package source named " + name);
+            log.warn("Already registered a package source named {}", name);
         }
     }
 
@@ -433,7 +405,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(res, new PackageComparator());
+        res.sort(new PackageComparator());
         return res;
     }
 
@@ -441,25 +413,21 @@ public class PackageManagerImpl implements PackageManager {
     public List<String> listInstalledPackagesNames(PackageType pkgType) {
         List<DownloadablePackage> installedPackages = listInstalledPackages();
         // filter on type and collect names
-        List<String> installedPackagesNames = installedPackages.stream()
-                                                               .filter(pkg -> (pkgType == null
-                                                                       || pkg.getType() == pkgType))
-                                                               .map(DownloadablePackage::getName)
-                                                               .collect(Collectors.toList());
-
-        return installedPackagesNames;
+        return installedPackages.stream()
+                                .filter(pkg -> (pkgType == null || pkg.getType() == pkgType))
+                                .map(DownloadablePackage::getName)
+                                .collect(Collectors.toList());
     }
 
     @Override
     public List<String> listHotfixesNames(PlatformId targetPlatform, boolean allowSNAPSHOT) {
         List<DownloadablePackage> hotFixes = listPackages(PackageType.HOT_FIX, targetPlatform);
         // filter on snapshots and collect unique names
-        List<String> hotFixesNames = hotFixes.stream()
-                                             .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
-                                             .map(DownloadablePackage::getName)
-                                             .distinct()
-                                             .collect(Collectors.toList());
-        return hotFixesNames;
+        return hotFixes.stream()
+                       .filter(pkg -> (allowSNAPSHOT || !pkg.getVersion().isSnapshot()))
+                       .map(DownloadablePackage::getName)
+                       .distinct()
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -471,13 +439,11 @@ public class PackageManagerImpl implements PackageManager {
                                                                                 || !pkg.getVersion().isSnapshot())) //
                                                                         .collect(Collectors.groupingBy(
                                                                                 DownloadablePackage::getName));
-        List<String> lastHotFixes = hotfixesByName.values()
-                                                  .stream() //
-                                                  .map(list -> Collections.max(list,
-                                                          Comparator.comparing(DownloadablePackage::getVersion))) //
-                                                  .map(DownloadablePackage::getId) //
-                                                  .collect(Collectors.toList());
-        return lastHotFixes;
+        return hotfixesByName.values()
+                             .stream() //
+                             .map(list -> Collections.max(list, Comparator.comparing(DownloadablePackage::getVersion))) //
+                             .map(DownloadablePackage::getId) //
+                             .collect(Collectors.toList());
     }
 
     @Override
@@ -513,7 +479,7 @@ public class PackageManagerImpl implements PackageManager {
                 }
             }
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
     }
 
@@ -545,15 +511,14 @@ public class PackageManagerImpl implements PackageManager {
                 targetPlatform, CUDFHelper.defaultAllowSNAPSHOT);
 
         List<String> toUpdateIds = resolution.getOrderedPackageIdsToInstall();
-        List<DownloadablePackage> toUpdate = toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
 
-        return toUpdate;
+        return toUpdateIds.stream().map(this::getPackage).collect(Collectors.toList());
     }
 
     @Override
     public List<DownloadablePackage> listPrivatePackages(PackageType pkgType, PlatformId targetPlatform) {
         List<DownloadablePackage> allPackages = getAllPackages(getAllSources(), pkgType, targetPlatform);
-        Collections.sort(allPackages, new PackageComparator());
+        allPackages.sort(new PackageComparator());
         List<DownloadablePackage> allPrivatePackages = new ArrayList<>();
         for (DownloadablePackage downloadablePackage : allPackages) {
             if (downloadablePackage.getOwner() != null) {
@@ -582,7 +547,7 @@ public class PackageManagerImpl implements PackageManager {
             if (download != null) {
                 downloadings.add(download);
             } else {
-                log.error("Download failed for " + packageId);
+                log.error("Download failed for {}", packageId);
             }
         }
         return downloadings;
@@ -602,28 +567,6 @@ public class PackageManagerImpl implements PackageManager {
         for (String packageId : packageIds) {
             install(packageId, params);
         }
-    }
-
-    /**
-     * @deprecated Since 1.4.25. Unused.
-     */
-    @Deprecated
-    protected void invalidateCache() {
-        cachedPackageList = null;
-    }
-
-    /**
-     * @deprecated Since 1.4.25. Unused.
-     */
-    @Deprecated
-    protected Map<String, DownloadablePackage> getCachedPackageList() {
-        if (cachedPackageList == null) {
-            cachedPackageList = new HashMap<>();
-        }
-        for (DownloadablePackage pkg : listPackages()) {
-            cachedPackageList.put(pkg.getId(), pkg);
-        }
-        return cachedPackageList;
     }
 
     protected DownloadablePackage getPkgInList(List<DownloadablePackage> pkgs, String pkgId) {
@@ -653,22 +596,10 @@ public class PackageManagerImpl implements PackageManager {
         List<DownloadablePackage> pkgs = listAllPackages();
         DownloadablePackage pkg = getPkgInList(pkgs, pkgId);
         if (pkg == null) {
-            List<DownloadablePackage> studioPkgs = listAllStudioRemotePackages();
+            List<DownloadablePackage> studioPkgs = listRemotePackages(PackageType.STUDIO);
             pkg = getPkgInList(studioPkgs, pkgId);
         }
         return pkg;
-    }
-
-    @Deprecated
-    @Override
-    public List<DownloadablePackage> listRemoteOrLocalPackages() {
-        return listRemoteOrLocalPackages(null, currentTargetPlatform);
-    }
-
-    @Deprecated
-    @Override
-    public List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType) {
-        return listRemoteOrLocalPackages(pkgType, currentTargetPlatform);
     }
 
     @Override
@@ -697,8 +628,7 @@ public class PackageManagerImpl implements PackageManager {
     public List<DownloadablePackage> listAllStudioRemoteOrLocalPackages() {
         List<DownloadablePackage> remote = listRemoteAssociatedStudioPackages();
         List<DownloadablePackage> local = listLocalPackages(PackageType.STUDIO);
-        List<DownloadablePackage> result = new ArrayList<>();
-        result.addAll(local);
+        List<DownloadablePackage> result = new ArrayList<>(local);
         REMOTE: for (DownloadablePackage rpkg : remote) {
             for (DownloadablePackage lpkg : local) {
                 if (lpkg.getId().equals(rpkg.getId())) {
@@ -707,20 +637,8 @@ public class PackageManagerImpl implements PackageManager {
             }
             result.add(rpkg);
         }
-        Collections.sort(result, new PackageComparator());
+        result.sort(new PackageComparator());
         return result;
-    }
-
-    @Deprecated
-    @Override
-    public List<DownloadablePackage> listOnlyRemotePackages() {
-        return listOnlyRemotePackages(null, currentTargetPlatform);
-    }
-
-    @Deprecated
-    @Override
-    public List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType) {
-        return listOnlyRemotePackages(pkgType, currentTargetPlatform);
     }
 
     @Override
@@ -741,11 +659,6 @@ public class PackageManagerImpl implements PackageManager {
             }
         }
         return result;
-    }
-
-    @Override
-    public List<DownloadablePackage> listAllStudioRemotePackages() {
-        return listRemotePackages(PackageType.STUDIO);
     }
 
     @Override
@@ -771,36 +684,24 @@ public class PackageManagerImpl implements PackageManager {
         }
     }
 
-    @Override
-    @Deprecated
-    public DependencyResolution resolveDependencies(String pkgId, PlatformId targetPlatform) {
-        try {
-            DependencyResolution resolution = resolver.resolve(pkgId, targetPlatform);
-            log.debug(beforeAfterResolutionToString(resolution));
-            return resolution;
-        } catch (DependencyException e) {
-            return new DependencyResolution(e);
-        }
-    }
-
     /**
      * @return Packages list before and after given resolution
      * @since 1.4.13
      */
     public String beforeAfterResolutionToString(DependencyResolution resolution) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nBefore: " + listInstalledPackages());
+        sb.append("\nBefore: ").append(listInstalledPackages());
         List<String> after = new ArrayList<>();
         after.addAll(resolution.getUnchangedPackageIds());
         after.addAll(resolution.getInstallPackageIds());
         Collections.sort(after);
-        sb.append("\nAfter:  " + after);
+        sb.append("\nAfter:  ").append(after);
         return sb.toString();
     }
 
     /**
      * @since 1.4
-     * @see PackageManager#resolveDependencies(List, List, List, String, boolean)
+     * @see PackageManager#resolveDependencies(List, List, List, PlatformId, boolean)
      */
     @Override
     public DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove,
@@ -850,42 +751,9 @@ public class PackageManagerImpl implements PackageManager {
                 if (localPackage != null) {
                     packagesToUninstall.add(localPackage);
                 } else {
-                    log.error("Missing local package to remove: " + pkgIdToRemove);
+                    log.error("Missing local package to remove: {}", pkgIdToRemove);
                 }
             }
-        }
-        return packagesToUninstall;
-    }
-
-    @Deprecated
-    @Override
-    public List<DownloadablePackage> getUninstallDependencies(Package pkg) {
-        // This impl is clearly not very sharp
-        List<String> pkgNamesToRemove = new ArrayList<>();
-        List<DownloadablePackage> installedPackages = listInstalledPackages();
-        int nbImpactedPackages = 0;
-        pkgNamesToRemove.add(pkg.getName());
-        while (pkgNamesToRemove.size() > nbImpactedPackages) {
-            nbImpactedPackages = pkgNamesToRemove.size();
-            for (DownloadablePackage p : installedPackages) {
-                if (!pkgNamesToRemove.contains(p.getName())) {
-                    for (PackageDependency dep : p.getDependencies()) {
-                        if (pkgNamesToRemove.contains(dep.getName())) {
-                            pkgNamesToRemove.add(p.getName());
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        pkgNamesToRemove.remove(pkg.getName());
-        List<DownloadablePackage> packagesToUninstall = new ArrayList<>();
-        for (String pkgName : pkgNamesToRemove) {
-            for (Version v : findLocalPackageInstalledVersions(pkgName)) {
-                DownloadablePackage p = getLocalPackage(pkgName + "-" + v.toString());
-                packagesToUninstall.add(p);
-            }
-
         }
         return packagesToUninstall;
     }
@@ -1023,8 +891,7 @@ public class PackageManagerImpl implements PackageManager {
         if (!optionalMissingDeps.isEmpty() && !isRemoveList) {
             for (Entry<String, Set<String>> entry : optionalMissingDeps.entrySet()) {
                 if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                    log.info(String.format("Optional dependencies %s will be ignored for '%s'.", entry.getValue(),
-                            entry.getKey()));
+                    log.info("Optional dependencies {} will be ignored for '{}'.", entry.getValue(), entry.getKey());
                 }
             }
         }
@@ -1082,18 +949,8 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public List<? extends Package> sort(List<? extends Package> pkgs) {
-        Collections.sort(pkgs, new PackageComparator());
+        pkgs.sort(new PackageComparator());
         return pkgs;
-    }
-
-    @Override
-    public String getNonCompliant(List<String> packages, PlatformId targetPlatform) throws PackageException {
-        for (String pkg : packages) {
-            if (!matchesPlatform(pkg, targetPlatform)) {
-                return pkg;
-            }
-        }
-        return null;
     }
 
     @Override

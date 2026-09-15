@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2019 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -117,15 +117,6 @@ public interface Package {
      * @since 1.3.3
      */
     PackageDependency[] getProvides();
-
-    /**
-     * Gets the package life cycle status.
-     *
-     * @see PackageState
-     * @deprecated Since 1.4.17. Use {@link #getPackageState()} instead.
-     */
-    @Deprecated
-    int getState();
 
     /**
      * Gets the package life cycle status.

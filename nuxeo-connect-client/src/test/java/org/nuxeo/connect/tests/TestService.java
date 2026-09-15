@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,9 +13,7 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
  */
-
 package org.nuxeo.connect.tests;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class TestService extends TestCase {
         LogicalInstanceIdentifier.cleanUp();
         NuxeoConnectClient.resetPackageManager();
         ((DefaultCallbackHolder) NuxeoConnectClient.getCallBackHolder()).setUpdateService(
-                new MockPackageUpdateService(NuxeoConnectClient.getPackageManager()));
+                new MockPackageUpdateService(NuxeoConnectClient.getPackageManager(null)));
     }
 
     public void testServiceLookup() {
@@ -92,7 +90,7 @@ public class TestService extends TestCase {
     }
 
     public void testPackageManagerSimple() throws Exception {
-        PackageManager pm = NuxeoConnectClient.getPackageManager();
+        PackageManager pm = NuxeoConnectClient.getPackageManager(null);
         assertNotNull(pm);
         for (PackageSource packageSource : pm.getAllSources()) {
             assertNotNull(packageSource.listPackages());

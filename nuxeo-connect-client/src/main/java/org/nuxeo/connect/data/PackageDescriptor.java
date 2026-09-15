@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2018 Nuxeo (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -14,9 +14,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.data;
 
 import java.util.ArrayList;
@@ -26,9 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.nuxeo.connect.data.marshaling.JSONExportMethod;
 import org.nuxeo.connect.data.marshaling.JSONExportableField;
 import org.nuxeo.connect.data.marshaling.JSONImportMethod;
@@ -37,6 +32,8 @@ import org.nuxeo.connect.update.PackageDependency;
 import org.nuxeo.connect.update.PackageState;
 import org.nuxeo.connect.update.PackageType;
 import org.nuxeo.connect.update.Version;
+
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * DTO implementation of the {@link DownloadablePackage} interface. Used to transfer {@link Package} description between
@@ -159,22 +156,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, JSONObject)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(JSONObject json) throws JSONException {
-        return loadFromJSON(PackageDescriptor.class, json);
-    }
-
-    /**
-     * @deprecated Since 1.0. Use {@link #loadFromJSON(Class, String)} instead.
-     */
-    @Deprecated
-    public static PackageDescriptor loadFromJSON(String json) throws JSONException {
-        return loadFromJSON(new JSONObject(json));
-    }
-
-    /**
      * Merges two arrays of package dependencies.
      *
      * @since 8.3
@@ -287,19 +268,19 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     @JSONExportMethod(name = "conflicts")
-    protected JSONArray getConflictsAsJSON() {
-        JSONArray deps = new JSONArray();
+    protected ArrayNode getConflictsAsJSON() {
+        ArrayNode deps = JSONHelper.arrayNode();
         for (PackageDependency dep : getConflicts()) {
-            deps.put(dep.toString());
+            deps.add(dep.toString());
         }
         return deps;
     }
 
     @JSONImportMethod(name = "conflicts")
-    protected void setConflictsAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
+    protected void setConflictsAsJSON(ArrayNode array) {
+        PackageDependency[] deps = new PackageDependency[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            deps[i] = new PackageDependency(array.get(i).asString());
         }
         setConflicts(deps);
     }
@@ -329,19 +310,19 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     @JSONExportMethod(name = "dependencies")
-    protected JSONArray getDependenciesAsJSON() {
-        JSONArray deps = new JSONArray();
+    protected ArrayNode getDependenciesAsJSON() {
+        ArrayNode deps = JSONHelper.arrayNode();
         for (PackageDependency dep : getDependencies()) {
-            deps.put(dep.toString());
+            deps.add(dep.toString());
         }
         return deps;
     }
 
     @JSONImportMethod(name = "dependencies")
-    protected void setDependenciesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
+    protected void setDependenciesAsJSON(ArrayNode array) {
+        PackageDependency[] deps = new PackageDependency[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            deps[i] = new PackageDependency(array.get(i).asString());
         }
         setDependencies(deps);
     }
@@ -377,10 +358,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
      * @since 1.5.2
      */
     @JSONExportMethod(name = "optionalDependencies")
-    protected JSONArray getOptionalDependenciesAsJSON() {
-        JSONArray deps = new JSONArray();
+    protected ArrayNode getOptionalDependenciesAsJSON() {
+        ArrayNode deps = JSONHelper.arrayNode();
         for (PackageDependency dep : getOptionalDependencies()) {
-            deps.put(dep.toString());
+            deps.add(dep.toString());
         }
         return deps;
     }
@@ -389,10 +370,10 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
      * @since 1.4.26
      */
     @JSONImportMethod(name = "optionalDependencies")
-    protected void setOptionalDependenciesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
+    protected void setOptionalDependenciesAsJSON(ArrayNode array) {
+        PackageDependency[] deps = new PackageDependency[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            deps[i] = new PackageDependency(array.get(i).asString());
         }
         setOptionalDependencies(deps);
     }
@@ -489,7 +470,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
 
     @JSONImportMethod(name = "packageState")
     public void setPackageStateAsJson(String packageState) {
-        setPackageState(PackageState.getByLabel(packageState));
+        var state = PackageState.getByLabel(packageState);
+        if (state == PackageState.UNKNOWN) {
+            try {
+                state = PackageState.getByValue(packageState);
+            } catch (NumberFormatException e) {
+                // not a legacy numeric value either, keep UNKNOWN
+            }
+        }
+        setPackageState(state);
     }
 
     /**
@@ -513,19 +502,19 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     }
 
     @JSONExportMethod(name = "provides")
-    protected JSONArray getProvidesAsJSON() {
-        JSONArray deps = new JSONArray();
+    protected ArrayNode getProvidesAsJSON() {
+        ArrayNode deps = JSONHelper.arrayNode();
         for (PackageDependency dep : getProvides()) {
-            deps.put(dep.toString());
+            deps.add(dep.toString());
         }
         return deps;
     }
 
     @JSONImportMethod(name = "provides")
-    protected void setProvidesAsJSON(JSONArray array) throws JSONException {
-        PackageDependency[] deps = new PackageDependency[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            deps[i] = new PackageDependency(array.getString(i));
+    protected void setProvidesAsJSON(ArrayNode array) {
+        PackageDependency[] deps = new PackageDependency[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            deps[i] = new PackageDependency(array.get(i).asString());
         }
         setProvides(deps);
     }
@@ -578,28 +567,13 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         this.sourceUrl = sourceUrl;
     }
 
-    @Deprecated
-    @Override
-    public int getState() {
-        return packageState.getValue();
-    }
-
-    /**
-     * @deprecated Since 1.4.17. Use {@link #setPackageState(PackageState)} instead.
-     */
-    @Deprecated
-    public void setState(int state) {
-        packageState = PackageState.getByValue(state);
-    }
-
     @Override
     public String[] getTargetPlatforms() {
         return targetPlatforms;
     }
 
     public void setTargetPlatforms(List<String> targetPlatforms) {
-        this.targetPlatforms = targetPlatforms == null ? new String[0]
-                : targetPlatforms.toArray(new String[targetPlatforms.size()]);
+        this.targetPlatforms = targetPlatforms == null ? new String[0] : targetPlatforms.toArray(String[]::new);
     }
 
     public void setTargetPlatforms(String[] targetPlatforms) {
@@ -684,23 +658,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         this.license = license;
     }
 
-    /**
-     * @since 1.4.17
-     */
-    @JSONImportMethod(name = "packageState")
-    public void setPackageStateAsJSON(String state) {
-        setPackageState(PackageState.getByValue(state));
-    }
-
     public void setSupportsHotReload(boolean supportsHotReload) {
         this.supportsHotReload = supportsHotReload;
     }
 
     @JSONImportMethod(name = "targetPlatforms")
-    public void setTargetPlatformsAsJSON(JSONArray array) throws JSONException {
-        String[] targets = new String[array.length()];
-        for (int i = 0; i < array.length(); i++) {
-            targets[i] = array.getString(i);
+    public void setTargetPlatformsAsJSON(ArrayNode array) {
+        String[] targets = new String[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            targets[i] = array.get(i).asString();
         }
         MutableObject packageDependencies = new MutableObject();
         targetPlatforms = fixTargetPlatforms(name, targets, packageDependencies);

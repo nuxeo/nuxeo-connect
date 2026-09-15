@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -36,32 +36,15 @@ public interface PackageUpdateService {
 
     /**
      * Initialize the service. This is usually doing file system initialization and loading the list of local packages.
-     *
-     * @throws PackageException
      */
     void initialize() throws PackageException;
 
     /**
      * Close any resource held by this service. The service instance will no more be available.
-     *
-     * @throws PackageException
      */
     void shutdown() throws PackageException;
 
     /**
-     * Set the state for the given package.
-     *
-     * @param pkg
-     * @param state
-     * @see PackageState
-     * @deprecated Since 1.4.5. See {@link #setPackageState(LocalPackage, PackageState)}
-     */
-    @Deprecated
-    void setPackageState(LocalPackage pkg, int state) throws PackageException;
-
-    /**
-     * @param pkg
-     * @param state
      * @since 1.4.5
      */
     void setPackageState(LocalPackage pkg, PackageState state) throws PackageException;
@@ -72,23 +55,18 @@ public interface PackageUpdateService {
      *
      * @param file the package file.
      * @return the package object.
-     * @throws PackageException
      */
     LocalPackage addPackage(File file) throws PackageException;
 
     /**
      * Removes a package from the packages registry given its ID. The package has to be in
      * {@link PackageState#DOWNLOADED} state.
-     *
-     * @param id
-     * @throws PackageException
      */
     void removePackage(String id) throws PackageException;
 
     /**
      * Get a package object given its ID
      *
-     * @param id
      * @return the package or null if not found
      */
     LocalPackage getPackage(String id) throws PackageException;
@@ -101,9 +79,9 @@ public interface PackageUpdateService {
     /**
      * Get the local package having the given name and which is in either one of the following states:
      * <ul>
-     * <li> {@link PackageState#INSTALLING}
-     * <li> {@link PackageState#INSTALLED}
-     * <li> {@link PackageState#STARTED}
+     * <li>{@link PackageState#INSTALLING}
+     * <li>{@link PackageState#INSTALLED}
+     * <li>{@link PackageState#STARTED}
      * </ul>
      * Return null if no such package is found.
      *
@@ -119,23 +97,16 @@ public interface PackageUpdateService {
 
     /**
      * Load the package definition from the given package ZIP.
-     *
-     * @param zip
      */
     public PackageDefinition loadPackageFromZip(File zip) throws PackageException;
 
     /**
      * Load the package definition from the given XML file.
-     *
-     * @param file
      */
     public PackageDefinition loadPackage(File file) throws PackageException;
 
     /**
      * Load the package definition for the given XML input stream.
-     *
-     * @param in
-     * @throws PackageException
      */
     public PackageDefinition loadPackage(InputStream in) throws PackageException;
 
@@ -143,15 +114,11 @@ public interface PackageUpdateService {
      * Reset the index file: mark all packages as downloaded. Do not modify package data. This method should be used
      * after a system upgrade to reset packages that were previously installed. This is usually invoked from command
      * line tools by the administrator after an upgrade to reset the downloaded package states.
-     *
-     * @throws PackageException
      */
     public void reset() throws PackageException;
 
     /**
      * @since 1.4
-     * @param id
-     * @throws PackageException
      */
     public abstract Command getCommand(String id) throws PackageException;
 

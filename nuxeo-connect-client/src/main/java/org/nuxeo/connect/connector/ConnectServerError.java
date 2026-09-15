@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2009 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,14 +13,13 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
- * $Id$
  */
-
 package org.nuxeo.connect.connector;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.nuxeo.connect.data.ConnectJSONException;
+import org.nuxeo.connect.data.JSONHelper;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Exception class for security errors returned by Nuxeo Connect Server.
@@ -40,15 +39,20 @@ public class ConnectServerError extends Exception {
     }
 
     public String toJSON() {
-        JSONObject json = new JSONObject();
+        ObjectNode json = JSONHelper.objectNode();
         try {
             json.put("errorClass", this.getClass().getSimpleName());
-            json.put("message", this.getMessage());
-            if (this.getCause()!=null) {
-                json.put("cause", this.getCause().getMessage());
+            String message = this.getMessage();
+            if (message != null) {
+                json.put("message", message);
             }
-        }
-        catch (JSONException e) {
+            if (this.getCause() != null) {
+                String causeMessage = this.getCause().getMessage();
+                if (causeMessage != null) {
+                    json.put("cause", causeMessage);
+                }
+            }
+        } catch (ConnectJSONException e) {
             // NOP
         }
         return json.toString();

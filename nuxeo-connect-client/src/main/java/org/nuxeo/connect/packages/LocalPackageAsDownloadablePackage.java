@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2010-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -15,7 +15,6 @@
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
  */
-
 package org.nuxeo.connect.packages;
 
 import java.io.File;
@@ -101,12 +100,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     }
 
     @Override
-    @Deprecated
-    public void setState(int state) {
-        localPackage.setState(state);
-    }
-
-    @Override
     public void setState(PackageState state) {
         localPackage.setState(state);
     }
@@ -149,12 +142,6 @@ public class LocalPackageAsDownloadablePackage implements LocalPackage, Download
     @Override
     public String getName() {
         return localPackage.getName();
-    }
-
-    @Deprecated
-    @Override
-    public int getState() {
-        return localPackage.getState();
     }
 
     @Override

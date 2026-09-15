@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,6 @@
  *
  * Contributors:
  *     Nuxeo - initial API and implementation
- *
  */
 package org.nuxeo.connect.packages.dependencies;
 
@@ -93,8 +92,7 @@ public class RecursiveDependencyResolver {
             return resolution;
         } else {
             if (fallBacks.size() > 0) {
-                DependencyResolution fbRes = fallBacks.get(0); // XXX choose the
-                                                               // best one
+                DependencyResolution fbRes = fallBacks.getFirst();
                 fbRes.markAsSuccess();
                 return fbRes;
             }

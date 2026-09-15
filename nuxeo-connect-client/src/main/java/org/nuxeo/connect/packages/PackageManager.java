@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2026 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * Contributors:
  *     Nuxeo - initial API and implementation
  *     Yannis JULIENNE
- *
  */
-
 package org.nuxeo.connect.packages;
 
 import java.util.List;
@@ -51,17 +49,17 @@ public interface PackageManager extends BasePackageManager {
      * @deprecated Use {@link #P2CUDF_DEPENDENCY_RESOLVER}
      */
     @Deprecated
-    public static final String LEGACY_DEPENDENCY_RESOLVER = "legacy";
+    String LEGACY_DEPENDENCY_RESOLVER = "legacy";
 
     /**
      * @since 1.4
      */
-    public static final String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
+    String P2CUDF_DEPENDENCY_RESOLVER = "p2cudf";
 
     /**
      * @since 1.4
      */
-    public static final String DEFAULT_DEPENDENCY_RESOLVER = P2CUDF_DEPENDENCY_RESOLVER;
+    String DEFAULT_DEPENDENCY_RESOLVER = P2CUDF_DEPENDENCY_RESOLVER;
 
     /**
      * Returns most recent version of {@link DownloadablePackage} from all sources.
@@ -84,8 +82,6 @@ public interface PackageManager extends BasePackageManager {
      * Returns most recent version of {@link DownloadablePackage} from all sources for given {@link PackageType} and
      * {@code targetPlatform}
      *
-     * @param pkgType
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listPackages(PackageType pkgType, PlatformId targetPlatform);
@@ -122,8 +118,6 @@ public interface PackageManager extends BasePackageManager {
      * Lists most recent version of {@link DownloadablePackage} available on connect server for a given
      * {@link PackageType} and {@code targetPlatform}
      *
-     * @param pkgType
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listRemotePackages(PackageType pkgType, PlatformId targetPlatform);
@@ -137,7 +131,7 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
      * available on connect server for a given {@link PackageType}. Also list all available hotfixes for the current
-     * targetPlatform if {@link PackageType} is null or is explicitly {@value PackageType#HOT_FIX}.
+     * targetPlatform if {@link PackageType} is null or is explicitly {@link PackageType#HOT_FIX}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type);
 
@@ -151,7 +145,7 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Lists all {@link DownloadablePackage} that are locally present and that can be updated by a higher version
      * available on connect server for a given {@link PackageType} and target platform. Also list all available hotfixes
-     * for the given targetPlatform if {@link PackageType} is null or is explicitly {@value PackageType#HOT_FIX}.
+     * for the given targetPlatform if {@link PackageType} is null or is explicitly {@link PackageType#HOT_FIX}.
      */
     List<DownloadablePackage> listUpdatePackages(PackageType type, PlatformId targetPlatform);
 
@@ -159,16 +153,6 @@ public interface PackageManager extends BasePackageManager {
      * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
      * version).
      *
-     * @deprecated Since 1.4. Use {@link #listOnlyRemotePackages(String)} instead.
-     */
-    @Deprecated
-    List<DownloadablePackage> listOnlyRemotePackages();
-
-    /**
-     * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
-     * version).
-     *
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listOnlyRemotePackages(PlatformId targetPlatform);
@@ -177,32 +161,10 @@ public interface PackageManager extends BasePackageManager {
      * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
      * version) for a given {@link PackageType}.
      *
-     * @deprecated Since 1.4. Use {@link #listOnlyRemotePackages(PackageType, String)} instead.
-     */
-    @Deprecated
-    List<DownloadablePackage> listOnlyRemotePackages(PackageType type);
-
-    /**
-     * Lists most recent version of {@link DownloadablePackage} available only on the connect server (ie no local
-     * version) for a given {@link PackageType}.
-     *
      * @param pkgType {@link PackageType}
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listOnlyRemotePackages(PackageType pkgType, PlatformId targetPlatform);
-
-    /**
-     * Lists all versions of the studio packages the user has access to. This was used to return only the Studio
-     * package(s) associated with the server registration. Now that includes the Studio packages the user is contributor
-     * on. Thus the deprecation to encourage explicit use of {@link #listRemotePackages(PackageType)} or
-     * {@link #listRemoteAssociatedStudioPackages()}.
-     *
-     * @deprecated Since 1.4.19. Use instead {@link #listRemotePackages(PackageType)} with {@link PackageType#STUDIO} or
-     *             {@link #listRemoteAssociatedStudioPackages()}
-     */
-    @Deprecated
-    List<DownloadablePackage> listAllStudioRemotePackages();
 
     /**
      * @return All remote versions of the Studio package associated with the server registration.
@@ -219,33 +181,15 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Lists packages available in remote and potentially overridden by a local package.
      *
-     * @deprecated Since 1.4. Use {@link #listRemoteOrLocalPackages(String)} instead.
-     */
-    @Deprecated
-    List<DownloadablePackage> listRemoteOrLocalPackages();
-
-    /**
-     * Lists packages available in remote and potentially overridden by a local package.
-     *
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listRemoteOrLocalPackages(PlatformId targetPlatform);
-
-    /**
-     * Lists packages availab.e in remote and potentially overridden by a local package.
-     *
-     * @deprecated Since 1.4. Use {@link #listRemoteOrLocalPackages(PackageType, String)} instead.
-     */
-    @Deprecated
-    List<DownloadablePackage> listRemoteOrLocalPackages(PackageType type);
 
     /**
      * Lists most recent version of {@link DownloadablePackage} available on connect server for a given
      * {@link PackageType}.
      *
      * @param pkgType {@link PackageType}
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listRemoteOrLocalPackages(PackageType pkgType, PlatformId targetPlatform);
@@ -254,14 +198,13 @@ public interface PackageManager extends BasePackageManager {
      * Lists all local or remote private packages, filtered on package type if {@code pkgType} is not null.
      *
      * @param pkgType {@link PackageType}
-     * @param targetPlatform
      * @since 1.4
      */
     List<DownloadablePackage> listPrivatePackages(PackageType pkgType, PlatformId targetPlatform);
 
     /**
      * @since 1.4
-     * @see #listPrivatePackages(PackageType, String)
+     * @see #listPrivatePackages(PackageType, PlatformId)
      */
     List<DownloadablePackage> listPrivatePackages(PlatformId targetPlatform);
 
@@ -291,23 +234,16 @@ public interface PackageManager extends BasePackageManager {
 
     /**
      * Register a new {@link PackageSource}
-     *
-     * @param source
-     * @param local
      */
     void registerSource(PackageSource source, boolean local);
 
     /**
      * Get the Download descriptor for a given package id
-     *
-     * @param packageId
      */
     DownloadingPackage download(String packageId) throws ConnectServerError;
 
     /**
      * Get the Download descriptors for a given list of package ids
-     *
-     * @param packageIds
      */
     List<DownloadingPackage> download(List<String> packageIds) throws ConnectServerError;
 
@@ -340,34 +276,10 @@ public interface PackageManager extends BasePackageManager {
     void setResolver(String resolverType);
 
     /**
-     * Try to resolve dependencies of a given {@link Package}
-     *
-     * @param pkgId
-     * @param targetPlatform (String representing the target platform or null
-     * @deprecated since 1.4.26 use {@link #resolveDependencies(List, List, List, String)} instead
-     */
-    @Deprecated
-    DependencyResolution resolveDependencies(String pkgId, PlatformId targetPlatform);
-
-    /**
-     * @param pkgInstall
-     * @param pkgRemove
-     * @param pkgUpgrade
-     * @param targetPlatform
      * @since 1.4
      */
     DependencyResolution resolveDependencies(List<String> pkgInstall, List<String> pkgRemove, List<String> pkgUpgrade,
             PlatformId targetPlatform);
-
-    /**
-     * Returns the packages uninstalled if the given {@link Package} is removed
-     *
-     * @param pkg the {@link Package} that is being uninstalled
-     * @return List of all {@link DownloadablePackage} that must be uninstalled too
-     * @deprecated Since 1.4. Use {@link #getUninstallDependencies(Package, String)} instead.
-     */
-    @Deprecated
-    List<DownloadablePackage> getUninstallDependencies(Package pkg);
 
     /**
      * @param pkg the {@link Package} that is being uninstalled
@@ -408,7 +320,6 @@ public interface PackageManager extends BasePackageManager {
      * <li>remote versions sorted by version number (higher comes last)</li>
      * </ul>
      *
-     * @param pkgName
      * @since 1.4
      */
     List<Version> getPreferedVersions(String pkgName);
@@ -416,7 +327,6 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all remote {@link Package} versions for a given name
      *
-     * @param packageName
      * @since 1.4
      */
     List<DownloadablePackage> findRemotePackages(String packageName);
@@ -424,7 +334,6 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Find a {@link Package} by it's id (will find masked versions on the contrary of {@link PackageManager} getPackage
      *
-     * @param packageId
      * @since 1.4
      */
     DownloadablePackage findPackageById(String packageId);
@@ -432,7 +341,6 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all local {@link Package} versions for a given name
      *
-     * @param packageName
      * @since 1.4
      */
     List<Version> findLocalPackageVersions(String packageName);
@@ -440,7 +348,6 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all local {@link Package} installed versions for a given name
      *
-     * @param packageName
      * @since 1.4
      */
     List<Version> findLocalPackageInstalledVersions(String packageName);
@@ -448,9 +355,6 @@ public interface PackageManager extends BasePackageManager {
     /**
      * Returns all {@link Package} versions for a given name and {@link PackageVersionRange}
      *
-     * @param pkgName
-     * @param range
-     * @param targetPlatform
      * @since 1.4
      */
     List<Version> getAvailableVersion(String pkgName, PackageVersionRange range, PlatformId targetPlatform);
@@ -459,7 +363,6 @@ public interface PackageManager extends BasePackageManager {
      * Order dependencies to install and to remove.
      *
      * @param res DependencyResolution to be ordered
-     * @throws DependencyException
      * @since 1.4
      */
     void order(DependencyResolution res) throws DependencyException;
@@ -477,30 +380,14 @@ public interface PackageManager extends BasePackageManager {
     List<? extends Package> sort(List<? extends Package> pkgs);
 
     /**
-     * @param packages
      * @param targetPlatform The target platform to be compliant with.
-     * @return First non compliant package found. Null if none.
-     * @throws PackageException
-     * @since 1.4
-     */
-    @Deprecated
-    String getNonCompliant(List<String> packages, PlatformId targetPlatform) throws PackageException;
-
-    /**
-     * @param packages
-     * @param targetPlatform The target platform to be compliant with.
-     * @param targetPlatformVersion
      * @return List of non compliant packages. Empty list if none.
-     * @throws PackageException
      * @since 1.4.17
      */
     List<String> getNonCompliantList(List<String> packages, PlatformId targetPlatform) throws PackageException;
 
     /**
-     * @param requestPkgStr
-     * @param targetPlatform
      * @return true if {@code requestPkgStr} is compliant with {@code targetPlatform}
-     * @throws PackageException
      */
     boolean matchesPlatform(String requestPkgStr, PlatformId targetPlatform) throws PackageException;
 
