@@ -28,6 +28,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.After;
 import org.junit.Test;
 import org.nuxeo.connect.update.PackageDependency;
+import org.nuxeo.connect.update.PackageState;
 
 public class TestPackageDescriptor {
 
@@ -101,6 +102,20 @@ public class TestPackageDescriptor {
         assertEquals(Arrays.asList("bar-888", "cap-123"), Arrays.asList(targets));
         packageDependencies = (PackageDependency[]) pd.getValue();
         assertNull(packageDependencies);
+    }
+
+    @Test
+    public void testPackageStateImport() {
+        assertEquals(PackageState.DOWNLOADED, load("{\"packageState\":2}").getPackageState());
+        assertEquals(PackageState.DOWNLOADED, load("{\"packageState\":\"2\"}").getPackageState());
+        assertEquals(PackageState.DOWNLOADED, load("{\"packageState\":\"downloaded\"}").getPackageState());
+        assertEquals(PackageState.UNKNOWN, load("{\"packageState\":\"unknown\"}").getPackageState());
+        assertEquals(PackageState.UNKNOWN, load("{\"packageState\":\"bogus\"}").getPackageState());
+        assertEquals(PackageState.UNKNOWN, load("{}").getPackageState());
+    }
+
+    protected static PackageDescriptor load(String json) {
+        return AbstractJSONSerializableData.loadFromJSON(PackageDescriptor.class, json);
     }
 
 }
