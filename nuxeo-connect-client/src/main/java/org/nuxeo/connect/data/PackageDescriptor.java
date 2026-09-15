@@ -470,7 +470,15 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
 
     @JSONImportMethod(name = "packageState")
     public void setPackageStateAsJson(String packageState) {
-        setPackageState(PackageState.getByLabel(packageState));
+        var state = PackageState.getByLabel(packageState);
+        if (state == PackageState.UNKNOWN) {
+            try {
+                state = PackageState.getByValue(packageState);
+            } catch (NumberFormatException e) {
+                // not a legacy numeric value either, keep UNKNOWN
+            }
+        }
+        setPackageState(state);
     }
 
     /**
@@ -650,14 +658,6 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
         this.license = license;
     }
 
-    /**
-     * @since 1.4.17
-     */
-    @JSONImportMethod(name = "packageState")
-    public void setPackageStateAsJSON(String state) {
-        setPackageState(PackageState.getByValue(state));
-    }
-
     public void setSupportsHotReload(boolean supportsHotReload) {
         this.supportsHotReload = supportsHotReload;
     }
@@ -666,7 +666,7 @@ public class PackageDescriptor extends AbstractJSONSerializableData implements D
     public void setTargetPlatformsAsJSON(ArrayNode array) {
         String[] targets = new String[array.size()];
         for (int i = 0; i < array.size(); i++) {
-            targets[i] = array.get(i).asText();
+            targets[i] = array.get(i).asString();
         }
         MutableObject packageDependencies = new MutableObject();
         targetPlatforms = fixTargetPlatforms(name, targets, packageDependencies);
