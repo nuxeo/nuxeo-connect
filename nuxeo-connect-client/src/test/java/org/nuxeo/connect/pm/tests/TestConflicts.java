@@ -16,11 +16,20 @@
  */
 package org.nuxeo.connect.pm.tests;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.nuxeo.connect.connector.AbstractConnectConnector.CONNECT_SERVER_REACHABLE_PROPERTY;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.nuxeo.connect.data.DownloadablePackage;
+import org.nuxeo.connect.packages.dependencies.CUDFHelper;
 import org.nuxeo.connect.packages.dependencies.DependencyResolution;
 
 /**
@@ -74,6 +83,52 @@ public class TestConflicts extends AbstractPackageManagerTestCase {
         assertEquals(0, depResolution.getLocalPackagesToRemove().size());
         assertEquals(1, depResolution.getOrderedPackageIdsToInstall().size());
         assertTrue(depResolution.getOrderedPackageIdsToInstall().contains("nuxeo-jsf-ui-9.10.0-HF01"));
+    }
+
+    // NXP-34135
+    public void testNoWarningForUnknownConflictWhenOffline() throws Exception {
+        // the installed nuxeo-9.10-HF01 conflicts with nuxeo-jsf-ui, which can only be found in the remote source
+        remoteSource.reset(List.of());
+        assertThat(getUnknownDependencyLogs(false)).containsExactly(
+                "DEBUG Unknown dependency: nuxeo-jsf-ui:9.10.0:9.10.0");
+    }
+
+    // NXP-34135
+    public void testWarningForUnknownConflictWhenOnline() throws Exception {
+        remoteSource.reset(List.of());
+        assertThat(getUnknownDependencyLogs(true)).containsExactly(
+                "WARN Unknown dependency: nuxeo-jsf-ui:9.10.0:9.10.0");
+    }
+
+    protected List<String> getUnknownDependencyLogs(boolean connectServerReachable) throws Exception {
+        List<String> logs = new ArrayList<>();
+        var appender = new AbstractAppender("TestConflicts", null, null, false, null) {
+            @Override
+            public void append(LogEvent event) {
+                String message = event.getMessage().getFormattedMessage();
+                if (message.startsWith("Unknown dependency")) {
+                    logs.add(event.getLevel() + " " + message);
+                }
+            }
+        };
+        appender.start();
+        var logger = (Logger) LogManager.getLogger(CUDFHelper.class);
+        logger.addAppender(appender);
+        String previousReachable = System.setProperty(CONNECT_SERVER_REACHABLE_PROPERTY,
+                String.valueOf(connectServerReachable));
+        try {
+            DependencyResolution depResolution = pm.resolveDependencies(List.of("nuxeo-9.10-HF01"), null, null, null);
+            assertTrue(depResolution.isValidated());
+        } finally {
+            if (previousReachable == null) {
+                System.clearProperty(CONNECT_SERVER_REACHABLE_PROPERTY);
+            } else {
+                System.setProperty(CONNECT_SERVER_REACHABLE_PROPERTY, previousReachable);
+            }
+            logger.removeAppender(appender);
+            appender.stop();
+        }
+        return logs;
     }
 
 }
