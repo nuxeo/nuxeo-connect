@@ -44,6 +44,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.equinox.p2.cudf.metadata.InstallableUnit;
 import org.eclipse.equinox.p2.cudf.solver.OptimizationFunction.Criteria;
+import org.nuxeo.connect.NuxeoConnectClient;
+import org.nuxeo.connect.connector.AbstractConnectConnector;
 import org.nuxeo.connect.data.DownloadablePackage;
 import org.nuxeo.connect.packages.PackageManager;
 import org.nuxeo.connect.platform.PlatformId;
@@ -295,9 +297,9 @@ public class CUDFHelper {
         if (involvedPackages.contains(pkg.getName())) {
             boolean isPkgInstalledOrRequiredSNAPSHOT = installedOrRequiredSNAPSHOTPackages.contains(pkg.getName());
             computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getDependencies(),
-                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT);
+                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT, false);
             computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkg.getConflicts(),
-                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT);
+                    allPackagesMap, isPkgInstalledOrRequiredSNAPSHOT, true);
             for (PackageDependency pkgDep : pkg.getProvides()) {
                 involvedPackages.add(pkgDep.getName());
             }
@@ -308,11 +310,31 @@ public class CUDFHelper {
      * Browse the given packages' "dependencies", "conflicts" and "provides" to populate the list of involved packages
      *
      * @since 1.4.18
+     * @deprecated since 1.8.7, use
+     *             {@link #computeInvolvedReferences(Set, Set, PackageDependency[], Map, boolean, boolean)} instead
      */
+    @Deprecated
     protected void computeInvolvedReferences(Set<String> involvedPackages,
             Set<String> installedOrRequiredSNAPSHOTPackages,
             PackageDependency[] pkgDeps,
             Map<String, List<DownloadablePackage>> allPackagesMap, boolean isParentInstalledOrRequiredSNAPSHOT) {
+        computeInvolvedReferences(involvedPackages, installedOrRequiredSNAPSHOTPackages, pkgDeps, allPackagesMap,
+                isParentInstalledOrRequiredSNAPSHOT, false);
+    }
+
+    /**
+     * Browse the given packages' "dependencies" or "conflicts" to populate the list of involved packages.
+     * <p>
+     * An unknown conflict is only logged at debug level in offline mode, as the conflicting packages usually come from
+     * the unreachable Connect server, and conflicting with a package that is not there is harmless.
+     *
+     * @param isConflict whether the given packages are conflicts of their parent package, or dependencies
+     * @since 1.8.7
+     */
+    protected void computeInvolvedReferences(Set<String> involvedPackages,
+            Set<String> installedOrRequiredSNAPSHOTPackages, PackageDependency[] pkgDeps,
+            Map<String, List<DownloadablePackage>> allPackagesMap, boolean isParentInstalledOrRequiredSNAPSHOT,
+            boolean isConflict) {
         for (PackageDependency pkgDep : pkgDeps) {
             if (isParentInstalledOrRequiredSNAPSHOT) {
                 // no SNAPSHOT references if parent SNAPSHOT is not installed or required
@@ -321,7 +343,11 @@ public class CUDFHelper {
             if (involvedPackages.add(pkgDep.getName())) {
                 List<DownloadablePackage> downloadablePkgDeps = allPackagesMap.get(pkgDep.getName());
                 if (downloadablePkgDeps == null) {
-                    log.warn("Unknown dependency: " + pkgDep);
+                    if (isConflict && !isConnectServerReachable()) {
+                        log.debug("Unknown dependency: " + pkgDep);
+                    } else {
+                        log.warn("Unknown dependency: " + pkgDep);
+                    }
                     continue;
                 }
                 for (DownloadablePackage downloadablePkgDep : downloadablePkgDeps) {
@@ -338,6 +364,14 @@ public class CUDFHelper {
         if (minVersion != null && minVersion.isSnapshot() && maxVersion != null && maxVersion.isSnapshot()) {
             installedOrRequiredSNAPSHOTPackages.add(pd.getName());
         }
+    }
+
+    /**
+     * @since 1.8.7
+     */
+    protected boolean isConnectServerReachable() {
+        return Boolean.parseBoolean(
+                NuxeoConnectClient.getProperty(AbstractConnectConnector.CONNECT_SERVER_REACHABLE_PROPERTY, "true"));
     }
 
     protected List<String> getInstalledSNAPSHOTPackages() {
